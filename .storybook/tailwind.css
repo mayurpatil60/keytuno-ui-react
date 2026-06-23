@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ktn-bg-default: #ffffff;
+  --ktn-bg-surface: #f8fafc;
+  --ktn-bg-muted: #f1f5f9;
+  --ktn-text-primary: #0f172a;
+  --ktn-text-secondary: #475569;
+  --ktn-border-muted: #dbe2ea;
+  --ktn-action-primary-bg: #0f766e;
+  --ktn-action-primary-fg: #ffffff;
+  --ktn-space-xs: 0.25rem;
+  --ktn-space-sm: 0.5rem;
+  --ktn-space-md: 0.75rem;
+  --ktn-space-lg: 1rem;
+  --ktn-space-xl: 1.5rem;
+  --ktn-radius-sm: 0.25rem;
+  --ktn-radius-md: 0.375rem;
+  --ktn-radius-lg: 0.5rem;
+  --ktn-radius-pill: 9999px;
+  --ktn-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.08);
+  --ktn-shadow-md: 0 6px 16px rgb(15 23 42 / 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ktn-bg-default);
+  color: var(--ktn-text-primary);
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Helvetica,
+    Arial,
+    Apple Color Emoji,
+    Segoe UI Emoji;
+}
