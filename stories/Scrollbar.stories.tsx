@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Scrollbar } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Scrollbar> = {
-  title: 'Component/Scrollbar',
+  title: 'Layout/Scrollbar',
   component: Scrollbar,
   tags: ['autodocs'],
   parameters: {

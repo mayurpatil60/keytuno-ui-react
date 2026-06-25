@@ -12,7 +12,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Sheet> = {
-  title: 'Component/Sheet',
+  title: 'Overlay/Sheet',
   component: Sheet,
   tags: ['autodocs'],
   parameters: {

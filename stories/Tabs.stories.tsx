@@ -94,7 +94,7 @@ const tabItemsWithoutIcons: TabsItem[] = tabItemsWithCardContent.map((item) => (
 }));
 
 const meta: Meta<typeof Tabs> = {
-  title: 'Component/Tabs',
+  title: 'Navigation/Tabs',
   component: Tabs,
   tags: ['autodocs'],
   parameters: {

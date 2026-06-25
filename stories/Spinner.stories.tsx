@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Spinner } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Spinner> = {
-  title: 'Component/Spinner',
+  title: 'Feedback/Spinner',
   component: Spinner,
   tags: ['autodocs'],
   parameters: {

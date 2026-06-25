@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Separator> = {
-  title: 'Component/Separator',
+  title: 'Layout/Separator',
   component: Separator,
   tags: ['autodocs'],
   parameters: {

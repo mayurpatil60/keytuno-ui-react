@@ -168,7 +168,7 @@ const tableFrameStyle: CSSProperties = {
 };
 
 const meta: Meta<TableProps<TradeRow>> = {
-  title: 'Component/Table',
+  title: 'Data/Table',
   component: Table as unknown as Meta<TableProps<TradeRow>>['component'],
   tags: ['autodocs'],
   parameters: {

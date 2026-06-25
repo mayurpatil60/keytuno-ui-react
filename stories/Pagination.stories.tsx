@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Pagination> = {
-  title: 'Component/Pagination',
+  title: 'Navigation/Pagination',
   component: Pagination,
   tags: ['autodocs'],
   parameters: {

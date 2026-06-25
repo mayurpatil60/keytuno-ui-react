@@ -4,7 +4,7 @@ import { FiEdit3, FiEye, FiSettings } from 'react-icons/fi';
 import { Button, ButtonGroup, type ButtonGroupActionContext } from '@keytuno/ui-react';
 
 const meta: Meta<typeof ButtonGroup> = {
-  title: 'Component/Button Group',
+  title: 'Actions/Button Group',
   component: ButtonGroup,
   tags: ['autodocs'],
   parameters: {

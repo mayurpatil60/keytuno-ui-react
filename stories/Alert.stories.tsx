@@ -112,7 +112,7 @@ const sideOptions: AlertSide[] = [
 const sizeOptions: AlertSize[] = ['xs', 'sm', 'md', 'lg'];
 
 const meta: Meta<typeof Alert> = {
-  title: 'Component/Alert',
+  title: 'Feedback/Alert',
   component: Alert,
   tags: ['autodocs'],
   parameters: {

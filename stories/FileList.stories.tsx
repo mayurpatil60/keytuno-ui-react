@@ -66,7 +66,7 @@ const demoFiles: FileListItem[] = [
 ];
 
 const meta: Meta<FileListProps> = {
-  title: 'Component/FileList',
+  title: 'Data/FileList',
   component: FileList,
   tags: ['autodocs'],
   parameters: {

@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Card> = {
-  title: 'Component/Card',
+  title: 'Data/Card',
   component: Card,
   tags: ['autodocs'],
   parameters: {

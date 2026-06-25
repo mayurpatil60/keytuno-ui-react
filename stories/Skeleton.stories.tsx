@@ -16,7 +16,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Skeleton> = {
-  title: 'Component/Skeleton',
+  title: 'Feedback/Skeleton',
   component: Skeleton,
   tags: ['autodocs'],
   parameters: {

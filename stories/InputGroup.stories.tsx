@@ -17,7 +17,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof InputGroup> = {
-  title: 'Component/InputGroup',
+  title: 'Forms/InputGroup',
   component: InputGroup,
   tags: ['autodocs'],
   parameters: {

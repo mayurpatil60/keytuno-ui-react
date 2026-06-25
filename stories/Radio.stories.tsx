@@ -14,7 +14,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Radio> = {
-  title: 'Component/Radio',
+  title: 'Forms/Radio',
   component: Radio,
   tags: ['autodocs'],
   parameters: {

@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof DatePicker> = {
-  title: 'Component/DatePicker',
+  title: 'Forms/DatePicker',
   component: DatePicker,
   tags: ['autodocs'],
   parameters: {

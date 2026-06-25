@@ -56,7 +56,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof DropdownMenu> = {
-  title: 'Component/Dropdown Menu',
+  title: 'Navigation/Dropdown Menu',
   component: DropdownMenu,
   tags: ['autodocs'],
   parameters: {

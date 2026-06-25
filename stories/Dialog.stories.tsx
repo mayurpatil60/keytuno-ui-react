@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Dialog> = {
-  title: 'Component/Dialog',
+  title: 'Overlay/Dialog',
   component: Dialog,
   tags: ['autodocs'],
   parameters: {

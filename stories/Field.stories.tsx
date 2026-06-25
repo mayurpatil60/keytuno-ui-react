@@ -19,7 +19,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Field> = {
-  title: 'Component/Field',
+  title: 'Forms/Field',
   component: Field,
   tags: ['autodocs'],
   parameters: {

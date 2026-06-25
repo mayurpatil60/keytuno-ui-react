@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Checkbox, type CheckboxActionContext } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Checkbox> = {
-  title: 'Component/Checkbox',
+  title: 'Forms/Checkbox',
   component: Checkbox,
   tags: ['autodocs'],
   parameters: {

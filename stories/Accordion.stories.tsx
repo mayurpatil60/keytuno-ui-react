@@ -55,7 +55,7 @@ const demoItemsWithActions = [
 ];
 
 const meta: Meta<typeof Accordion> = {
-  title: 'Component/Accordion',
+  title: 'Data/Accordion',
   component: Accordion,
   tags: ['autodocs'],
   parameters: {

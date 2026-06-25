@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Tooltip> = {
-  title: 'Component/Tooltip',
+  title: 'Feedback/Tooltip',
   component: Tooltip,
   tags: ['autodocs'],
   parameters: {

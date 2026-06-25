@@ -12,7 +12,7 @@ import {
 } from "@keytuno/ui-react";
 
 const meta: Meta = {
-  title: "Theme/Overview",
+  title: "Themes/Overview",
   tags: ["autodocs"],
   parameters: {
     layout: "centered",

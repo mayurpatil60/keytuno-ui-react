@@ -4,7 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { Badge } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Badge> = {
-  title: 'Component/Badge',
+  title: 'Feedback/Badge',
   component: Badge,
   tags: ['autodocs'],
   parameters: {

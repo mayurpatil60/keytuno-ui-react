@@ -13,7 +13,7 @@ import {
 import { Button, Spinner } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Button> = {
-  title: 'Component/Button',
+  title: 'Actions/Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {

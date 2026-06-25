@@ -14,7 +14,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Select> = {
-  title: 'Component/Select',
+  title: 'Forms/Select',
   component: Select,
   tags: ['autodocs'],
   parameters: {

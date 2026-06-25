@@ -5,7 +5,7 @@ import { FiChevronRight } from 'react-icons/fi';
 import { Breadcrumb, type BreadcrumbActionContext, type BreadcrumbItem } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Breadcrumb> = {
-  title: 'Component/Breadcrumb',
+  title: 'Navigation/Breadcrumb',
   component: Breadcrumb,
   tags: ['autodocs'],
   parameters: {

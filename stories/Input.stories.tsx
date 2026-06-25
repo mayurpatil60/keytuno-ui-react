@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Input> = {
-  title: 'Component/Input',
+  title: 'Forms/Input',
   component: Input,
   tags: ['autodocs'],
   parameters: {

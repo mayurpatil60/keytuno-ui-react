@@ -14,7 +14,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Switch> = {
-  title: 'Component/Switch',
+  title: 'Actions/Switch',
   component: Switch,
   tags: ['autodocs'],
   parameters: {

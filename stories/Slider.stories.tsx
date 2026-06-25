@@ -13,7 +13,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Slider> = {
-  title: 'Component/Slider',
+  title: 'Forms/Slider',
   component: Slider,
   tags: ['autodocs'],
   parameters: {

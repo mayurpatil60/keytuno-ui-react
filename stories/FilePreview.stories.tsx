@@ -13,7 +13,7 @@ const sampleXlsx = 'https://github.com/SheetJS/test_files/raw/master/xlsx/number
 const sampleFile = 'https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore';
 
 const meta: Meta<typeof FilePreview> = {
-  title: 'Component/FilePreview',
+  title: 'Data/FilePreview',
   component: FilePreview,
   tags: ['autodocs'],
   parameters: {

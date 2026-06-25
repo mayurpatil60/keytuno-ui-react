@@ -11,7 +11,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<FileUploadProps> = {
-  title: 'Component/FileUpload',
+  title: 'Forms/FileUpload',
   component: FileUpload,
   tags: ['autodocs'],
   parameters: {

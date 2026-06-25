@@ -12,7 +12,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Textarea> = {
-  title: 'Component/Textarea',
+  title: 'Forms/Textarea',
   component: Textarea,
   tags: ['autodocs'],
   parameters: {

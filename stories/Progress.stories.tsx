@@ -14,7 +14,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Progress> = {
-  title: 'Component/Progress',
+  title: 'Feedback/Progress',
   component: Progress,
   tags: ['autodocs'],
   parameters: {

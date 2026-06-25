@@ -12,7 +12,7 @@ import {
 } from '@keytuno/ui-react';
 
 const meta: Meta<typeof Toggle> = {
-  title: 'Component/Toggle',
+  title: 'Actions/Toggle',
   component: Toggle,
   tags: ['autodocs'],
   parameters: {
