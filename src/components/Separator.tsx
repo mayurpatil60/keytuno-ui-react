@@ -1,8 +1,13 @@
-import { type CSSProperties, type FocusEvent, type HTMLAttributes, type MouseEvent } from 'react';
+import {
+  type CSSProperties,
+  type FocusEvent,
+  type HTMLAttributes,
+  type MouseEvent,
+} from "react";
 
-export type SeparatorSize = 'xs' | 'sm' | 'md' | 'lg';
-export type SeparatorOrientation = 'horizontal' | 'vertical';
-export type SeparatorActionSource = 'click' | 'focus' | 'blur';
+export type SeparatorSize = "xs" | "sm" | "md" | "lg";
+export type SeparatorOrientation = "horizontal" | "vertical";
+export type SeparatorActionSource = "click" | "focus" | "blur";
 
 export interface SeparatorActionContext {
   source: SeparatorActionSource;
@@ -22,35 +27,41 @@ export interface SeparatorProps extends HTMLAttributes<HTMLDivElement> {
 type SeparatorSizeTokens = {
   thickness: string;
   minLength: string;
+  /** Default height for a vertical separator so it centres naturally in flex rows. */
+  length: string;
 };
 
 const sizeTokens: Record<SeparatorSize, SeparatorSizeTokens> = {
   xs: {
-    thickness: '1px',
-    minLength: '0.9rem',
+    thickness: "1px",
+    minLength: "0.9rem",
+    length: "1rem",
   },
   sm: {
-    thickness: '1.5px',
-    minLength: '1.1rem',
+    thickness: "1.5px",
+    minLength: "1.1rem",
+    length: "1.25rem",
   },
   md: {
-    thickness: '2px',
-    minLength: '1.35rem',
+    thickness: "2px",
+    minLength: "1.35rem",
+    length: "1.5rem",
   },
   lg: {
-    thickness: '3px',
-    minLength: '1.7rem',
+    thickness: "3px",
+    minLength: "1.7rem",
+    length: "1.8rem",
   },
 };
 
-const baseClasses = 'shrink-0';
+const baseClasses = "shrink-0";
 
 export function Separator({
-  size = 'md',
-  orientation = 'horizontal',
+  size = "md",
+  orientation = "horizontal",
   decorative = true,
   onAction,
-  className = '',
+  className = "",
   style,
   onClick,
   onFocus,
@@ -60,19 +71,20 @@ export function Separator({
   const tokens = sizeTokens[size];
 
   const separatorStyle: CSSProperties = {
-    borderRadius: '999px',
-    backgroundColor: 'var(--ktn-border-muted)',
+    borderRadius: "999px",
+    backgroundColor: "var(--ktn-border-muted)",
     flexShrink: 0,
-    ...(orientation === 'vertical'
+    ...(orientation === "vertical"
       ? {
           width: tokens.thickness,
           minWidth: tokens.thickness,
-          height: '100%',
+          height: tokens.length,
           minHeight: tokens.minLength,
-          alignSelf: 'stretch',
+          alignSelf: "center" as const,
         }
       : {
-          width: '100%',
+          width: "100%",
+          minWidth: tokens.minLength,
           height: tokens.thickness,
           minHeight: tokens.thickness,
         }),
@@ -93,7 +105,7 @@ export function Separator({
     onClick?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('click', event);
+      emitAction("click", event);
     }
   }
 
@@ -101,7 +113,7 @@ export function Separator({
     onFocus?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('focus', event);
+      emitAction("focus", event);
     }
   }
 
@@ -109,13 +121,13 @@ export function Separator({
     onBlur?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('blur', event);
+      emitAction("blur", event);
     }
   }
 
   return (
     <div
-      role={decorative ? 'presentation' : 'separator'}
+      role={decorative ? "presentation" : "separator"}
       aria-orientation={decorative ? undefined : orientation}
       aria-hidden={decorative ? true : undefined}
       className={`${baseClasses} ${className}`.trim()}

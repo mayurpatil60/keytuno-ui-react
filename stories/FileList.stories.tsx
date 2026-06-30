@@ -1,5 +1,5 @@
-import { useState, type CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import { useState, type CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   FileList,
@@ -9,68 +9,140 @@ import {
   FieldLabel,
   type FileListItem,
   type FileListProps,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
 
 const sampleImage =
-  'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&h=1000&fit=crop';
-const sampleVideo = 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4';
-const sampleAudio = 'https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3';
-const sampleCsv = 'https://raw.githubusercontent.com/cs109/2014_data/master/countries.csv';
-const sampleXlsx = 'https://github.com/SheetJS/test_files/raw/master/xlsx/number_format.xlsx';
+  "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1600&h=1000&fit=crop";
+const sampleVideo =
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4";
+const sampleAudio =
+  "https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3";
+const sampleCsv =
+  "https://raw.githubusercontent.com/cs109/2014_data/master/countries.csv";
+const sampleXlsx =
+  "https://github.com/SheetJS/test_files/raw/master/xlsx/number_format.xlsx";
 
 const demoFiles: FileListItem[] = [
   {
-    id: 'img-1',
-    name: 'Mountain-Lake-Cover.jpg',
+    id: "img-1",
+    name: "Mountain-Lake-Cover.jpg",
     src: sampleImage,
-    type: 'image',
+    type: "image",
     sizeBytes: 2_354_120,
     width: 1600,
     height: 1000,
-    mimeType: 'image/jpeg',
-    description: 'Hero cover image used in the campaign tile.',
+    mimeType: "image/jpeg",
+    description: "Hero cover image used in the campaign tile.",
   },
   {
-    id: 'vid-1',
-    name: 'Flower-Motion.mp4',
+    id: "vid-1",
+    name: "Flower-Motion.mp4",
     src: sampleVideo,
-    type: 'video',
+    type: "video",
     sizeBytes: 4_712_220,
-    mimeType: 'video/mp4',
-    description: 'Short looping background video clip.',
+    mimeType: "video/mp4",
+    description: "Short looping background video clip.",
   },
   {
-    id: 'audio-1',
-    name: 'Alert-Sound.mp3',
+    id: "audio-1",
+    name: "Alert-Sound.mp3",
     src: sampleAudio,
-    type: 'audio',
+    type: "audio",
     sizeBytes: 1_032_201,
-    mimeType: 'audio/mpeg',
+    mimeType: "audio/mpeg",
   },
   {
-    id: 'csv-1',
-    name: 'Countries.csv',
+    id: "csv-1",
+    name: "Countries.csv",
     src: sampleCsv,
-    type: 'auto',
+    type: "auto",
     sizeBytes: 84_021,
-    mimeType: 'text/csv',
+    mimeType: "text/csv",
   },
   {
-    id: 'xlsx-1',
-    name: 'NumberFormat.xlsx',
+    id: "xlsx-1",
+    name: "NumberFormat.xlsx",
     src: sampleXlsx,
-    type: 'auto',
+    type: "auto",
     sizeBytes: 153_640,
-    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    mimeType:
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   },
 ];
 
+const largeDemoFiles: FileListItem[] = Array.from(
+  { length: 1200 },
+  (_, index) => {
+    const id = index + 1;
+    const kind = index % 5;
+
+    if (kind === 0) {
+      return {
+        id: `large-img-${id}`,
+        name: `Campaign-Image-${String(id).padStart(4, "0")}.jpg`,
+        src: sampleImage,
+        type: "image",
+        width: 1600,
+        height: 1000,
+        sizeBytes: 1_900_000 + id * 10,
+        mimeType: "image/jpeg",
+        description: id % 9 === 0 ? `Large image asset #${id}` : undefined,
+      };
+    }
+
+    if (kind === 1) {
+      return {
+        id: `large-video-${id}`,
+        name: `Promo-Video-${String(id).padStart(4, "0")}.mp4`,
+        src: sampleVideo,
+        type: "video",
+        sizeBytes: 4_500_000 + id * 17,
+        mimeType: "video/mp4",
+        description:
+          id % 11 === 0 ? `Auto-generated video row ${id}` : undefined,
+      };
+    }
+
+    if (kind === 2) {
+      return {
+        id: `large-audio-${id}`,
+        name: `Alert-Tone-${String(id).padStart(4, "0")}.mp3`,
+        src: sampleAudio,
+        type: "audio",
+        sizeBytes: 1_000_000 + id * 13,
+        mimeType: "audio/mpeg",
+      };
+    }
+
+    if (kind === 3) {
+      return {
+        id: `large-csv-${id}`,
+        name: `Metrics-${String(id).padStart(4, "0")}.csv`,
+        src: sampleCsv,
+        type: "auto",
+        sizeBytes: 80_000 + id * 7,
+        mimeType: "text/csv",
+      };
+    }
+
+    return {
+      id: `large-xlsx-${id}`,
+      name: `Report-${String(id).padStart(4, "0")}.xlsx`,
+      src: sampleXlsx,
+      type: "auto",
+      sizeBytes: 150_000 + id * 9,
+      mimeType:
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    };
+  },
+);
+
 const meta: Meta<FileListProps> = {
-  title: 'Data/FileList',
+  title: "Data/FileList",
   component: FileList,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'padded',
+    layout: "padded",
   },
 };
 
@@ -78,20 +150,21 @@ export default meta;
 
 type Story = StoryObj<FileListProps>;
 type FileListPlaygroundArgs = FileListProps & {
+  dataset: "default" | "large";
   showHeroDescription: boolean;
   heroDescription: string;
 };
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: '100%',
-  maxWidth: '1080px',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "100%",
+  maxWidth: "1080px",
 };
 
 const frameStyle: CSSProperties = {
-  width: '100%',
+  width: "100%",
 };
 
 function RemovableListDemo({
@@ -99,8 +172,8 @@ function RemovableListDemo({
   variant,
   disabled,
 }: {
-  size: FileListProps['size'];
-  variant: FileListProps['variant'];
+  size: FileListProps["size"];
+  variant: FileListProps["variant"];
   disabled: boolean;
 }): JSX.Element {
   const [files, setFiles] = useState<FileListItem[]>(demoFiles);
@@ -113,7 +186,9 @@ function RemovableListDemo({
         variant={variant}
         disabled={disabled}
         onRemove={(fileToRemove) => {
-          setFiles((current) => current.filter((file) => file.id !== fileToRemove.id));
+          setFiles((current) =>
+            current.filter((file) => file.id !== fileToRemove.id),
+          );
         }}
         emptyText="All files removed."
       />
@@ -122,7 +197,7 @@ function RemovableListDemo({
 }
 
 export const BasicDetailed: Story = {
-  name: 'Basic Detailed',
+  name: "Basic Detailed",
   render: () => (
     <div style={stackStyle}>
       <Field style={frameStyle}>
@@ -132,8 +207,9 @@ export const BasicDetailed: Story = {
           <FileList files={demoFiles} variant="detailed" size="md" />
 
           <FieldDescription>
-            Shows a thumbnail-style box for every file, image previews for image files, file icons
-            for non-image files, and both the thumbnail/icon box and filename as preview links.
+            Shows a thumbnail-style box for every file, image previews for image
+            files, file icons for non-image files, and both the thumbnail/icon
+            box and filename as preview links.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -151,8 +227,8 @@ export const Variants: Story = {
           <FileList files={demoFiles} variant="compact" size="sm" />
 
           <FieldDescription>
-            Compact mode renders inline filename chips as preview links, with optional remove
-            actions.
+            Compact mode renders inline filename chips as preview links, with
+            optional remove actions.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -172,8 +248,8 @@ export const Variants: Story = {
           <FileList files={demoFiles} variant="advanced" size="md" />
 
           <FieldDescription>
-            Advanced mode includes the same thumbnail/icon box plus exact byte count and mime/type
-            information.
+            Advanced mode includes the same thumbnail/icon box plus exact byte
+            count and mime/type information.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -182,7 +258,7 @@ export const Variants: Story = {
 };
 
 export const SizesAndDisabled: Story = {
-  name: 'Sizes and Disabled',
+  name: "Sizes and Disabled",
   render: () => (
     <div style={stackStyle}>
       <Field style={frameStyle}>
@@ -221,7 +297,12 @@ export const SizesAndDisabled: Story = {
         <FieldLabel>Disabled</FieldLabel>
 
         <FieldContent>
-          <FileList files={demoFiles.slice(0, 3)} variant="detailed" size="md" disabled />
+          <FileList
+            files={demoFiles.slice(0, 3)}
+            variant="detailed"
+            size="md"
+            disabled
+          />
 
           <FieldDescription>
             Disabled mode blocks remove actions and file preview interactions.
@@ -233,7 +314,7 @@ export const SizesAndDisabled: Story = {
 };
 
 export const RemovableList: Story = {
-  name: 'Removable List',
+  name: "Removable List",
   render: () => (
     <div style={stackStyle}>
       <Field style={frameStyle}>
@@ -242,7 +323,57 @@ export const RemovableList: Story = {
         <FieldContent>
           <RemovableListDemo size="md" variant="detailed" disabled={false} />
 
-          <FieldDescription>Rounded compact trash action removes each file row.</FieldDescription>
+          <FieldDescription>
+            Rounded compact trash action removes each file row.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
+export const VirtualizedLargeDataset: Story = {
+  name: "Virtualized Large Dataset",
+  render: () => (
+    <div style={stackStyle}>
+      <Field style={frameStyle}>
+        <FieldLabel>Large File List (Virtualized)</FieldLabel>
+
+        <FieldContent>
+          <FileList
+            files={largeDemoFiles}
+            variant="detailed"
+            size="md"
+            virtualized
+            virtualizedMaxHeight="24rem"
+            virtualizedEstimateSize={84}
+            virtualizedOverscan={10}
+            showRemoveAction={false}
+          />
+
+          <FieldDescription>
+            Uses TanStack Virtual so only visible rows are mounted for a
+            1200-item list.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Compact Fallback</FieldLabel>
+
+        <FieldContent>
+          <FileList
+            files={demoFiles}
+            variant="compact"
+            size="sm"
+            virtualized
+            virtualizedMaxHeight="24rem"
+          />
+
+          <FieldDescription>
+            Compact variant intentionally keeps standard chip rendering even
+            when virtualized=true.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -250,52 +381,75 @@ export const RemovableList: Story = {
 };
 
 export const FileListPlayground: StoryObj<FileListPlaygroundArgs> = {
-  name: 'FileList Playground',
+  name: "FileList Playground",
   args: {
-    variant: 'detailed',
-    size: 'md',
+    dataset: "default",
+    variant: "detailed",
+    size: "md",
     disabled: false,
     showRemoveAction: true,
     showSize: true,
     showDimensions: true,
     showMimeType: true,
     showBytes: true,
-    emptyText: 'No files available.',
+    virtualized: false,
+    virtualizedMaxHeight: "24rem",
+    virtualizedEstimateSize: 84,
+    virtualizedOverscan: 8,
+    emptyText: "No files available.",
     compactChipProps: {
-      variant: 'secondary',
-      size: 'sm',
+      variant: "secondary",
+      size: "sm",
     },
     showHeroDescription: true,
-    heroDescription: 'Hero cover image used in the campaign tile.',
+    heroDescription: "Hero cover image used in the campaign tile.",
   },
   argTypes: {
+    dataset: {
+      control: "inline-radio",
+      options: ["default", "large"],
+    },
     variant: {
-      control: 'select',
-      options: ['compact', 'detailed', 'advanced'],
+      control: "select",
+      options: ["compact", "detailed", "advanced"],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    showRemoveAction: { control: 'boolean' },
-    showSize: { control: 'boolean' },
-    showDimensions: { control: 'boolean' },
-    showMimeType: { control: 'boolean' },
-    showBytes: { control: 'boolean' },
-    emptyText: { control: 'text' },
-    compactChipProps: {
-      control: 'object',
+    disabled: { control: "boolean" },
+    showRemoveAction: { control: "boolean" },
+    showSize: { control: "boolean" },
+    showDimensions: { control: "boolean" },
+    showMimeType: { control: "boolean" },
+    showBytes: { control: "boolean" },
+    virtualized: { control: "boolean" },
+    virtualizedMaxHeight: {
+      control: "text",
+      description: "Viewport max height when virtualization is enabled.",
+    },
+    virtualizedEstimateSize: {
+      control: { type: "number", min: 20, max: 220, step: 1 },
       description:
-        'Configures compact chips. You can set badge variant/size/style/className and span attributes.',
+        "Estimated row height in pixels for virtualized detailed/advanced lists.",
+    },
+    virtualizedOverscan: {
+      control: { type: "number", min: 1, max: 40, step: 1 },
+      description: "Extra rows rendered above/below viewport in virtual mode.",
+    },
+    emptyText: { control: "text" },
+    compactChipProps: {
+      control: "object",
+      description:
+        "Configures compact chips. You can set badge variant/size/style/className and span attributes.",
     },
     showHeroDescription: {
-      control: 'boolean',
-      description: 'Toggle description for the hero cover image item.',
+      control: "boolean",
+      description: "Toggle description for the hero cover image item.",
     },
     heroDescription: {
-      control: 'text',
-      description: 'Editable description text for the hero cover image item.',
+      control: "text",
+      description: "Editable description text for the hero cover image item.",
     },
     files: { table: { disable: true } },
     onRemove: { table: { disable: true } },
@@ -303,23 +457,50 @@ export const FileListPlayground: StoryObj<FileListPlaygroundArgs> = {
     style: { table: { disable: true } },
   },
   render: (args) => {
+    const dataset = args.dataset ?? "default";
     const normalizedEmptyText =
-      typeof args.emptyText === 'string' && args.emptyText.trim() !== ''
+      typeof args.emptyText === "string" && args.emptyText.trim() !== ""
         ? args.emptyText
-        : 'No files available.';
+        : "No files available.";
+
+    const virtualizedMaxHeight =
+      typeof args.virtualizedMaxHeight === "number"
+        ? args.virtualizedMaxHeight
+        : typeof args.virtualizedMaxHeight === "string" &&
+            args.virtualizedMaxHeight.trim() !== ""
+          ? args.virtualizedMaxHeight
+          : "24rem";
+
+    const virtualizedEstimateSize =
+      typeof args.virtualizedEstimateSize === "number" &&
+      Number.isFinite(args.virtualizedEstimateSize) &&
+      args.virtualizedEstimateSize > 0
+        ? args.virtualizedEstimateSize
+        : undefined;
+
+    const virtualizedOverscan =
+      typeof args.virtualizedOverscan === "number" &&
+      Number.isFinite(args.virtualizedOverscan) &&
+      args.virtualizedOverscan > 0
+        ? Math.round(args.virtualizedOverscan)
+        : 8;
 
     const normalizedHeroDescription =
-      typeof args.heroDescription === 'string' ? args.heroDescription.trim() : '';
+      typeof args.heroDescription === "string"
+        ? args.heroDescription.trim()
+        : "";
 
-    const playgroundFiles = demoFiles.map((file) => {
-      if (file.id !== 'img-1') {
+    const sourceFiles = dataset === "large" ? largeDemoFiles : demoFiles;
+
+    const playgroundFiles = sourceFiles.map((file) => {
+      if (dataset !== "default" || file.id !== "img-1") {
         return file;
       }
 
       return {
         ...file,
         description:
-          args.showHeroDescription && normalizedHeroDescription !== ''
+          args.showHeroDescription && normalizedHeroDescription !== ""
             ? normalizedHeroDescription
             : undefined,
       };
@@ -327,7 +508,7 @@ export const FileListPlayground: StoryObj<FileListPlaygroundArgs> = {
 
     return (
       <FileList
-        key={`${args.variant}-${args.size}-${args.disabled}-${args.showRemoveAction}-${args.showBytes}-${args.showHeroDescription}-${normalizedHeroDescription}`}
+        key={`${dataset}-${args.variant}-${args.size}-${args.disabled}-${args.showRemoveAction}-${args.showBytes}-${args.virtualized}-${args.virtualizedEstimateSize}-${args.virtualizedOverscan}-${args.showHeroDescription}-${normalizedHeroDescription}`}
         files={playgroundFiles}
         variant={args.variant}
         size={args.size}
@@ -337,6 +518,10 @@ export const FileListPlayground: StoryObj<FileListPlaygroundArgs> = {
         showDimensions={args.showDimensions}
         showMimeType={args.showMimeType}
         showBytes={args.showBytes}
+        virtualized={args.virtualized}
+        virtualizedMaxHeight={virtualizedMaxHeight}
+        virtualizedEstimateSize={virtualizedEstimateSize}
+        virtualizedOverscan={virtualizedOverscan}
         compactChipProps={args.compactChipProps}
         emptyText={normalizedEmptyText}
       />

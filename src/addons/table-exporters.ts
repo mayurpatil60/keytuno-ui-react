@@ -51,8 +51,7 @@ export const exportTableAsXlsx: TableExportHandler = async ({
   rows,
   fileNameBase,
 }): Promise<void> => {
-  const xlsxSpecifier = "xlsx";
-  const xlsxModule = (await import(xlsxSpecifier)) as XlsxLikeModule;
+  const xlsxModule = (await import("xlsx")) as XlsxLikeModule;
   const records = toSheetRows(rows);
   const worksheet = xlsxModule.utils.json_to_sheet(records);
   const workbook = xlsxModule.utils.book_new();
@@ -65,12 +64,9 @@ export const exportTableAsPdf: TableExportHandler = async ({
   rows,
   fileNameBase,
 }): Promise<void> => {
-  const jspdfSpecifier = "jspdf";
-  const autoTableSpecifier = "jspdf-autotable";
-
   const [{ jsPDF }, autoTableModule] = (await Promise.all([
-    import(jspdfSpecifier),
-    import(autoTableSpecifier),
+    import("jspdf"),
+    import("jspdf-autotable"),
   ])) as [JsPdfLikeModule, AutoTableLikeModule];
 
   const doc = new jsPDF({ orientation: "landscape" });

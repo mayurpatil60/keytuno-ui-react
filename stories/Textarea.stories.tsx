@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   Field,
@@ -9,14 +9,14 @@ import {
   FieldGroup,
   FieldLabel,
   Textarea,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
 
 const meta: Meta<typeof Textarea> = {
-  title: 'Forms/Textarea',
+  title: "Forms/Textarea",
   component: Textarea,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -25,14 +25,14 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(860px, 92vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(860px, 92vw)",
 };
 
 const frameStyle: CSSProperties = {
-  width: 'min(560px, 92vw)',
+  width: "min(560px, 92vw)",
 };
 
 export const Basic: Story = {
@@ -49,7 +49,9 @@ export const Basic: Story = {
             placeholder="Write your strategy notes here"
             defaultValue="Watch breakout confirmation near day-high."
           />
-          <FieldDescription>Use textarea for multi-line user input.</FieldDescription>
+          <FieldDescription>
+            Use textarea for multi-line user input.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -66,7 +68,11 @@ export const Sizes: Story = {
           <FieldLabel htmlFor="textarea-size-xs">Extra Small</FieldLabel>
 
           <FieldContent>
-            <Textarea id="textarea-size-xs" size="xs" placeholder="XS textarea" />
+            <Textarea
+              id="textarea-size-xs"
+              size="xs"
+              placeholder="XS textarea"
+            />
           </FieldContent>
         </Field>
 
@@ -74,7 +80,11 @@ export const Sizes: Story = {
           <FieldLabel htmlFor="textarea-size-sm">Small</FieldLabel>
 
           <FieldContent>
-            <Textarea id="textarea-size-sm" size="sm" placeholder="SM textarea" />
+            <Textarea
+              id="textarea-size-sm"
+              size="sm"
+              placeholder="SM textarea"
+            />
           </FieldContent>
         </Field>
 
@@ -82,7 +92,11 @@ export const Sizes: Story = {
           <FieldLabel htmlFor="textarea-size-md">Medium</FieldLabel>
 
           <FieldContent>
-            <Textarea id="textarea-size-md" size="md" placeholder="MD textarea" />
+            <Textarea
+              id="textarea-size-md"
+              size="md"
+              placeholder="MD textarea"
+            />
           </FieldContent>
         </Field>
 
@@ -90,7 +104,11 @@ export const Sizes: Story = {
           <FieldLabel htmlFor="textarea-size-lg">Large</FieldLabel>
 
           <FieldContent>
-            <Textarea id="textarea-size-lg" size="lg" placeholder="LG textarea" />
+            <Textarea
+              id="textarea-size-lg"
+              size="lg"
+              placeholder="LG textarea"
+            />
           </FieldContent>
         </Field>
       </FieldGroup>
@@ -112,7 +130,9 @@ export const Disabled: Story = {
             disabled
             defaultValue="This profile is synced from organization settings."
           />
-          <FieldDescription>Textarea is read-only when disabled.</FieldDescription>
+          <FieldDescription>
+            Textarea is read-only when disabled.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -124,12 +144,13 @@ export const Invalid: Story = {
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Invalid</h3>
 
-      <Field invalid style={frameStyle}>
+      <Field invalid required style={frameStyle}>
         <FieldLabel htmlFor="textarea-invalid-comment">Comment</FieldLabel>
 
         <FieldContent>
           <Textarea
             id="textarea-invalid-comment"
+            required
             invalid
             placeholder="Enter at least 20 characters"
             defaultValue="Too short"
@@ -142,31 +163,33 @@ export const Invalid: Story = {
 };
 
 export const TextareaPlayground: Story = {
-  name: 'Textarea Playground',
+  name: "Textarea Playground",
   args: {
-    size: 'md',
+    size: "md",
     disabled: false,
+    required: false,
     invalid: false,
     rows: 4,
-    placeholder: 'Write details here...',
+    placeholder: "Write details here...",
     withAction: false,
   },
   argTypes: {
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    invalid: { control: 'boolean' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    invalid: { control: "boolean" },
     rows: {
-      control: 'number',
+      control: "number",
     },
-    placeholder: { control: 'text' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onChange: { action: 'change' },
-    onFocus: { action: 'focus' },
-    onBlur: { action: 'blur' },
+    placeholder: { control: "text" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onChange: { action: "change" },
+    onFocus: { action: "focus" },
+    onBlur: { action: "blur" },
     value: { table: { disable: true } },
     defaultValue: { table: { disable: true } },
     className: { table: { disable: true } },
@@ -176,15 +199,21 @@ export const TextareaPlayground: Story = {
     const withAction = args.withAction ?? false;
 
     return (
-      <Field invalid={args.invalid} disabled={args.disabled} style={frameStyle}>
+      <Field
+        invalid={args.invalid}
+        required={args.required}
+        disabled={args.disabled}
+        style={frameStyle}
+      >
         <FieldLabel htmlFor="textarea-playground">Playground</FieldLabel>
 
         <FieldContent>
           <Textarea
             id="textarea-playground"
-            key={`${args.size}-${args.disabled}-${args.invalid}-${args.rows}-${withAction}`}
+            key={`${args.size}-${args.disabled}-${args.required}-${args.invalid}-${args.rows}-${withAction}`}
             size={args.size}
             disabled={args.disabled}
+            required={args.required}
             invalid={args.invalid}
             rows={args.rows}
             placeholder={args.placeholder}
@@ -197,7 +226,9 @@ export const TextareaPlayground: Story = {
           {args.invalid ? (
             <FieldError>Textarea content is invalid.</FieldError>
           ) : (
-            <FieldDescription>Use controls to test textarea size and states.</FieldDescription>
+            <FieldDescription>
+              Use controls to test textarea size and states.
+            </FieldDescription>
           )}
         </FieldContent>
       </Field>

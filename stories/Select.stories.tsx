@@ -1,5 +1,5 @@
-﻿import { useState, type CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+﻿import { useState, type CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   Select,
@@ -11,14 +11,14 @@ import {
   type SelectGroup,
   type SelectOption,
   type SelectValue,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
 
 const meta: Meta<typeof Select> = {
-  title: 'Forms/Select',
+  title: "Forms/Select",
   component: Select,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -27,65 +27,65 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(860px, 92vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(860px, 92vw)",
 };
 
 const frameStyle: CSSProperties = {
-  width: 'min(560px, 92vw)',
+  width: "min(560px, 92vw)",
 };
 
 const frameworkOptions: SelectOption[] = [
-  { value: 'nextjs', label: 'Next.js', keywords: ['react', 'ssr'] },
-  { value: 'react', label: 'React', keywords: ['spa', 'ui'] },
-  { value: 'svelte', label: 'SvelteKit', keywords: ['svelte'] },
-  { value: 'nuxt', label: 'Nuxt', keywords: ['vue'] },
-  { value: 'astro', label: 'Astro', keywords: ['content', 'islands'] },
+  { value: "nextjs", label: "Next.js", keywords: ["react", "ssr"] },
+  { value: "react", label: "React", keywords: ["spa", "ui"] },
+  { value: "svelte", label: "SvelteKit", keywords: ["svelte"] },
+  { value: "nuxt", label: "Nuxt", keywords: ["vue"] },
+  { value: "astro", label: "Astro", keywords: ["content", "islands"] },
 ];
 
 const groupedItems: SelectGroup[] = [
   {
-    label: 'Popular',
+    label: "Popular",
     options: [
-      { value: 'banknifty', label: 'BANKNIFTY' },
-      { value: 'nifty50', label: 'NIFTY 50' },
+      { value: "banknifty", label: "BANKNIFTY" },
+      { value: "nifty50", label: "NIFTY 50" },
     ],
   },
   {
-    label: 'Sector',
+    label: "Sector",
     options: [
-      { value: 'finnifty', label: 'FINNIFTY' },
-      { value: 'itnifty', label: 'NIFTY IT' },
-      { value: 'autonifty', label: 'NIFTY AUTO' },
+      { value: "finnifty", label: "FINNIFTY" },
+      { value: "itnifty", label: "NIFTY IT" },
+      { value: "autonifty", label: "NIFTY AUTO" },
     ],
   },
 ];
 
 const customItems: SelectOption[] = [
   {
-    value: 'pro',
-    label: 'Pro Plan',
-    description: 'Advanced analytics and priority alerts',
+    value: "pro",
+    label: "Pro Plan",
+    description: "Advanced analytics and priority alerts",
   },
   {
-    value: 'growth',
-    label: 'Growth Plan',
-    description: 'Portfolio tracking and strategy templates',
+    value: "growth",
+    label: "Growth Plan",
+    description: "Portfolio tracking and strategy templates",
   },
   {
-    value: 'starter',
-    label: 'Starter Plan',
-    description: 'Essential watchlist and order management',
+    value: "starter",
+    label: "Starter Plan",
+    description: "Essential watchlist and order management",
   },
 ];
 
 function MultipleDemo(): JSX.Element {
-  const [value, setValue] = useState<SelectValue>(['nextjs', 'react']);
+  const [value, setValue] = useState<SelectValue>(["nextjs", "react"]);
 
   return (
-    <div style={{ ...stackStyle, gap: '0.6rem' }}>
+    <div style={{ ...stackStyle, gap: "0.6rem" }}>
       <Field style={frameStyle}>
         <FieldLabel>Frameworks</FieldLabel>
 
@@ -97,11 +97,14 @@ function MultipleDemo(): JSX.Element {
             value={value}
             onValueChange={setValue}
             placeholder="Select frameworks"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
 
           <FieldDescription>
-            Selected: {Array.isArray(value) && value.length > 0 ? value.join(', ') : 'none'}
+            Selected:{" "}
+            {Array.isArray(value) && value.length > 0
+              ? value.join(", ")
+              : "none"}
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -121,9 +124,11 @@ export const Basic: Story = {
           <Select
             options={frameworkOptions}
             placeholder="Select framework"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
-          <FieldDescription>Pick the primary stack used in your project.</FieldDescription>
+          <FieldDescription>
+            Pick the primary stack used in your project.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -140,7 +145,7 @@ export const Multiple: Story = {
 };
 
 export const ClearButton: Story = {
-  name: 'Clear Button',
+  name: "Clear Button",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Clear Button</h3>
@@ -154,9 +159,11 @@ export const ClearButton: Story = {
             defaultValue="nextjs"
             showClear
             placeholder="Choose framework"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
-          <FieldDescription>Use the clear icon to reset the selection.</FieldDescription>
+          <FieldDescription>
+            Use the clear icon to reset the selection.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -172,8 +179,14 @@ export const Groups: Story = {
         <FieldLabel>Market Index</FieldLabel>
 
         <FieldContent>
-          <Select groups={groupedItems} placeholder="Select index" style={{ width: '100%' }} />
-          <FieldDescription>Grouped options help organize large watchlists.</FieldDescription>
+          <Select
+            groups={groupedItems}
+            placeholder="Select index"
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Grouped options help organize large watchlists.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -181,7 +194,7 @@ export const Groups: Story = {
 };
 
 export const CustomItems: Story = {
-  name: 'Custom Items',
+  name: "Custom Items",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Custom Items</h3>
@@ -193,34 +206,50 @@ export const CustomItems: Story = {
           <Select
             options={customItems}
             placeholder="Select plan"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
             renderItem={(item, state) => (
               <span
                 style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
                   minWidth: 0,
                 }}
               >
                 <span
                   aria-hidden
                   style={{
-                    width: '0.5rem',
-                    height: '0.5rem',
-                    borderRadius: '999px',
+                    width: "0.5rem",
+                    height: "0.5rem",
+                    borderRadius: "999px",
                     backgroundColor: state.selected
-                      ? 'var(--ktn-action-primary-bg)'
-                      : 'var(--ktn-border-muted)',
+                      ? "var(--ktn-action-primary-bg)"
+                      : "var(--ktn-border-muted)",
                     flexShrink: 0,
                   }}
                 />
-                <span style={{ display: 'inline-flex', flexDirection: 'column', gap: '0.1rem' }}>
-                  <span style={{ fontSize: '0.875rem', color: 'var(--ktn-text-primary)' }}>
+                <span
+                  style={{
+                    display: "inline-flex",
+                    flexDirection: "column",
+                    gap: "0.1rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "0.875rem",
+                      color: "var(--ktn-text-primary)",
+                    }}
+                  >
                     {item.label}
                   </span>
                   {item.description != null ? (
-                    <span style={{ fontSize: '0.75rem', color: 'var(--ktn-text-secondary)' }}>
+                    <span
+                      style={{
+                        fontSize: "0.75rem",
+                        color: "var(--ktn-text-secondary)",
+                      }}
+                    >
                       {item.description}
                     </span>
                   ) : null}
@@ -228,7 +257,9 @@ export const CustomItems: Story = {
               </span>
             )}
           />
-          <FieldDescription>Custom rendering can add metadata in each option row.</FieldDescription>
+          <FieldDescription>
+            Custom rendering can add metadata in each option row.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -245,10 +276,11 @@ export const Invalid: Story = {
 
         <FieldContent>
           <Select
+            required
             invalid
             options={frameworkOptions}
             placeholder="Please select a framework"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
           <FieldError>This field is required.</FieldError>
         </FieldContent>
@@ -271,9 +303,11 @@ export const Disabled: Story = {
             options={frameworkOptions}
             defaultValue="react"
             placeholder="Select framework"
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
-          <FieldDescription>Selection is disabled for this account tier.</FieldDescription>
+          <FieldDescription>
+            Selection is disabled for this account tier.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -281,33 +315,35 @@ export const Disabled: Story = {
 };
 
 export const SelectPlayground: Story = {
-  name: 'Select Playground',
+  name: "Select Playground",
   args: {
-    size: 'md',
+    size: "md",
     disabled: false,
+    required: false,
     invalid: false,
     multiple: false,
     showClear: true,
-    placeholder: 'Select framework',
-    searchPlaceholder: 'Search framework...',
-    emptyText: 'No frameworks found.',
+    placeholder: "Select framework",
+    searchPlaceholder: "Search framework...",
+    emptyText: "No frameworks found.",
     withAction: false,
   },
   argTypes: {
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    invalid: { control: 'boolean' },
-    multiple: { control: 'boolean' },
-    showClear: { control: 'boolean' },
-    placeholder: { control: 'text' },
-    searchPlaceholder: { control: 'text' },
-    emptyText: { control: 'text' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onValueChange: { action: 'value-change' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    invalid: { control: "boolean" },
+    multiple: { control: "boolean" },
+    showClear: { control: "boolean" },
+    placeholder: { control: "text" },
+    searchPlaceholder: { control: "text" },
+    emptyText: { control: "text" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onValueChange: { action: "value-change" },
     value: { table: { disable: true } },
     defaultValue: { table: { disable: true } },
     options: { table: { disable: true } },
@@ -320,14 +356,20 @@ export const SelectPlayground: Story = {
     const withAction = args.withAction ?? false;
 
     return (
-      <Field disabled={args.disabled} invalid={args.invalid} style={frameStyle}>
+      <Field
+        disabled={args.disabled}
+        invalid={args.invalid}
+        required={args.required}
+        style={frameStyle}
+      >
         <FieldLabel>Framework</FieldLabel>
 
         <FieldContent>
           <Select
-            key={`${args.size}-${args.disabled}-${args.invalid}-${args.multiple}-${args.showClear}-${withAction}`}
+            key={`${args.size}-${args.disabled}-${args.required}-${args.invalid}-${args.multiple}-${args.showClear}-${withAction}`}
             size={args.size}
             disabled={args.disabled}
+            required={args.required}
             invalid={args.invalid}
             multiple={args.multiple}
             showClear={args.showClear}
@@ -335,16 +377,18 @@ export const SelectPlayground: Story = {
             searchPlaceholder={args.searchPlaceholder}
             emptyText={args.emptyText}
             options={frameworkOptions}
-            defaultValue={args.multiple ? ['nextjs', 'react'] : 'nextjs'}
+            defaultValue={args.multiple ? ["nextjs", "react"] : "nextjs"}
             onAction={withAction ? args.onAction : undefined}
             onValueChange={withAction ? args.onValueChange : undefined}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
 
           {args.invalid ? (
             <FieldError>Choose at least one framework.</FieldError>
           ) : (
-            <FieldDescription>Adjust props from controls to test behavior.</FieldDescription>
+            <FieldDescription>
+              Adjust props from controls to test behavior.
+            </FieldDescription>
           )}
         </FieldContent>
       </Field>

@@ -88,16 +88,20 @@
     }
   },
   "dependencies": {
-    "@tanstack/react-table": "^8.21.3"
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.14.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
     "@size-limit/preset-small-lib": "^12.1.0",
-    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/addon-actions": "8.6.18",
+    "@storybook/addon-essentials": "^8.6.18",
     "@storybook/react": "^8.6.14",
     "@storybook/react-vite": "^8.6.14",
     "@tanstack/react-query": "^5.101.0",
     "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",

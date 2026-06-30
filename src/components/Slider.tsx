@@ -8,16 +8,16 @@ import {
   type KeyboardEvent,
   type PointerEvent,
   type ReactNode,
-} from 'react';
+} from "react";
 
-export type SliderOrientation = 'horizontal' | 'vertical';
-export type SliderSize = 'xs' | 'sm' | 'md' | 'lg';
+export type SliderOrientation = "horizontal" | "vertical";
+export type SliderSize = "xs" | "sm" | "md" | "lg";
 export type SliderActionSource =
-  | 'value-change'
-  | 'thumb-focus'
-  | 'thumb-blur'
-  | 'drag-start'
-  | 'drag-end';
+  | "value-change"
+  | "thumb-focus"
+  | "thumb-blur"
+  | "drag-start"
+  | "drag-end";
 
 export interface SliderActionContext {
   source: SliderActionSource;
@@ -29,12 +29,13 @@ export interface SliderActionContext {
   max: number;
   step: number;
   disabled: boolean;
+  required: boolean;
   event?: unknown;
 }
 
 export interface SliderProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  'children' | 'defaultValue' | 'onChange'
+  "children" | "defaultValue" | "onChange"
 > {
   orientation?: SliderOrientation;
   size?: SliderSize;
@@ -47,6 +48,7 @@ export interface SliderProps extends Omit<
   step?: number;
   minStepsBetweenThumbs?: number;
   disabled?: boolean;
+  required?: boolean;
   showLabels?: boolean;
   minLabel?: ReactNode;
   maxLabel?: ReactNode;
@@ -65,40 +67,40 @@ type SliderSizeTokens = {
 
 const sizeTokens: Record<SliderSize, SliderSizeTokens> = {
   xs: {
-    trackThickness: '0.3rem',
-    verticalTrackThickness: '0.35rem',
-    thumbSize: '0.78rem',
-    focusRing: '2px',
-    gap: '0.45rem',
-    verticalLength: '8.4rem',
+    trackThickness: "0.3rem",
+    verticalTrackThickness: "0.35rem",
+    thumbSize: "0.78rem",
+    focusRing: "2px",
+    gap: "0.45rem",
+    verticalLength: "8.4rem",
   },
   sm: {
-    trackThickness: '0.36rem',
-    verticalTrackThickness: '0.42rem',
-    thumbSize: '0.9rem',
-    focusRing: '2px',
-    gap: '0.5rem',
-    verticalLength: '9.2rem',
+    trackThickness: "0.36rem",
+    verticalTrackThickness: "0.42rem",
+    thumbSize: "0.9rem",
+    focusRing: "2px",
+    gap: "0.5rem",
+    verticalLength: "9.2rem",
   },
   md: {
-    trackThickness: '0.44rem',
-    verticalTrackThickness: '0.54rem',
-    thumbSize: '1.02rem',
-    focusRing: '2px',
-    gap: '0.55rem',
-    verticalLength: '10.5rem',
+    trackThickness: "0.44rem",
+    verticalTrackThickness: "0.54rem",
+    thumbSize: "1.02rem",
+    focusRing: "2px",
+    gap: "0.55rem",
+    verticalLength: "10.5rem",
   },
   lg: {
-    trackThickness: '0.52rem',
-    verticalTrackThickness: '0.66rem',
-    thumbSize: '1.16rem',
-    focusRing: '2px',
-    gap: '0.6rem',
-    verticalLength: '11.6rem',
+    trackThickness: "0.52rem",
+    verticalTrackThickness: "0.66rem",
+    thumbSize: "1.16rem",
+    focusRing: "2px",
+    gap: "0.6rem",
+    verticalLength: "11.6rem",
   },
 };
 
-const baseClasses = 'inline-flex min-w-0';
+const baseClasses = "inline-flex min-w-0";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
@@ -107,21 +109,30 @@ function clamp(value: number, min: number, max: number): number {
 function decimalPlaces(value: number): number {
   const asText = `${value}`;
 
-  if (!asText.includes('.')) {
+  if (!asText.includes(".")) {
     return 0;
   }
 
-  return asText.split('.')[1]?.length ?? 0;
+  return asText.split(".")[1]?.length ?? 0;
 }
 
-function roundToStep(value: number, min: number, step: number, max: number): number {
+function roundToStep(
+  value: number,
+  min: number,
+  step: number,
+  max: number,
+): number {
   if (!(step > 0)) {
     return clamp(value, min, max);
   }
 
   const steps = Math.round((value - min) / step);
   const rounded = min + steps * step;
-  const precision = Math.max(decimalPlaces(step), decimalPlaces(min), decimalPlaces(max));
+  const precision = Math.max(
+    decimalPlaces(step),
+    decimalPlaces(min),
+    decimalPlaces(max),
+  );
 
   return clamp(Number(rounded.toFixed(precision)), min, max);
 }
@@ -143,8 +154,10 @@ function normalizeValues(
   }
 
   const availableSpan = Math.max(max - min, 0);
-  const maxGapByCount = roundedValues.length > 1 ? availableSpan / (roundedValues.length - 1) : 0;
-  const maxGapByStep = step > 0 ? Math.floor(maxGapByCount / step) * step : maxGapByCount;
+  const maxGapByCount =
+    roundedValues.length > 1 ? availableSpan / (roundedValues.length - 1) : 0;
+  const maxGapByStep =
+    step > 0 ? Math.floor(maxGapByCount / step) * step : maxGapByCount;
   const constrainedMinGap = clamp(minGap, 0, Math.max(maxGapByStep, 0));
 
   const normalized = [...roundedValues];
@@ -153,14 +166,20 @@ function normalizeValues(
 
   for (let index = 1; index < normalized.length; index += 1) {
     const current = clamp(normalized[index], min, max);
-    normalized[index] = Math.max(current, normalized[index - 1] + constrainedMinGap);
+    normalized[index] = Math.max(
+      current,
+      normalized[index - 1] + constrainedMinGap,
+    );
   }
 
   if (normalized[normalized.length - 1] > max) {
     normalized[normalized.length - 1] = max;
 
     for (let index = normalized.length - 2; index >= 0; index -= 1) {
-      normalized[index] = Math.min(normalized[index], normalized[index + 1] - constrainedMinGap);
+      normalized[index] = Math.min(
+        normalized[index],
+        normalized[index + 1] - constrainedMinGap,
+      );
     }
   }
 
@@ -168,7 +187,10 @@ function normalizeValues(
     normalized[0] = min;
 
     for (let index = 1; index < normalized.length; index += 1) {
-      normalized[index] = Math.max(normalized[index], normalized[index - 1] + constrainedMinGap);
+      normalized[index] = Math.max(
+        normalized[index],
+        normalized[index - 1] + constrainedMinGap,
+      );
     }
   }
 
@@ -185,7 +207,7 @@ function valueToPercent(value: number, min: number, max: number): number {
 
 function defaultValueLabel(values: number[]): string {
   if (values.length === 0) {
-    return '';
+    return "";
   }
 
   if (values.length === 1) {
@@ -195,12 +217,15 @@ function defaultValueLabel(values: number[]): string {
   return `${values[0]} - ${values[values.length - 1]}`;
 }
 
-function resolveEndpointLabel(label: ReactNode | undefined, fallback: string): ReactNode {
+function resolveEndpointLabel(
+  label: ReactNode | undefined,
+  fallback: string,
+): ReactNode {
   if (label == null) {
     return fallback;
   }
 
-  if (typeof label === 'string' && label.trim() === '') {
+  if (typeof label === "string" && label.trim() === "") {
     return fallback;
   }
 
@@ -208,8 +233,8 @@ function resolveEndpointLabel(label: ReactNode | undefined, fallback: string): R
 }
 
 export function Slider({
-  orientation = 'horizontal',
-  size = 'md',
+  orientation = "horizontal",
+  size = "md",
   value,
   defaultValue,
   onValueChange,
@@ -219,12 +244,13 @@ export function Slider({
   step = 1,
   minStepsBetweenThumbs = 0,
   disabled = false,
+  required = false,
   showLabels = true,
   minLabel,
   maxLabel,
   showValueLabel,
   formatValueLabel,
-  className = '',
+  className = "",
   style,
   ...props
 }: SliderProps): JSX.Element {
@@ -239,18 +265,30 @@ export function Slider({
     normalizeValues(defaultValue, min, max, resolvedStep, minGap),
   );
   const [activeThumbIndex, setActiveThumbIndex] = useState(0);
-  const [focusedThumbIndex, setFocusedThumbIndex] = useState<number | null>(null);
-  const [draggingThumbIndex, setDraggingThumbIndex] = useState<number | null>(null);
+  const [focusedThumbIndex, setFocusedThumbIndex] = useState<number | null>(
+    null,
+  );
+  const [draggingThumbIndex, setDraggingThumbIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!isControlled) {
-      setUncontrolledValues((current) => normalizeValues(current, min, max, resolvedStep, minGap));
+      setUncontrolledValues((current) =>
+        normalizeValues(current, min, max, resolvedStep, minGap),
+      );
     }
   }, [isControlled, max, min, minGap, resolvedStep]);
 
   const resolvedValues = useMemo(
     () =>
-      normalizeValues(isControlled ? value : uncontrolledValues, min, max, resolvedStep, minGap),
+      normalizeValues(
+        isControlled ? value : uncontrolledValues,
+        min,
+        max,
+        resolvedStep,
+        minGap,
+      ),
     [isControlled, max, min, minGap, resolvedStep, uncontrolledValues, value],
   );
 
@@ -281,12 +319,23 @@ export function Slider({
       max,
       step: resolvedStep,
       disabled,
+      required,
       event: options?.event,
     });
   }
 
-  function emitValues(nextValues: number[], index: number, event?: unknown): void {
-    const normalized = normalizeValues(nextValues, min, max, resolvedStep, minGap);
+  function emitValues(
+    nextValues: number[],
+    index: number,
+    event?: unknown,
+  ): void {
+    const normalized = normalizeValues(
+      nextValues,
+      min,
+      max,
+      resolvedStep,
+      minGap,
+    );
     const previousValues = resolvedValues;
 
     if (!isControlled) {
@@ -294,7 +343,7 @@ export function Slider({
     }
 
     onValueChange?.(normalized);
-    emitAction('value-change', {
+    emitAction("value-change", {
       values: normalized,
       previousValues,
       activeThumbIndex: index,
@@ -318,7 +367,11 @@ export function Slider({
     return values[index + 1] - minGap;
   }
 
-  function resolveThumbValue(index: number, candidate: number, values: number[]): number {
+  function resolveThumbValue(
+    index: number,
+    candidate: number,
+    values: number[],
+  ): number {
     const thumbMin = getThumbMin(index, values);
     const thumbMax = getThumbMax(index, values);
 
@@ -356,7 +409,7 @@ export function Slider({
 
     const rect = trackRef.current.getBoundingClientRect();
 
-    if (orientation === 'horizontal') {
+    if (orientation === "horizontal") {
       const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
       return min + ratio * (max - min);
     }
@@ -400,7 +453,7 @@ export function Slider({
     setActiveThumbIndex(closestIndex);
     updateThumbValue(closestIndex, pointerValue, true, event);
     setDraggingThumbIndex(closestIndex);
-    emitAction('drag-start', {
+    emitAction("drag-start", {
       activeThumbIndex: closestIndex,
       event,
     });
@@ -427,7 +480,7 @@ export function Slider({
       const dragIndex = draggingThumbIndex;
 
       if (dragIndex != null) {
-        emitAction('drag-end', {
+        emitAction("drag-end", {
           activeThumbIndex: dragIndex,
           event,
         });
@@ -436,18 +489,30 @@ export function Slider({
       setDraggingThumbIndex(null);
     }
 
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', stopDragging);
-    window.addEventListener('pointercancel', stopDragging);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", stopDragging);
+    window.addEventListener("pointercancel", stopDragging);
 
     return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', stopDragging);
-      window.removeEventListener('pointercancel', stopDragging);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", stopDragging);
+      window.removeEventListener("pointercancel", stopDragging);
     };
-  }, [disabled, draggingThumbIndex, max, min, minGap, orientation, resolvedValues, resolvedStep]);
+  }, [
+    disabled,
+    draggingThumbIndex,
+    max,
+    min,
+    minGap,
+    orientation,
+    resolvedValues,
+    resolvedStep,
+  ]);
 
-  function handleThumbKeyDown(index: number, event: KeyboardEvent<HTMLButtonElement>): void {
+  function handleThumbKeyDown(
+    index: number,
+    event: KeyboardEvent<HTMLButtonElement>,
+  ): void {
     if (disabled) {
       return;
     }
@@ -455,17 +520,17 @@ export function Slider({
     const current = resolvedValues[index] ?? min;
     let nextValue: number | null = null;
 
-    if (event.key === 'ArrowRight' || event.key === 'ArrowUp') {
+    if (event.key === "ArrowRight" || event.key === "ArrowUp") {
       nextValue = current + resolvedStep;
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowDown') {
+    } else if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
       nextValue = current - resolvedStep;
-    } else if (event.key === 'PageUp') {
+    } else if (event.key === "PageUp") {
       nextValue = current + resolvedStep * 10;
-    } else if (event.key === 'PageDown') {
+    } else if (event.key === "PageDown") {
       nextValue = current - resolvedStep * 10;
-    } else if (event.key === 'Home') {
+    } else if (event.key === "Home") {
       nextValue = getThumbMin(index, resolvedValues);
-    } else if (event.key === 'End') {
+    } else if (event.key === "End") {
       nextValue = getThumbMax(index, resolvedValues);
     }
 
@@ -484,98 +549,101 @@ export function Slider({
   const rangeEndPercent = valueToPercent(rangeEnd, min, max);
   const rangeSpanPercent = Math.max(rangeEndPercent - rangeStartPercent, 0);
 
-  const resolvedShowValueLabel = showValueLabel ?? orientation === 'vertical';
+  const resolvedShowValueLabel = showValueLabel ?? orientation === "vertical";
   const resolvedMinLabel = resolveEndpointLabel(minLabel, `Min: ${min}`);
   const resolvedMaxLabel = resolveEndpointLabel(maxLabel, `Max: ${max}`);
   const resolvedValueLabel =
-    formatValueLabel != null ? formatValueLabel(resolvedValues) : defaultValueLabel(resolvedValues);
+    formatValueLabel != null
+      ? formatValueLabel(resolvedValues)
+      : defaultValueLabel(resolvedValues);
 
   const rootStyle: CSSProperties = {
-    width: orientation === 'horizontal' ? '100%' : 'fit-content',
+    width: orientation === "horizontal" ? "100%" : "fit-content",
     minWidth: 0,
-    display: 'inline-flex',
-    flexDirection: 'column',
-    alignItems: orientation === 'horizontal' ? 'stretch' : 'center',
-    justifyContent: 'center',
-    gap: '0.45rem',
-    touchAction: 'none',
+    display: "inline-flex",
+    flexDirection: "column",
+    alignItems: orientation === "horizontal" ? "stretch" : "center",
+    justifyContent: "center",
+    gap: "0.45rem",
+    touchAction: "none",
     ...style,
   };
 
   const labelsStyle: CSSProperties = {
-    width: orientation === 'horizontal' ? '100%' : 'fit-content',
-    display: 'inline-flex',
-    flexDirection: orientation === 'horizontal' ? 'row' : 'column-reverse',
-    justifyContent: 'space-between',
-    alignItems: orientation === 'horizontal' ? 'center' : 'stretch',
-    gap: orientation === 'horizontal' ? '0.75rem' : '0.35rem',
-    fontSize: '0.78rem',
+    width: orientation === "horizontal" ? "100%" : "fit-content",
+    display: "inline-flex",
+    flexDirection: orientation === "horizontal" ? "row" : "column-reverse",
+    justifyContent: "space-between",
+    alignItems: orientation === "horizontal" ? "center" : "stretch",
+    gap: orientation === "horizontal" ? "0.75rem" : "0.35rem",
+    fontSize: "0.78rem",
     lineHeight: 1.3,
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   };
 
   const valueLabelStyle: CSSProperties = {
-    width: 'fit-content',
-    paddingInline: '0.4rem',
-    paddingBlock: '0.2rem',
-    borderRadius: 'var(--ktn-radius-sm, 0.375rem)',
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.1))',
-    color: 'var(--ktn-text-primary)',
-    fontSize: '0.78rem',
+    width: "fit-content",
+    paddingInline: "0.4rem",
+    paddingBlock: "0.2rem",
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.1))",
+    color: "var(--ktn-text-primary)",
+    fontSize: "0.78rem",
     lineHeight: 1.25,
-    border: '1px solid var(--ktn-border-muted)',
+    border: "1px solid var(--ktn-border-muted)",
   };
 
   const trackWrapStyle: CSSProperties = {
-    position: 'relative',
+    position: "relative",
     width:
-      orientation === 'horizontal'
-        ? '100%'
+      orientation === "horizontal"
+        ? "100%"
         : `calc(${tokens.verticalTrackThickness} + ${tokens.gap} + ${tokens.gap})`,
     height:
-      orientation === 'horizontal'
+      orientation === "horizontal"
         ? `calc(${tokens.thumbSize} + ${tokens.gap} + ${tokens.gap})`
         : `calc(${tokens.verticalLength} + ${tokens.gap} + ${tokens.gap})`,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
     paddingBlock: tokens.gap,
-    paddingInline: orientation === 'horizontal' ? 0 : tokens.gap,
-    boxSizing: 'border-box',
+    paddingInline: orientation === "horizontal" ? 0 : tokens.gap,
+    boxSizing: "border-box",
   };
 
   const trackStyle: CSSProperties = {
-    position: 'relative',
-    width: orientation === 'horizontal' ? '100%' : tokens.verticalTrackThickness,
-    height: orientation === 'horizontal' ? tokens.trackThickness : '100%',
-    borderRadius: '999px',
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))',
-    border: '1px solid var(--ktn-border-muted)',
-    boxSizing: 'border-box',
+    position: "relative",
+    width:
+      orientation === "horizontal" ? "100%" : tokens.verticalTrackThickness,
+    height: orientation === "horizontal" ? tokens.trackThickness : "100%",
+    borderRadius: "999px",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))",
+    border: "1px solid var(--ktn-border-muted)",
+    boxSizing: "border-box",
   };
 
   const rangeStyle: CSSProperties = {
-    position: 'absolute',
-    borderRadius: '999px',
-    pointerEvents: 'none',
+    position: "absolute",
+    borderRadius: "999px",
+    pointerEvents: "none",
     zIndex: 1,
     backgroundColor: disabled
-      ? 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 55%, var(--ktn-bg-muted))'
-      : 'var(--ktn-action-primary-bg, #2563eb)',
-    ...(orientation === 'horizontal'
+      ? "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 55%, var(--ktn-bg-muted))"
+      : "var(--ktn-action-primary-bg, #2563eb)",
+    ...(orientation === "horizontal"
       ? {
           top: 0,
           left: `${rangeStartPercent}%`,
           width: `${rangeSpanPercent}%`,
-          minWidth: rangeSpanPercent > 0 ? '2px' : undefined,
-          height: '100%',
+          minWidth: rangeSpanPercent > 0 ? "2px" : undefined,
+          height: "100%",
         }
       : {
           left: 0,
           bottom: `${rangeStartPercent}%`,
-          width: '100%',
+          width: "100%",
           height: `${rangeSpanPercent}%`,
-          minHeight: rangeSpanPercent > 0 ? '3px' : undefined,
+          minHeight: rangeSpanPercent > 0 ? "3px" : undefined,
         }),
   };
 
@@ -584,9 +652,12 @@ export function Slider({
       className={`${baseClasses} ${className}`.trim()}
       style={rootStyle}
       aria-disabled={disabled || undefined}
+      aria-required={required || undefined}
       {...props}
     >
-      {resolvedShowValueLabel ? <div style={valueLabelStyle}>{resolvedValueLabel}</div> : null}
+      {resolvedShowValueLabel ? (
+        <div style={valueLabelStyle}>{resolvedValueLabel}</div>
+      ) : null}
 
       <div style={trackWrapStyle} onPointerDown={handleTrackPointerDown}>
         <div ref={trackRef} style={trackStyle}>
@@ -600,34 +671,34 @@ export function Slider({
               index === draggingThumbIndex;
 
             const thumbPositionStyle: CSSProperties =
-              orientation === 'horizontal'
+              orientation === "horizontal"
                 ? {
                     insetInlineStart: `${percent}%`,
-                    insetBlockStart: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    insetBlockStart: "50%",
+                    transform: "translate(-50%, -50%)",
                   }
                 : {
-                    insetInlineStart: '50%',
+                    insetInlineStart: "50%",
                     insetBlockStart: `${100 - percent}%`,
-                    transform: 'translate(-50%, -50%)',
+                    transform: "translate(-50%, -50%)",
                   };
 
             const thumbStyle: CSSProperties = {
-              position: 'absolute',
+              position: "absolute",
               width: tokens.thumbSize,
               height: tokens.thumbSize,
-              borderRadius: '999px',
-              borderWidth: '1px',
-              borderStyle: 'solid',
-              borderColor: 'var(--ktn-action-primary-bg)',
-              backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
+              borderRadius: "999px",
+              borderWidth: "1px",
+              borderStyle: "solid",
+              borderColor: "var(--ktn-action-primary-bg)",
+              backgroundColor: "var(--ktn-bg-surface, #ffffff)",
               boxShadow: thumbIsActive
                 ? `0 0 0 ${tokens.focusRing} color-mix(in srgb, var(--ktn-action-primary-bg) 24%, transparent)`
-                : '0 1px 2px color-mix(in srgb, var(--ktn-text-primary, #0f172a) 22%, transparent)',
-              cursor: disabled ? 'not-allowed' : 'grab',
-              touchAction: 'none',
+                : "0 1px 2px color-mix(in srgb, var(--ktn-text-primary, #0f172a) 22%, transparent)",
+              cursor: disabled ? "not-allowed" : "grab",
+              touchAction: "none",
               transition:
-                'box-shadow 120ms ease, border-color 120ms ease, background-color 120ms ease',
+                "box-shadow 120ms ease, border-color 120ms ease, background-color 120ms ease",
               zIndex: thumbIsActive ? 3 : 2,
               ...thumbPositionStyle,
             };
@@ -647,21 +718,27 @@ export function Slider({
                 aria-valuenow={sliderValue}
                 aria-valuetext={`${sliderValue}`}
                 aria-disabled={disabled}
-                aria-label={resolvedValues.length > 1 ? `Slider thumb ${index + 1}` : 'Slider'}
+                aria-label={
+                  resolvedValues.length > 1
+                    ? `Slider thumb ${index + 1}`
+                    : "Slider"
+                }
                 tabIndex={disabled ? -1 : index === activeThumbIndex ? 0 : -1}
                 disabled={disabled}
                 style={thumbStyle}
                 onFocus={(event) => {
                   setFocusedThumbIndex(index);
                   setActiveThumbIndex(index);
-                  emitAction('thumb-focus', {
+                  emitAction("thumb-focus", {
                     activeThumbIndex: index,
                     event,
                   });
                 }}
                 onBlur={(event) => {
-                  setFocusedThumbIndex((current) => (current === index ? null : current));
-                  emitAction('thumb-blur', {
+                  setFocusedThumbIndex((current) =>
+                    current === index ? null : current,
+                  );
+                  emitAction("thumb-blur", {
                     activeThumbIndex: index,
                     event,
                   });
@@ -675,7 +752,7 @@ export function Slider({
                   setActiveThumbIndex(index);
                   thumbRefs.current[index]?.focus();
                   setDraggingThumbIndex(index);
-                  emitAction('drag-start', {
+                  emitAction("drag-start", {
                     activeThumbIndex: index,
                     event,
                   });

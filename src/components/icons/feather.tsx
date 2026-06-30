@@ -174,6 +174,34 @@ export function FiMusic(props: FeatherIconProps): JSX.Element {
   );
 }
 
+export function FiMenu(props: FeatherIconProps): JSX.Element {
+  return (
+    <FeatherIcon {...props}>
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </FeatherIcon>
+  );
+}
+
+export function FiEye(props: FeatherIconProps): JSX.Element {
+  return (
+    <FeatherIcon {...props}>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </FeatherIcon>
+  );
+}
+
+export function FiEdit3(props: FeatherIconProps): JSX.Element {
+  return (
+    <FeatherIcon {...props}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z" />
+    </FeatherIcon>
+  );
+}
+
 export function FiTrash2(props: FeatherIconProps): JSX.Element {
   return (
     <FeatherIcon {...props}>

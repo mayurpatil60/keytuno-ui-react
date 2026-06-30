@@ -9,13 +9,18 @@
   type HTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { Button } from './Button';
+import { Button } from "./Button";
 
-export type SelectSize = 'xs' | 'sm' | 'md' | 'lg';
+export type SelectSize = "xs" | "sm" | "md" | "lg";
 export type SelectValue = string | string[] | null;
-export type SelectActionSource = 'open' | 'close' | 'search' | 'select' | 'clear';
+export type SelectActionSource =
+  | "open"
+  | "close"
+  | "search"
+  | "select"
+  | "clear";
 
 export interface SelectActionContext {
   source: SelectActionSource;
@@ -24,6 +29,7 @@ export interface SelectActionContext {
   multiple: boolean;
   open: boolean;
   query: string;
+  required: boolean;
   optionValue?: string;
   event?: unknown;
 }
@@ -43,10 +49,11 @@ export interface SelectGroup {
 
 export interface SelectProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  'children' | 'defaultValue' | 'onChange'
+  "children" | "defaultValue" | "onChange"
 > {
   size?: SelectSize;
   disabled?: boolean;
+  required?: boolean;
   invalid?: boolean;
   multiple?: boolean;
   showClear?: boolean;
@@ -59,7 +66,10 @@ export interface SelectProps extends Omit<
   defaultValue?: SelectValue;
   onValueChange?: (value: SelectValue) => void;
   onAction?: (context: SelectActionContext) => void;
-  renderItem?: (option: SelectOption, state: { selected: boolean }) => ReactNode;
+  renderItem?: (
+    option: SelectOption,
+    state: { selected: boolean },
+  ) => ReactNode;
 }
 
 type SelectSizeTokens = {
@@ -78,50 +88,57 @@ type NormalizedGroup = {
 
 const sizeTokens: Record<SelectSize, SelectSizeTokens> = {
   xs: {
-    inputHeight: '1.9rem',
-    fontSize: '0.75rem',
-    panelPadding: '0.35rem',
-    optionHeight: '1.7rem',
-    optionPaddingInline: '0.45rem',
-    groupLabelSize: '0.625rem',
+    inputHeight: "1.9rem",
+    fontSize: "0.75rem",
+    panelPadding: "0.35rem",
+    optionHeight: "1.7rem",
+    optionPaddingInline: "0.45rem",
+    groupLabelSize: "0.625rem",
   },
   sm: {
-    inputHeight: '2.1rem',
-    fontSize: '0.8125rem',
-    panelPadding: '0.4rem',
-    optionHeight: '1.95rem',
-    optionPaddingInline: '0.5rem',
-    groupLabelSize: '0.6875rem',
+    inputHeight: "2.1rem",
+    fontSize: "0.8125rem",
+    panelPadding: "0.4rem",
+    optionHeight: "1.95rem",
+    optionPaddingInline: "0.5rem",
+    groupLabelSize: "0.6875rem",
   },
   md: {
-    inputHeight: '2.35rem',
-    fontSize: '0.875rem',
-    panelPadding: '0.45rem',
-    optionHeight: '2.15rem',
-    optionPaddingInline: '0.55rem',
-    groupLabelSize: '0.75rem',
+    inputHeight: "2.35rem",
+    fontSize: "0.875rem",
+    panelPadding: "0.45rem",
+    optionHeight: "2.15rem",
+    optionPaddingInline: "0.55rem",
+    groupLabelSize: "0.75rem",
   },
   lg: {
-    inputHeight: '2.6rem',
-    fontSize: '0.9375rem',
-    panelPadding: '0.5rem',
-    optionHeight: '2.4rem',
-    optionPaddingInline: '0.65rem',
-    groupLabelSize: '0.8125rem',
+    inputHeight: "2.6rem",
+    fontSize: "0.9375rem",
+    panelPadding: "0.5rem",
+    optionHeight: "2.4rem",
+    optionPaddingInline: "0.65rem",
+    groupLabelSize: "0.8125rem",
   },
 };
 
-const baseClasses = 'relative inline-flex flex-col';
+const baseClasses = "relative inline-flex flex-col";
 
-function normalizeValue(value: SelectValue | undefined, multiple: boolean): SelectValue {
+function normalizeValue(
+  value: SelectValue | undefined,
+  multiple: boolean,
+): SelectValue {
   if (multiple) {
     if (Array.isArray(value)) {
       return Array.from(
-        new Set(value.filter((item) => typeof item === 'string' && item.trim() !== '')),
+        new Set(
+          value.filter(
+            (item) => typeof item === "string" && item.trim() !== "",
+          ),
+        ),
       );
     }
 
-    if (typeof value === 'string' && value.trim() !== '') {
+    if (typeof value === "string" && value.trim() !== "") {
       return [value];
     }
 
@@ -129,13 +146,15 @@ function normalizeValue(value: SelectValue | undefined, multiple: boolean): Sele
   }
 
   if (Array.isArray(value)) {
-    const first = value.find((item) => typeof item === 'string' && item.trim() !== '');
+    const first = value.find(
+      (item) => typeof item === "string" && item.trim() !== "",
+    );
     return first ?? null;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     const trimmed = value.trim();
-    return trimmed === '' ? null : trimmed;
+    return trimmed === "" ? null : trimmed;
   }
 
   return null;
@@ -146,19 +165,24 @@ function valueToArray(value: SelectValue): string[] {
     return value;
   }
 
-  if (typeof value === 'string' && value.trim() !== '') {
+  if (typeof value === "string" && value.trim() !== "") {
     return [value];
   }
 
   return [];
 }
 
-function normalizeGroups(options: SelectOption[], groups: SelectGroup[]): NormalizedGroup[] {
+function normalizeGroups(
+  options: SelectOption[],
+  groups: SelectGroup[],
+): NormalizedGroup[] {
   const normalized: NormalizedGroup[] = [];
 
   if (groups.length > 0) {
     groups.forEach((group) => {
-      const validOptions = group.options.filter((option) => option.value.trim() !== '');
+      const validOptions = group.options.filter(
+        (option) => option.value.trim() !== "",
+      );
 
       if (validOptions.length > 0) {
         normalized.push({
@@ -171,7 +195,7 @@ function normalizeGroups(options: SelectOption[], groups: SelectGroup[]): Normal
 
   if (options.length > 0) {
     normalized.push({
-      options: options.filter((option) => option.value.trim() !== ''),
+      options: options.filter((option) => option.value.trim() !== ""),
     });
   }
 
@@ -191,14 +215,15 @@ function getFirstEnabledOption(groups: NormalizedGroup[]): SelectOption | null {
 }
 
 export function Select({
-  size = 'md',
+  size = "md",
   disabled = false,
+  required = false,
   invalid = false,
   multiple = false,
   showClear = false,
-  placeholder = 'Select an option',
-  searchPlaceholder = 'Search...',
-  emptyText = 'No items found.',
+  placeholder = "Select an option",
+  searchPlaceholder = "Search...",
+  emptyText = "No items found.",
   options = [],
   groups = [],
   value,
@@ -206,15 +231,15 @@ export function Select({
   onValueChange,
   onAction,
   renderItem,
-  className = '',
+  className = "",
   style,
-  ['aria-label']: ariaLabel,
-  ['aria-labelledby']: ariaLabelledBy,
-  ['aria-describedby']: ariaDescribedBy,
+  ["aria-label"]: ariaLabel,
+  ["aria-labelledby"]: ariaLabelledBy,
+  ["aria-describedby"]: ariaDescribedBy,
   ...props
 }: SelectProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
 
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -234,7 +259,7 @@ export function Select({
 
   useEffect(() => {
     if (!isOpen) {
-      setSearch('');
+      setSearch("");
     }
   }, [isOpen]);
 
@@ -250,24 +275,33 @@ export function Select({
     }
 
     function handlePointerDown(event: PointerEvent): void {
-      if (rootRef.current != null && !rootRef.current.contains(event.target as Node)) {
+      if (
+        rootRef.current != null &&
+        !rootRef.current.contains(event.target as Node)
+      ) {
         setOpenState(false, event);
       }
     }
 
-    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [isOpen]);
 
   const tokens = sizeTokens[size];
-  const resolvedValue = normalizeValue(isControlled ? value : uncontrolledValue, multiple);
+  const resolvedValue = normalizeValue(
+    isControlled ? value : uncontrolledValue,
+    multiple,
+  );
   const selectedValues = valueToArray(resolvedValue);
   const selectedSet = useMemo(() => new Set(selectedValues), [selectedValues]);
 
-  const normalizedGroups = useMemo(() => normalizeGroups(options, groups), [groups, options]);
+  const normalizedGroups = useMemo(
+    () => normalizeGroups(options, groups),
+    [groups, options],
+  );
 
   const allOptions = useMemo(
     () => normalizedGroups.flatMap((group) => group.options),
@@ -289,7 +323,7 @@ export function Select({
   const filteredGroups = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    if (query === '') {
+    if (query === "") {
       return normalizedGroups;
     }
 
@@ -299,10 +333,10 @@ export function Select({
           const searchableText = [
             option.label,
             option.value,
-            option.description ?? '',
+            option.description ?? "",
             ...(option.keywords ?? []),
           ]
-            .join(' ')
+            .join(" ")
             .toLowerCase();
 
           return searchableText.includes(query);
@@ -317,15 +351,18 @@ export function Select({
   }, [normalizedGroups, search]);
 
   const selectedLabels = selectedValues
-    .map((selectedValue) => optionByValue.get(selectedValue)?.label ?? selectedValue)
-    .filter((label) => label.trim() !== '');
+    .map(
+      (selectedValue) =>
+        optionByValue.get(selectedValue)?.label ?? selectedValue,
+    )
+    .filter((label) => label.trim() !== "");
 
   const displayText =
     selectedLabels.length === 0
-      ? ''
+      ? ""
       : multiple
         ? selectedLabels.length <= 2
-          ? selectedLabels.join(', ')
+          ? selectedLabels.join(", ")
           : `${selectedLabels.length} selected`
         : selectedLabels[0];
 
@@ -352,6 +389,7 @@ export function Select({
       multiple,
       open: options?.open ?? isOpen,
       query: options?.query ?? search,
+      required,
       optionValue: options?.optionValue,
       event: options?.event,
     });
@@ -363,7 +401,7 @@ export function Select({
     }
 
     setIsOpen(nextOpen);
-    emitAction(nextOpen ? 'open' : 'close', {
+    emitAction(nextOpen ? "open" : "close", {
       open: nextOpen,
       event,
     });
@@ -371,7 +409,7 @@ export function Select({
 
   function setValue(
     nextValue: SelectValue,
-    source: Extract<SelectActionSource, 'select' | 'clear'>,
+    source: Extract<SelectActionSource, "select" | "clear">,
     event?: unknown,
     optionValue?: string,
   ): void {
@@ -404,18 +442,18 @@ export function Select({
       return;
     }
 
-    if (event.key === 'ArrowDown') {
+    if (event.key === "ArrowDown") {
       event.preventDefault();
       setOpenState(true, event);
       return;
     }
 
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       setOpenState(false, event);
       return;
     }
 
-    if (event.key === 'Enter' && isOpen) {
+    if (event.key === "Enter" && isOpen) {
       const firstOption = getFirstEnabledOption(filteredGroups);
 
       if (firstOption != null) {
@@ -439,14 +477,14 @@ export function Select({
         nextValues.add(option.value);
       }
 
-      setValue(Array.from(nextValues), 'select', undefined, option.value);
-      setSearch('');
+      setValue(Array.from(nextValues), "select", undefined, option.value);
+      setSearch("");
       inputRef.current?.focus();
       return;
     }
 
-    setValue(option.value, 'select', undefined, option.value);
-    setSearch('');
+    setValue(option.value, "select", undefined, option.value);
+    setSearch("");
     setOpenState(false);
   }
 
@@ -455,8 +493,8 @@ export function Select({
       return;
     }
 
-    setValue(multiple ? [] : null, 'clear');
-    setSearch('');
+    setValue(multiple ? [] : null, "clear");
+    setSearch("");
     setOpenState(true);
     inputRef.current?.focus();
   }
@@ -464,7 +502,10 @@ export function Select({
   function handleInputBlur(event: FocusEvent<HTMLInputElement>): void {
     const relatedTarget = event.relatedTarget;
 
-    if (relatedTarget instanceof Node && rootRef.current?.contains(relatedTarget)) {
+    if (
+      relatedTarget instanceof Node &&
+      rootRef.current?.contains(relatedTarget)
+    ) {
       return;
     }
 
@@ -472,175 +513,184 @@ export function Select({
   }
 
   const rootStyle: CSSProperties = {
-    position: 'relative',
-    width: '100%',
+    position: "relative",
+    width: "100%",
     ...style,
   };
 
   const fieldWrapStyle: CSSProperties = {
-    position: 'relative',
-    width: '100%',
+    position: "relative",
+    width: "100%",
   };
 
   const inputStyle: CSSProperties = {
-    width: '100%',
+    width: "100%",
     height: tokens.inputHeight,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderRadius: 'var(--ktn-radius-md, 0.5rem)',
-    outline: 'none',
-    paddingInlineStart: '0.625rem',
-    paddingInlineEnd: showClearButton ? '4.05rem' : '2.2rem',
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderRadius: "var(--ktn-radius-md, 0.5rem)",
+    outline: "none",
+    paddingInlineStart: "0.625rem",
+    paddingInlineEnd: showClearButton ? "4.05rem" : "2.2rem",
     fontSize: tokens.fontSize,
     lineHeight: 1.2,
-    borderColor: invalid ? 'var(--ktn-action-danger-bg, #dc2626)' : 'var(--ktn-border-muted)',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
+    borderColor: invalid
+      ? "var(--ktn-action-danger-bg, #dc2626)"
+      : "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
     color:
-      inputValue.trim() === ''
-        ? 'var(--ktn-text-secondary, var(--ktn-text-primary))'
-        : 'var(--ktn-text-primary)',
+      inputValue.trim() === ""
+        ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
+        : "var(--ktn-text-primary)",
     boxShadow: isOpen
       ? invalid
-        ? '0 0 0 2px rgba(220, 38, 38, 0.22)'
-        : '0 0 0 2px rgba(37, 99, 235, 0.22)'
+        ? "0 0 0 2px rgba(220, 38, 38, 0.22)"
+        : "0 0 0 2px rgba(37, 99, 235, 0.22)"
       : undefined,
     opacity: disabled ? 0.62 : 1,
-    cursor: disabled ? 'not-allowed' : 'text',
+    cursor: disabled ? "not-allowed" : "text",
   };
 
   const chevronButtonStyle: CSSProperties = {
-    position: 'absolute',
-    insetInlineEnd: '0.25rem',
-    insetBlockStart: '50%',
-    transform: 'translateY(-50%)',
-    width: '1.5rem',
-    height: '1.5rem',
-    minHeight: '1.5rem',
+    position: "absolute",
+    insetInlineEnd: "0.25rem",
+    insetBlockStart: "50%",
+    transform: "translateY(-50%)",
+    width: "1.5rem",
+    height: "1.5rem",
+    minHeight: "1.5rem",
     paddingInline: 0,
     paddingBlock: 0,
-    borderRadius: '999px',
+    borderRadius: "999px",
     zIndex: 2,
   };
 
   const chevronStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '1rem',
-    height: '1rem',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "1rem",
+    height: "1rem",
     lineHeight: 0,
     flexShrink: 0,
-    transition: 'transform 160ms ease',
-    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+    transition: "transform 160ms ease",
+    transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
   };
 
   const clearButtonStyle: CSSProperties = {
-    position: 'absolute',
-    insetInlineEnd: '2.1rem',
-    insetBlockStart: '50%',
-    transform: 'translateY(-50%)',
-    width: '1.3rem',
-    height: '1.3rem',
-    minHeight: '1.3rem',
+    position: "absolute",
+    insetInlineEnd: "2.1rem",
+    insetBlockStart: "50%",
+    transform: "translateY(-50%)",
+    width: "1.3rem",
+    height: "1.3rem",
+    minHeight: "1.3rem",
     paddingInline: 0,
     paddingBlock: 0,
-    borderRadius: '999px',
+    borderRadius: "999px",
     zIndex: 2,
   };
 
   const panelStyle: CSSProperties = {
-    position: 'absolute',
+    position: "absolute",
     insetInlineStart: 0,
     insetInlineEnd: 0,
-    insetBlockStart: 'calc(100% + 0.35rem)',
+    insetBlockStart: "calc(100% + 0.35rem)",
     zIndex: 20,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: invalid ? 'var(--ktn-action-danger-bg, #dc2626)' : 'var(--ktn-border-muted)',
-    borderRadius: 'var(--ktn-radius-md, 0.5rem)',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    boxShadow: '0 10px 28px rgba(15, 23, 42, 0.12)',
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: invalid
+      ? "var(--ktn-action-danger-bg, #dc2626)"
+      : "var(--ktn-border-muted)",
+    borderRadius: "var(--ktn-radius-md, 0.5rem)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    boxShadow: "0 10px 28px rgba(15, 23, 42, 0.12)",
     padding: tokens.panelPadding,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.35rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.35rem",
   };
 
   const listStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.3rem',
-    maxHeight: '14.5rem',
-    overflowY: 'auto',
-    paddingInlineEnd: '0.1rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.3rem",
+    maxHeight: "14.5rem",
+    overflowY: "auto",
+    paddingInlineEnd: "0.1rem",
   };
 
   const groupStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.2rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.2rem",
   };
 
   const groupLabelStyle: CSSProperties = {
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     fontSize: tokens.groupLabelSize,
-    letterSpacing: '0.04em',
-    textTransform: 'uppercase',
-    paddingInline: '0.25rem',
-    paddingBlockStart: '0.15rem',
+    letterSpacing: "0.04em",
+    textTransform: "uppercase",
+    paddingInline: "0.25rem",
+    paddingBlockStart: "0.15rem",
   };
 
   const optionStyle: CSSProperties = {
-    width: '100%',
-    justifyContent: 'space-between',
+    width: "100%",
+    justifyContent: "space-between",
     height: tokens.optionHeight,
     paddingInline: tokens.optionPaddingInline,
-    borderRadius: 'var(--ktn-radius-sm, 0.375rem)',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'transparent',
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "transparent",
     lineHeight: 1.2,
   };
 
   const optionTextWrapStyle: CSSProperties = {
-    display: 'inline-flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
-    gap: '0.1rem',
+    display: "inline-flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: "0.1rem",
     minWidth: 0,
   };
 
   const optionLabelStyle: CSSProperties = {
     fontSize: tokens.fontSize,
-    color: 'var(--ktn-text-primary)',
+    color: "var(--ktn-text-primary)",
   };
 
   const optionDescriptionStyle: CSSProperties = {
-    fontSize: '0.72em',
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    fontSize: "0.72em",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   };
 
   const checkMarkStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '0.95rem',
-    height: '0.95rem',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "0.95rem",
+    height: "0.95rem",
     lineHeight: 0,
-    color: 'var(--ktn-action-primary-bg)',
+    color: "var(--ktn-action-primary-bg)",
     flexShrink: 0,
-    marginInlineStart: '0.35rem',
+    marginInlineStart: "0.35rem",
   };
 
   const emptyStyle: CSSProperties = {
-    paddingBlock: '0.625rem',
-    paddingInline: '0.45rem',
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    paddingBlock: "0.625rem",
+    paddingInline: "0.45rem",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     fontSize: tokens.fontSize,
   };
 
   return (
-    <div className={composedClassName} style={rootStyle} ref={rootRef} {...props}>
+    <div
+      className={composedClassName}
+      style={rootStyle}
+      ref={rootRef}
+      {...props}
+    >
       <div style={fieldWrapStyle}>
         <input
           ref={inputRef}
@@ -649,6 +699,7 @@ export function Select({
           value={inputValue}
           placeholder={inputPlaceholder}
           disabled={disabled}
+          required={required}
           aria-autocomplete="list"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
@@ -657,6 +708,7 @@ export function Select({
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
           aria-disabled={disabled || undefined}
+          aria-required={required || undefined}
           aria-invalid={invalid ? true : undefined}
           onFocus={(event) => {
             if (!disabled) {
@@ -673,7 +725,7 @@ export function Select({
             const nextQuery = event.currentTarget.value;
             setSearch(nextQuery);
 
-            emitAction('search', {
+            emitAction("search", {
               query: nextQuery,
               open: isOpen || !disabled,
               event,
@@ -721,7 +773,7 @@ export function Select({
           variant="ghost"
           size="xs"
           disabled={disabled}
-          aria-label={isOpen ? 'Close options' : 'Open options'}
+          aria-label={isOpen ? "Close options" : "Open options"}
           style={chevronButtonStyle}
           onMouseDown={(event) => {
             event.preventDefault();
@@ -750,7 +802,9 @@ export function Select({
         <div
           id={listboxId}
           role="listbox"
-          aria-label={ariaLabelledBy == null ? (ariaLabel ?? placeholder) : undefined}
+          aria-label={
+            ariaLabelledBy == null ? (ariaLabel ?? placeholder) : undefined
+          }
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
           aria-multiselectable={multiple || undefined}
@@ -764,10 +818,14 @@ export function Select({
             <div style={listStyle}>
               {filteredGroups.map((group, groupIndex) => (
                 <div
-                  key={`select-group-${group.label ?? 'plain'}-${groupIndex}`}
-                  role={group.label != null && group.label.trim() !== '' ? 'group' : undefined}
+                  key={`select-group-${group.label ?? "plain"}-${groupIndex}`}
+                  role={
+                    group.label != null && group.label.trim() !== ""
+                      ? "group"
+                      : undefined
+                  }
                   aria-labelledby={
-                    group.label != null && group.label.trim() !== ''
+                    group.label != null && group.label.trim() !== ""
                       ? `${listboxId}-group-${groupIndex}-label`
                       : undefined
                   }
@@ -775,13 +833,16 @@ export function Select({
                     ...groupStyle,
                     borderTop:
                       groupIndex > 0 && group.label != null
-                        ? '1px solid var(--ktn-border-muted)'
+                        ? "1px solid var(--ktn-border-muted)"
                         : undefined,
-                    paddingBlockStart: groupIndex > 0 ? '0.35rem' : 0,
+                    paddingBlockStart: groupIndex > 0 ? "0.35rem" : 0,
                   }}
                 >
-                  {group.label != null && group.label.trim() !== '' ? (
-                    <div id={`${listboxId}-group-${groupIndex}-label`} style={groupLabelStyle}>
+                  {group.label != null && group.label.trim() !== "" ? (
+                    <div
+                      id={`${listboxId}-group-${groupIndex}-label`}
+                      style={groupLabelStyle}
+                    >
                       {group.label}
                     </div>
                   ) : null}
@@ -799,17 +860,22 @@ export function Select({
                         size="xs"
                         disabled={disabled || option.disabled}
                         aria-selected={selected}
-                        aria-disabled={disabled || option.disabled ? true : undefined}
+                        aria-disabled={
+                          disabled || option.disabled ? true : undefined
+                        }
                         role="option"
                         style={{
                           ...optionStyle,
                           backgroundColor: selected
-                            ? 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.12))'
-                            : 'transparent',
+                            ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.12))"
+                            : "transparent",
                           color: option.disabled
-                            ? 'var(--ktn-text-secondary, var(--ktn-text-primary))'
-                            : 'var(--ktn-text-primary)',
-                          cursor: disabled || option.disabled ? 'not-allowed' : 'pointer',
+                            ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
+                            : "var(--ktn-text-primary)",
+                          cursor:
+                            disabled || option.disabled
+                              ? "not-allowed"
+                              : "pointer",
                           opacity: option.disabled ? 0.6 : 1,
                         }}
                         onMouseDown={(event) => {
@@ -825,14 +891,21 @@ export function Select({
                           <span style={optionTextWrapStyle}>
                             <span style={optionLabelStyle}>{option.label}</span>
                             {option.description != null ? (
-                              <span style={optionDescriptionStyle}>{option.description}</span>
+                              <span style={optionDescriptionStyle}>
+                                {option.description}
+                              </span>
                             ) : null}
                           </span>
                         )}
 
                         {selected ? (
                           <span aria-hidden style={checkMarkStyle}>
-                            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                            >
                               <path
                                 d="M3.5 8.2l2.8 2.8 6.2-6.2"
                                 stroke="currentColor"

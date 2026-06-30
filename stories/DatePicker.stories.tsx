@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   DatePicker,
@@ -10,14 +10,14 @@ import {
   FieldLabel,
   type DatePickerActionContext,
   type DateRangeValue,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
 
 const meta: Meta<typeof DatePicker> = {
-  title: 'Forms/DatePicker',
+  title: "Forms/DatePicker",
   component: DatePicker,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -26,23 +26,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(860px, 92vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(860px, 92vw)",
 };
 
 const fieldStyle: CSSProperties = {
-  width: 'min(560px, 92vw)',
+  width: "min(560px, 92vw)",
 };
 
 const defaultRange: DateRangeValue = {
-  start: '2026-06-01',
-  end: '2026-06-10',
+  start: "2026-06-01",
+  end: "2026-06-10",
 };
 
 export const Datepicker: Story = {
-  name: 'Datepicker',
+  name: "Datepicker",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Datepicker</h3>
@@ -51,8 +51,14 @@ export const Datepicker: Story = {
         <FieldLabel>Trade Date</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="date" defaultValue="2026-06-21" style={{ width: '100%' }} />
-          <FieldDescription>Select a date for your analysis snapshot.</FieldDescription>
+          <DatePicker
+            mode="date"
+            defaultValue="2026-06-21"
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Select a date for your analysis snapshot.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -60,7 +66,7 @@ export const Datepicker: Story = {
 };
 
 export const RangePickerInput: Story = {
-  name: 'RangePicker Input',
+  name: "RangePicker Input",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>RangePicker Input</h3>
@@ -69,8 +75,14 @@ export const RangePickerInput: Story = {
         <FieldLabel>Execution Window</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="range" defaultValue={defaultRange} style={{ width: '100%' }} />
-          <FieldDescription>Set start and end dates for range-based reporting.</FieldDescription>
+          <DatePicker
+            mode="range"
+            defaultValue={defaultRange}
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Set start and end dates for range-based reporting.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -78,7 +90,7 @@ export const RangePickerInput: Story = {
 };
 
 export const TimePicker: Story = {
-  name: 'TimePicker',
+  name: "TimePicker",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>TimePicker</h3>
@@ -87,8 +99,14 @@ export const TimePicker: Story = {
         <FieldLabel>Alert Time</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="time" defaultValue="10:30" style={{ width: '100%' }} />
-          <FieldDescription>Choose when notifications should be triggered.</FieldDescription>
+          <DatePicker
+            mode="time"
+            defaultValue="10:30"
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Choose when notifications should be triggered.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -104,7 +122,7 @@ export const Invalid: Story = {
         <FieldLabel>Trade Date</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="date" invalid style={{ width: '100%' }} />
+          <DatePicker mode="date" required invalid style={{ width: "100%" }} />
           <FieldError>Trade date is required.</FieldError>
         </FieldContent>
       </Field>
@@ -113,7 +131,13 @@ export const Invalid: Story = {
         <FieldLabel>Execution Window</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="range" invalid defaultValue={defaultRange} style={{ width: '100%' }} />
+          <DatePicker
+            mode="range"
+            required
+            invalid
+            defaultValue={defaultRange}
+            style={{ width: "100%" }}
+          />
           <FieldError>Valid start and end dates are required.</FieldError>
         </FieldContent>
       </Field>
@@ -122,7 +146,13 @@ export const Invalid: Story = {
         <FieldLabel>Alert Time</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="time" invalid defaultValue="09:45" style={{ width: '100%' }} />
+          <DatePicker
+            mode="time"
+            required
+            invalid
+            defaultValue="09:45"
+            style={{ width: "100%" }}
+          />
           <FieldError>Alert time is required.</FieldError>
         </FieldContent>
       </Field>
@@ -139,8 +169,15 @@ export const Disabled: Story = {
         <FieldLabel>Trade Date</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="date" disabled defaultValue="2026-06-21" style={{ width: '100%' }} />
-          <FieldDescription>Date selection is locked for archived entries.</FieldDescription>
+          <DatePicker
+            mode="date"
+            disabled
+            defaultValue="2026-06-21"
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Date selection is locked for archived entries.
+          </FieldDescription>
         </FieldContent>
       </Field>
 
@@ -148,8 +185,15 @@ export const Disabled: Story = {
         <FieldLabel>Execution Window</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="range" disabled defaultValue={defaultRange} style={{ width: '100%' }} />
-          <FieldDescription>Range editing is disabled in this workflow.</FieldDescription>
+          <DatePicker
+            mode="range"
+            disabled
+            defaultValue={defaultRange}
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Range editing is disabled in this workflow.
+          </FieldDescription>
         </FieldContent>
       </Field>
 
@@ -157,8 +201,15 @@ export const Disabled: Story = {
         <FieldLabel>Alert Time</FieldLabel>
 
         <FieldContent>
-          <DatePicker mode="time" disabled defaultValue="10:30" style={{ width: '100%' }} />
-          <FieldDescription>Alert schedule is managed by the system.</FieldDescription>
+          <DatePicker
+            mode="time"
+            disabled
+            defaultValue="10:30"
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Alert schedule is managed by the system.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -166,20 +217,20 @@ export const Disabled: Story = {
 };
 
 export const DatePickerActions: Story = {
-  name: 'DatePicker Actions',
+  name: "DatePicker Actions",
   args: {
     onAction: undefined,
     onValueChange: undefined,
   },
   argTypes: {
     onAction: {
-      action: 'action',
+      action: "action",
       description:
-        'Fires for open, close, input, clear, date/time select, and month/year navigation actions.',
+        "Fires for open, close, input, clear, date/time select, and month/year navigation actions.",
     },
     onValueChange: {
-      action: 'value-change',
-      description: 'Fires when a valid normalized value is committed.',
+      action: "value-change",
+      description: "Fires when a valid normalized value is committed.",
     },
   },
   render: (args) => {
@@ -206,7 +257,7 @@ export const DatePickerActions: Story = {
               defaultValue="2026-06-21"
               onAction={handleAction}
               onValueChange={onValueChange}
-              style={{ width: '100%' }}
+              style={{ width: "100%" }}
             />
             <FieldDescription>
               Use input, open/close controls, and day buttons to emit actions.
@@ -219,39 +270,48 @@ export const DatePickerActions: Story = {
 };
 
 export const DatePickerPlayground: Story = {
-  name: 'Date Playground',
+  name: "Date Playground",
   args: {
-    mode: 'date',
-    variant: 'primary',
-    size: 'md',
+    mode: "date",
+    variant: "primary",
+    size: "md",
     disabled: false,
+    required: false,
     invalid: false,
-    placeholder: 'Select date',
+    placeholder: "Select date",
     withAction: false,
   },
   argTypes: {
     mode: {
-      control: 'inline-radio',
-      options: ['date'],
+      control: "inline-radio",
+      options: ["date"],
     },
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
     varient: { table: { disable: true } },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    invalid: { control: 'boolean' },
-    placeholder: { control: 'text' },
-    withAction: { control: 'boolean' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    invalid: { control: "boolean" },
+    placeholder: { control: "text" },
+    withAction: { control: "boolean" },
     rangeSeparator: { table: { disable: true } },
     value: { table: { disable: true } },
     defaultValue: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onValueChange: { action: 'value-change' },
+    onAction: { action: "action" },
+    onValueChange: { action: "value-change" },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
@@ -259,28 +319,36 @@ export const DatePickerPlayground: Story = {
     const withAction = args.withAction ?? false;
 
     return (
-      <Field disabled={args.disabled} invalid={args.invalid} style={fieldStyle}>
+      <Field
+        disabled={args.disabled}
+        invalid={args.invalid}
+        required={args.required}
+        style={fieldStyle}
+      >
         <FieldLabel>Trade Date</FieldLabel>
 
         <FieldContent>
           <DatePicker
-            key={`${args.variant}-${args.size}-${args.disabled}-${args.invalid}-${args.placeholder}`}
+            key={`${args.variant}-${args.size}-${args.disabled}-${args.required}-${args.invalid}-${args.placeholder}`}
             mode="date"
             variant={args.variant}
             size={args.size}
             disabled={args.disabled}
+            required={args.required}
             invalid={args.invalid}
             placeholder={args.placeholder}
             defaultValue="2026-06-21"
             onAction={withAction ? args.onAction : undefined}
             onValueChange={withAction ? args.onValueChange : undefined}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
 
           {args.invalid ? (
             <FieldError>Provide a valid date.</FieldError>
           ) : (
-            <FieldDescription>Adjust props to test date mode behavior.</FieldDescription>
+            <FieldDescription>
+              Adjust props to test date mode behavior.
+            </FieldDescription>
           )}
         </FieldContent>
       </Field>
@@ -289,40 +357,49 @@ export const DatePickerPlayground: Story = {
 };
 
 export const RangePickerPlayground: Story = {
-  name: 'Range Playground',
+  name: "Range Playground",
   args: {
-    mode: 'range',
-    variant: 'primary',
-    size: 'md',
+    mode: "range",
+    variant: "primary",
+    size: "md",
     disabled: false,
+    required: false,
     invalid: false,
-    placeholder: 'Select date range',
-    rangeSeparator: ' - ',
+    placeholder: "Select date range",
+    rangeSeparator: " - ",
     withAction: false,
   },
   argTypes: {
     mode: {
-      control: 'inline-radio',
-      options: ['range'],
+      control: "inline-radio",
+      options: ["range"],
     },
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
     varient: { table: { disable: true } },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    invalid: { control: 'boolean' },
-    placeholder: { control: 'text' },
-    rangeSeparator: { control: 'text' },
-    withAction: { control: 'boolean' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    invalid: { control: "boolean" },
+    placeholder: { control: "text" },
+    rangeSeparator: { control: "text" },
+    withAction: { control: "boolean" },
     value: { table: { disable: true } },
     defaultValue: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onValueChange: { action: 'value-change' },
+    onAction: { action: "action" },
+    onValueChange: { action: "value-change" },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
@@ -330,29 +407,37 @@ export const RangePickerPlayground: Story = {
     const withAction = args.withAction ?? false;
 
     return (
-      <Field disabled={args.disabled} invalid={args.invalid} style={fieldStyle}>
+      <Field
+        disabled={args.disabled}
+        invalid={args.invalid}
+        required={args.required}
+        style={fieldStyle}
+      >
         <FieldLabel>Execution Window</FieldLabel>
 
         <FieldContent>
           <DatePicker
-            key={`${args.variant}-${args.size}-${args.disabled}-${args.invalid}-${args.rangeSeparator}`}
+            key={`${args.variant}-${args.size}-${args.disabled}-${args.required}-${args.invalid}-${args.rangeSeparator}`}
             mode="range"
             variant={args.variant}
             size={args.size}
             disabled={args.disabled}
+            required={args.required}
             invalid={args.invalid}
             placeholder={args.placeholder}
             rangeSeparator={args.rangeSeparator}
             defaultValue={defaultRange}
             onAction={withAction ? args.onAction : undefined}
             onValueChange={withAction ? args.onValueChange : undefined}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
 
           {args.invalid ? (
             <FieldError>Provide a valid date range.</FieldError>
           ) : (
-            <FieldDescription>Adjust controls to validate range behavior.</FieldDescription>
+            <FieldDescription>
+              Adjust controls to validate range behavior.
+            </FieldDescription>
           )}
         </FieldContent>
       </Field>
@@ -361,39 +446,48 @@ export const RangePickerPlayground: Story = {
 };
 
 export const TimePickerPlayground: Story = {
-  name: 'Time Playground',
+  name: "Time Playground",
   args: {
-    mode: 'time',
-    variant: 'primary',
-    size: 'md',
+    mode: "time",
+    variant: "primary",
+    size: "md",
     disabled: false,
+    required: false,
     invalid: false,
-    placeholder: 'Select time',
+    placeholder: "Select time",
     withAction: false,
   },
   argTypes: {
     mode: {
-      control: 'inline-radio',
-      options: ['time'],
+      control: "inline-radio",
+      options: ["time"],
     },
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
     varient: { table: { disable: true } },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    invalid: { control: 'boolean' },
-    placeholder: { control: 'text' },
-    withAction: { control: 'boolean' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    invalid: { control: "boolean" },
+    placeholder: { control: "text" },
+    withAction: { control: "boolean" },
     rangeSeparator: { table: { disable: true } },
     value: { table: { disable: true } },
     defaultValue: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onValueChange: { action: 'value-change' },
+    onAction: { action: "action" },
+    onValueChange: { action: "value-change" },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
@@ -401,28 +495,36 @@ export const TimePickerPlayground: Story = {
     const withAction = args.withAction ?? false;
 
     return (
-      <Field disabled={args.disabled} invalid={args.invalid} style={fieldStyle}>
+      <Field
+        disabled={args.disabled}
+        invalid={args.invalid}
+        required={args.required}
+        style={fieldStyle}
+      >
         <FieldLabel>Alert Time</FieldLabel>
 
         <FieldContent>
           <DatePicker
-            key={`${args.variant}-${args.size}-${args.disabled}-${args.invalid}-${args.placeholder}`}
+            key={`${args.variant}-${args.size}-${args.disabled}-${args.required}-${args.invalid}-${args.placeholder}`}
             mode="time"
             variant={args.variant}
             size={args.size}
             disabled={args.disabled}
+            required={args.required}
             invalid={args.invalid}
             placeholder={args.placeholder}
             defaultValue="10:30"
             onAction={withAction ? args.onAction : undefined}
             onValueChange={withAction ? args.onValueChange : undefined}
-            style={{ width: '100%' }}
+            style={{ width: "100%" }}
           />
 
           {args.invalid ? (
             <FieldError>Provide a valid time.</FieldError>
           ) : (
-            <FieldDescription>Adjust controls to validate time behavior.</FieldDescription>
+            <FieldDescription>
+              Adjust controls to validate time behavior.
+            </FieldDescription>
           )}
         </FieldContent>
       </Field>

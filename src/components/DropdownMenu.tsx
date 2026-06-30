@@ -20,6 +20,7 @@ import { Button } from "./Button";
 export type DropdownMenuVariant = "default" | "outline" | "soft";
 export type DropdownMenuSize = "xs" | "sm" | "md" | "lg";
 export type DropdownMenuSide = "auto" | "bottom" | "top" | "left" | "right";
+export type DropdownMenuItemLayout = "block" | "inline";
 export type DropdownMenuActionSource =
   | "trigger"
   | "outside-click"
@@ -50,6 +51,7 @@ export interface DropdownMenuProps extends Omit<
   variant?: DropdownMenuVariant;
   varient?: DropdownMenuVariant;
   side?: DropdownMenuSide;
+  itemLayout?: DropdownMenuItemLayout;
   closeOnSelect?: boolean;
   disabled?: boolean;
 }
@@ -138,7 +140,6 @@ export interface DropdownMenuRadioItemProps extends Omit<
 
 type DropdownMenuSizeTokens = {
   triggerSize: "xs" | "sm" | "md" | "lg";
-  panelMinWidth: string;
   panelPadding: string;
   itemHeight: string;
   itemFontSize: string;
@@ -179,6 +180,7 @@ interface DropdownMenuContextValue {
   size: DropdownMenuSize;
   variant: DropdownMenuVariant;
   side: DropdownMenuSide;
+  itemLayout: DropdownMenuItemLayout;
   closeOnSelect: boolean;
   disabled: boolean;
   triggerRef: React.MutableRefObject<HTMLDivElement | null>;
@@ -196,7 +198,6 @@ const baseClasses = "inline-flex min-w-0";
 const sizeTokens: Record<DropdownMenuSize, DropdownMenuSizeTokens> = {
   xs: {
     triggerSize: "xs",
-    panelMinWidth: "11.5rem",
     panelPadding: "0.2rem",
     itemHeight: "1.7rem",
     itemFontSize: "0.75rem",
@@ -207,7 +208,6 @@ const sizeTokens: Record<DropdownMenuSize, DropdownMenuSizeTokens> = {
   },
   sm: {
     triggerSize: "sm",
-    panelMinWidth: "12rem",
     panelPadding: "0.25rem",
     itemHeight: "1.95rem",
     itemFontSize: "0.8125rem",
@@ -218,7 +218,6 @@ const sizeTokens: Record<DropdownMenuSize, DropdownMenuSizeTokens> = {
   },
   md: {
     triggerSize: "md",
-    panelMinWidth: "13rem",
     panelPadding: "0.3rem",
     itemHeight: "2.15rem",
     itemFontSize: "0.875rem",
@@ -229,7 +228,6 @@ const sizeTokens: Record<DropdownMenuSize, DropdownMenuSizeTokens> = {
   },
   lg: {
     triggerSize: "lg",
-    panelMinWidth: "14rem",
     panelPadding: "0.35rem",
     itemHeight: "2.35rem",
     itemFontSize: "0.9375rem",
@@ -536,6 +534,7 @@ function useDropdownMenuContextValue(): DropdownMenuContextValue {
     size: "md",
     variant: "default",
     side: "auto",
+    itemLayout: "block",
     closeOnSelect: true,
     disabled: false,
     triggerRef: { current: null },
@@ -559,17 +558,20 @@ function renderPortal(children: ReactNode): JSX.Element | null {
 function getPanelStyle(
   sizeToken: DropdownMenuSizeTokens,
   variantToken: DropdownMenuVariantTokens,
+  itemLayout: DropdownMenuItemLayout,
   x: number,
   y: number,
   visible: boolean,
-  minWidth?: string,
 ): CSSProperties {
   return {
     position: "fixed",
     insetInlineStart: `${x}px`,
     insetBlockStart: `${y}px`,
     zIndex: 120,
-    minWidth: minWidth ?? sizeToken.panelMinWidth,
+    width: "max-content",
+    display: itemLayout === "block" ? "flex" : "block",
+    flexDirection: itemLayout === "block" ? "column" : undefined,
+    alignItems: itemLayout === "block" ? "stretch" : undefined,
     maxWidth: `calc(100vw - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
     maxHeight: `calc(100vh - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
     overflowY: visible ? "auto" : "hidden",
@@ -602,6 +604,7 @@ export function DropdownMenu({
   variant,
   varient,
   side = "auto",
+  itemLayout = "block",
   closeOnSelect = true,
   disabled = false,
   className = "",
@@ -695,6 +698,7 @@ export function DropdownMenu({
     size,
     variant: resolvedVariant,
     side,
+    itemLayout,
     closeOnSelect,
     disabled,
     triggerRef,
@@ -809,6 +813,7 @@ export function DropdownMenuContent({
     open,
     size,
     variant,
+    itemLayout,
     side: rootSide,
     triggerRef,
     setOpen,
@@ -893,12 +898,10 @@ export function DropdownMenuContent({
   const panelStyle = getPanelStyle(
     sizeToken,
     variantToken,
+    itemLayout,
     position?.x ?? FLOATING_VIEWPORT_MARGIN,
     position?.y ?? FLOATING_VIEWPORT_MARGIN,
     isReady,
-    triggerRef.current != null
-      ? `${Math.max(triggerRef.current.getBoundingClientRect().width, 0)}px`
-      : undefined,
   );
 
   const composedStyle: CSSProperties = {
@@ -1114,6 +1117,7 @@ export function DropdownMenuItem({
   const {
     size,
     variant,
+    itemLayout,
     closeOnSelect,
     setOpen,
     disabled: menuDisabled,
@@ -1242,7 +1246,6 @@ export function DropdownMenuItem({
   }, [isSubmenuOpen, submenuOffset, submenuSide]);
 
   const rowStyle: CSSProperties = {
-    width: "100%",
     minWidth: 0,
     minHeight: sizeToken.itemHeight,
     border: "none",
@@ -1368,6 +1371,7 @@ export function DropdownMenuItem({
   const panelStyle = getPanelStyle(
     sizeToken,
     variantToken,
+    itemLayout,
     submenuPosition?.x ?? FLOATING_VIEWPORT_MARGIN,
     submenuPosition?.y ?? FLOATING_VIEWPORT_MARGIN,
     isSubmenuReady,

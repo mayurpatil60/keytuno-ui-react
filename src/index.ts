@@ -321,6 +321,7 @@ export type {
   DropdownMenuCheckboxItemProps,
   DropdownMenuContentProps,
   DropdownMenuGroupProps,
+  DropdownMenuItemLayout,
   DropdownMenuItemProps,
   DropdownMenuLabelProps,
   DropdownMenuProps,
@@ -359,6 +360,20 @@ export type {
   FileListSize,
   FileListVariant,
 } from "./components/FileList";
+export { List } from "./components/List";
+export type {
+  ListActionContext,
+  ListActionSource,
+  ListColumns,
+  ListHoverActionId,
+  ListItem,
+  ListItemValues,
+  ListLine,
+  ListProps,
+  ListResolvedColumns,
+  ListSize,
+  ListTone,
+} from "./components/List";
 export { FileUpload } from "./components/FileUpload";
 export type {
   FileUploadFile,

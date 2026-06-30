@@ -1,4 +1,11 @@
-import { type CSSProperties, type HTMLAttributes, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+} from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 import {
   FiFile,
@@ -54,6 +61,10 @@ export interface FileListProps extends Omit<
   showMimeType?: boolean;
   showBytes?: boolean;
   compactChipProps?: Omit<BadgeProps, "children">;
+  virtualized?: boolean;
+  virtualizedMaxHeight?: CSSProperties["maxHeight"];
+  virtualizedEstimateSize?: number;
+  virtualizedOverscan?: number;
   onRemove?: (file: FileListItem, index: number) => void;
 }
 
@@ -71,6 +82,12 @@ type FileListSizeTokens = {
 };
 
 const baseClasses = "flex w-full min-w-0 flex-col";
+const DEFAULT_VIRTUAL_ESTIMATE: Record<FileListSize, number> = {
+  xs: 66,
+  sm: 74,
+  md: 84,
+  lg: 96,
+};
 
 const sizeTokens: Record<FileListSize, FileListSizeTokens> = {
   xs: {
@@ -328,6 +345,10 @@ export function FileList({
   showMimeType = true,
   showBytes = true,
   compactChipProps,
+  virtualized = false,
+  virtualizedMaxHeight = "24rem",
+  virtualizedEstimateSize,
+  virtualizedOverscan = 8,
   onRemove,
   className = "",
   style,
@@ -336,6 +357,53 @@ export function FileList({
   const sizeToken = sizeTokens[size];
   const badgeSize = toBadgeSize(size);
   const isCompact = variant === "compact";
+  const shouldVirtualize = virtualized && !isCompact;
+  const listViewportRef = useRef<HTMLDivElement | null>(null);
+  const resolvedEstimateSize =
+    virtualizedEstimateSize ?? DEFAULT_VIRTUAL_ESTIMATE[size];
+
+  const virtualizer = useVirtualizer({
+    count: files.length,
+    getScrollElement: () => (shouldVirtualize ? listViewportRef.current : null),
+    estimateSize: () => resolvedEstimateSize,
+    overscan: virtualizedOverscan,
+    getItemKey: (index) => {
+      const file = files[index];
+
+      if (file == null) {
+        return index;
+      }
+
+      return `${file.id}-${index}`;
+    },
+    measureElement: (element) => {
+      if (element == null) {
+        return resolvedEstimateSize;
+      }
+
+      return element.getBoundingClientRect().height;
+    },
+  });
+
+  useEffect(() => {
+    if (!shouldVirtualize) {
+      return;
+    }
+
+    virtualizer.measure();
+  }, [
+    shouldVirtualize,
+    files.length,
+    size,
+    variant,
+    showRemoveAction,
+    showSize,
+    showDimensions,
+    showMimeType,
+    showBytes,
+    virtualizer,
+  ]);
+
   const {
     variant: compactChipVariant,
     varient: compactChipLegacyVariant,
@@ -345,6 +413,22 @@ export function FileList({
     ...compactChipRestProps
   } = compactChipProps ?? {};
 
+  const itemGap = isCompact
+    ? size === "xs"
+      ? "0.34rem"
+      : size === "sm"
+        ? "0.4rem"
+        : size === "lg"
+          ? "0.58rem"
+          : "0.46rem"
+    : size === "xs"
+      ? "0.36rem"
+      : size === "sm"
+        ? "0.42rem"
+        : size === "lg"
+          ? "0.6rem"
+          : "0.5rem";
+
   const rootStyle: CSSProperties = {
     width: "100%",
     minWidth: 0,
@@ -352,21 +436,7 @@ export function FileList({
     flexDirection: isCompact ? "row" : "column",
     flexWrap: isCompact ? "wrap" : undefined,
     alignItems: isCompact ? "center" : undefined,
-    gap: isCompact
-      ? size === "xs"
-        ? "0.34rem"
-        : size === "sm"
-          ? "0.4rem"
-          : size === "lg"
-            ? "0.58rem"
-            : "0.46rem"
-      : size === "xs"
-        ? "0.36rem"
-        : size === "sm"
-          ? "0.42rem"
-          : size === "lg"
-            ? "0.6rem"
-            : "0.5rem",
+    gap: shouldVirtualize ? undefined : itemGap,
     boxSizing: "border-box",
     ...style,
   };
@@ -394,404 +464,466 @@ export function FileList({
     );
   }
 
-  return (
-    <div className={composedClassName} style={rootStyle} {...props}>
-      {files.map((file, index) => {
-        const itemDisabled = disabled || file.disabled === true;
-        const hasRemoveHandler = typeof onRemove === "function";
+  function renderCompactItem(file: FileListItem, index: number): JSX.Element {
+    const itemDisabled = disabled || file.disabled === true;
+    const hasRemoveHandler = typeof onRemove === "function";
 
-        if (isCompact) {
-          const compactChipWrapStyle: CSSProperties = {
-            minWidth: 0,
-            display: "inline-flex",
-            alignItems: "center",
-            gap:
-              size === "xs"
-                ? "0.22rem"
-                : size === "sm"
-                  ? "0.24rem"
-                  : size === "lg"
-                    ? "0.3rem"
-                    : "0.26rem",
-            opacity: itemDisabled ? 0.64 : 1,
-          };
+    const compactChipWrapStyle: CSSProperties = {
+      minWidth: 0,
+      display: "inline-flex",
+      alignItems: "center",
+      gap:
+        size === "xs"
+          ? "0.22rem"
+          : size === "sm"
+            ? "0.24rem"
+            : size === "lg"
+              ? "0.3rem"
+              : "0.26rem",
+      opacity: itemDisabled ? 0.64 : 1,
+    };
 
-          const compactChipContainerStyle: CSSProperties = {
-            maxWidth: "min(100%, 18.5rem)",
-            opacity: itemDisabled ? 0.86 : 1,
-            ...compactChipCustomStyle,
-          };
+    const compactChipContainerStyle: CSSProperties = {
+      maxWidth: "min(100%, 18.5rem)",
+      opacity: itemDisabled ? 0.86 : 1,
+      ...compactChipCustomStyle,
+    };
 
-          const compactChipLinkStyle: CSSProperties = {
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 0,
-            margin: 0,
-            gap: 0,
-            lineHeight: 1,
-            textDecoration: "none",
-            maxWidth: "100%",
-            color: "inherit",
-            minWidth: 0,
-            width: "100%",
-          };
+    const compactChipLinkStyle: CSSProperties = {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 0,
+      margin: 0,
+      gap: 0,
+      lineHeight: 1,
+      textDecoration: "none",
+      maxWidth: "100%",
+      color: "inherit",
+      minWidth: 0,
+      width: "100%",
+    };
 
-          const compactChipTextStyle: CSSProperties = {
-            display: "inline-block",
-            maxWidth: "100%",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            fontWeight: 500,
-          };
+    const compactChipTextStyle: CSSProperties = {
+      display: "inline-block",
+      maxWidth: "100%",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      fontWeight: 500,
+    };
 
-          const compactRemoveDisabled = itemDisabled || !hasRemoveHandler;
-          const compactRemoveIconSize = Math.max(
-            9,
-            sizeToken.removeIconSize - 4,
-          );
+    const compactRemoveDisabled = itemDisabled || !hasRemoveHandler;
+    const compactRemoveIconSize = Math.max(9, sizeToken.removeIconSize - 4);
 
-          const compactRemoveButtonStyle: CSSProperties = {
-            border: 0,
-            background: "transparent",
-            display: "inline-flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 0,
-            margin: 0,
-            width:
-              size === "xs"
-                ? "0.74rem"
-                : size === "sm"
-                  ? "0.8rem"
-                  : size === "lg"
-                    ? "0.9rem"
-                    : "0.84rem",
-            height:
-              size === "xs"
-                ? "0.74rem"
-                : size === "sm"
-                  ? "0.8rem"
-                  : size === "lg"
-                    ? "0.9rem"
-                    : "0.84rem",
-            borderRadius: "999px",
-            color: "var(--ktn-action-danger-bg, #dc2626)",
-            cursor: compactRemoveDisabled ? "not-allowed" : "pointer",
-            opacity: compactRemoveDisabled ? 0.48 : 0.86,
-            lineHeight: 0,
-            flexShrink: 0,
-          };
+    const compactRemoveButtonStyle: CSSProperties = {
+      border: 0,
+      background: "transparent",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 0,
+      margin: 0,
+      width:
+        size === "xs"
+          ? "0.74rem"
+          : size === "sm"
+            ? "0.8rem"
+            : size === "lg"
+              ? "0.9rem"
+              : "0.84rem",
+      height:
+        size === "xs"
+          ? "0.74rem"
+          : size === "sm"
+            ? "0.8rem"
+            : size === "lg"
+              ? "0.9rem"
+              : "0.84rem",
+      borderRadius: "999px",
+      color: "var(--ktn-action-danger-bg, #dc2626)",
+      cursor: compactRemoveDisabled ? "not-allowed" : "pointer",
+      opacity: compactRemoveDisabled ? 0.48 : 0.86,
+      lineHeight: 0,
+      flexShrink: 0,
+    };
 
-          return (
-            <div key={file.id} style={compactChipWrapStyle}>
-              <Badge
-                {...compactChipRestProps}
-                size={compactChipSize ?? badgeSize}
-                variant={
-                  compactChipVariant ??
-                  compactChipLegacyVariant ??
-                  (itemDisabled ? "ghost" : "secondary")
+    return (
+      <div key={file.id} style={compactChipWrapStyle}>
+        <Badge
+          {...compactChipRestProps}
+          size={compactChipSize ?? badgeSize}
+          variant={
+            compactChipVariant ??
+            compactChipLegacyVariant ??
+            (itemDisabled ? "ghost" : "secondary")
+          }
+          className={compactChipClassName}
+          style={compactChipContainerStyle}
+        >
+          <Tooltip
+            label={file.name}
+            size="xs"
+            side="top"
+            disabled={file.name.trim() === ""}
+            style={{ minWidth: 0, maxWidth: "14.5rem", width: "100%" }}
+          >
+            <FilePreview
+              asLink
+              src={file.src}
+              name={file.name}
+              size={toPreviewSize(size)}
+              type={file.type ?? "auto"}
+              mimeType={file.mimeType}
+              thumbnailSrc={file.thumbnailSrc}
+              disabled={itemDisabled}
+              showLinkIcons={false}
+              linkButtonStyle={compactChipLinkStyle}
+              linkLabel={<span style={compactChipTextStyle}>{file.name}</span>}
+              style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}
+            />
+          </Tooltip>
+
+          {showRemoveAction ? (
+            <button
+              type="button"
+              disabled={compactRemoveDisabled}
+              aria-label={`Remove ${file.name}`}
+              title={`Remove ${file.name}`}
+              style={compactRemoveButtonStyle}
+              onClick={() => {
+                if (compactRemoveDisabled) {
+                  return;
                 }
-                className={compactChipClassName}
-                style={compactChipContainerStyle}
-              >
-                <Tooltip
-                  label={file.name}
-                  size="xs"
-                  side="top"
-                  disabled={file.name.trim() === ""}
-                  style={{ minWidth: 0, maxWidth: "14.5rem", width: "100%" }}
-                >
-                  <FilePreview
-                    asLink
-                    src={file.src}
-                    name={file.name}
-                    size={toPreviewSize(size)}
-                    type={file.type ?? "auto"}
-                    mimeType={file.mimeType}
-                    thumbnailSrc={file.thumbnailSrc}
-                    disabled={itemDisabled}
-                    showLinkIcons={false}
-                    linkButtonStyle={compactChipLinkStyle}
-                    linkLabel={
-                      <span style={compactChipTextStyle}>{file.name}</span>
-                    }
-                    style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}
-                  />
-                </Tooltip>
 
-                {showRemoveAction ? (
-                  <button
-                    type="button"
-                    disabled={compactRemoveDisabled}
-                    aria-label={`Remove ${file.name}`}
-                    title={`Remove ${file.name}`}
-                    style={compactRemoveButtonStyle}
-                    onClick={() => {
-                      if (compactRemoveDisabled) {
-                        return;
-                      }
+                onRemove?.(file, index);
+              }}
+            >
+              <FiTrash2 size={compactRemoveIconSize} />
+            </button>
+          ) : null}
+        </Badge>
+      </div>
+    );
+  }
 
-                      onRemove?.(file, index);
+  function renderDetailedItem(file: FileListItem, index: number): JSX.Element {
+    const itemDisabled = disabled || file.disabled === true;
+    const hasRemoveHandler = typeof onRemove === "function";
+    const visualType = resolveVisualType(file);
+    const thumbnailImageSource =
+      visualType === "image" ? (file.thumbnailSrc ?? file.src) : undefined;
+
+    const rowStyle: CSSProperties = {
+      width: "100%",
+      minWidth: 0,
+      display: "flex",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      gap: sizeToken.itemGap,
+      padding: sizeToken.itemPadding,
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderColor: "var(--ktn-border-muted)",
+      borderRadius: sizeToken.itemRadius,
+      backgroundColor:
+        "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 92%, var(--ktn-bg-muted, #f3f4f6))",
+      boxSizing: "border-box",
+      opacity: itemDisabled ? 0.64 : 1,
+    };
+
+    const leftColumnStyle: CSSProperties = {
+      minWidth: 0,
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: "0.24rem",
+    };
+
+    const contentWrapStyle: CSSProperties = {
+      minWidth: 0,
+      flex: 1,
+      display: "flex",
+      alignItems: "flex-start",
+      gap: sizeToken.itemGap,
+    };
+
+    const thumbnailBoxStyle: CSSProperties = {
+      width: sizeToken.thumbnailBoxSize,
+      height: sizeToken.thumbnailBoxSize,
+      minWidth: sizeToken.thumbnailBoxSize,
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderColor:
+        "color-mix(in srgb, var(--ktn-border-muted) 88%, transparent)",
+      borderRadius: `calc(${sizeToken.itemRadius} - 0.08rem)`,
+      backgroundColor:
+        visualType === "image"
+          ? "color-mix(in srgb, var(--ktn-bg-muted, #f3f4f6) 74%, transparent)"
+          : "color-mix(in srgb, var(--ktn-bg-muted, #f3f4f6) 84%, transparent)",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      overflow: "hidden",
+      color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+      flexShrink: 0,
+    };
+
+    const thumbnailTriggerStyle: CSSProperties = {
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: 0,
+      margin: 0,
+      gap: 0,
+      lineHeight: 0,
+      textDecoration: "none",
+      maxWidth: "none",
+      color: "inherit",
+    };
+
+    const metaParts: string[] = [];
+
+    if (showSize) {
+      const resolvedSize =
+        typeof file.sizeLabel === "string" && file.sizeLabel.trim() !== ""
+          ? file.sizeLabel.trim()
+          : isFinitePositiveNumber(file.sizeBytes)
+            ? formatBytes(file.sizeBytes)
+            : null;
+
+      if (resolvedSize != null) {
+        metaParts.push(resolvedSize);
+      }
+    }
+
+    if (showDimensions) {
+      const dimensionLabel = resolveDimensionsLabel(file);
+
+      if (dimensionLabel != null) {
+        metaParts.push(dimensionLabel);
+      }
+    }
+
+    if (
+      variant === "advanced" &&
+      showBytes &&
+      isFinitePositiveNumber(file.sizeBytes)
+    ) {
+      metaParts.push(
+        `${Math.round(file.sizeBytes).toLocaleString("en-US")} bytes`,
+      );
+    }
+
+    if (variant === "advanced" && showMimeType) {
+      if (typeof file.mimeType === "string" && file.mimeType.trim() !== "") {
+        metaParts.push(file.mimeType.trim());
+      } else {
+        metaParts.push(toTypeLabel(file));
+      }
+    }
+
+    const metaLine = metaParts.join(" • ");
+
+    const metaStyle: CSSProperties = {
+      margin: 0,
+      fontSize: sizeToken.metaFontSize,
+      lineHeight: 1.35,
+      color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+      whiteSpace: "normal",
+      overflowWrap: "anywhere",
+    };
+
+    const descriptionStyle: CSSProperties = {
+      margin: 0,
+      fontSize: sizeToken.descriptionFontSize,
+      lineHeight: 1.35,
+      color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+      whiteSpace: "normal",
+      overflowWrap: "anywhere",
+    };
+
+    return (
+      <div key={file.id} style={rowStyle}>
+        <div style={contentWrapStyle}>
+          <FilePreview
+            asLink
+            src={file.src}
+            name={file.name}
+            size={toPreviewSize(size)}
+            type={file.type ?? "auto"}
+            mimeType={file.mimeType}
+            thumbnailSrc={file.thumbnailSrc}
+            disabled={itemDisabled}
+            showLinkIcons={false}
+            linkButtonStyle={thumbnailTriggerStyle}
+            linkLabel={
+              <span style={thumbnailBoxStyle}>
+                {thumbnailImageSource != null ? (
+                  <img
+                    src={thumbnailImageSource}
+                    alt=""
+                    aria-hidden
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      display: "block",
                     }}
+                  />
+                ) : (
+                  <span
+                    aria-hidden
+                    style={{ display: "inline-flex", lineHeight: 0 }}
                   >
-                    <FiTrash2 size={compactRemoveIconSize} />
-                  </button>
-                ) : null}
-              </Badge>
-            </div>
-          );
-        }
+                    {renderThumbnailIcon(
+                      visualType,
+                      sizeToken.thumbnailIconSize,
+                    )}
+                  </span>
+                )}
+              </span>
+            }
+          />
 
-        const visualType = resolveVisualType(file);
-        const thumbnailImageSource =
-          visualType === "image" ? (file.thumbnailSrc ?? file.src) : undefined;
-
-        const rowStyle: CSSProperties = {
-          width: "100%",
-          minWidth: 0,
-          display: "flex",
-          alignItems: "flex-start",
-          justifyContent: "space-between",
-          gap: sizeToken.itemGap,
-          padding: sizeToken.itemPadding,
-          borderWidth: "1px",
-          borderStyle: "solid",
-          borderColor: "var(--ktn-border-muted)",
-          borderRadius: sizeToken.itemRadius,
-          backgroundColor:
-            "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 92%, var(--ktn-bg-muted, #f3f4f6))",
-          boxSizing: "border-box",
-          opacity: itemDisabled ? 0.64 : 1,
-        };
-
-        const leftColumnStyle: CSSProperties = {
-          minWidth: 0,
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          gap: "0.24rem",
-        };
-
-        const contentWrapStyle: CSSProperties = {
-          minWidth: 0,
-          flex: 1,
-          display: "flex",
-          alignItems: "flex-start",
-          gap: sizeToken.itemGap,
-        };
-
-        const thumbnailBoxStyle: CSSProperties = {
-          width: sizeToken.thumbnailBoxSize,
-          height: sizeToken.thumbnailBoxSize,
-          minWidth: sizeToken.thumbnailBoxSize,
-          borderWidth: "1px",
-          borderStyle: "solid",
-          borderColor:
-            "color-mix(in srgb, var(--ktn-border-muted) 88%, transparent)",
-          borderRadius: `calc(${sizeToken.itemRadius} - 0.08rem)`,
-          backgroundColor:
-            visualType === "image"
-              ? "color-mix(in srgb, var(--ktn-bg-muted, #f3f4f6) 74%, transparent)"
-              : "color-mix(in srgb, var(--ktn-bg-muted, #f3f4f6) 84%, transparent)",
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-          color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-          flexShrink: 0,
-        };
-
-        const thumbnailTriggerStyle: CSSProperties = {
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: 0,
-          margin: 0,
-          gap: 0,
-          lineHeight: 0,
-          textDecoration: "none",
-          maxWidth: "none",
-          color: "inherit",
-        };
-
-        const metaParts: string[] = [];
-
-        if (showSize) {
-          const resolvedSize =
-            typeof file.sizeLabel === "string" && file.sizeLabel.trim() !== ""
-              ? file.sizeLabel.trim()
-              : isFinitePositiveNumber(file.sizeBytes)
-                ? formatBytes(file.sizeBytes)
-                : null;
-
-          if (resolvedSize != null) {
-            metaParts.push(resolvedSize);
-          }
-        }
-
-        if (showDimensions) {
-          const dimensionLabel = resolveDimensionsLabel(file);
-
-          if (dimensionLabel != null) {
-            metaParts.push(dimensionLabel);
-          }
-        }
-
-        if (
-          variant === "advanced" &&
-          showBytes &&
-          isFinitePositiveNumber(file.sizeBytes)
-        ) {
-          metaParts.push(
-            `${Math.round(file.sizeBytes).toLocaleString("en-US")} bytes`,
-          );
-        }
-
-        if (variant === "advanced" && showMimeType) {
-          if (
-            typeof file.mimeType === "string" &&
-            file.mimeType.trim() !== ""
-          ) {
-            metaParts.push(file.mimeType.trim());
-          } else {
-            metaParts.push(toTypeLabel(file));
-          }
-        }
-
-        const metaLine = metaParts.join(" • ");
-
-        const metaStyle: CSSProperties = {
-          margin: 0,
-          fontSize: sizeToken.metaFontSize,
-          lineHeight: 1.35,
-          color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-          whiteSpace: "normal",
-          overflowWrap: "anywhere",
-        };
-
-        const descriptionStyle: CSSProperties = {
-          margin: 0,
-          fontSize: sizeToken.descriptionFontSize,
-          lineHeight: 1.35,
-          color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-          whiteSpace: "normal",
-          overflowWrap: "anywhere",
-        };
-
-        return (
-          <div key={file.id} style={rowStyle}>
-            <div style={contentWrapStyle}>
+          <div style={leftColumnStyle}>
+            <Tooltip
+              label={file.name}
+              size="xs"
+              side="top"
+              disabled={file.name.trim() === ""}
+              style={{ width: "100%", minWidth: 0 }}
+            >
               <FilePreview
                 asLink
                 src={file.src}
                 name={file.name}
+                linkLabel={file.name}
                 size={toPreviewSize(size)}
                 type={file.type ?? "auto"}
                 mimeType={file.mimeType}
                 thumbnailSrc={file.thumbnailSrc}
                 disabled={itemDisabled}
                 showLinkIcons={false}
-                linkButtonStyle={thumbnailTriggerStyle}
-                linkLabel={
-                  <span style={thumbnailBoxStyle}>
-                    {thumbnailImageSource != null ? (
-                      <img
-                        src={thumbnailImageSource}
-                        alt=""
-                        aria-hidden
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
-                      />
-                    ) : (
-                      <span
-                        aria-hidden
-                        style={{ display: "inline-flex", lineHeight: 0 }}
-                      >
-                        {renderThumbnailIcon(
-                          visualType,
-                          sizeToken.thumbnailIconSize,
-                        )}
-                      </span>
-                    )}
-                  </span>
-                }
-              />
-
-              <div style={leftColumnStyle}>
-                <Tooltip
-                  label={file.name}
-                  size="xs"
-                  side="top"
-                  disabled={file.name.trim() === ""}
-                  style={{ width: "100%", minWidth: 0 }}
-                >
-                  <FilePreview
-                    asLink
-                    src={file.src}
-                    name={file.name}
-                    linkLabel={file.name}
-                    size={toPreviewSize(size)}
-                    type={file.type ?? "auto"}
-                    mimeType={file.mimeType}
-                    thumbnailSrc={file.thumbnailSrc}
-                    disabled={itemDisabled}
-                    showLinkIcons={false}
-                    linkButtonStyle={{
-                      width: "100%",
-                      minWidth: 0,
-                      maxWidth: "100%",
-                      justifyContent: "flex-start",
-                      textAlign: "left",
-                    }}
-                    style={{
-                      width: "100%",
-                      minWidth: 0,
-                      fontSize: sizeToken.titleFontSize,
-                    }}
-                  />
-                </Tooltip>
-
-                {metaLine !== "" ? <p style={metaStyle}>{metaLine}</p> : null}
-
-                {file.description != null ? (
-                  <p style={descriptionStyle}>{file.description}</p>
-                ) : null}
-              </div>
-            </div>
-
-            {showRemoveAction ? (
-              <Button
-                type="button"
-                size={sizeToken.removeButtonSize}
-                variant="outline"
-                compact
-                iconOnly
-                iconOnlyTone
-                disabled={itemDisabled || !hasRemoveHandler}
-                aria-label={`Remove ${file.name}`}
-                tooltip={`Remove ${file.name}`}
-                tooltipSide="left"
-                tooltipSize="xs"
-                iconColor="var(--ktn-action-danger-bg, #dc2626)"
-                style={{ borderRadius: "999px", flexShrink: 0 }}
-                onClick={() => {
-                  onRemove?.(file, index);
+                linkButtonStyle={{
+                  width: "100%",
+                  minWidth: 0,
+                  maxWidth: "100%",
+                  justifyContent: "flex-start",
+                  textAlign: "left",
                 }}
-              >
-                <FiTrash2 size={sizeToken.removeIconSize} />
-              </Button>
+                style={{
+                  width: "100%",
+                  minWidth: 0,
+                  fontSize: sizeToken.titleFontSize,
+                }}
+              />
+            </Tooltip>
+
+            {metaLine !== "" ? <p style={metaStyle}>{metaLine}</p> : null}
+
+            {file.description != null ? (
+              <p style={descriptionStyle}>{file.description}</p>
             ) : null}
           </div>
-        );
-      })}
+        </div>
+
+        {showRemoveAction ? (
+          <Button
+            type="button"
+            size={sizeToken.removeButtonSize}
+            variant="outline"
+            compact
+            iconOnly
+            iconOnlyTone
+            disabled={itemDisabled || !hasRemoveHandler}
+            aria-label={`Remove ${file.name}`}
+            tooltip={`Remove ${file.name}`}
+            tooltipSide="left"
+            tooltipSize="xs"
+            iconColor="var(--ktn-action-danger-bg, #dc2626)"
+            style={{ borderRadius: "999px", flexShrink: 0 }}
+            onClick={() => {
+              onRemove?.(file, index);
+            }}
+          >
+            <FiTrash2 size={sizeToken.removeIconSize} />
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (isCompact) {
+    return (
+      <div className={composedClassName} style={rootStyle} {...props}>
+        {files.map((file, index) => renderCompactItem(file, index))}
+      </div>
+    );
+  }
+
+  if (shouldVirtualize) {
+    return (
+      <div className={composedClassName} style={rootStyle} {...props}>
+        <div
+          ref={listViewportRef}
+          role="presentation"
+          style={{
+            position: "relative",
+            width: "100%",
+            minWidth: 0,
+            maxHeight: virtualizedMaxHeight,
+            overflowY: "auto",
+            overflowX: "hidden",
+          }}
+        >
+          <div
+            role="presentation"
+            style={{
+              position: "relative",
+              width: "100%",
+              minWidth: 0,
+              height: `${virtualizer.getTotalSize()}px`,
+            }}
+          >
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const file = files[virtualRow.index];
+
+              if (file == null) {
+                return null;
+              }
+
+              return (
+                <div
+                  key={virtualRow.key}
+                  role="presentation"
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    boxSizing: "border-box",
+                    paddingBottom:
+                      virtualRow.index < files.length - 1 ? itemGap : undefined,
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  {renderDetailedItem(file, virtualRow.index)}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={composedClassName} style={rootStyle} {...props}>
+      {files.map((file, index) => renderDetailedItem(file, index))}
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { useState, type CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import { useState, type CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   Card,
@@ -10,14 +10,14 @@ import {
   FieldGroup,
   FieldLabel,
   Slider,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
 
 const meta: Meta<typeof Slider> = {
-  title: 'Forms/Slider',
+  title: "Forms/Slider",
   component: Slider,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -26,34 +26,40 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(900px, 94vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(900px, 94vw)",
 };
 
 const frameStyle: CSSProperties = {
-  width: 'min(620px, 94vw)',
+  width: "min(620px, 94vw)",
 };
 
 const verticalRowStyle: CSSProperties = {
-  display: 'flex',
-  alignItems: 'flex-end',
-  gap: '1rem',
-  minHeight: '13rem',
+  display: "flex",
+  alignItems: "flex-end",
+  gap: "1rem",
+  minHeight: "13rem",
 };
 
 function ControlledDemo(): JSX.Element {
   const [values, setValues] = useState<number[]>([40]);
 
   return (
-    <div style={{ width: '100%' }}>
-      <Slider value={values} onValueChange={setValues} min={0} max={100} step={1} />
+    <div style={{ width: "100%" }}>
+      <Slider
+        value={values}
+        onValueChange={setValues}
+        min={0}
+        max={100}
+        step={1}
+      />
       <p
         style={{
-          margin: '0.5rem 0 0',
-          fontSize: '0.8rem',
-          color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+          margin: "0.5rem 0 0",
+          fontSize: "0.8rem",
+          color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
         }}
       >
         Current value: {values[0]}
@@ -71,7 +77,13 @@ export const Basic: Story = {
         <FieldLabel htmlFor="slider-basic">Risk Threshold</FieldLabel>
 
         <FieldContent>
-          <Slider id="slider-basic" defaultValue={[55]} min={0} max={100} step={1} />
+          <Slider
+            id="slider-basic"
+            defaultValue={[55]}
+            min={0}
+            max={100}
+            step={1}
+          />
           <FieldDescription>
             Use slider for selecting numeric values in a bounded range.
           </FieldDescription>
@@ -108,7 +120,7 @@ export const Range: Story = {
 };
 
 export const MultipleThumbs: Story = {
-  name: 'Multiple Thumbs',
+  name: "Multiple Thumbs",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Multiple Thumbs</h3>
@@ -212,10 +224,18 @@ export const Disabled: Story = {
 
       <FieldGroup style={frameStyle}>
         <Field disabled>
-          <FieldLabel htmlFor="slider-disabled-single">Single Thumb Disabled</FieldLabel>
+          <FieldLabel htmlFor="slider-disabled-single">
+            Single Thumb Disabled
+          </FieldLabel>
 
           <FieldContent>
-            <Slider id="slider-disabled-single" disabled defaultValue={[64]} min={0} max={100} />
+            <Slider
+              id="slider-disabled-single"
+              disabled
+              defaultValue={[64]}
+              min={0}
+              max={100}
+            />
             <FieldDescription>
               Disabled state prevents pointer and keyboard changes.
             </FieldDescription>
@@ -223,10 +243,18 @@ export const Disabled: Story = {
         </Field>
 
         <Field disabled>
-          <FieldLabel htmlFor="slider-disabled-range">Range Disabled</FieldLabel>
+          <FieldLabel htmlFor="slider-disabled-range">
+            Range Disabled
+          </FieldLabel>
 
           <FieldContent>
-            <Slider id="slider-disabled-range" disabled defaultValue={[25, 78]} min={0} max={100} />
+            <Slider
+              id="slider-disabled-range"
+              disabled
+              defaultValue={[25, 78]}
+              min={0}
+              max={100}
+            />
           </FieldContent>
         </Field>
       </FieldGroup>
@@ -256,7 +284,9 @@ export const Labels: Story = {
 
       <FieldGroup style={frameStyle}>
         <Field>
-          <FieldLabel htmlFor="slider-labels-high-low">High / Low Labels</FieldLabel>
+          <FieldLabel htmlFor="slider-labels-high-low">
+            High / Low Labels
+          </FieldLabel>
 
           <FieldContent>
             <Slider
@@ -271,7 +301,9 @@ export const Labels: Story = {
         </Field>
 
         <Field>
-          <FieldLabel htmlFor="slider-labels-min-max">Default Min / Max Labels</FieldLabel>
+          <FieldLabel htmlFor="slider-labels-min-max">
+            Default Min / Max Labels
+          </FieldLabel>
 
           <FieldContent>
             <Slider
@@ -288,7 +320,11 @@ export const Labels: Story = {
           <FieldLabel htmlFor="slider-labels-hidden">Labels Hidden</FieldLabel>
 
           <FieldContent>
-            <Slider id="slider-labels-hidden" defaultValue={[60]} showLabels={false} />
+            <Slider
+              id="slider-labels-hidden"
+              defaultValue={[60]}
+              showLabels={false}
+            />
           </FieldContent>
         </Field>
       </FieldGroup>
@@ -297,42 +333,44 @@ export const Labels: Story = {
 };
 
 export const SliderPlayground: Story = {
-  name: 'Range Slider Playground',
+  name: "Range Slider Playground",
   args: {
-    orientation: 'horizontal',
-    size: 'md',
+    orientation: "horizontal",
+    size: "md",
     disabled: false,
+    required: false,
     min: 0,
     max: 100,
     step: 1,
     minStepsBetweenThumbs: 5,
     showLabels: true,
-    minLabel: '',
-    maxLabel: '',
+    minLabel: "",
+    maxLabel: "",
     showValueLabel: false,
     withAction: false,
   },
   argTypes: {
     orientation: {
-      control: 'inline-radio',
-      options: ['horizontal', 'vertical'],
+      control: "inline-radio",
+      options: ["horizontal", "vertical"],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    min: { control: 'number' },
-    max: { control: 'number' },
-    step: { control: 'number' },
-    minStepsBetweenThumbs: { control: 'number' },
-    showLabels: { control: 'boolean' },
-    minLabel: { control: 'text' },
-    maxLabel: { control: 'text' },
-    showValueLabel: { control: 'boolean' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onValueChange: { action: 'value-change' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    min: { control: "number" },
+    max: { control: "number" },
+    step: { control: "number" },
+    minStepsBetweenThumbs: { control: "number" },
+    showLabels: { control: "boolean" },
+    minLabel: { control: "text" },
+    maxLabel: { control: "text" },
+    showValueLabel: { control: "boolean" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onValueChange: { action: "value-change" },
     formatValueLabel: { table: { disable: true } },
     value: { table: { disable: true } },
     defaultValue: { table: { disable: true } },
@@ -344,20 +382,25 @@ export const SliderPlayground: Story = {
 
     return (
       <Field
+        required={args.required}
         style={{
           ...frameStyle,
-          maxWidth: args.orientation === 'vertical' ? '16rem' : frameStyle.width,
+          maxWidth:
+            args.orientation === "vertical" ? "16rem" : frameStyle.width,
         }}
       >
-        <FieldLabel htmlFor="slider-playground">Interactive Range Playground</FieldLabel>
+        <FieldLabel htmlFor="slider-playground">
+          Interactive Range Playground
+        </FieldLabel>
 
         <FieldContent>
           <Slider
-            key={`${args.orientation}-${args.size}-${args.disabled}-${args.min}-${args.max}-${args.step}-${args.minStepsBetweenThumbs}-${withAction}`}
+            key={`${args.orientation}-${args.size}-${args.disabled}-${args.required}-${args.min}-${args.max}-${args.step}-${args.minStepsBetweenThumbs}-${withAction}`}
             id="slider-playground"
             orientation={args.orientation}
             size={args.size}
             disabled={args.disabled}
+            required={args.required}
             min={args.min}
             max={args.max}
             step={args.step}
@@ -372,7 +415,8 @@ export const SliderPlayground: Story = {
           />
 
           <FieldDescription>
-            Adjust controls to test orientation, size, and min-steps constraints for a range slider.
+            Adjust controls to test orientation, size, and min-steps constraints
+            for a range slider.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -381,40 +425,42 @@ export const SliderPlayground: Story = {
 };
 
 export const BasicSliderPlayground: Story = {
-  name: 'Basic Slider Playground',
+  name: "Basic Slider Playground",
   args: {
-    orientation: 'vertical',
-    size: 'md',
+    orientation: "vertical",
+    size: "md",
     disabled: false,
+    required: false,
     min: 0,
     max: 100,
     step: 1,
     showLabels: true,
-    minLabel: '',
-    maxLabel: '',
+    minLabel: "",
+    maxLabel: "",
     showValueLabel: false,
     withAction: false,
   },
   argTypes: {
     orientation: {
-      control: 'inline-radio',
-      options: ['horizontal', 'vertical'],
+      control: "inline-radio",
+      options: ["horizontal", "vertical"],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    min: { control: 'number' },
-    max: { control: 'number' },
-    step: { control: 'number' },
-    showLabels: { control: 'boolean' },
-    minLabel: { control: 'text' },
-    maxLabel: { control: 'text' },
-    showValueLabel: { control: 'boolean' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onValueChange: { action: 'value-change' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    min: { control: "number" },
+    max: { control: "number" },
+    step: { control: "number" },
+    showLabels: { control: "boolean" },
+    minLabel: { control: "text" },
+    maxLabel: { control: "text" },
+    showValueLabel: { control: "boolean" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onValueChange: { action: "value-change" },
     formatValueLabel: { table: { disable: true } },
     minStepsBetweenThumbs: { table: { disable: true } },
     value: { table: { disable: true } },
@@ -427,20 +473,25 @@ export const BasicSliderPlayground: Story = {
 
     return (
       <Field
+        required={args.required}
         style={{
           ...frameStyle,
-          maxWidth: args.orientation === 'vertical' ? '16rem' : frameStyle.width,
+          maxWidth:
+            args.orientation === "vertical" ? "16rem" : frameStyle.width,
         }}
       >
-        <FieldLabel htmlFor="slider-basic-playground">Interactive Basic Playground</FieldLabel>
+        <FieldLabel htmlFor="slider-basic-playground">
+          Interactive Basic Playground
+        </FieldLabel>
 
         <FieldContent>
           <Slider
-            key={`basic-${args.orientation}-${args.size}-${args.disabled}-${args.min}-${args.max}-${args.step}-${withAction}`}
+            key={`basic-${args.orientation}-${args.size}-${args.disabled}-${args.required}-${args.min}-${args.max}-${args.step}-${withAction}`}
             id="slider-basic-playground"
             orientation={args.orientation}
             size={args.size}
             disabled={args.disabled}
+            required={args.required}
             min={args.min}
             max={args.max}
             step={args.step}
@@ -453,7 +504,9 @@ export const BasicSliderPlayground: Story = {
             onValueChange={withAction ? args.onValueChange : undefined}
           />
 
-          <FieldDescription>Use this playground for a single-thumb slider setup.</FieldDescription>
+          <FieldDescription>
+            Use this playground for a single-thumb slider setup.
+          </FieldDescription>
         </FieldContent>
       </Field>
     );

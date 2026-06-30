@@ -49,6 +49,7 @@ export interface FileUploadProps extends Omit<
   varient?: FileUploadVariant;
   size?: FileUploadSize;
   disabled?: boolean;
+  required?: boolean;
   multiple?: boolean;
   accept?: string;
   placeholder?: ReactNode;
@@ -273,6 +274,7 @@ export function FileUpload({
   varient,
   size = "md",
   disabled = false,
+  required = false,
   multiple = false,
   accept,
   placeholder,
@@ -764,6 +766,8 @@ export function FileUpload({
       multiple={multiple}
       accept={accept}
       disabled={disabled}
+      required={required && files.length === 0}
+      aria-required={required || undefined}
       style={{ display: "none" }}
       onChange={handleInputChange}
     />

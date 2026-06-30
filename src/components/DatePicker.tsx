@@ -47,6 +47,7 @@ export interface DatePickerActionContext {
   value: DatePickerValue;
   inputText: string;
   open: boolean;
+  required: boolean;
 }
 
 export interface DateRangeValue {
@@ -65,6 +66,7 @@ export interface DatePickerProps extends Omit<
   varient?: DatePickerVariant;
   size?: DatePickerSize;
   disabled?: boolean;
+  required?: boolean;
   invalid?: boolean;
   placeholder?: string;
   rangeSeparator?: string;
@@ -589,6 +591,7 @@ export function DatePicker({
   varient,
   size = "md",
   disabled = false,
+  required = false,
   invalid = false,
   placeholder,
   rangeSeparator = " - ",
@@ -830,6 +833,7 @@ export function DatePicker({
       value: nextValue,
       inputText: options?.inputText ?? inputText,
       open: options?.open ?? isOpen,
+      required,
     });
   }
 
@@ -1617,7 +1621,9 @@ export function DatePicker({
           id={inputElementId}
           type="text"
           disabled={disabled}
+          required={required}
           aria-invalid={invalid ? true : undefined}
+          aria-required={required || undefined}
           aria-label={inputAriaLabel}
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
