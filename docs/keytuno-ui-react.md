@@ -416,6 +416,37 @@ import { DatePicker } from '@keytuno/ui-react';
 />
 ```
 
+### TimezonePicker
+
+```ts
+import { TimezonePicker } from '@keytuno/ui-react';
+
+// Uses Select (combobox) behavior from ui-react Select component
+
+<TimezonePicker
+  size?={'xs'|'sm'|'md'|'lg'}
+  variant?={'compact'|'detailed'}
+  includeSystemTimezone?={boolean}   // include local/system timezone option at top
+  systemTimezone?={string | null}    // override detected system timezone when needed
+  timezones?={string[]}              // optional curated IANA list (defaults to important/common zones)
+  preferredTimezones?={string[]}     // optional pinned timezone ordering
+  value?={string | null}             // controlled value
+  defaultValue?={string | null}      // uncontrolled initial value
+  showClear?={boolean}
+  disabled?={boolean}
+  required?={boolean}
+  invalid?={boolean}
+  placeholder?={string}
+  searchPlaceholder?={string}
+  emptyText?={string}
+  onValueChange?={(value: string | null) => void}
+  onAction?={(context: TimezonePickerActionContext) => void} // open | close | search | select | clear | system-select
+/>
+
+// selected value remains concise (IANA timezone string)
+// metadata like UTC offset stays in dropdown rows
+```
+
 ### Scrollbar
 
 ```ts

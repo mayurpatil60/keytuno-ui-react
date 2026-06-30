@@ -296,6 +296,15 @@ export type {
   DatePickerVariant,
   DateRangeValue,
 } from "./components/DatePicker";
+export { TimezonePicker } from "./components/TimezonePicker";
+export type {
+  TimezonePickerActionContext,
+  TimezonePickerActionSource,
+  TimezonePickerOption,
+  TimezonePickerProps,
+  TimezonePickerSize,
+  TimezonePickerVariant,
+} from "./components/TimezonePicker";
 export { Scrollbar } from "./components/Scrollbar";
 export type {
   ScrollbarActionContext,
