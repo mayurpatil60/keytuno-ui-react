@@ -1,5 +1,5 @@
-import { useState, type CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import { useState, type CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 import {
   FiArchive,
   FiBell,
@@ -32,10 +32,11 @@ import {
   FiTrash2,
   FiUser,
   FiUsers,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 
 import {
   Avatar,
+  Button,
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
@@ -53,14 +54,14 @@ import {
   type DropdownMenuActionContext,
   type DropdownMenuSide,
   type DropdownMenuProps,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
 
 const meta: Meta<typeof DropdownMenu> = {
-  title: 'Navigation/Dropdown Menu',
+  title: "Navigation/Dropdown Menu",
   component: DropdownMenu,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -69,48 +70,104 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(980px, 96vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(980px, 96vw)",
 };
 
 const frameStyle: CSSProperties = {
-  width: 'min(860px, 96vw)',
+  width: "min(860px, 96vw)",
+};
+
+const buttonTriggerVariants = [
+  "primary",
+  "secondary",
+  "outline",
+  "ghost",
+  "destructive",
+  "link",
+] as const;
+
+const buttonTriggerSizes = ["xs", "sm", "md", "lg"] as const;
+const buttonTriggerModes = ["regular", "compact", "icon-only"] as const;
+
+const triggerRowStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "0.6rem",
+  flexWrap: "wrap",
+};
+
+const triggerTagStyle: CSSProperties = {
+  fontSize: "0.7rem",
+  lineHeight: 1.2,
+  letterSpacing: "0.03em",
+  textTransform: "uppercase",
+  color: "var(--ktn-text-secondary, #64748b)",
+  minWidth: "6.2rem",
+};
+
+const linkTriggerStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "0.4rem 0.65rem",
+  border: "1px solid var(--ktn-border-muted)",
+  borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+  color: "var(--ktn-action-primary-bg, #2563eb)",
+  backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+  textDecoration: "underline",
+  textUnderlineOffset: "0.12em",
+  cursor: "pointer",
+  fontSize: "0.8125rem",
+};
+
+const customChipTriggerStyle: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  padding: "0.42rem 0.7rem",
+  borderRadius: "999px",
+  border: "1px solid var(--ktn-border-muted)",
+  backgroundColor:
+    "color-mix(in srgb, var(--ktn-bg-muted, #f1f5f9) 84%, transparent)",
+  color: "var(--ktn-text-primary)",
+  fontSize: "0.8rem",
+  lineHeight: 1.2,
+  cursor: "pointer",
 };
 
 const DEEP_NESTED_LEVEL_COUNT = 10;
 const SIDE_DEBUG_SCROLL_ITEM_COUNT = 18;
 
 const sideDebugViewportStyle: CSSProperties = {
-  position: 'relative',
-  width: 'min(1100px, 96vw)',
-  height: '72vh',
-  minHeight: '34rem',
-  border: '1px dashed var(--ktn-border-muted, #94a3b8)',
-  borderRadius: '0.85rem',
+  position: "relative",
+  width: "min(1100px, 96vw)",
+  height: "72vh",
+  minHeight: "34rem",
+  border: "1px dashed var(--ktn-border-muted, #94a3b8)",
+  borderRadius: "0.85rem",
   background:
-    'linear-gradient(145deg, color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, #e2e8f0 12%), var(--ktn-bg-surface, #ffffff))',
-  overflow: 'hidden',
+    "linear-gradient(145deg, color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, #e2e8f0 12%), var(--ktn-bg-surface, #ffffff))",
+  overflow: "hidden",
 };
 
 const sideDebugInfoStyle: CSSProperties = {
-  position: 'absolute',
-  insetInline: '0.75rem',
-  insetBlockStart: '0.6rem',
-  fontSize: '0.74rem',
-  color: 'var(--ktn-text-secondary, #64748b)',
+  position: "absolute",
+  insetInline: "0.75rem",
+  insetBlockStart: "0.6rem",
+  fontSize: "0.74rem",
+  color: "var(--ktn-text-secondary, #64748b)",
   lineHeight: 1.35,
   zIndex: 1,
 };
 
 const sideDebugAnchorTagStyle: CSSProperties = {
-  marginTop: '0.35rem',
-  fontSize: '0.66rem',
+  marginTop: "0.35rem",
+  fontSize: "0.66rem",
   lineHeight: 1.2,
-  letterSpacing: '0.01em',
-  color: 'var(--ktn-text-secondary, #64748b)',
-  textTransform: 'uppercase',
+  letterSpacing: "0.01em",
+  color: "var(--ktn-text-secondary, #64748b)",
+  textTransform: "uppercase",
 };
 
 const sideDebugAnchorPositions: Array<{
@@ -119,60 +176,60 @@ const sideDebugAnchorPositions: Array<{
   style: CSSProperties;
 }> = [
   {
-    label: 'Top Center Auto',
-    side: 'auto',
+    label: "Top Center Auto",
+    side: "auto",
     style: {
-      position: 'absolute',
-      insetBlockStart: '2.2rem',
-      insetInlineStart: '50%',
-      transform: 'translateX(-50%)',
+      position: "absolute",
+      insetBlockStart: "2.2rem",
+      insetInlineStart: "50%",
+      transform: "translateX(-50%)",
     },
   },
   {
-    label: 'Top Left Bottom',
-    side: 'bottom',
+    label: "Top Left Bottom",
+    side: "bottom",
     style: {
-      position: 'absolute',
-      insetBlockStart: '5.2rem',
-      insetInlineStart: '1rem',
+      position: "absolute",
+      insetBlockStart: "5.2rem",
+      insetInlineStart: "1rem",
     },
   },
   {
-    label: 'Bottom Left Top',
-    side: 'top',
+    label: "Bottom Left Top",
+    side: "top",
     style: {
-      position: 'absolute',
-      insetBlockEnd: '1rem',
-      insetInlineStart: '1rem',
+      position: "absolute",
+      insetBlockEnd: "1rem",
+      insetInlineStart: "1rem",
     },
   },
   {
-    label: 'Center Left Right',
-    side: 'right',
+    label: "Center Left Right",
+    side: "right",
     style: {
-      position: 'absolute',
-      insetBlockStart: '50%',
-      insetInlineStart: '1rem',
-      transform: 'translateY(-50%)',
+      position: "absolute",
+      insetBlockStart: "50%",
+      insetInlineStart: "1rem",
+      transform: "translateY(-50%)",
     },
   },
   {
-    label: 'Center Right Left',
-    side: 'left',
+    label: "Center Right Left",
+    side: "left",
     style: {
-      position: 'absolute',
-      insetBlockStart: '50%',
-      insetInlineEnd: '1rem',
-      transform: 'translateY(-50%)',
+      position: "absolute",
+      insetBlockStart: "50%",
+      insetInlineEnd: "1rem",
+      transform: "translateY(-50%)",
     },
   },
   {
-    label: 'Bottom Right Auto',
-    side: 'auto',
+    label: "Bottom Right Auto",
+    side: "auto",
     style: {
-      position: 'absolute',
-      insetBlockEnd: '1rem',
-      insetInlineEnd: '1rem',
+      position: "absolute",
+      insetBlockEnd: "1rem",
+      insetInlineEnd: "1rem",
     },
   },
 ];
@@ -291,7 +348,7 @@ function CheckboxesIconsDemo(): JSX.Element {
 }
 
 function RadioGroupDemo(): JSX.Element {
-  const [density, setDensity] = useState('comfortable');
+  const [density, setDensity] = useState("comfortable");
 
   return (
     <DropdownMenu>
@@ -303,8 +360,12 @@ function RadioGroupDemo(): JSX.Element {
 
         <DropdownMenuRadioGroup value={density} onValueChange={setDensity}>
           <DropdownMenuRadioItem value="compact">Compact</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="comfortable">Comfortable</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value="expanded">Expanded</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="comfortable">
+            Comfortable
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="expanded">
+            Expanded
+          </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -312,7 +373,7 @@ function RadioGroupDemo(): JSX.Element {
 }
 
 function RadioIconsDemo(): JSX.Element {
-  const [theme, setTheme] = useState('dark');
+  const [theme, setTheme] = useState("dark");
 
   return (
     <DropdownMenu>
@@ -339,7 +400,7 @@ function RadioIconsDemo(): JSX.Element {
 }
 
 function SelectGroupDemo(): JSX.Element {
-  const [market, setMarket] = useState('nse');
+  const [market, setMarket] = useState("nse");
 
   return (
     <DropdownMenu>
@@ -365,7 +426,10 @@ function SelectGroupDemo(): JSX.Element {
   );
 }
 
-function renderDeepNestedChildren(level: number, maxLevel: number): JSX.Element {
+function renderDeepNestedChildren(
+  level: number,
+  maxLevel: number,
+): JSX.Element {
   const isLastLevel = level >= maxLevel;
   const nextLevel = level + 1;
 
@@ -374,7 +438,9 @@ function renderDeepNestedChildren(level: number, maxLevel: number): JSX.Element 
       <DropdownMenuLabel>{`Level ${level}`}</DropdownMenuLabel>
       <DropdownMenuSeparator />
 
-      <DropdownMenuItem icon={<FiEye size={14} />}>{`Inspect Level ${level}`}</DropdownMenuItem>
+      <DropdownMenuItem
+        icon={<FiEye size={14} />}
+      >{`Inspect Level ${level}`}</DropdownMenuItem>
       <DropdownMenuItem
         icon={<FiSettings size={14} />}
       >{`Configure Level ${level}`}</DropdownMenuItem>
@@ -400,16 +466,16 @@ function MultiChildPlaygroundDemo({
   onAction,
   onOpenChange,
 }: {
-  onAction?: DropdownMenuProps['onAction'];
-  onOpenChange?: DropdownMenuProps['onOpenChange'];
+  onAction?: DropdownMenuProps["onAction"];
+  onOpenChange?: DropdownMenuProps["onOpenChange"];
 }): JSX.Element {
   const [menuState, setMenuState] = useState({
     watchlist: true,
     voiceCommands: false,
     marketAudio: true,
   });
-  const [theme, setTheme] = useState('dark');
-  const [executionType, setExecutionType] = useState('limit');
+  const [theme, setTheme] = useState("dark");
+  const [executionType, setExecutionType] = useState("limit");
 
   return (
     <DropdownMenu
@@ -426,16 +492,24 @@ function MultiChildPlaygroundDemo({
         <DropdownMenuSeparator />
 
         <DropdownMenuGroup>
-          <DropdownMenuItem icon={<FiEye size={14} />}>Preview Workspace</DropdownMenuItem>
-          <DropdownMenuItem icon={<FiCopy size={14} />}>Duplicate</DropdownMenuItem>
+          <DropdownMenuItem icon={<FiEye size={14} />}>
+            Preview Workspace
+          </DropdownMenuItem>
+          <DropdownMenuItem icon={<FiCopy size={14} />}>
+            Duplicate
+          </DropdownMenuItem>
           <DropdownMenuItem
             icon={<FiShare2 size={14} />}
             submenu={
               <>
                 <DropdownMenuLabel inset>Share With</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem icon={<FiUsers size={14} />}>Strategy Team</DropdownMenuItem>
-                <DropdownMenuItem icon={<FiMail size={14} />}>Email Digest</DropdownMenuItem>
+                <DropdownMenuItem icon={<FiUsers size={14} />}>
+                  Strategy Team
+                </DropdownMenuItem>
+                <DropdownMenuItem icon={<FiMail size={14} />}>
+                  Email Digest
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   icon={<FiLayers size={14} />}
                   submenu={renderDeepNestedChildren(2, 5)}
@@ -512,7 +586,10 @@ function MultiChildPlaygroundDemo({
         <DropdownMenuSeparator />
         <DropdownMenuLabel>Select Group</DropdownMenuLabel>
 
-        <DropdownMenuRadioGroup value={executionType} onValueChange={setExecutionType}>
+        <DropdownMenuRadioGroup
+          value={executionType}
+          onValueChange={setExecutionType}
+        >
           <DropdownMenuRadioItem value="market" icon={<FiPlay size={14} />}>
             Market Order
           </DropdownMenuRadioItem>
@@ -534,7 +611,11 @@ interface SideDebugAnchorProps {
   style: CSSProperties;
 }
 
-function SideDebugAnchor({ label, side, style }: SideDebugAnchorProps): JSX.Element {
+function SideDebugAnchor({
+  label,
+  side,
+  style,
+}: SideDebugAnchorProps): JSX.Element {
   return (
     <div style={style}>
       <DropdownMenu side={side} size="sm" variant="outline">
@@ -547,7 +628,13 @@ function SideDebugAnchor({ label, side, style }: SideDebugAnchorProps): JSX.Elem
           {Array.from({ length: SIDE_DEBUG_SCROLL_ITEM_COUNT }, (_, index) => (
             <DropdownMenuItem
               key={`${label}-${index + 1}`}
-              icon={index % 2 === 0 ? <FiLayers size={14} /> : <FiFileText size={14} />}
+              icon={
+                index % 2 === 0 ? (
+                  <FiLayers size={14} />
+                ) : (
+                  <FiFileText size={14} />
+                )
+              }
             >
               {`Debug Item ${index + 1}`}
             </DropdownMenuItem>
@@ -575,13 +662,21 @@ export const Basic: Story = {
             <DropdownMenuContent>
               <DropdownMenuLabel>My Account</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem icon={<FiUser size={14} />}>Profile</DropdownMenuItem>
-              <DropdownMenuItem icon={<FiSettings size={14} />}>Settings</DropdownMenuItem>
-              <DropdownMenuItem icon={<FiLogOut size={14} />}>Logout</DropdownMenuItem>
+              <DropdownMenuItem icon={<FiUser size={14} />}>
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem icon={<FiSettings size={14} />}>
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem icon={<FiLogOut size={14} />}>
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <FieldDescription>Basic dropdown with label, items, and separator.</FieldDescription>
+          <FieldDescription>
+            Basic dropdown with label, items, and separator.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -601,22 +696,32 @@ export const Submenu: Story = {
             <DropdownMenuTrigger>Actions</DropdownMenuTrigger>
 
             <DropdownMenuContent>
-              <DropdownMenuItem icon={<FiCopy size={14} />}>Duplicate</DropdownMenuItem>
+              <DropdownMenuItem icon={<FiCopy size={14} />}>
+                Duplicate
+              </DropdownMenuItem>
               <DropdownMenuItem
                 icon={<FiShare2 size={14} />}
                 submenu={
                   <>
                     <DropdownMenuLabel inset>Share Options</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem icon={<FiLink2 size={14} />}>Copy Link</DropdownMenuItem>
-                    <DropdownMenuItem icon={<FiMail size={14} />}>Email</DropdownMenuItem>
-                    <DropdownMenuItem icon={<FiSend size={14} />}>Send to Team</DropdownMenuItem>
+                    <DropdownMenuItem icon={<FiLink2 size={14} />}>
+                      Copy Link
+                    </DropdownMenuItem>
+                    <DropdownMenuItem icon={<FiMail size={14} />}>
+                      Email
+                    </DropdownMenuItem>
+                    <DropdownMenuItem icon={<FiSend size={14} />}>
+                      Send to Team
+                    </DropdownMenuItem>
                   </>
                 }
               >
                 Share
               </DropdownMenuItem>
-              <DropdownMenuItem icon={<FiArchive size={14} />}>Archive</DropdownMenuItem>
+              <DropdownMenuItem icon={<FiArchive size={14} />}>
+                Archive
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
@@ -642,22 +747,36 @@ export const Shortcuts: Story = {
             <DropdownMenuTrigger>Command Palette</DropdownMenuTrigger>
 
             <DropdownMenuContent>
-              <DropdownMenuItem icon={<FiSearch size={14} />} shortcut="Ctrl + K">
+              <DropdownMenuItem
+                icon={<FiSearch size={14} />}
+                shortcut="Ctrl + K"
+              >
                 Search
               </DropdownMenuItem>
-              <DropdownMenuItem icon={<FiEdit3 size={14} />} shortcut="Ctrl + E">
+              <DropdownMenuItem
+                icon={<FiEdit3 size={14} />}
+                shortcut="Ctrl + E"
+              >
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem icon={<FiScissors size={14} />} shortcut="Ctrl + X">
+              <DropdownMenuItem
+                icon={<FiScissors size={14} />}
+                shortcut="Ctrl + X"
+              >
                 Cut
               </DropdownMenuItem>
-              <DropdownMenuItem icon={<FiDownload size={14} />} shortcut="Ctrl + D">
+              <DropdownMenuItem
+                icon={<FiDownload size={14} />}
+                shortcut="Ctrl + D"
+              >
                 Download
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <FieldDescription>Use shortcut badges for fast-action discovery.</FieldDescription>
+          <FieldDescription>
+            Use shortcut badges for fast-action discovery.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -677,14 +796,24 @@ export const Icons: Story = {
             <DropdownMenuTrigger>Media</DropdownMenuTrigger>
 
             <DropdownMenuContent>
-              <DropdownMenuItem icon={<FiImage size={14} />}>Image</DropdownMenuItem>
-              <DropdownMenuItem icon={<FiFileText size={14} />}>Document</DropdownMenuItem>
-              <DropdownMenuItem icon={<FiFolder size={14} />}>Folder</DropdownMenuItem>
-              <DropdownMenuItem icon={<FiUsers size={14} />}>Shared</DropdownMenuItem>
+              <DropdownMenuItem icon={<FiImage size={14} />}>
+                Image
+              </DropdownMenuItem>
+              <DropdownMenuItem icon={<FiFileText size={14} />}>
+                Document
+              </DropdownMenuItem>
+              <DropdownMenuItem icon={<FiFolder size={14} />}>
+                Folder
+              </DropdownMenuItem>
+              <DropdownMenuItem icon={<FiUsers size={14} />}>
+                Shared
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <FieldDescription>Leading icons improve menu scanning speed.</FieldDescription>
+          <FieldDescription>
+            Leading icons improve menu scanning speed.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -711,7 +840,7 @@ export const Checkboxes: Story = {
 };
 
 export const CheckboxesIcons: Story = {
-  name: 'Checkboxes Icons',
+  name: "Checkboxes Icons",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Checkboxes Icons</h3>
@@ -731,7 +860,7 @@ export const CheckboxesIcons: Story = {
 };
 
 export const RadioGroup: Story = {
-  name: 'Radio Group',
+  name: "Radio Group",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Radio Group</h3>
@@ -741,7 +870,9 @@ export const RadioGroup: Story = {
 
         <FieldContent>
           <RadioGroupDemo />
-          <FieldDescription>Radio group keeps exactly one item selected.</FieldDescription>
+          <FieldDescription>
+            Radio group keeps exactly one item selected.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -749,7 +880,7 @@ export const RadioGroup: Story = {
 };
 
 export const RadioIcons: Story = {
-  name: 'Radio Icons',
+  name: "Radio Icons",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Radio Icons</h3>
@@ -769,7 +900,7 @@ export const RadioIcons: Story = {
 };
 
 export const SelectGroup: Story = {
-  name: 'Select Group',
+  name: "Select Group",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Select Group</h3>
@@ -780,7 +911,8 @@ export const SelectGroup: Story = {
         <FieldContent>
           <SelectGroupDemo />
           <FieldDescription>
-            Select-only menu remains open after selection and closes on outside click.
+            Select-only menu remains open after selection and closes on outside
+            click.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -801,8 +933,12 @@ export const Destructive: Story = {
             <DropdownMenuTrigger>Danger Zone</DropdownMenuTrigger>
 
             <DropdownMenuContent>
-              <DropdownMenuItem icon={<FiEdit3 size={14} />}>Rename</DropdownMenuItem>
-              <DropdownMenuItem icon={<FiArchive size={14} />}>Archive</DropdownMenuItem>
+              <DropdownMenuItem icon={<FiEdit3 size={14} />}>
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem icon={<FiArchive size={14} />}>
+                Archive
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem destructive icon={<FiTrash2 size={14} />}>
                 Delete Permanently
@@ -820,7 +956,7 @@ export const Destructive: Story = {
 };
 
 export const AvatarMenu: Story = {
-  name: 'Avatar',
+  name: "Avatar",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Avatar</h3>
@@ -835,17 +971,231 @@ export const AvatarMenu: Story = {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent>
-              <DropdownMenuLabel inset>Signed in as mayur@keytuno.app</DropdownMenuLabel>
+              <DropdownMenuLabel inset>
+                Signed in as mayur@keytuno.app
+              </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem icon={<Avatar size="xs" text="Mayur" />}>Profile</DropdownMenuItem>
-              <DropdownMenuItem icon={<Avatar size="xs" text="Team" badgeColor="#22c55e" />}>
+              <DropdownMenuItem icon={<Avatar size="xs" text="Mayur" />}>
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                icon={<Avatar size="xs" text="Team" badgeColor="#22c55e" />}
+              >
                 Team Workspace
               </DropdownMenuItem>
-              <DropdownMenuItem icon={<FiLogOut size={14} />}>Sign Out</DropdownMenuItem>
+              <DropdownMenuItem icon={<FiLogOut size={14} />}>
+                Sign Out
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <FieldDescription>Dropdown opens directly from avatar click.</FieldDescription>
+          <FieldDescription>
+            Dropdown opens directly from avatar click.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
+export const TriggerTypes: Story = {
+  name: "Trigger Types",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Trigger Types</h3>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Link, Avatar, Custom Trigger</FieldLabel>
+
+        <FieldContent>
+          <div style={triggerRowStyle}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <a href="#dropdown-link-trigger" style={linkTriggerStyle}>
+                  Open Link Menu
+                </a>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Link Trigger</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem icon={<FiLink2 size={14} />}>
+                  Copy Link
+                </DropdownMenuItem>
+                <DropdownMenuItem icon={<FiShare2 size={14} />}>
+                  Share
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar size="sm" text="Mayur" badgeColor="#22c55e" />
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Avatar Trigger</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem icon={<FiUser size={14} />}>
+                  Profile
+                </DropdownMenuItem>
+                <DropdownMenuItem icon={<FiSettings size={14} />}>
+                  Settings
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <span style={customChipTriggerStyle}>Custom Chip Trigger</span>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Custom Trigger</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem icon={<FiEye size={14} />}>
+                  Preview
+                </DropdownMenuItem>
+                <DropdownMenuItem icon={<FiEdit3 size={14} />}>
+                  Edit
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <FieldDescription>
+            DropdownMenu can be opened from link, avatar, button, or any custom
+            element using trigger-as-child mode.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
+export const ButtonTriggerVariants: Story = {
+  name: "Button Trigger Variants",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Button Trigger Variants</h3>
+
+      <Field style={frameStyle}>
+        <FieldLabel>All Button Variants and Sizes as Trigger</FieldLabel>
+
+        <FieldContent>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+          >
+            {buttonTriggerVariants.map((variant) => (
+              <div key={variant} style={triggerRowStyle}>
+                <span style={triggerTagStyle}>{variant}</span>
+
+                {buttonTriggerSizes.map((size) => (
+                  <DropdownMenu key={`${variant}-${size}`} size={size}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant={variant} size={size}>
+                        {`${variant} ${size}`}
+                      </Button>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>{`${variant} / ${size}`}</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem icon={<FiEye size={14} />}>
+                        Preview
+                      </DropdownMenuItem>
+                      <DropdownMenuItem icon={<FiSettings size={14} />}>
+                        Configure
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        icon={<FiTrash2 size={14} />}
+                        destructive
+                      >
+                        Remove
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <FieldDescription>
+            Every button variant and size works as a dropdown trigger, with no
+            extra wrapper code needed.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
+export const ButtonTriggerTypes: Story = {
+  name: "Button Trigger Types",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Button Trigger Types</h3>
+
+      <Field style={frameStyle}>
+        <FieldLabel>
+          Regular, Compact, and Icon-Only Triggers Across Variants
+        </FieldLabel>
+
+        <FieldContent>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}
+          >
+            {buttonTriggerModes.map((mode) => (
+              <div key={mode} style={triggerRowStyle}>
+                <span style={triggerTagStyle}>{mode}</span>
+
+                {buttonTriggerVariants.map((variant) => {
+                  const isIconOnly = mode === "icon-only";
+                  const isCompact = mode === "compact";
+
+                  return (
+                    <DropdownMenu key={`${mode}-${variant}`} size="sm">
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant={variant}
+                          size="sm"
+                          compact={isCompact || undefined}
+                          iconOnly={isIconOnly || undefined}
+                          aria-label={
+                            isIconOnly ? `${variant} trigger` : undefined
+                          }
+                        >
+                          {isIconOnly ? <FiGrid size={14} /> : `${variant}`}
+                        </Button>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent>
+                        <DropdownMenuLabel>{`${mode} / ${variant}`}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem icon={<FiEye size={14} />}>
+                          Preview
+                        </DropdownMenuItem>
+                        <DropdownMenuItem icon={<FiSettings size={14} />}>
+                          Configure
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          icon={<FiTrash2 size={14} />}
+                          destructive
+                        >
+                          Remove
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+
+          <FieldDescription>
+            Demonstrates all button trigger types and all button variants
+            opening DropdownMenu with the same trigger API.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -871,7 +1221,10 @@ export const Complex: Story = {
                 <DropdownMenuItem icon={<FiPlus size={14} />} shortcut="N">
                   New Strategy
                 </DropdownMenuItem>
-                <DropdownMenuItem icon={<FiCopy size={14} />} shortcut="Ctrl + C">
+                <DropdownMenuItem
+                  icon={<FiCopy size={14} />}
+                  shortcut="Ctrl + C"
+                >
                   Duplicate Sheet
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -880,8 +1233,12 @@ export const Complex: Story = {
                     <>
                       <DropdownMenuLabel inset>Share with</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem icon={<FiUsers size={14} />}>Trading Team</DropdownMenuItem>
-                      <DropdownMenuItem icon={<FiMail size={14} />}>Email Digest</DropdownMenuItem>
+                      <DropdownMenuItem icon={<FiUsers size={14} />}>
+                        Trading Team
+                      </DropdownMenuItem>
+                      <DropdownMenuItem icon={<FiMail size={14} />}>
+                        Email Digest
+                      </DropdownMenuItem>
                       <DropdownMenuItem icon={<FiLink2 size={14} />}>
                         Copy Public Link
                       </DropdownMenuItem>
@@ -907,13 +1264,22 @@ export const Complex: Story = {
 
               <DropdownMenuLabel>Mode</DropdownMenuLabel>
               <DropdownMenuRadioGroup defaultValue="balanced">
-                <DropdownMenuRadioItem value="safe" icon={<FiShield size={14} />}>
+                <DropdownMenuRadioItem
+                  value="safe"
+                  icon={<FiShield size={14} />}
+                >
                   Safe
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="balanced" icon={<FiHeart size={14} />}>
+                <DropdownMenuRadioItem
+                  value="balanced"
+                  icon={<FiHeart size={14} />}
+                >
                   Balanced
                 </DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="aggressive" icon={<FiStar size={14} />}>
+                <DropdownMenuRadioItem
+                  value="aggressive"
+                  icon={<FiStar size={14} />}
+                >
                   Aggressive
                 </DropdownMenuRadioItem>
               </DropdownMenuRadioGroup>
@@ -927,8 +1293,8 @@ export const Complex: Story = {
           </DropdownMenu>
 
           <FieldDescription>
-            Complex menu combines submenu, shortcuts, checkbox items, radio group, and destructive
-            actions.
+            Complex menu combines submenu, shortcuts, checkbox items, radio
+            group, and destructive actions.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -937,14 +1303,14 @@ export const Complex: Story = {
 };
 
 export const DeepNestedPlayground: Story = {
-  name: 'Deep Nested Playground',
+  name: "Deep Nested Playground",
   args: {
     onAction: undefined,
     onOpenChange: undefined,
   },
   argTypes: {
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
   },
   render: (args) => (
     <div style={stackStyle}>
@@ -969,8 +1335,8 @@ export const DeepNestedPlayground: Story = {
           </DropdownMenu>
 
           <FieldDescription>
-            Supports at least 10 levels and auto repositions each submenu to stay visible in the
-            viewport.
+            Supports at least 10 levels and auto repositions each submenu to
+            stay visible in the viewport.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -979,14 +1345,14 @@ export const DeepNestedPlayground: Story = {
 };
 
 export const MultiChildPlayground: Story = {
-  name: 'Multi Child Playground',
+  name: "Multi Child Playground",
   args: {
     onAction: undefined,
     onOpenChange: undefined,
   },
   argTypes: {
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
   },
   render: (args) => (
     <div style={stackStyle}>
@@ -996,10 +1362,13 @@ export const MultiChildPlayground: Story = {
         <FieldLabel>Checkboxes, Radios, Select Group, Nested Childs</FieldLabel>
 
         <FieldContent>
-          <MultiChildPlaygroundDemo onAction={args.onAction} onOpenChange={args.onOpenChange} />
+          <MultiChildPlaygroundDemo
+            onAction={args.onAction}
+            onOpenChange={args.onOpenChange}
+          />
           <FieldDescription>
-            Combined playground with multiple child groups and nested subchildren for real usage
-            flows.
+            Combined playground with multiple child groups and nested
+            subchildren for real usage flows.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -1008,16 +1377,16 @@ export const MultiChildPlayground: Story = {
 };
 
 export const SideDebug: Story = {
-  name: 'Side Debug',
+  name: "Side Debug",
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
   },
   render: () => (
-    <div style={{ padding: '1rem', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: "1rem", display: "flex", justifyContent: "center" }}>
       <div style={sideDebugViewportStyle}>
         <div style={sideDebugInfoStyle}>
-          Auto mode tries bottom first, then falls back to other sides if bottom cannot fit. Menus
-          include long content to validate scrollbar behavior.
+          Auto mode tries bottom first, then falls back to other sides if bottom
+          cannot fit. Menus include long content to validate scrollbar behavior.
         </div>
 
         {sideDebugAnchorPositions.map((anchor) => (
@@ -1034,20 +1403,21 @@ export const SideDebug: Story = {
 };
 
 export const DropdownMenuActions: Story = {
-  name: 'DropdownMenu Actions',
+  name: "DropdownMenu Actions",
   args: {
     onAction: undefined,
     onOpenChange: undefined,
   },
   argTypes: {
     onAction: {
-      action: 'action',
+      action: "action",
       description:
-        'Fires for trigger open/close, outside click close, escape close, and menu item selections.',
+        "Fires for trigger open/close, outside click close, escape close, and menu item selections.",
     },
     onOpenChange: {
-      action: 'open-change',
-      description: 'Fires with the next open state whenever dropdown visibility changes.',
+      action: "open-change",
+      description:
+        "Fires with the next open state whenever dropdown visibility changes.",
     },
   },
   render: (args) => {
@@ -1073,8 +1443,12 @@ export const DropdownMenuActions: Story = {
               <DropdownMenuLabel>Quick Actions</DropdownMenuLabel>
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem icon={<FiEye size={14} />}>Preview</DropdownMenuItem>
-              <DropdownMenuItem icon={<FiSettings size={14} />}>Configure</DropdownMenuItem>
+              <DropdownMenuItem icon={<FiEye size={14} />}>
+                Preview
+              </DropdownMenuItem>
+              <DropdownMenuItem icon={<FiSettings size={14} />}>
+                Configure
+              </DropdownMenuItem>
               <DropdownMenuCheckboxItem icon={<FiBell size={14} />} checked>
                 Notifications
               </DropdownMenuCheckboxItem>
@@ -1082,7 +1456,8 @@ export const DropdownMenuActions: Story = {
           </DropdownMenu>
 
           <FieldDescription>
-            Open, close, and select items to inspect action payloads in Storybook actions panel.
+            Open, close, and select items to inspect action payloads in
+            Storybook actions panel.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -1095,35 +1470,35 @@ type DropdownMenuPlaygroundProps = DropdownMenuProps & {
 };
 
 export const DropdownMenuPlayground: StoryObj<DropdownMenuPlaygroundProps> = {
-  name: 'DropdownMenu Playground',
+  name: "DropdownMenu Playground",
   args: {
-    variant: 'default',
-    size: 'md',
-    side: 'auto',
+    variant: "default",
+    size: "md",
+    side: "auto",
     closeOnSelect: true,
     disabled: false,
     withAction: true,
   },
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['default', 'outline', 'soft'],
+      control: "select",
+      options: ["default", "outline", "soft"],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
     side: {
-      control: 'select',
-      options: ['auto', 'bottom', 'top', 'left', 'right'],
+      control: "select",
+      options: ["auto", "bottom", "top", "left", "right"],
     },
-    closeOnSelect: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-    withAction: { control: 'boolean' },
+    closeOnSelect: { control: "boolean" },
+    disabled: { control: "boolean" },
+    withAction: { control: "boolean" },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
@@ -1148,28 +1523,40 @@ export const DropdownMenuPlayground: StoryObj<DropdownMenuPlaygroundProps> = {
             onAction={onAction}
             onOpenChange={onOpenChange}
           >
-            <DropdownMenuTrigger disabled={args.disabled}>Playground Trigger</DropdownMenuTrigger>
+            <DropdownMenuTrigger disabled={args.disabled}>
+              Playground Trigger
+            </DropdownMenuTrigger>
 
             <DropdownMenuContent>
               <DropdownMenuLabel>Playground Menu</DropdownMenuLabel>
               <DropdownMenuSeparator />
 
               <DropdownMenuGroup>
-                <DropdownMenuItem icon={<FiEye size={14} />}>Preview</DropdownMenuItem>
-                <DropdownMenuItem icon={<FiSettings size={14} />}>Configure</DropdownMenuItem>
+                <DropdownMenuItem icon={<FiEye size={14} />}>
+                  Preview
+                </DropdownMenuItem>
+                <DropdownMenuItem icon={<FiSettings size={14} />}>
+                  Configure
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   icon={<FiShare2 size={14} />}
                   submenu={
                     <>
                       <DropdownMenuLabel inset>Share Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem icon={<FiUsers size={14} />}>Team</DropdownMenuItem>
-                      <DropdownMenuItem icon={<FiMail size={14} />}>Email</DropdownMenuItem>
+                      <DropdownMenuItem icon={<FiUsers size={14} />}>
+                        Team
+                      </DropdownMenuItem>
+                      <DropdownMenuItem icon={<FiMail size={14} />}>
+                        Email
+                      </DropdownMenuItem>
                       <DropdownMenuItem
                         icon={<FiLayers size={14} />}
                         submenu={
                           <>
-                            <DropdownMenuLabel inset>Nested Childs</DropdownMenuLabel>
+                            <DropdownMenuLabel inset>
+                              Nested Childs
+                            </DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem icon={<FiLink2 size={14} />}>
                               Copy Link
@@ -1198,8 +1585,8 @@ export const DropdownMenuPlayground: StoryObj<DropdownMenuPlaygroundProps> = {
           </DropdownMenu>
 
           <FieldDescription>
-            Test variant, size, side positioning, and close behavior with multi-child nested
-            content.
+            Test variant, size, side positioning, and close behavior with
+            multi-child nested content.
           </FieldDescription>
         </FieldContent>
       </Field>

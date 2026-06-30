@@ -1,5 +1,6 @@
 import {
   createContext,
+  isValidElement,
   useEffect,
   useContext,
   useId,
@@ -8,6 +9,7 @@ import {
   useState,
   type CSSProperties,
   type HTMLAttributes,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -62,6 +64,7 @@ export interface DropdownMenuTriggerProps extends Omit<
 > {
   children?: ReactNode;
   disabled?: boolean;
+  asChild?: boolean;
 }
 
 export interface DropdownMenuContentProps extends Omit<
@@ -555,6 +558,46 @@ function renderPortal(children: ReactNode): JSX.Element | null {
   return createPortal(children, document.body);
 }
 
+function hasLikelyFocusableChild(node: ReactNode): boolean {
+  if (!isValidElement(node)) {
+    return false;
+  }
+
+  if (typeof node.type === "string") {
+    const tagName = node.type.toLowerCase();
+
+    if (
+      tagName === "button" ||
+      tagName === "a" ||
+      tagName === "input" ||
+      tagName === "select" ||
+      tagName === "textarea" ||
+      tagName === "summary"
+    ) {
+      return true;
+    }
+  }
+
+  const elementProps = node.props as {
+    tabIndex?: number;
+    role?: string;
+    href?: string;
+    to?: string;
+  };
+
+  if (typeof elementProps.tabIndex === "number" && elementProps.tabIndex >= 0) {
+    return true;
+  }
+
+  if (elementProps.role === "button") {
+    return true;
+  }
+
+  return (
+    typeof elementProps.href === "string" || typeof elementProps.to === "string"
+  );
+}
+
 function getPanelStyle(
   sizeToken: DropdownMenuSizeTokens,
   variantToken: DropdownMenuVariantTokens,
@@ -729,6 +772,7 @@ export function DropdownMenu({
 export function DropdownMenuTrigger({
   children,
   disabled = false,
+  asChild,
   className = "",
   style,
   ...props
@@ -757,6 +801,91 @@ export function DropdownMenuTrigger({
     ) : (
       <span>{open ? "Close menu" : "Open menu"}</span>
     );
+
+  const shouldUseCustomTrigger = asChild ?? isValidElement(triggerContent);
+  const shouldWrapAsFocusable =
+    shouldUseCustomTrigger && !hasLikelyFocusableChild(triggerContent);
+
+  function handleTriggerToggle(event: unknown): void {
+    if (!isDisabled) {
+      setOpen(!open, "trigger", event);
+    }
+  }
+
+  function handleTriggerKeyDown(
+    event: ReactKeyboardEvent<HTMLDivElement>,
+  ): void {
+    if (isDisabled) {
+      return;
+    }
+
+    if (
+      event.key === "Enter" ||
+      event.key === " " ||
+      event.key === "ArrowDown" ||
+      event.key === "ArrowUp"
+    ) {
+      event.preventDefault();
+
+      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        setOpen(true, "trigger", event);
+        return;
+      }
+
+      handleTriggerToggle(event);
+      return;
+    }
+
+    if (event.key === "Escape" && open) {
+      event.preventDefault();
+      setOpen(false, "escape", event);
+    }
+  }
+
+  if (shouldUseCustomTrigger) {
+    return (
+      <div
+        ref={triggerRef}
+        className={className.trim() === "" ? undefined : className}
+        style={triggerWrapperStyle}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={contentId}
+        aria-disabled={isDisabled || undefined}
+        role={shouldWrapAsFocusable ? "button" : undefined}
+        tabIndex={shouldWrapAsFocusable ? (isDisabled ? -1 : 0) : undefined}
+        {...props}
+        onClick={(event) => {
+          props.onClick?.(event);
+
+          if (event.defaultPrevented || isDisabled) {
+            return;
+          }
+
+          const targetElement = event.target;
+
+          if (targetElement instanceof HTMLElement) {
+            const anchorElement = targetElement.closest("a[href]");
+
+            if (anchorElement != null) {
+              event.preventDefault();
+            }
+          }
+
+          handleTriggerToggle(event);
+        }}
+        onKeyDown={(event) => {
+          props.onKeyDown?.(event);
+
+          if (!event.defaultPrevented) {
+            handleTriggerKeyDown(event);
+          }
+        }}
+      >
+        {triggerContent}
+      </div>
+    );
+  }
 
   return (
     <div

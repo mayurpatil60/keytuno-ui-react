@@ -60,6 +60,18 @@ export type {
   BreadcrumbSeparatorProps,
   BreadcrumbSize,
 } from "./components/Breadcrumb";
+export { Sidebar } from "./components/Sidebar";
+export type {
+  SidebarActionContext,
+  SidebarActionSource,
+  SidebarItem,
+  SidebarItemActionEvent,
+  SidebarProps,
+  SidebarSectionSeparatorContext,
+  SidebarSection,
+  SidebarSize,
+  SidebarVariant,
+} from "./components/Sidebar";
 export {
   Card,
   CardAction,
