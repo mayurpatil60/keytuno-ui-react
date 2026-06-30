@@ -7,9 +7,9 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type KeyboardEvent,
-} from 'react';
+} from "react";
 
-import { Button } from './Button';
+import { Button } from "./Button";
 import {
   FiCalendar,
   FiChevronDown,
@@ -17,29 +17,29 @@ import {
   FiChevronRight,
   FiClock,
   FiX,
-} from 'react-icons/fi';
+} from "./icons/feather";
 
 export type DatePickerVariant =
-  | 'primary'
-  | 'secondary'
-  | 'destructive'
-  | 'outline'
-  | 'ghost'
-  | 'link';
+  | "primary"
+  | "secondary"
+  | "destructive"
+  | "outline"
+  | "ghost"
+  | "link";
 
-export type DatePickerSize = 'xs' | 'sm' | 'md' | 'lg';
-export type DatePickerMode = 'date' | 'range' | 'time';
+export type DatePickerSize = "xs" | "sm" | "md" | "lg";
+export type DatePickerMode = "date" | "range" | "time";
 export type DatePickerActionSource =
-  | 'open'
-  | 'close'
-  | 'clear'
-  | 'input-change'
-  | 'input-commit'
-  | 'date-select'
-  | 'time-select'
-  | 'month-shift'
-  | 'month-set'
-  | 'year-set';
+  | "open"
+  | "close"
+  | "clear"
+  | "input-change"
+  | "input-commit"
+  | "date-select"
+  | "time-select"
+  | "month-shift"
+  | "month-set"
+  | "year-set";
 
 export interface DatePickerActionContext {
   source: DatePickerActionSource;
@@ -58,7 +58,7 @@ export type DatePickerValue = string | DateRangeValue | null;
 
 export interface DatePickerProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  'children' | 'defaultValue' | 'onChange'
+  "children" | "defaultValue" | "onChange"
 > {
   mode?: DatePickerMode;
   variant?: DatePickerVariant;
@@ -92,127 +92,134 @@ type CalendarDayCell = {
   inCurrentMonth: boolean;
 };
 
-const WEEKDAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const WEEKDAY_LABELS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
 const MONTH_LABELS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const sizeTokens: Record<DatePickerSize, DatePickerSizeTokens> = {
   xs: {
-    height: '1.9rem',
-    fontSize: '0.75rem',
-    panelPadding: '0.55rem',
-    dayCellSize: '1.65rem',
+    height: "1.9rem",
+    fontSize: "0.75rem",
+    panelPadding: "0.55rem",
+    dayCellSize: "1.65rem",
   },
   sm: {
-    height: '2.15rem',
-    fontSize: '0.8125rem',
-    panelPadding: '0.65rem',
-    dayCellSize: '1.8rem',
+    height: "2.15rem",
+    fontSize: "0.8125rem",
+    panelPadding: "0.65rem",
+    dayCellSize: "1.8rem",
   },
   md: {
-    height: '2.4rem',
-    fontSize: '0.875rem',
-    panelPadding: '0.75rem',
-    dayCellSize: '2rem',
+    height: "2.4rem",
+    fontSize: "0.875rem",
+    panelPadding: "0.75rem",
+    dayCellSize: "2rem",
   },
   lg: {
-    height: '2.65rem',
-    fontSize: '0.9375rem',
-    panelPadding: '0.875rem',
-    dayCellSize: '2.2rem',
+    height: "2.65rem",
+    fontSize: "0.9375rem",
+    panelPadding: "0.875rem",
+    dayCellSize: "2.2rem",
   },
 };
 
 const variantStyles: Record<DatePickerVariant, CSSProperties> = {
   primary: {
-    borderColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 42%, var(--ktn-border-muted))',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    color: 'var(--ktn-text-primary)',
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg) 42%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
   },
   secondary: {
-    borderColor: 'var(--ktn-border-muted)',
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))',
-    color: 'var(--ktn-text-primary)',
+    borderColor: "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
+    color: "var(--ktn-text-primary)",
   },
   destructive: {
     borderColor:
-      'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 42%, var(--ktn-border-muted))',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    color: 'var(--ktn-text-primary)',
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 42%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
   },
   outline: {
-    borderColor: 'var(--ktn-border-muted)',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    color: 'var(--ktn-text-primary)',
+    borderColor: "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
   },
   ghost: {
-    borderColor: 'transparent',
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.1))',
-    color: 'var(--ktn-text-primary)',
+    borderColor: "transparent",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.1))",
+    color: "var(--ktn-text-primary)",
   },
   link: {
-    borderColor: 'transparent',
-    backgroundColor: 'transparent',
-    color: 'var(--ktn-action-primary-bg)',
-    textDecoration: 'underline',
-    textUnderlineOffset: '0.14em',
+    borderColor: "transparent",
+    backgroundColor: "transparent",
+    color: "var(--ktn-action-primary-bg)",
+    textDecoration: "underline",
+    textUnderlineOffset: "0.14em",
   },
 };
 
 const focusStyles: Record<DatePickerVariant, CSSProperties> = {
   primary: {
-    boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.24)',
+    boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.24)",
   },
   secondary: {
-    boxShadow: '0 0 0 2px rgba(100, 116, 139, 0.2)',
+    boxShadow: "0 0 0 2px rgba(100, 116, 139, 0.2)",
   },
   destructive: {
-    boxShadow: '0 0 0 2px rgba(220, 38, 38, 0.24)',
+    boxShadow: "0 0 0 2px rgba(220, 38, 38, 0.24)",
   },
   outline: {
-    boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.2)',
+    boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.2)",
   },
   ghost: {
-    boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.16)',
+    boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.16)",
   },
   link: {
-    boxShadow: '0 0 0 2px rgba(37, 99, 235, 0.16)',
+    boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.16)",
   },
 };
 
-const baseClasses = 'relative inline-flex flex-col';
+const baseClasses = "relative inline-flex flex-col";
 
 function padTwo(value: number): string {
-  return String(value).padStart(2, '0');
+  return String(value).padStart(2, "0");
 }
 
 function formatIsoDate(year: number, month: number, day: number): string {
   return `${year}-${padTwo(month)}-${padTwo(day)}`;
 }
 
-function parseIsoDate(value: string): { year: number; month: number; day: number } | null {
+function parseIsoDate(
+  value: string,
+): { year: number; month: number; day: number } | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return null;
   }
 
-  const [yearText, monthText, dayText] = value.split('-');
+  const [yearText, monthText, dayText] = value.split("-");
   const year = Number(yearText);
   const month = Number(monthText);
   const day = Number(dayText);
 
-  if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) {
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
     return null;
   }
 
@@ -222,7 +229,11 @@ function parseIsoDate(value: string): { year: number; month: number; day: number
 
   const date = new Date(year, month - 1, day);
 
-  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) {
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
     return null;
   }
 
@@ -233,12 +244,14 @@ function parseIsoDate(value: string): { year: number; month: number; day: number
   };
 }
 
-function isDateRangeValue(value: DatePickerValue | undefined): value is DateRangeValue {
-  if (value == null || typeof value !== 'object') {
+function isDateRangeValue(
+  value: DatePickerValue | undefined,
+): value is DateRangeValue {
+  if (value == null || typeof value !== "object") {
     return false;
   }
 
-  return 'start' in value && 'end' in value;
+  return "start" in value && "end" in value;
 }
 
 function isValidDateValue(value: string): boolean {
@@ -250,7 +263,7 @@ function isValidTimeValue(value: string): boolean {
     return false;
   }
 
-  const [hourText, minuteText] = value.split(':');
+  const [hourText, minuteText] = value.split(":");
   const hour = Number(hourText);
   const minute = Number(minuteText);
 
@@ -277,7 +290,10 @@ function toMonthState(isoDate: string | null | undefined): CalendarMonthState {
   };
 }
 
-function shiftMonth(monthState: CalendarMonthState, delta: number): CalendarMonthState {
+function shiftMonth(
+  monthState: CalendarMonthState,
+  delta: number,
+): CalendarMonthState {
   const monthIndex = monthState.year * 12 + monthState.month + delta;
   const nextYear = Math.floor(monthIndex / 12);
   const nextMonth = ((monthIndex % 12) + 12) % 12;
@@ -289,16 +305,31 @@ function shiftMonth(monthState: CalendarMonthState, delta: number): CalendarMont
 }
 
 function monthLabel(monthState: CalendarMonthState): string {
-  return new Date(monthState.year, monthState.month, 1).toLocaleString(undefined, {
-    month: 'long',
-    year: 'numeric',
-  });
+  return new Date(monthState.year, monthState.month, 1).toLocaleString(
+    undefined,
+    {
+      month: "long",
+      year: "numeric",
+    },
+  );
 }
 
 function buildCalendarCells(monthState: CalendarMonthState): CalendarDayCell[] {
-  const firstDayOfMonth = new Date(monthState.year, monthState.month, 1).getDay();
-  const daysInCurrentMonth = new Date(monthState.year, monthState.month + 1, 0).getDate();
-  const daysInPreviousMonth = new Date(monthState.year, monthState.month, 0).getDate();
+  const firstDayOfMonth = new Date(
+    monthState.year,
+    monthState.month,
+    1,
+  ).getDay();
+  const daysInCurrentMonth = new Date(
+    monthState.year,
+    monthState.month + 1,
+    0,
+  ).getDate();
+  const daysInPreviousMonth = new Date(
+    monthState.year,
+    monthState.month,
+    0,
+  ).getDate();
 
   const cells: CalendarDayCell[] = [];
 
@@ -340,36 +371,39 @@ function buildCalendarCells(monthState: CalendarMonthState): CalendarDayCell[] {
 
 function normalizeScalarValue(
   value: DatePickerValue | undefined,
-  mode: 'date' | 'time',
+  mode: "date" | "time",
 ): string | null {
-  if (typeof value !== 'string') {
+  if (typeof value !== "string") {
     return null;
   }
 
   const trimmed = value.trim();
 
-  if (trimmed === '') {
+  if (trimmed === "") {
     return null;
   }
 
-  if (mode === 'date') {
+  if (mode === "date") {
     return isValidDateValue(trimmed) ? trimmed : null;
   }
 
   return isValidTimeValue(trimmed) ? trimmed : null;
 }
 
-function parseRangeInput(input: string, separator: string): DateRangeValue | null {
+function parseRangeInput(
+  input: string,
+  separator: string,
+): DateRangeValue | null {
   const trimmed = input.trim();
 
-  if (trimmed === '') {
+  if (trimmed === "") {
     return {
       start: null,
       end: null,
     };
   }
 
-  const effectiveSeparator = separator === '' ? ' - ' : separator;
+  const effectiveSeparator = separator === "" ? " - " : separator;
   const parts = trimmed.split(effectiveSeparator).map((item) => item.trim());
 
   if (parts.length > 2) {
@@ -390,8 +424,8 @@ function parseRangeInput(input: string, separator: string): DateRangeValue | nul
   }
 
   const [startRaw, endRaw] = parts;
-  const start = startRaw === '' ? null : startRaw;
-  const end = endRaw === '' ? null : endRaw;
+  const start = startRaw === "" ? null : startRaw;
+  const end = endRaw === "" ? null : endRaw;
 
   if (start != null && !isValidDateValue(start)) {
     return null;
@@ -420,8 +454,13 @@ function normalizeRangeValue(
 ): DateRangeValue {
   if (isDateRangeValue(value)) {
     const start =
-      typeof value.start === 'string' && isValidDateValue(value.start) ? value.start : null;
-    const end = typeof value.end === 'string' && isValidDateValue(value.end) ? value.end : null;
+      typeof value.start === "string" && isValidDateValue(value.start)
+        ? value.start
+        : null;
+    const end =
+      typeof value.end === "string" && isValidDateValue(value.end)
+        ? value.end
+        : null;
 
     if (start != null && end != null && start > end) {
       return {
@@ -436,7 +475,7 @@ function normalizeRangeValue(
     };
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     const parsed = parseRangeInput(value, separator);
 
     if (parsed != null) {
@@ -455,7 +494,7 @@ function normalizeValueByMode(
   mode: DatePickerMode,
   separator: string,
 ): DatePickerValue {
-  if (mode === 'range') {
+  if (mode === "range") {
     return normalizeRangeValue(value, separator);
   }
 
@@ -475,7 +514,7 @@ function formatRangeValue(value: DateRangeValue, separator: string): string {
     return value.end;
   }
 
-  return '';
+  return "";
 }
 
 function createTimeOptions(stepMinutes: number): string[] {
@@ -501,14 +540,14 @@ function createYearOptions(anchorYear: number): number[] {
 }
 
 function formatTime12Hour(value: string): string {
-  const [hourText, minuteText] = value.split(':');
+  const [hourText, minuteText] = value.split(":");
   const hour = Number(hourText);
 
   if (!Number.isFinite(hour)) {
     return value;
   }
 
-  const suffix = hour >= 12 ? 'PM' : 'AM';
+  const suffix = hour >= 12 ? "PM" : "AM";
   const normalizedHour = hour % 12 === 0 ? 12 : hour % 12;
 
   return `${normalizedHour}:${minuteText} ${suffix}`;
@@ -521,12 +560,15 @@ function formatAccessibleDate(value: string): string {
     return value;
   }
 
-  return new Date(parsed.year, parsed.month - 1, parsed.day).toLocaleDateString(undefined, {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  return new Date(parsed.year, parsed.month - 1, parsed.day).toLocaleDateString(
+    undefined,
+    {
+      weekday: "short",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    },
+  );
 }
 
 function formatDisplayValue(
@@ -534,46 +576,51 @@ function formatDisplayValue(
   mode: DatePickerMode,
   separator: string,
 ): string {
-  if (mode === 'range') {
-    return isDateRangeValue(value) ? formatRangeValue(value, separator) : '';
+  if (mode === "range") {
+    return isDateRangeValue(value) ? formatRangeValue(value, separator) : "";
   }
 
-  return typeof value === 'string' ? value : '';
+  return typeof value === "string" ? value : "";
 }
 
 export function DatePicker({
-  mode = 'date',
+  mode = "date",
   variant,
   varient,
-  size = 'md',
+  size = "md",
   disabled = false,
   invalid = false,
   placeholder,
-  rangeSeparator = ' - ',
+  rangeSeparator = " - ",
   value,
   defaultValue,
   onValueChange,
   onAction,
-  className = '',
+  className = "",
   style,
   id,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
-  'aria-describedby': ariaDescribedBy,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
   ...props
 }: DatePickerProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? 'outline';
+  const resolvedVariant = variant ?? varient ?? "outline";
   const isControlled = value !== undefined;
 
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
-  const [uncontrolledValue, setUncontrolledValue] = useState<DatePickerValue>(() =>
-    normalizeValueByMode(defaultValue, mode, rangeSeparator),
+  const [uncontrolledValue, setUncontrolledValue] = useState<DatePickerValue>(
+    () => normalizeValueByMode(defaultValue, mode, rangeSeparator),
   );
 
   const resolvedValue = useMemo(
-    () => normalizeValueByMode(isControlled ? value : uncontrolledValue, mode, rangeSeparator),
+    () =>
+      normalizeValueByMode(
+        isControlled ? value : uncontrolledValue,
+        mode,
+        rangeSeparator,
+      ),
     [isControlled, mode, rangeSeparator, uncontrolledValue, value],
   );
 
@@ -586,17 +633,21 @@ export function DatePicker({
   );
 
   const [leftMonth, setLeftMonth] = useState<CalendarMonthState>(() => {
-    const normalizedDefault = normalizeValueByMode(defaultValue, mode, rangeSeparator);
+    const normalizedDefault = normalizeValueByMode(
+      defaultValue,
+      mode,
+      rangeSeparator,
+    );
 
     if (
-      mode === 'range' &&
+      mode === "range" &&
       isDateRangeValue(normalizedDefault) &&
       normalizedDefault.start != null
     ) {
       return toMonthState(normalizedDefault.start);
     }
 
-    if (mode === 'date' && typeof normalizedDefault === 'string') {
+    if (mode === "date" && typeof normalizedDefault === "string") {
       return toMonthState(normalizedDefault);
     }
 
@@ -604,9 +655,13 @@ export function DatePicker({
   });
 
   const [rightMonth, setRightMonth] = useState<CalendarMonthState>(() => {
-    const normalizedDefault = normalizeValueByMode(defaultValue, mode, rangeSeparator);
+    const normalizedDefault = normalizeValueByMode(
+      defaultValue,
+      mode,
+      rangeSeparator,
+    );
 
-    if (mode === 'range' && isDateRangeValue(normalizedDefault)) {
+    if (mode === "range" && isDateRangeValue(normalizedDefault)) {
       if (normalizedDefault.end != null) {
         return toMonthState(normalizedDefault.end);
       }
@@ -628,31 +683,33 @@ export function DatePicker({
   const inputElementId = `${idBase}-input`;
   const panelElementId = `${idBase}-panel`;
   const panelAriaLabel =
-    mode === 'time'
-      ? 'Time picker panel'
-      : mode === 'range'
-        ? 'Date range picker panel'
-        : 'Date picker panel';
+    mode === "time"
+      ? "Time picker panel"
+      : mode === "range"
+        ? "Date range picker panel"
+        : "Date picker panel";
   const inputAriaLabel =
     ariaLabel ??
     (ariaLabelledBy == null
-      ? mode === 'time'
-        ? 'Time picker'
-        : mode === 'range'
-          ? 'Date range picker'
-          : 'Date picker'
+      ? mode === "time"
+        ? "Time picker"
+        : mode === "range"
+          ? "Date range picker"
+          : "Date picker"
       : undefined);
 
   const rangeValue =
-    mode === 'range' && isDateRangeValue(resolvedValue)
+    mode === "range" && isDateRangeValue(resolvedValue)
       ? resolvedValue
       : {
           start: null,
           end: null,
         };
 
-  const selectedDate = mode === 'date' && typeof resolvedValue === 'string' ? resolvedValue : null;
-  const selectedTime = mode === 'time' && typeof resolvedValue === 'string' ? resolvedValue : null;
+  const selectedDate =
+    mode === "date" && typeof resolvedValue === "string" ? resolvedValue : null;
+  const selectedTime =
+    mode === "time" && typeof resolvedValue === "string" ? resolvedValue : null;
 
   const displayValue = useMemo(
     () => formatDisplayValue(resolvedValue, mode, rangeSeparator),
@@ -660,13 +717,19 @@ export function DatePicker({
   );
 
   const hasSelection =
-    mode === 'range'
+    mode === "range"
       ? rangeValue.start != null || rangeValue.end != null
-      : displayValue.trim() !== '';
+      : displayValue.trim() !== "";
 
   const timeOptions = useMemo(() => createTimeOptions(15), []);
-  const leftYearOptions = useMemo(() => createYearOptions(leftMonth.year), [leftMonth.year]);
-  const rightYearOptions = useMemo(() => createYearOptions(rightMonth.year), [rightMonth.year]);
+  const leftYearOptions = useMemo(
+    () => createYearOptions(leftMonth.year),
+    [leftMonth.year],
+  );
+  const rightYearOptions = useMemo(
+    () => createYearOptions(rightMonth.year),
+    [rightMonth.year],
+  );
   const todayIso = useMemo(() => {
     const now = new Date();
 
@@ -675,7 +738,9 @@ export function DatePicker({
 
   useEffect(() => {
     if (!isControlled) {
-      setUncontrolledValue((current) => normalizeValueByMode(current, mode, rangeSeparator));
+      setUncontrolledValue((current) =>
+        normalizeValueByMode(current, mode, rangeSeparator),
+      );
     }
   }, [isControlled, mode, rangeSeparator]);
 
@@ -689,17 +754,20 @@ export function DatePicker({
     }
 
     function handlePointerDown(event: PointerEvent): void {
-      if (rootRef.current != null && !rootRef.current.contains(event.target as Node)) {
+      if (
+        rootRef.current != null &&
+        !rootRef.current.contains(event.target as Node)
+      ) {
         commitInputText();
         closePanel(false);
         setIsFocused(false);
       }
     }
 
-    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener("pointerdown", handlePointerDown);
 
     return () => {
-      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener("pointerdown", handlePointerDown);
     };
   }, [disabled, inputText, isOpen, mode, rangeSeparator, resolvedValue]);
 
@@ -708,12 +776,12 @@ export function DatePicker({
       return;
     }
 
-    if (mode === 'date' && selectedDate != null) {
+    if (mode === "date" && selectedDate != null) {
       setLeftMonth(toMonthState(selectedDate));
       return;
     }
 
-    if (mode === 'range' && rangeValue.start != null) {
+    if (mode === "range" && rangeValue.start != null) {
       const nextLeftMonth = toMonthState(rangeValue.start);
       setLeftMonth(nextLeftMonth);
 
@@ -725,7 +793,7 @@ export function DatePicker({
       return;
     }
 
-    if (mode === 'range') {
+    if (mode === "range") {
       const nextLeftMonth = toMonthState(null);
       setLeftMonth(nextLeftMonth);
       setRightMonth(shiftMonth(nextLeftMonth, 1));
@@ -750,7 +818,11 @@ export function DatePicker({
       return;
     }
 
-    const nextValue = normalizeValueByMode(options?.value ?? resolvedValue, mode, rangeSeparator);
+    const nextValue = normalizeValueByMode(
+      options?.value ?? resolvedValue,
+      mode,
+      rangeSeparator,
+    );
 
     onAction({
       source,
@@ -776,9 +848,16 @@ export function DatePicker({
     return normalized;
   }
 
-  function setValueAndSync(nextValue: DatePickerValue, source: DatePickerActionSource): void {
+  function setValueAndSync(
+    nextValue: DatePickerValue,
+    source: DatePickerActionSource,
+  ): void {
     const normalized = updateValue(nextValue, source);
-    const nextDisplayValue = formatDisplayValue(normalized, mode, rangeSeparator);
+    const nextDisplayValue = formatDisplayValue(
+      normalized,
+      mode,
+      rangeSeparator,
+    );
     setInputText(nextDisplayValue);
     emitAction(source, {
       value: normalized,
@@ -789,11 +868,11 @@ export function DatePicker({
   function commitInputText(): void {
     const trimmed = inputText.trim();
 
-    if (mode === 'range') {
+    if (mode === "range") {
       const parsedRange = parseRangeInput(inputText, rangeSeparator);
 
       if (parsedRange != null) {
-        setValueAndSync(parsedRange, 'input-commit');
+        setValueAndSync(parsedRange, "input-commit");
         return;
       }
 
@@ -801,14 +880,14 @@ export function DatePicker({
       return;
     }
 
-    if (trimmed === '') {
-      setValueAndSync(null, 'input-commit');
+    if (trimmed === "") {
+      setValueAndSync(null, "input-commit");
       return;
     }
 
-    if (mode === 'date') {
+    if (mode === "date") {
       if (isValidDateValue(trimmed)) {
-        setValueAndSync(trimmed, 'input-commit');
+        setValueAndSync(trimmed, "input-commit");
         return;
       }
 
@@ -817,7 +896,7 @@ export function DatePicker({
     }
 
     if (isValidTimeValue(trimmed)) {
-      setValueAndSync(trimmed, 'input-commit');
+      setValueAndSync(trimmed, "input-commit");
       return;
     }
 
@@ -834,7 +913,7 @@ export function DatePicker({
         return current;
       }
 
-      emitAction('open', {
+      emitAction("open", {
         open: true,
       });
 
@@ -848,7 +927,7 @@ export function DatePicker({
         return current;
       }
 
-      emitAction('close', {
+      emitAction("close", {
         open: false,
       });
 
@@ -865,26 +944,26 @@ export function DatePicker({
       return;
     }
 
-    if (event.key === 'ArrowDown') {
+    if (event.key === "ArrowDown") {
       event.preventDefault();
       openPanel();
       return;
     }
 
-    if (event.key === 'Escape') {
+    if (event.key === "Escape") {
       event.preventDefault();
       closePanel(true);
       return;
     }
 
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       event.preventDefault();
       commitInputText();
       closePanel(false);
       return;
     }
 
-    if (event.key === 'Tab') {
+    if (event.key === "Tab") {
       commitInputText();
       closePanel(false);
     }
@@ -895,10 +974,10 @@ export function DatePicker({
       return;
     }
 
-    if (mode === 'range') {
-      setValueAndSync({ start: null, end: null }, 'clear');
+    if (mode === "range") {
+      setValueAndSync({ start: null, end: null }, "clear");
     } else {
-      setValueAndSync(null, 'clear');
+      setValueAndSync(null, "clear");
     }
 
     inputRef.current?.focus();
@@ -909,7 +988,7 @@ export function DatePicker({
       return;
     }
 
-    if (mode === 'range') {
+    if (mode === "range") {
       let nextRange: DateRangeValue;
 
       if (rangeValue.start == null || rangeValue.end != null) {
@@ -929,7 +1008,7 @@ export function DatePicker({
         };
       }
 
-      setValueAndSync(nextRange, 'date-select');
+      setValueAndSync(nextRange, "date-select");
 
       if (nextRange.end != null) {
         closePanel(false);
@@ -938,7 +1017,7 @@ export function DatePicker({
       return;
     }
 
-    setValueAndSync(isoDate, 'date-select');
+    setValueAndSync(isoDate, "date-select");
     closePanel(false);
   }
 
@@ -947,7 +1026,7 @@ export function DatePicker({
       return;
     }
 
-    setValueAndSync(nextTime, 'time-select');
+    setValueAndSync(nextTime, "time-select");
     closePanel(false);
   }
 
@@ -976,57 +1055,61 @@ export function DatePicker({
   }
 
   const rootStyle: CSSProperties = {
-    width: '100%',
-    position: 'relative',
+    width: "100%",
+    position: "relative",
     ...style,
   };
 
   const fieldWrapStyle: CSSProperties = {
-    position: 'relative',
-    width: '100%',
+    position: "relative",
+    width: "100%",
   };
 
   const leadingIconStyle: CSSProperties = {
-    position: 'absolute',
-    insetInlineStart: '0.625rem',
-    insetBlockStart: '50%',
-    transform: 'translateY(-50%)',
-    width: '0.95rem',
-    height: '0.95rem',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    position: "absolute",
+    insetInlineStart: "0.625rem",
+    insetBlockStart: "50%",
+    transform: "translateY(-50%)",
+    width: "0.95rem",
+    height: "0.95rem",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     lineHeight: 0,
-    pointerEvents: 'none',
+    pointerEvents: "none",
     zIndex: 1,
   };
 
   const fieldBaseStyle: CSSProperties = {
-    width: '100%',
+    width: "100%",
     height: tokens.height,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderRadius: 'var(--ktn-radius-md, 0.5rem)',
-    outline: 'none',
-    paddingInlineStart: '2rem',
-    paddingInlineEnd: hasSelection ? '4.2rem' : '2.35rem',
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderRadius: "var(--ktn-radius-md, 0.5rem)",
+    outline: "none",
+    paddingInlineStart: "2rem",
+    paddingInlineEnd: hasSelection ? "4.2rem" : "2.35rem",
     fontSize: tokens.fontSize,
     lineHeight: 1.25,
-    transition: 'border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease',
+    transition:
+      "border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease",
   };
 
   const fieldStyle: CSSProperties = {
     ...fieldBaseStyle,
     ...variantStyles[resolvedVariant],
     color:
-      inputText.trim() === ''
-        ? 'var(--ktn-text-secondary, var(--ktn-text-primary))'
-        : 'var(--ktn-text-primary)',
+      inputText.trim() === ""
+        ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
+        : "var(--ktn-text-primary)",
     ...(invalid
       ? {
-          borderColor: 'var(--ktn-action-danger-bg, #dc2626)',
-          boxShadow: isFocused || isOpen ? '0 0 0 2px rgba(220, 38, 38, 0.24)' : undefined,
+          borderColor: "var(--ktn-action-danger-bg, #dc2626)",
+          boxShadow:
+            isFocused || isOpen
+              ? "0 0 0 2px rgba(220, 38, 38, 0.24)"
+              : undefined,
         }
       : isFocused || isOpen
         ? focusStyles[resolvedVariant]
@@ -1034,246 +1117,254 @@ export function DatePicker({
     ...(disabled
       ? {
           opacity: 0.62,
-          cursor: 'not-allowed',
+          cursor: "not-allowed",
         }
       : {
-          cursor: 'text',
+          cursor: "text",
         }),
   };
 
   const controlWrapStyle: CSSProperties = {
-    position: 'absolute',
-    insetInlineEnd: '0.35rem',
-    insetBlockStart: '50%',
-    transform: 'translateY(-50%)',
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.25rem',
+    position: "absolute",
+    insetInlineEnd: "0.35rem",
+    insetBlockStart: "50%",
+    transform: "translateY(-50%)",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.25rem",
   };
 
   const iconButtonStyle: CSSProperties = {
-    width: '1.45rem',
-    height: '1.45rem',
-    minHeight: '1.45rem',
+    width: "1.45rem",
+    height: "1.45rem",
+    minHeight: "1.45rem",
     paddingInline: 0,
     paddingBlock: 0,
-    borderRadius: '999px',
+    borderRadius: "999px",
   };
 
   const chevronStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '0.9rem',
-    height: '0.9rem',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "0.9rem",
+    height: "0.9rem",
     lineHeight: 0,
-    transition: 'transform 160ms ease',
-    transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+    transition: "transform 160ms ease",
+    transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
   };
 
   const panelStyle: CSSProperties = {
-    position: 'absolute',
+    position: "absolute",
     insetInlineStart: 0,
-    insetBlockStart: 'calc(100% + 0.35rem)',
+    insetBlockStart: "calc(100% + 0.35rem)",
     zIndex: 20,
     width:
-      mode === 'range'
-        ? 'min(44rem, calc(100vw - 1rem))'
-        : mode === 'time'
-          ? 'min(18.5rem, calc(100vw - 1rem))'
-          : 'min(20rem, calc(100vw - 1rem))',
-    maxWidth: 'calc(100vw - 1rem)',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: invalid ? 'var(--ktn-action-danger-bg, #dc2626)' : 'var(--ktn-border-muted)',
-    borderRadius: 'var(--ktn-radius-md, 0.5rem)',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    boxShadow: '0 10px 28px rgba(15, 23, 42, 0.12)',
+      mode === "range"
+        ? "min(44rem, calc(100vw - 1rem))"
+        : mode === "time"
+          ? "min(18.5rem, calc(100vw - 1rem))"
+          : "min(20rem, calc(100vw - 1rem))",
+    maxWidth: "calc(100vw - 1rem)",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: invalid
+      ? "var(--ktn-action-danger-bg, #dc2626)"
+      : "var(--ktn-border-muted)",
+    borderRadius: "var(--ktn-radius-md, 0.5rem)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    boxShadow: "0 10px 28px rgba(15, 23, 42, 0.12)",
     padding: tokens.panelPadding,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.65rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.65rem",
   };
 
   const panelHeaderStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: mode === 'time' ? 'center' : 'space-between',
-    gap: '0.5rem',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: mode === "time" ? "center" : "space-between",
+    gap: "0.5rem",
   };
 
   const panelNavigationButtonStyle: CSSProperties = {
-    width: '1.65rem',
-    height: '1.65rem',
-    minHeight: '1.65rem',
+    width: "1.65rem",
+    height: "1.65rem",
+    minHeight: "1.65rem",
     paddingInline: 0,
     paddingBlock: 0,
-    borderRadius: '999px',
+    borderRadius: "999px",
   };
 
   const monthYearControlWrapStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.35rem',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "0.35rem",
     flex: 1,
     minWidth: 0,
   };
 
   const monthYearSelectStyle: CSSProperties = {
-    height: '1.75rem',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--ktn-border-muted)',
-    borderRadius: 'var(--ktn-radius-sm, 0.375rem)',
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))',
-    color: 'var(--ktn-text-primary)',
-    fontSize: '0.78rem',
+    height: "1.75rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "var(--ktn-border-muted)",
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
+    color: "var(--ktn-text-primary)",
+    fontSize: "0.78rem",
     fontWeight: 500,
-    paddingInline: '0.4rem',
-    outline: 'none',
+    paddingInline: "0.4rem",
+    outline: "none",
   };
 
   const calendarHeaderStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '0.35rem',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "0.35rem",
   };
 
   const panelHeaderTitleStyle: CSSProperties = {
-    fontSize: '0.8rem',
+    fontSize: "0.8rem",
     fontWeight: 600,
-    color: 'var(--ktn-text-primary)',
-    textAlign: 'center',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '0.3rem',
+    color: "var(--ktn-text-primary)",
+    textAlign: "center",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "0.3rem",
   };
 
   const calendarStackStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.55rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.55rem",
   };
 
   const rangeSummaryStyle: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-    gap: '0.5rem',
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: "0.5rem",
   };
 
   const rangeSummaryItemStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.1rem',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--ktn-border-muted)',
-    borderRadius: 'var(--ktn-radius-sm, 0.375rem)',
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))',
-    paddingInline: '0.55rem',
-    paddingBlock: '0.35rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.1rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "var(--ktn-border-muted)",
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
+    paddingInline: "0.55rem",
+    paddingBlock: "0.35rem",
   };
 
   const rangeSummaryLabelStyle: CSSProperties = {
-    fontSize: '0.68rem',
-    textTransform: 'uppercase',
-    letterSpacing: '0.04em',
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    fontSize: "0.68rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.04em",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   };
 
   const rangeSummaryValueStyle: CSSProperties = {
-    fontSize: '0.78rem',
-    color: 'var(--ktn-text-primary)',
-    minHeight: '1rem',
+    fontSize: "0.78rem",
+    color: "var(--ktn-text-primary)",
+    minHeight: "1rem",
   };
 
   const calendarRowStyle: CSSProperties = {
-    display: 'grid',
+    display: "grid",
     gridTemplateColumns:
-      mode === 'range' ? 'repeat(auto-fit, minmax(16rem, 1fr))' : 'minmax(16rem, 1fr)',
-    gap: '0.75rem',
-    alignItems: 'start',
+      mode === "range"
+        ? "repeat(auto-fit, minmax(16rem, 1fr))"
+        : "minmax(16rem, 1fr)",
+    gap: "0.75rem",
+    alignItems: "start",
   };
 
   const calendarBoxStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.35rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.35rem",
     minWidth: 0,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--ktn-border-muted)',
-    borderRadius: 'var(--ktn-radius-sm, 0.375rem)',
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.06))',
-    padding: '0.45rem',
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "var(--ktn-border-muted)",
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.06))",
+    padding: "0.45rem",
   };
 
   const weekHeaderStyle: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-    gap: '0.25rem',
+    display: "grid",
+    gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+    gap: "0.25rem",
   };
 
   const weekDayStyle: CSSProperties = {
-    textAlign: 'center',
-    fontSize: '0.72rem',
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    textAlign: "center",
+    fontSize: "0.72rem",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     fontWeight: 500,
   };
 
   const dayGridStyle: CSSProperties = {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-    gap: '0.25rem',
-    alignItems: 'center',
+    display: "grid",
+    gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
+    gap: "0.25rem",
+    alignItems: "center",
   };
 
   const timeListStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.35rem',
-    maxHeight: '15rem',
-    overflowY: 'auto',
-    paddingInlineEnd: '0.2rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.35rem",
+    maxHeight: "15rem",
+    overflowY: "auto",
+    paddingInlineEnd: "0.2rem",
   };
 
   const timeButtonStyle: CSSProperties = {
-    width: '100%',
-    justifyContent: 'space-between',
-    height: '1.95rem',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'transparent',
-    paddingInline: '0.65rem',
+    width: "100%",
+    justifyContent: "space-between",
+    height: "1.95rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "transparent",
+    paddingInline: "0.65rem",
   };
 
   const timeTextRowStyle: CSSProperties = {
-    width: '100%',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '0.65rem',
-    fontVariantNumeric: 'tabular-nums',
+    width: "100%",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "0.65rem",
+    fontVariantNumeric: "tabular-nums",
   };
 
   const timeTextPrimaryStyle: CSSProperties = {
     fontSize: tokens.fontSize,
-    color: 'var(--ktn-text-primary)',
+    color: "var(--ktn-text-primary)",
     fontWeight: 500,
   };
 
   const timeTextSecondaryStyle: CSSProperties = {
-    fontSize: '0.78em',
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    letterSpacing: '0.02em',
+    fontSize: "0.78em",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    letterSpacing: "0.02em",
   };
 
   const resolvedPlaceholder =
     placeholder ??
-    (mode === 'time' ? 'Select time' : mode === 'range' ? 'Select date range' : 'Select date');
+    (mode === "time"
+      ? "Select time"
+      : mode === "range"
+        ? "Select date range"
+        : "Select date");
 
   const leftMonthCells = buildCalendarCells(leftMonth);
   const rightMonthCells = buildCalendarCells(rightMonth);
@@ -1318,10 +1409,10 @@ export function DatePicker({
             }}
             onClick={() => {
               onShiftMonth(-1);
-              emitAction('month-shift');
+              emitAction("month-shift");
             }}
           >
-            <span aria-hidden style={{ display: 'inline-flex', lineHeight: 0 }}>
+            <span aria-hidden style={{ display: "inline-flex", lineHeight: 0 }}>
               <FiChevronLeft size={14} />
             </span>
           </Button>
@@ -1333,19 +1424,22 @@ export function DatePicker({
               disabled={disabled}
               style={{
                 ...monthYearSelectStyle,
-                minWidth: '5.1rem',
+                minWidth: "5.1rem",
               }}
               onChange={(event) => {
                 const nextMonth = Number(event.currentTarget.value);
 
                 if (Number.isFinite(nextMonth)) {
                   onSetMonth(nextMonth);
-                  emitAction('month-set');
+                  emitAction("month-set");
                 }
               }}
             >
               {MONTH_LABELS.map((monthLabel, monthIndex) => (
-                <option key={`${ariaPrefix}-month-option-${monthLabel}`} value={monthIndex}>
+                <option
+                  key={`${ariaPrefix}-month-option-${monthLabel}`}
+                  value={monthIndex}
+                >
                   {monthLabel}
                 </option>
               ))}
@@ -1357,19 +1451,22 @@ export function DatePicker({
               disabled={disabled}
               style={{
                 ...monthYearSelectStyle,
-                minWidth: '4.65rem',
+                minWidth: "4.65rem",
               }}
               onChange={(event) => {
                 const nextYear = Number(event.currentTarget.value);
 
                 if (Number.isFinite(nextYear)) {
                   onSetYear(nextYear);
-                  emitAction('year-set');
+                  emitAction("year-set");
                 }
               }}
             >
               {yearOptions.map((yearValue) => (
-                <option key={`${ariaPrefix}-year-option-${yearValue}`} value={yearValue}>
+                <option
+                  key={`${ariaPrefix}-year-option-${yearValue}`}
+                  value={yearValue}
+                >
                   {yearValue}
                 </option>
               ))}
@@ -1388,10 +1485,10 @@ export function DatePicker({
             }}
             onClick={() => {
               onShiftMonth(1);
-              emitAction('month-shift');
+              emitAction("month-shift");
             }}
           >
-            <span aria-hidden style={{ display: 'inline-flex', lineHeight: 0 }}>
+            <span aria-hidden style={{ display: "inline-flex", lineHeight: 0 }}>
               <FiChevronRight size={14} />
             </span>
           </Button>
@@ -1410,37 +1507,39 @@ export function DatePicker({
 
         <div style={dayGridStyle}>
           {cells.map((cell) => {
-            const isSelectedDate = mode === 'date' && selectedDate === cell.iso;
-            const isRangeStart = mode === 'range' && rangeValue.start === cell.iso;
-            const isRangeEnd = mode === 'range' && rangeValue.end === cell.iso;
-            const isRangeBoundary = mode === 'range' && (isRangeStart || isRangeEnd);
-            const isBetweenRange = mode === 'range' && isInRange(cell.iso);
+            const isSelectedDate = mode === "date" && selectedDate === cell.iso;
+            const isRangeStart =
+              mode === "range" && rangeValue.start === cell.iso;
+            const isRangeEnd = mode === "range" && rangeValue.end === cell.iso;
+            const isRangeBoundary =
+              mode === "range" && (isRangeStart || isRangeEnd);
+            const isBetweenRange = mode === "range" && isInRange(cell.iso);
             const isToday = cell.iso === todayIso;
 
             const cellAriaParts: string[] = [formatAccessibleDate(cell.iso)];
 
             if (isToday) {
-              cellAriaParts.push('today');
+              cellAriaParts.push("today");
             }
 
             if (isSelectedDate) {
-              cellAriaParts.push('selected');
+              cellAriaParts.push("selected");
             }
 
             if (isRangeStart) {
-              cellAriaParts.push('range start');
+              cellAriaParts.push("range start");
             }
 
             if (isRangeEnd) {
-              cellAriaParts.push('range end');
+              cellAriaParts.push("range end");
             }
 
             if (isBetweenRange) {
-              cellAriaParts.push('in selected range');
+              cellAriaParts.push("in selected range");
             }
 
             if (!cell.inCurrentMonth) {
-              cellAriaParts.push('outside current month');
+              cellAriaParts.push("outside current month");
             }
 
             return (
@@ -1456,39 +1555,39 @@ export function DatePicker({
                 onClick={() => {
                   handleDateSelect(cell.iso);
                 }}
-                aria-label={cellAriaParts.join(', ')}
+                aria-label={cellAriaParts.join(", ")}
                 aria-pressed={isSelectedDate || isRangeBoundary}
-                aria-current={isToday ? 'date' : undefined}
+                aria-current={isToday ? "date" : undefined}
                 style={{
-                  width: '100%',
+                  width: "100%",
                   minHeight: tokens.dayCellSize,
                   paddingInline: 0,
                   paddingBlock: 0,
-                  justifyContent: 'center',
-                  borderRadius: '0.375rem',
-                  borderWidth: '1px',
-                  borderStyle: 'solid',
+                  justifyContent: "center",
+                  borderRadius: "0.375rem",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
                   borderColor:
                     isSelectedDate || isRangeBoundary
-                      ? 'var(--ktn-action-primary-bg)'
+                      ? "var(--ktn-action-primary-bg)"
                       : isToday
-                        ? 'color-mix(in srgb, var(--ktn-action-primary-bg) 40%, var(--ktn-border-muted))'
-                        : 'transparent',
+                        ? "color-mix(in srgb, var(--ktn-action-primary-bg) 40%, var(--ktn-border-muted))"
+                        : "transparent",
                   backgroundColor:
                     isSelectedDate || isRangeBoundary
-                      ? 'var(--ktn-action-primary-bg)'
+                      ? "var(--ktn-action-primary-bg)"
                       : isBetweenRange
-                        ? 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.2))'
-                        : 'transparent',
+                        ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.2))"
+                        : "transparent",
                   color:
                     isSelectedDate || isRangeBoundary
-                      ? 'var(--ktn-action-primary-fg, #ffffff)'
+                      ? "var(--ktn-action-primary-fg, #ffffff)"
                       : cell.inCurrentMonth
-                        ? 'var(--ktn-text-primary)'
-                        : 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+                        ? "var(--ktn-text-primary)"
+                        : "var(--ktn-text-secondary, var(--ktn-text-primary))",
                   opacity: cell.inCurrentMonth ? 1 : 0.6,
                   fontSize: tokens.fontSize,
-                  aspectRatio: '1 / 1',
+                  aspectRatio: "1 / 1",
                 }}
               >
                 {cell.day}
@@ -1510,7 +1609,7 @@ export function DatePicker({
     >
       <div style={fieldWrapStyle}>
         <span aria-hidden style={leadingIconStyle}>
-          {mode === 'time' ? <FiClock size={14} /> : <FiCalendar size={14} />}
+          {mode === "time" ? <FiClock size={14} /> : <FiCalendar size={14} />}
         </span>
 
         <input
@@ -1542,7 +1641,7 @@ export function DatePicker({
           onChange={(event) => {
             const nextInputText = event.currentTarget.value;
             setInputText(nextInputText);
-            emitAction('input-change', {
+            emitAction("input-change", {
               inputText: nextInputText,
               open: disabled ? isOpen : true,
             });
@@ -1572,7 +1671,10 @@ export function DatePicker({
                 clearSelection();
               }}
             >
-              <span aria-hidden style={{ display: 'inline-flex', lineHeight: 0 }}>
+              <span
+                aria-hidden
+                style={{ display: "inline-flex", lineHeight: 0 }}
+              >
                 <FiX size={12} />
               </span>
             </Button>
@@ -1583,7 +1685,7 @@ export function DatePicker({
             variant="ghost"
             size="xs"
             disabled={disabled}
-            aria-label={isOpen ? 'Close picker' : 'Open picker'}
+            aria-label={isOpen ? "Close picker" : "Open picker"}
             style={iconButtonStyle}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -1598,7 +1700,7 @@ export function DatePicker({
               setIsOpen((current) => {
                 const nextOpen = !current;
 
-                emitAction(nextOpen ? 'open' : 'close', {
+                emitAction(nextOpen ? "open" : "close", {
                   open: nextOpen,
                 });
 
@@ -1622,19 +1724,23 @@ export function DatePicker({
           aria-label={panelAriaLabel}
           style={panelStyle}
         >
-          {mode === 'date' || mode === 'range' ? (
+          {mode === "date" || mode === "range" ? (
             <>
               <div style={calendarStackStyle}>
-                {mode === 'range' ? (
+                {mode === "range" ? (
                   <div style={rangeSummaryStyle}>
                     <div style={rangeSummaryItemStyle}>
                       <span style={rangeSummaryLabelStyle}>From</span>
-                      <span style={rangeSummaryValueStyle}>{rangeValue.start ?? 'Start date'}</span>
+                      <span style={rangeSummaryValueStyle}>
+                        {rangeValue.start ?? "Start date"}
+                      </span>
                     </div>
 
                     <div style={rangeSummaryItemStyle}>
                       <span style={rangeSummaryLabelStyle}>To</span>
-                      <span style={rangeSummaryValueStyle}>{rangeValue.end ?? 'End date'}</span>
+                      <span style={rangeSummaryValueStyle}>
+                        {rangeValue.end ?? "End date"}
+                      </span>
                     </div>
                   </div>
                 ) : null}
@@ -1653,10 +1759,10 @@ export function DatePicker({
                     onShiftMonth: (delta) => {
                       setLeftMonth((current) => shiftMonth(current, delta));
                     },
-                    ariaPrefix: mode === 'range' ? 'Left calendar' : 'Calendar',
+                    ariaPrefix: mode === "range" ? "Left calendar" : "Calendar",
                   })}
 
-                  {mode === 'range'
+                  {mode === "range"
                     ? renderCalendar({
                         monthState: rightMonth,
                         cells: rightMonthCells,
@@ -1668,9 +1774,11 @@ export function DatePicker({
                           updateRightMonth({ year: nextYear });
                         },
                         onShiftMonth: (delta) => {
-                          setRightMonth((current) => shiftMonth(current, delta));
+                          setRightMonth((current) =>
+                            shiftMonth(current, delta),
+                          );
                         },
-                        ariaPrefix: 'Right calendar',
+                        ariaPrefix: "Right calendar",
                       })
                     : null}
                 </div>
@@ -1708,12 +1816,14 @@ export function DatePicker({
                       style={{
                         ...timeButtonStyle,
                         backgroundColor: selected
-                          ? 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.16))'
-                          : 'transparent',
-                        borderColor: selected ? 'var(--ktn-action-primary-bg)' : 'transparent',
+                          ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.16))"
+                          : "transparent",
+                        borderColor: selected
+                          ? "var(--ktn-action-primary-bg)"
+                          : "transparent",
                         color: selected
-                          ? 'var(--ktn-text-primary)'
-                          : 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+                          ? "var(--ktn-text-primary)"
+                          : "var(--ktn-text-secondary, var(--ktn-text-primary))",
                       }}
                     >
                       <span style={timeTextRowStyle}>

@@ -15,37 +15,43 @@ import {
   type MouseEvent,
   type ReactElement,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { FiX } from 'react-icons/fi';
+import { FiX } from "./icons/feather";
 
-import { Button, type ButtonProps } from './Button';
+import { Button, type ButtonProps } from "./Button";
 
-export type AlertVariant = 'primary' | 'secondary' | 'destructive' | 'outline' | 'link' | 'compact';
+export type AlertVariant =
+  | "primary"
+  | "secondary"
+  | "destructive"
+  | "outline"
+  | "link"
+  | "compact";
 export type AlertSide =
-  | 'top-left'
-  | 'bottom-left'
-  | 'bottom-right'
-  | 'top-right'
-  | 'bottom-center'
-  | 'top-center';
-export type AlertSize = 'xs' | 'sm' | 'md' | 'lg';
+  | "top-left"
+  | "bottom-left"
+  | "bottom-right"
+  | "top-right"
+  | "bottom-center"
+  | "top-center";
+export type AlertSize = "xs" | "sm" | "md" | "lg";
 export type AlertActionSource =
-  | 'open'
-  | 'open-change'
-  | 'close-button'
-  | 'auto-close'
-  | 'escape'
-  | 'action-click'
-  | 'focus'
-  | 'blur';
+  | "open"
+  | "open-change"
+  | "close-button"
+  | "auto-close"
+  | "escape"
+  | "action-click"
+  | "focus"
+  | "blur";
 
 export interface AlertCustomColors {
-  backgroundColor?: CSSProperties['backgroundColor'];
-  borderColor?: CSSProperties['borderColor'];
-  titleColor?: CSSProperties['color'];
-  descriptionColor?: CSSProperties['color'];
-  actionColor?: CSSProperties['color'];
+  backgroundColor?: CSSProperties["backgroundColor"];
+  borderColor?: CSSProperties["borderColor"];
+  titleColor?: CSSProperties["color"];
+  descriptionColor?: CSSProperties["color"];
+  actionColor?: CSSProperties["color"];
 }
 
 export interface AlertViewportInset {
@@ -70,7 +76,10 @@ export interface AlertActionContext {
   event?: unknown;
 }
 
-export interface AlertProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface AlertProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -92,7 +101,7 @@ export interface AlertTitleProps extends HTMLAttributes<HTMLHeadingElement> {}
 
 export interface AlertDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
 
-export interface AlertActionProps extends Omit<ButtonProps, 'onAction'> {
+export interface AlertActionProps extends Omit<ButtonProps, "onAction"> {
   closeOnAction?: boolean;
 }
 
@@ -105,16 +114,16 @@ type AlertSizeTokens = {
   titleFontSize: string;
   descriptionFontSize: string;
   actionGap: string;
-  closeButtonSize: NonNullable<ButtonProps['size']>;
+  closeButtonSize: NonNullable<ButtonProps["size"]>;
   stackGapPx: number;
 };
 
 type AlertVariantTokens = {
-  backgroundColor: CSSProperties['backgroundColor'];
-  borderColor: CSSProperties['borderColor'];
-  titleColor: CSSProperties['color'];
-  descriptionColor: CSSProperties['color'];
-  actionColor: CSSProperties['color'];
+  backgroundColor: CSSProperties["backgroundColor"];
+  borderColor: CSSProperties["borderColor"];
+  titleColor: CSSProperties["color"];
+  descriptionColor: CSSProperties["color"];
+  actionColor: CSSProperties["color"];
   shadowColor: string;
 };
 
@@ -133,125 +142,135 @@ interface AlertContextValue {
   size: AlertSize;
   variant: AlertVariant;
   customColors?: AlertCustomColors;
-  setAlertOpen: (nextOpen: boolean, source?: AlertActionSource, event?: unknown) => void;
-  emitAction: (source: AlertActionSource, event?: unknown, openOverride?: boolean) => void;
+  setAlertOpen: (
+    nextOpen: boolean,
+    source?: AlertActionSource,
+    event?: unknown,
+  ) => void;
+  emitAction: (
+    source: AlertActionSource,
+    event?: unknown,
+    openOverride?: boolean,
+  ) => void;
 }
 
 const sizeTokens: Record<AlertSize, AlertSizeTokens> = {
   xs: {
-    maxWidth: '18rem',
-    minHeight: '3.1rem',
-    paddingInline: '0.6rem',
-    paddingBlock: '0.5rem',
-    contentGap: '0.3rem',
-    titleFontSize: '0.78rem',
-    descriptionFontSize: '0.72rem',
-    actionGap: '0.35rem',
-    closeButtonSize: 'xs',
+    maxWidth: "18rem",
+    minHeight: "3.1rem",
+    paddingInline: "0.6rem",
+    paddingBlock: "0.5rem",
+    contentGap: "0.3rem",
+    titleFontSize: "0.78rem",
+    descriptionFontSize: "0.72rem",
+    actionGap: "0.35rem",
+    closeButtonSize: "xs",
     stackGapPx: 8,
   },
   sm: {
-    maxWidth: '20.5rem',
-    minHeight: '3.45rem',
-    paddingInline: '0.7rem',
-    paddingBlock: '0.56rem',
-    contentGap: '0.35rem',
-    titleFontSize: '0.84rem',
-    descriptionFontSize: '0.78rem',
-    actionGap: '0.4rem',
-    closeButtonSize: 'xs',
+    maxWidth: "20.5rem",
+    minHeight: "3.45rem",
+    paddingInline: "0.7rem",
+    paddingBlock: "0.56rem",
+    contentGap: "0.35rem",
+    titleFontSize: "0.84rem",
+    descriptionFontSize: "0.78rem",
+    actionGap: "0.4rem",
+    closeButtonSize: "xs",
     stackGapPx: 9,
   },
   md: {
-    maxWidth: '23rem',
-    minHeight: '3.8rem',
-    paddingInline: '0.8rem',
-    paddingBlock: '0.64rem',
-    contentGap: '0.4rem',
-    titleFontSize: '0.9rem',
-    descriptionFontSize: '0.825rem',
-    actionGap: '0.48rem',
-    closeButtonSize: 'sm',
+    maxWidth: "23rem",
+    minHeight: "3.8rem",
+    paddingInline: "0.8rem",
+    paddingBlock: "0.64rem",
+    contentGap: "0.4rem",
+    titleFontSize: "0.9rem",
+    descriptionFontSize: "0.825rem",
+    actionGap: "0.48rem",
+    closeButtonSize: "sm",
     stackGapPx: 10,
   },
   lg: {
-    maxWidth: '25rem',
-    minHeight: '4.2rem',
-    paddingInline: '0.9rem',
-    paddingBlock: '0.72rem',
-    contentGap: '0.45rem',
-    titleFontSize: '0.98rem',
-    descriptionFontSize: '0.9rem',
-    actionGap: '0.55rem',
-    closeButtonSize: 'sm',
+    maxWidth: "25rem",
+    minHeight: "4.2rem",
+    paddingInline: "0.9rem",
+    paddingBlock: "0.72rem",
+    contentGap: "0.45rem",
+    titleFontSize: "0.98rem",
+    descriptionFontSize: "0.9rem",
+    actionGap: "0.55rem",
+    closeButtonSize: "sm",
     stackGapPx: 12,
   },
 };
 
 const variantTokens: Record<AlertVariant, AlertVariantTokens> = {
   primary: {
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    borderColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 35%, var(--ktn-border-muted))',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    actionColor: 'var(--ktn-action-primary-bg)',
-    shadowColor: 'rgba(37, 99, 235, 0.18)',
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg) 35%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-action-primary-bg)",
+    shadowColor: "rgba(37, 99, 235, 0.18)",
   },
   secondary: {
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    borderColor: 'var(--ktn-border-muted)',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    actionColor: 'var(--ktn-text-primary)',
-    shadowColor: 'rgba(15, 23, 42, 0.14)',
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    borderColor: "var(--ktn-border-muted)",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-text-primary)",
+    shadowColor: "rgba(15, 23, 42, 0.14)",
   },
   destructive: {
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
     borderColor:
-      'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 45%, var(--ktn-border-muted))',
-    titleColor: 'var(--ktn-action-danger-bg, #dc2626)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    actionColor: 'var(--ktn-action-danger-bg, #dc2626)',
-    shadowColor: 'rgba(220, 38, 38, 0.2)',
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 45%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-danger-bg, #dc2626)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-action-danger-bg, #dc2626)",
+    shadowColor: "rgba(220, 38, 38, 0.2)",
   },
   outline: {
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    borderColor: 'var(--ktn-border-muted)',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    actionColor: 'var(--ktn-text-primary)',
-    shadowColor: 'rgba(15, 23, 42, 0.12)',
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    borderColor: "var(--ktn-border-muted)",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-text-primary)",
+    shadowColor: "rgba(15, 23, 42, 0.12)",
   },
   link: {
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    borderColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 24%, var(--ktn-border-muted))',
-    titleColor: 'var(--ktn-action-primary-bg)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    actionColor: 'var(--ktn-action-primary-bg)',
-    shadowColor: 'rgba(37, 99, 235, 0.16)',
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg) 24%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-primary-bg)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-action-primary-bg)",
+    shadowColor: "rgba(37, 99, 235, 0.16)",
   },
   compact: {
-    backgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))',
-    borderColor: 'var(--ktn-border-muted)',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    actionColor: 'var(--ktn-text-primary)',
-    shadowColor: 'rgba(15, 23, 42, 0.1)',
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
+    borderColor: "var(--ktn-border-muted)",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-text-primary)",
+    shadowColor: "rgba(15, 23, 42, 0.1)",
   },
 };
 
 const stackEntriesBySide: Record<AlertSide, AlertStackEntry[]> = {
-  'top-left': [],
-  'bottom-left': [],
-  'bottom-right': [],
-  'top-right': [],
-  'bottom-center': [],
-  'top-center': [],
+  "top-left": [],
+  "bottom-left": [],
+  "bottom-right": [],
+  "top-right": [],
+  "bottom-center": [],
+  "top-center": [],
 };
 
 const stackListeners = new Set<() => void>();
 
-const baseClasses = 'z-[1200]';
+const baseClasses = "z-[1200]";
 
 const AlertContext = createContext<AlertContextValue | null>(null);
 
@@ -296,7 +315,11 @@ function removeStackEntry(side: AlertSide, id: string): void {
   notifyStackListeners();
 }
 
-function updateStackEntryHeight(side: AlertSide, id: string, height: number): void {
+function updateStackEntryHeight(
+  side: AlertSide,
+  id: string,
+  height: number,
+): void {
   const sideEntries = stackEntriesBySide[side];
   const targetEntry = sideEntries.find((entry) => entry.id === id);
 
@@ -314,7 +337,11 @@ function updateStackEntryHeight(side: AlertSide, id: string, height: number): vo
   notifyStackListeners();
 }
 
-function getStackInfo(side: AlertSide, id: string, gapPx: number): AlertStackInfo {
+function getStackInfo(
+  side: AlertSide,
+  id: string,
+  gapPx: number,
+): AlertStackInfo {
   const sideEntries = stackEntriesBySide[side];
   const index = sideEntries.findIndex((entry) => entry.id === id);
 
@@ -349,39 +376,39 @@ function resolveVariant(
     return varient;
   }
 
-  return 'primary';
+  return "primary";
 }
 
 function getBasePlacementTransform(side: AlertSide): string {
-  if (side === 'top-center' || side === 'bottom-center') {
-    return 'translateX(-50%)';
+  if (side === "top-center" || side === "bottom-center") {
+    return "translateX(-50%)";
   }
 
-  return '';
+  return "";
 }
 
 function getHiddenMotionTransform(side: AlertSide): string {
-  if (side === 'top-left') {
-    return 'translateX(-14px) translateY(-18px)';
+  if (side === "top-left") {
+    return "translateX(-14px) translateY(-18px)";
   }
 
-  if (side === 'top-right') {
-    return 'translateX(14px) translateY(-18px)';
+  if (side === "top-right") {
+    return "translateX(14px) translateY(-18px)";
   }
 
-  if (side === 'bottom-left') {
-    return 'translateX(-14px) translateY(18px)';
+  if (side === "bottom-left") {
+    return "translateX(-14px) translateY(18px)";
   }
 
-  if (side === 'bottom-right') {
-    return 'translateX(14px) translateY(18px)';
+  if (side === "bottom-right") {
+    return "translateX(14px) translateY(18px)";
   }
 
-  if (side === 'bottom-center') {
-    return 'translateY(18px)';
+  if (side === "bottom-center") {
+    return "translateY(18px)";
   }
 
-  return 'translateY(-18px)';
+  return "translateY(-18px)";
 }
 
 function resolveViewportInset(input: number | AlertViewportInset | undefined): {
@@ -390,7 +417,7 @@ function resolveViewportInset(input: number | AlertViewportInset | undefined): {
   bottom: number;
   left: number;
 } {
-  if (typeof input === 'number') {
+  if (typeof input === "number") {
     const safeInset = Math.max(input, 0);
 
     return {
@@ -424,69 +451,73 @@ function getPlacementStyle(
   const bottomOffset = `${viewportInset.bottom + offsetPx}px`;
   const leftOffset = `${viewportInset.left}px`;
 
-  if (side === 'top-left') {
+  if (side === "top-left") {
     return {
       top: topOffset,
       left: leftOffset,
     };
   }
 
-  if (side === 'top-right') {
+  if (side === "top-right") {
     return {
       top: topOffset,
       right: rightOffset,
     };
   }
 
-  if (side === 'bottom-left') {
+  if (side === "bottom-left") {
     return {
       bottom: bottomOffset,
       left: leftOffset,
     };
   }
 
-  if (side === 'bottom-right') {
+  if (side === "bottom-right") {
     return {
       bottom: bottomOffset,
       right: rightOffset,
     };
   }
 
-  if (side === 'bottom-center') {
+  if (side === "bottom-center") {
     return {
       bottom: bottomOffset,
-      left: '50%',
+      left: "50%",
     };
   }
 
   return {
     top: topOffset,
-    left: '50%',
+    left: "50%",
   };
 }
 
-function resolveActionButtonVariant(variant: AlertVariant): NonNullable<ButtonProps['variant']> {
-  if (variant === 'destructive') {
-    return 'destructive';
+function resolveActionButtonVariant(
+  variant: AlertVariant,
+): NonNullable<ButtonProps["variant"]> {
+  if (variant === "destructive") {
+    return "destructive";
   }
 
-  if (variant === 'link') {
-    return 'link';
+  if (variant === "link") {
+    return "link";
   }
 
-  if (variant === 'secondary') {
-    return 'secondary';
+  if (variant === "secondary") {
+    return "secondary";
   }
 
-  return 'outline';
+  return "outline";
 }
 
-function resolveActionButtonSize(size: AlertSize): NonNullable<ButtonProps['size']> {
-  if (size === 'xs' || size === 'sm') {
-    return 'xs';
+function resolveActionButtonSize(
+  size: AlertSize,
+): NonNullable<ButtonProps["size"]> {
+  if (size === "xs" || size === "sm") {
+    return "xs";
   }
 
-  return 'sm';
+  return "sm";
 }
 
 function useAlertContextValue(): AlertContextValue {
@@ -497,8 +528,8 @@ function useAlertContextValue(): AlertContextValue {
   }
 
   return {
-    size: 'md',
-    variant: 'primary',
+    size: "md",
+    variant: "primary",
     setAlertOpen: () => {},
     emitAction: () => {},
   };
@@ -514,7 +545,9 @@ function isAlertActionType(type: unknown): boolean {
     name?: string;
   };
 
-  return maybeType.displayName === 'AlertAction' || maybeType.name === 'AlertAction';
+  return (
+    maybeType.displayName === "AlertAction" || maybeType.name === "AlertAction"
+  );
 }
 
 function containsAlertAction(children: ReactNode): boolean {
@@ -541,33 +574,39 @@ export function Alert({
   onAction,
   variant,
   varient,
-  side = 'top-right',
-  size = 'md',
+  side = "top-right",
+  size = "md",
   duration = 30_000,
   actionRequired,
   closeOnEscape = true,
-  closeButtonLabel = 'Close alert',
+  closeButtonLabel = "Close alert",
   customColors,
   viewportInset,
-  className = '',
+  className = "",
   style,
   onFocus,
   onBlur,
   role,
-  ['aria-live']: ariaLive,
+  ["aria-live"]: ariaLive,
   ...props
 }: AlertProps): JSX.Element {
   const alertId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const autoCloseTimeoutRef = useRef<number | null>(null);
   const openTransitionSourceRef = useRef<AlertActionSource | null>(null);
-  const previousOpenRef = useRef(open !== undefined ? open === true : defaultOpen);
+  const previousOpenRef = useRef(
+    open !== undefined ? open === true : defaultOpen,
+  );
   const startedAtRef = useRef<number | undefined>(undefined);
   const closesAtRef = useRef<number | undefined>(undefined);
 
   const isControlled = open !== undefined;
-  const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen === true);
-  const [isRendered, setIsRendered] = useState(isControlled ? open === true : defaultOpen === true);
+  const [uncontrolledOpen, setUncontrolledOpen] = useState(
+    defaultOpen === true,
+  );
+  const [isRendered, setIsRendered] = useState(
+    isControlled ? open === true : defaultOpen === true,
+  );
   const [isVisible, setIsVisible] = useState(false);
   const [stackRevision, setStackRevision] = useState(0);
   const [lastStackInfo, setLastStackInfo] = useState<AlertStackInfo>({
@@ -583,7 +622,10 @@ export function Alert({
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[resolvedVariant];
 
-  const hasActionableChild = useMemo(() => containsAlertAction(children), [children]);
+  const hasActionableChild = useMemo(
+    () => containsAlertAction(children),
+    [children],
+  );
   const resolvedActionRequired = actionRequired ?? hasActionableChild;
   const shouldAutoClose = !resolvedActionRequired && normalizedDuration > 0;
 
@@ -629,13 +671,17 @@ export function Alert({
     };
   }
 
-  function emitAction(source: AlertActionSource, event?: unknown, openOverride?: boolean): void {
+  function emitAction(
+    source: AlertActionSource,
+    event?: unknown,
+    openOverride?: boolean,
+  ): void {
     onAction?.(buildActionContext(source, openOverride ?? isOpen, event));
   }
 
   function setAlertOpen(
     nextOpen: boolean,
-    source: AlertActionSource = 'open-change',
+    source: AlertActionSource = "open-change",
     event?: unknown,
   ): void {
     if (nextOpen === isOpen) {
@@ -660,7 +706,10 @@ export function Alert({
     setLastStackInfo(stackInfo);
   }, [stackInfo]);
 
-  useEffect(() => subscribeStack(() => setStackRevision((current) => current + 1)), []);
+  useEffect(
+    () => subscribeStack(() => setStackRevision((current) => current + 1)),
+    [],
+  );
 
   useEffect(() => {
     if (!isOpen) {
@@ -682,12 +731,16 @@ export function Alert({
     const node = rootRef.current;
 
     function syncHeight(): void {
-      updateStackEntryHeight(side, alertId, node.getBoundingClientRect().height);
+      updateStackEntryHeight(
+        side,
+        alertId,
+        node.getBoundingClientRect().height,
+      );
     }
 
     syncHeight();
 
-    if (typeof ResizeObserver === 'undefined') {
+    if (typeof ResizeObserver === "undefined") {
       return;
     }
 
@@ -706,7 +759,7 @@ export function Alert({
     if (isOpen) {
       setIsRendered(true);
 
-      if (typeof window === 'undefined') {
+      if (typeof window === "undefined") {
         setIsVisible(true);
         return;
       }
@@ -722,7 +775,7 @@ export function Alert({
 
     setIsVisible(false);
 
-    if (typeof window === 'undefined') {
+    if (typeof window === "undefined") {
       setIsRendered(false);
       return;
     }
@@ -748,13 +801,15 @@ export function Alert({
     if (isOpen) {
       const startedAt = Date.now();
       startedAtRef.current = startedAt;
-      closesAtRef.current = shouldAutoClose ? startedAt + normalizedDuration : undefined;
+      closesAtRef.current = shouldAutoClose
+        ? startedAt + normalizedDuration
+        : undefined;
 
       if (openTransitionSourceRef.current == null) {
-        emitAction('open', undefined, true);
+        emitAction("open", undefined, true);
       }
     } else if (openTransitionSourceRef.current == null) {
-      emitAction('open-change', undefined, false);
+      emitAction("open-change", undefined, false);
     }
 
     openTransitionSourceRef.current = null;
@@ -801,7 +856,7 @@ export function Alert({
 
     autoCloseTimeoutRef.current = window.setTimeout(() => {
       autoCloseTimeoutRef.current = null;
-      setAlertOpen(false, 'auto-close');
+      setAlertOpen(false, "auto-close");
     }, remaining);
 
     return () => {
@@ -830,18 +885,18 @@ export function Alert({
     }
 
     function handleEscape(event: globalThis.KeyboardEvent): void {
-      if (event.key !== 'Escape') {
+      if (event.key !== "Escape") {
         return;
       }
 
       event.preventDefault();
-      setAlertOpen(false, 'escape', event);
+      setAlertOpen(false, "escape", event);
     }
 
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [closeOnEscape, isOpen]);
 
@@ -849,7 +904,7 @@ export function Alert({
     onFocus?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('focus', event, true);
+      emitAction("focus", event, true);
     }
   }
 
@@ -857,13 +912,13 @@ export function Alert({
     onBlur?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('blur', event, isOpen);
+      emitAction("blur", event, isOpen);
     }
   }
 
   function handleCloseButtonClick(event: MouseEvent<HTMLButtonElement>): void {
     event.stopPropagation();
-    setAlertOpen(false, 'close-button', event);
+    setAlertOpen(false, "close-button", event);
   }
 
   if (!isRendered) {
@@ -873,51 +928,53 @@ export function Alert({
   const placementStyle = getPlacementStyle(side, 0, resolvedViewportInset);
   const basePlacementTransform = getBasePlacementTransform(side);
   const motionTransform = isVisible
-    ? 'translateX(0) translateY(0) scale(1)'
+    ? "translateX(0) translateY(0) scale(1)"
     : `${getHiddenMotionTransform(side)} scale(0.94)`;
   const transform = `${basePlacementTransform} ${motionTransform}`.trim();
 
-  const resolvedBackgroundColor = customColors?.backgroundColor ?? variantToken.backgroundColor;
-  const resolvedBorderColor = customColors?.borderColor ?? variantToken.borderColor;
+  const resolvedBackgroundColor =
+    customColors?.backgroundColor ?? variantToken.backgroundColor;
+  const resolvedBorderColor =
+    customColors?.borderColor ?? variantToken.borderColor;
 
   const rootStyle: CSSProperties = {
-    position: 'fixed',
-    pointerEvents: 'auto',
+    position: "fixed",
+    pointerEvents: "auto",
     ...placementStyle,
     width: `min(${sizeToken.maxWidth}, calc(100vw - 1rem))`,
     minHeight: sizeToken.minHeight,
-    display: 'grid',
-    gridTemplateColumns: 'minmax(0, 1fr) auto',
-    gap: '0.45rem',
-    alignItems: 'start',
-    boxSizing: 'border-box',
-    borderWidth: '1px',
-    borderStyle: 'solid',
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) auto",
+    gap: "0.45rem",
+    alignItems: "start",
+    boxSizing: "border-box",
+    borderWidth: "1px",
+    borderStyle: "solid",
     borderColor: resolvedBorderColor,
     backgroundColor: resolvedBackgroundColor,
-    borderRadius: 'var(--ktn-radius-md, 0.5rem)',
+    borderRadius: "var(--ktn-radius-md, 0.5rem)",
     paddingInline: sizeToken.paddingInline,
     paddingBlock: sizeToken.paddingBlock,
     boxShadow: `0 10px 22px ${variantToken.shadowColor}`,
-    willChange: 'transform, opacity',
+    willChange: "transform, opacity",
     opacity: isVisible ? 1 : 0,
     transform,
     transition:
-      'transform 240ms cubic-bezier(0.18, 0.89, 0.32, 1.08), opacity 220ms ease-out, top 180ms ease, right 180ms ease, bottom 180ms ease, left 180ms ease',
+      "transform 240ms cubic-bezier(0.18, 0.89, 0.32, 1.08), opacity 220ms ease-out, top 180ms ease, right 180ms ease, bottom 180ms ease, left 180ms ease",
     zIndex: 1300 + Math.max(0, 200 - effectiveStackInfo.index),
     ...style,
   };
 
   const contentStyle: CSSProperties = {
     minWidth: 0,
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     gap: sizeToken.contentGap,
   };
 
   const closeButtonStyle: CSSProperties = {
     color: customColors?.actionColor ?? variantToken.actionColor,
-    marginTop: '-0.1rem',
+    marginTop: "-0.1rem",
   };
 
   const contextValue: AlertContextValue = {
@@ -929,8 +986,10 @@ export function Alert({
   };
 
   const composedClassName = `${baseClasses} ${className}`.trim();
-  const resolvedRole = role ?? (resolvedVariant === 'destructive' ? 'alert' : 'status');
-  const resolvedAriaLive = ariaLive ?? (resolvedVariant === 'destructive' ? 'assertive' : 'polite');
+  const resolvedRole =
+    role ?? (resolvedVariant === "destructive" ? "alert" : "status");
+  const resolvedAriaLive =
+    ariaLive ?? (resolvedVariant === "destructive" ? "assertive" : "polite");
 
   return (
     <AlertContext.Provider value={contextValue}>
@@ -941,7 +1000,7 @@ export function Alert({
         role={resolvedRole}
         aria-live={resolvedAriaLive}
         aria-atomic="true"
-        data-state={isOpen ? 'open' : 'closed'}
+        data-state={isOpen ? "open" : "closed"}
         data-side={side}
         style={rootStyle}
         onFocus={handleRootFocus}
@@ -967,14 +1026,14 @@ export function Alert({
 
 export function AlertTitle({
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: AlertTitleProps): JSX.Element {
   const { size, variant, customColors } = useAlertContextValue();
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[variant];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const titleStyle: CSSProperties = {
     margin: 0,
@@ -982,7 +1041,7 @@ export function AlertTitle({
     fontWeight: 600,
     lineHeight: 1.28,
     color: customColors?.titleColor ?? variantToken.titleColor,
-    letterSpacing: '0.01em',
+    letterSpacing: "0.01em",
     ...style,
   };
 
@@ -995,14 +1054,14 @@ export function AlertTitle({
 
 export function AlertDescription({
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: AlertDescriptionProps): JSX.Element {
   const { size, variant, customColors } = useAlertContextValue();
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[variant];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const descriptionStyle: CSSProperties = {
     margin: 0,
@@ -1025,7 +1084,7 @@ export function AlertAction({
   size,
   style,
   onClick,
-  type = 'button',
+  type = "button",
   ...props
 }: AlertActionProps): JSX.Element {
   const {
@@ -1052,10 +1111,10 @@ export function AlertAction({
       return;
     }
 
-    emitAction('action-click', event, true);
+    emitAction("action-click", event, true);
 
     if (closeOnAction) {
-      setAlertOpen(false, 'action-click', event);
+      setAlertOpen(false, "action-click", event);
     }
   }
 
@@ -1071,4 +1130,4 @@ export function AlertAction({
   );
 }
 
-AlertAction.displayName = 'AlertAction';
+AlertAction.displayName = "AlertAction";

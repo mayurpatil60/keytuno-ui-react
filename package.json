@@ -13,6 +13,36 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
+    "./addons/table-exporters": {
+      "types": "./dist/addons/table-exporters.d.ts",
+      "import": "./dist/addons/table-exporters.js",
+      "default": "./dist/addons/table-exporters.js"
+    },
+    "./components/*": {
+      "types": "./dist/components/*.d.ts",
+      "import": "./dist/components/*.js",
+      "default": "./dist/components/*.js"
+    },
+    "./themes/*": {
+      "types": "./dist/themes/*.d.ts",
+      "import": "./dist/themes/*.js",
+      "default": "./dist/themes/*.js"
+    },
+    "./tokens/*": {
+      "types": "./dist/tokens/*.d.ts",
+      "import": "./dist/tokens/*.js",
+      "default": "./dist/tokens/*.js"
+    },
+    "./adapters/*": {
+      "types": "./dist/adapters/*.d.ts",
+      "import": "./dist/adapters/*.js",
+      "default": "./dist/adapters/*.js"
+    },
+    "./contracts/*": {
+      "types": "./dist/contracts/*.d.ts",
+      "import": "./dist/contracts/*.js",
+      "default": "./dist/contracts/*.js"
+    },
     "./package.json": "./package.json"
   },
   "repository": {
@@ -28,33 +58,46 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsup",
+    "build:dev": "tsc -p tsconfig.json",
     "dev": "tsc -p tsconfig.json --watch",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "test": "vitest run --passWithNoTests",
+    "size": "size-limit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "pnpm run build"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
-  },
-  "dependencies": {
-    "@tanstack/react-table": "^8.21.3",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
-    "react-icons": "^5.6.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
     "xlsx": "^0.18.5"
   },
+  "peerDependenciesMeta": {
+    "jspdf": {
+      "optional": true
+    },
+    "jspdf-autotable": {
+      "optional": true
+    },
+    "xlsx": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.3"
+  },
   "devDependencies": {
-    "@tanstack/react-query": "^5.101.0",
+    "@eslint/js": "^9.15.0",
+    "@size-limit/preset-small-lib": "^12.1.0",
     "@storybook/addon-essentials": "^8.6.14",
     "@storybook/react": "^8.6.14",
     "@storybook/react-vite": "^8.6.14",
+    "@tanstack/react-query": "^5.101.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@eslint/js": "^9.15.0",
     "@types/node": "^22.10.1",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -63,10 +106,39 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "globals": "^15.12.0",
     "jsdom": "^25.0.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "react-icons": "^5.6.0",
+    "size-limit": "^12.1.0",
     "storybook": "^8.6.14",
+    "tsup": "8.3.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0",
-    "vitest": "^2.1.9"
+    "vitest": "^2.1.9",
+    "xlsx": "^0.18.5"
   },
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@9.15.0",
+  "size-limit": [
+    {
+      "name": "Button (subpath, tree-shaken)",
+      "path": "dist/components/Button.js",
+      "limit": "8 KB"
+    },
+    {
+      "name": "Button (root barrel, tree-shaken)",
+      "path": "dist/index.js",
+      "import": "{ Button }",
+      "limit": "8 KB"
+    },
+    {
+      "name": "Table (subpath, with @tanstack/react-table)",
+      "path": "dist/components/Table.js",
+      "limit": "60 KB"
+    },
+    {
+      "name": "Icons (all feather SVGs)",
+      "path": "dist/components/icons/feather.js",
+      "limit": "10 KB"
+    }
+  ]
 }

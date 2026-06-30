@@ -8,11 +8,11 @@ import {
   type DragEvent as ReactDragEvent,
   type HTMLAttributes,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { FiUploadCloud } from 'react-icons/fi';
+import { FiUploadCloud } from "./icons/feather";
 
-import { Button, type ButtonProps } from './Button';
+import { Button, type ButtonProps } from "./Button";
 import {
   Dialog,
   DialogContent,
@@ -20,13 +20,13 @@ import {
   DialogHeader,
   DialogTitle,
   type DialogProps,
-} from './Dialog';
-import { FileList, type FileListItem } from './FileList';
-import type { FilePreviewType } from './FilePreview';
-import { Tooltip } from './Tooltip';
+} from "./Dialog";
+import { FileList, type FileListItem } from "./FileList";
+import type { FilePreviewType } from "./FilePreview";
+import { Tooltip } from "./Tooltip";
 
-export type FileUploadVariant = 'compact' | 'dropzone';
-export type FileUploadSize = 'xs' | 'sm' | 'md' | 'lg';
+export type FileUploadVariant = "compact" | "dropzone";
+export type FileUploadSize = "xs" | "sm" | "md" | "lg";
 
 export interface FileUploadFile {
   id: string;
@@ -43,7 +43,7 @@ export interface FileUploadFile {
 
 export interface FileUploadProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  'children' | 'onChange'
+  "children" | "onChange"
 > {
   variant?: FileUploadVariant;
   varient?: FileUploadVariant;
@@ -55,10 +55,13 @@ export interface FileUploadProps extends Omit<
   dropzoneHint?: ReactNode;
   browseLabel?: ReactNode;
   onFilesChange?: (files: FileUploadFile[]) => void;
-  browseButtonProps?: Omit<ButtonProps, 'children' | 'onClick' | 'disabled' | 'size' | 'type'>;
+  browseButtonProps?: Omit<
+    ButtonProps,
+    "children" | "onClick" | "disabled" | "size" | "type"
+  >;
   dialogProps?: Pick<
     DialogProps,
-    'size' | 'variant' | 'varient' | 'closeOnEscape' | 'closeOnOverlayClick'
+    "size" | "variant" | "varient" | "closeOnEscape" | "closeOnOverlayClick"
   >;
 }
 
@@ -69,7 +72,7 @@ type FileUploadSizeTokens = {
   compactGap: string;
   compactRadius: string;
   compactNameMaxWidth: string;
-  browseButtonSize: 'xs' | 'sm' | 'md' | 'lg';
+  browseButtonSize: "xs" | "sm" | "md" | "lg";
   dropzonePadding: string;
   dropzoneRadius: string;
   dropzoneTitleFontSize: string;
@@ -79,91 +82,99 @@ type FileUploadSizeTokens = {
 };
 
 const imageExtensions = new Set([
-  'jpg',
-  'jpeg',
-  'png',
-  'gif',
-  'webp',
-  'bmp',
-  'svg',
-  'avif',
-  'heic',
-  'heif',
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "bmp",
+  "svg",
+  "avif",
+  "heic",
+  "heif",
 ]);
 
-const videoExtensions = new Set(['mp4', 'webm', 'mov', 'm4v', 'ogv', 'avi', 'mkv']);
+const videoExtensions = new Set([
+  "mp4",
+  "webm",
+  "mov",
+  "m4v",
+  "ogv",
+  "avi",
+  "mkv",
+]);
 
-const audioExtensions = new Set(['mp3', 'wav', 'ogg', 'aac', 'm4a', 'flac']);
+const audioExtensions = new Set(["mp3", "wav", "ogg", "aac", "m4a", "flac"]);
 
 const sizeTokens: Record<FileUploadSize, FileUploadSizeTokens> = {
   xs: {
-    compactMinHeight: '1.9rem',
-    compactFontSize: '0.72rem',
-    compactPadding: '0.12rem 0.28rem',
-    compactGap: '0.26rem',
-    compactRadius: '0.5rem',
-    compactNameMaxWidth: '10.5rem',
-    browseButtonSize: 'xs',
-    dropzonePadding: '0.5rem',
-    dropzoneRadius: '0.5rem',
-    dropzoneTitleFontSize: '0.7rem',
-    dropzoneHintFontSize: '0.62rem',
+    compactMinHeight: "1.9rem",
+    compactFontSize: "0.72rem",
+    compactPadding: "0.12rem 0.28rem",
+    compactGap: "0.26rem",
+    compactRadius: "0.5rem",
+    compactNameMaxWidth: "10.5rem",
+    browseButtonSize: "xs",
+    dropzonePadding: "0.5rem",
+    dropzoneRadius: "0.5rem",
+    dropzoneTitleFontSize: "0.7rem",
+    dropzoneHintFontSize: "0.62rem",
     dropzoneIconSize: 12,
-    cardGap: '0.36rem',
+    cardGap: "0.36rem",
   },
   sm: {
-    compactMinHeight: '2.1rem',
-    compactFontSize: '0.78rem',
-    compactPadding: '0.14rem 0.32rem',
-    compactGap: '0.3rem',
-    compactRadius: '0.56rem',
-    compactNameMaxWidth: '12.2rem',
-    browseButtonSize: 'sm',
-    dropzonePadding: '0.58rem',
-    dropzoneRadius: '0.56rem',
-    dropzoneTitleFontSize: '0.76rem',
-    dropzoneHintFontSize: '0.66rem',
+    compactMinHeight: "2.1rem",
+    compactFontSize: "0.78rem",
+    compactPadding: "0.14rem 0.32rem",
+    compactGap: "0.3rem",
+    compactRadius: "0.56rem",
+    compactNameMaxWidth: "12.2rem",
+    browseButtonSize: "sm",
+    dropzonePadding: "0.58rem",
+    dropzoneRadius: "0.56rem",
+    dropzoneTitleFontSize: "0.76rem",
+    dropzoneHintFontSize: "0.66rem",
     dropzoneIconSize: 13,
-    cardGap: '0.4rem',
+    cardGap: "0.4rem",
   },
   md: {
-    compactMinHeight: '2.35rem',
-    compactFontSize: '0.84rem',
-    compactPadding: '0.16rem 0.36rem',
-    compactGap: '0.34rem',
-    compactRadius: '0.62rem',
-    compactNameMaxWidth: '14rem',
-    browseButtonSize: 'md',
-    dropzonePadding: '0.66rem',
-    dropzoneRadius: '0.62rem',
-    dropzoneTitleFontSize: '0.82rem',
-    dropzoneHintFontSize: '0.7rem',
+    compactMinHeight: "2.35rem",
+    compactFontSize: "0.84rem",
+    compactPadding: "0.16rem 0.36rem",
+    compactGap: "0.34rem",
+    compactRadius: "0.62rem",
+    compactNameMaxWidth: "14rem",
+    browseButtonSize: "md",
+    dropzonePadding: "0.66rem",
+    dropzoneRadius: "0.62rem",
+    dropzoneTitleFontSize: "0.82rem",
+    dropzoneHintFontSize: "0.7rem",
     dropzoneIconSize: 14,
-    cardGap: '0.46rem',
+    cardGap: "0.46rem",
   },
   lg: {
-    compactMinHeight: '2.6rem',
-    compactFontSize: '0.9rem',
-    compactPadding: '0.18rem 0.4rem',
-    compactGap: '0.38rem',
-    compactRadius: '0.72rem',
-    compactNameMaxWidth: '15.8rem',
-    browseButtonSize: 'lg',
-    dropzonePadding: '0.78rem',
-    dropzoneRadius: '0.72rem',
-    dropzoneTitleFontSize: '0.88rem',
-    dropzoneHintFontSize: '0.76rem',
+    compactMinHeight: "2.6rem",
+    compactFontSize: "0.9rem",
+    compactPadding: "0.18rem 0.4rem",
+    compactGap: "0.38rem",
+    compactRadius: "0.72rem",
+    compactNameMaxWidth: "15.8rem",
+    browseButtonSize: "lg",
+    dropzonePadding: "0.78rem",
+    dropzoneRadius: "0.72rem",
+    dropzoneTitleFontSize: "0.88rem",
+    dropzoneHintFontSize: "0.76rem",
     dropzoneIconSize: 15,
-    cardGap: '0.52rem',
+    cardGap: "0.52rem",
   },
 };
 
-const baseClasses = 'flex w-full min-w-0 flex-col';
+const baseClasses = "flex w-full min-w-0 flex-col";
 
 function getLowerFileExtension(fileNameOrUrl: string): string {
   const normalized = fileNameOrUrl.toLowerCase();
-  const hashIndex = normalized.indexOf('#');
-  const queryIndex = normalized.indexOf('?');
+  const hashIndex = normalized.indexOf("#");
+  const queryIndex = normalized.indexOf("?");
 
   let stripped = normalized;
 
@@ -175,63 +186,66 @@ function getLowerFileExtension(fileNameOrUrl: string): string {
     stripped = stripped.slice(0, queryIndex);
   }
 
-  const dotIndex = stripped.lastIndexOf('.');
+  const dotIndex = stripped.lastIndexOf(".");
 
   if (dotIndex <= 0 || dotIndex === stripped.length - 1) {
-    return '';
+    return "";
   }
 
   return stripped.slice(dotIndex + 1);
 }
 
-function toDropzoneBrowseButtonSize(size: FileUploadSize): 'xs' | 'sm' | 'md' {
-  if (size === 'xs' || size === 'sm') {
-    return 'xs';
+function toDropzoneBrowseButtonSize(size: FileUploadSize): "xs" | "sm" | "md" {
+  if (size === "xs" || size === "sm") {
+    return "xs";
   }
 
-  if (size === 'lg') {
-    return 'md';
+  if (size === "lg") {
+    return "md";
   }
 
-  return 'sm';
+  return "sm";
 }
 
-function resolvePreviewType(mimeType: string | undefined, extension: string): FilePreviewType {
-  const normalizedMimeType = mimeType?.toLowerCase().trim() ?? '';
+function resolvePreviewType(
+  mimeType: string | undefined,
+  extension: string,
+): FilePreviewType {
+  const normalizedMimeType = mimeType?.toLowerCase().trim() ?? "";
 
-  if (normalizedMimeType.startsWith('image/')) {
-    return 'image';
+  if (normalizedMimeType.startsWith("image/")) {
+    return "image";
   }
 
-  if (normalizedMimeType.includes('pdf')) {
-    return 'pdf';
+  if (normalizedMimeType.includes("pdf")) {
+    return "pdf";
   }
 
-  if (normalizedMimeType.startsWith('video/')) {
-    return 'video';
+  if (normalizedMimeType.startsWith("video/")) {
+    return "video";
   }
 
-  if (normalizedMimeType.startsWith('audio/')) {
-    return 'audio';
+  if (normalizedMimeType.startsWith("audio/")) {
+    return "audio";
   }
 
   if (imageExtensions.has(extension)) {
-    return 'image';
+    return "image";
   }
 
-  if (extension === 'pdf') {
-    return 'pdf';
+  if (extension === "pdf") {
+    return "pdf";
   }
 
   if (videoExtensions.has(extension)) {
-    return 'video';
+    return "video";
   }
 
   if (audioExtensions.has(extension)) {
-    return 'audio';
+    return "audio";
   }
 
-  return 'file';
+  return "file";
 }
 
 function createFileUploadId(file: File): string {
@@ -239,11 +253,11 @@ function createFileUploadId(file: File): string {
 }
 
 function revokeItemObjectUrl(item: FileUploadFile): void {
-  if (!item.src.startsWith('blob:')) {
+  if (!item.src.startsWith("blob:")) {
     return;
   }
 
-  if (typeof URL === 'undefined' || typeof URL.revokeObjectURL !== 'function') {
+  if (typeof URL === "undefined" || typeof URL.revokeObjectURL !== "function") {
     return;
   }
 
@@ -257,22 +271,22 @@ function revokeItemObjectUrl(item: FileUploadFile): void {
 export function FileUpload({
   variant,
   varient,
-  size = 'md',
+  size = "md",
   disabled = false,
   multiple = false,
   accept,
   placeholder,
   dropzoneHint,
-  browseLabel = 'Upload',
+  browseLabel = "Upload",
   onFilesChange,
   browseButtonProps,
   dialogProps,
-  className = '',
+  className = "",
   style,
   ...props
 }: FileUploadProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? 'compact';
-  const isCompact = resolvedVariant === 'compact';
+  const resolvedVariant = variant ?? varient ?? "compact";
+  const isCompact = resolvedVariant === "compact";
   const sizeToken = sizeTokens[size];
   const inputId = useId();
 
@@ -290,20 +304,22 @@ export function FileUpload({
   } = browseButtonProps ?? {};
 
   const {
-    size: dialogSize = 'lg',
+    size: dialogSize = "lg",
     variant: dialogVariant,
     varient: dialogLegacyVariant,
     closeOnEscape = true,
     closeOnOverlayClick = true,
   } = dialogProps ?? {};
 
-  const resolvedDialogVariant = dialogVariant ?? dialogLegacyVariant ?? 'outline';
+  const resolvedDialogVariant =
+    dialogVariant ?? dialogLegacyVariant ?? "outline";
 
   const compactPlaceholder =
-    placeholder ?? (multiple ? 'Upload files to continue.' : 'Upload a file to continue.');
+    placeholder ??
+    (multiple ? "Upload files to continue." : "Upload a file to continue.");
 
   const resolvedDropzoneHint =
-    dropzoneHint ?? 'Drag and drop files here, or use Browse to pick files.';
+    dropzoneHint ?? "Drag and drop files here, or use Browse to pick files.";
 
   useEffect(() => {
     filesRef.current = files;
@@ -346,7 +362,11 @@ export function FileUpload({
     });
   }
 
-  function updateFileDimensions(fileId: string, width: number, height: number): void {
+  function updateFileDimensions(
+    fileId: string,
+    width: number,
+    height: number,
+  ): void {
     setFiles((currentFiles) => {
       const targetIndex = currentFiles.findIndex((file) => file.id === fileId);
 
@@ -356,7 +376,10 @@ export function FileUpload({
 
       const targetFile = currentFiles[targetIndex];
 
-      if (targetFile == null || (targetFile.width === width && targetFile.height === height)) {
+      if (
+        targetFile == null ||
+        (targetFile.width === width && targetFile.height === height)
+      ) {
         return currentFiles;
       }
 
@@ -385,7 +408,7 @@ export function FileUpload({
         name: file.name,
         src,
         sizeBytes: file.size,
-        mimeType: file.type.trim() !== '' ? file.type : undefined,
+        mimeType: file.type.trim() !== "" ? file.type : undefined,
         extension,
         previewType: resolvePreviewType(file.type, extension),
       };
@@ -393,12 +416,12 @@ export function FileUpload({
   }
 
   function hydrateImageDimensions(nextFiles: FileUploadFile[]): void {
-    if (typeof Image === 'undefined') {
+    if (typeof Image === "undefined") {
       return;
     }
 
     nextFiles.forEach((file) => {
-      if (file.previewType !== 'image') {
+      if (file.previewType !== "image") {
         return;
       }
 
@@ -449,7 +472,7 @@ export function FileUpload({
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
     addFiles(event.target.files);
-    event.target.value = '';
+    event.target.value = "";
   }
 
   function handleDropzoneDragOver(event: ReactDragEvent<HTMLDivElement>): void {
@@ -460,7 +483,9 @@ export function FileUpload({
     }
   }
 
-  function handleDropzoneDragLeave(event: ReactDragEvent<HTMLDivElement>): void {
+  function handleDropzoneDragLeave(
+    event: ReactDragEvent<HTMLDivElement>,
+  ): void {
     event.preventDefault();
 
     if (disabled) {
@@ -486,7 +511,10 @@ export function FileUpload({
   }
 
   function removeFile(fileId: string): void {
-    updateFiles((currentFiles) => currentFiles.filter((file) => file.id !== fileId), true);
+    updateFiles(
+      (currentFiles) => currentFiles.filter((file) => file.id !== fileId),
+      true,
+    );
   }
 
   const fileListItems: FileListItem[] = files.map((file) => ({
@@ -498,70 +526,70 @@ export function FileUpload({
     height: file.height,
     mimeType: file.mimeType,
     type: file.previewType,
-    thumbnailSrc: file.previewType === 'image' ? file.src : undefined,
+    thumbnailSrc: file.previewType === "image" ? file.src : undefined,
     disabled,
   }));
 
   const rootStyle: CSSProperties = {
-    width: '100%',
+    width: "100%",
     minWidth: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: isCompact ? '0.45rem' : sizeToken.cardGap,
-    boxSizing: 'border-box',
+    display: "flex",
+    flexDirection: "column",
+    gap: isCompact ? "0.45rem" : sizeToken.cardGap,
+    boxSizing: "border-box",
     ...style,
   };
 
   const compactShellStyle: CSSProperties = {
-    width: '100%',
+    width: "100%",
     minWidth: 0,
     minHeight: sizeToken.compactMinHeight,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--ktn-border-muted)',
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "var(--ktn-border-muted)",
     borderRadius: sizeToken.compactRadius,
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
     padding: sizeToken.compactPadding,
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     gap: sizeToken.compactGap,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     opacity: disabled ? 0.62 : 1,
   };
 
   const compactSummaryWrapStyle: CSSProperties = {
     minWidth: 0,
     flex: 1,
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.38rem',
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.38rem",
     fontSize: sizeToken.compactFontSize,
     lineHeight: 1.25,
-    color: 'var(--ktn-text-primary)',
-    overflow: 'hidden',
+    color: "var(--ktn-text-primary)",
+    overflow: "hidden",
   };
 
   const compactPlaceholderStyle: CSSProperties = {
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   };
 
   const compactNameButtonStyle: CSSProperties = {
     border: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     color: disabled
-      ? 'var(--ktn-text-secondary, var(--ktn-text-primary))'
-      : 'var(--ktn-action-primary-bg, #2563eb)',
-    textDecoration: 'underline',
-    textUnderlineOffset: '0.14em',
+      ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
+      : "var(--ktn-action-primary-bg, #2563eb)",
+    textDecoration: "underline",
+    textUnderlineOffset: "0.14em",
     padding: 0,
     margin: 0,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    cursor: disabled ? "not-allowed" : "pointer",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
     maxWidth: `min(100%, ${sizeToken.compactNameMaxWidth})`,
     minWidth: 0,
     flexShrink: 1,
@@ -571,13 +599,13 @@ export function FileUpload({
 
   const compactCountButtonStyle: CSSProperties = {
     border: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     color: disabled
-      ? 'var(--ktn-text-secondary, var(--ktn-text-primary))'
-      : 'var(--ktn-action-primary-bg, #2563eb)',
+      ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
+      : "var(--ktn-action-primary-bg, #2563eb)",
     padding: 0,
     margin: 0,
-    cursor: disabled ? 'not-allowed' : 'pointer',
+    cursor: disabled ? "not-allowed" : "pointer",
     fontSize: sizeToken.compactFontSize,
     lineHeight: 1.2,
     fontWeight: 600,
@@ -585,43 +613,45 @@ export function FileUpload({
   };
 
   const dropzoneSurfaceStyle: CSSProperties = {
-    width: '100%',
+    width: "100%",
     minWidth: 0,
-    borderWidth: '1px',
-    borderStyle: 'dashed',
-    borderColor: isDragging ? 'var(--ktn-action-primary-bg, #2563eb)' : 'var(--ktn-border-muted)',
+    borderWidth: "1px",
+    borderStyle: "dashed",
+    borderColor: isDragging
+      ? "var(--ktn-action-primary-bg, #2563eb)"
+      : "var(--ktn-border-muted)",
     borderRadius: sizeToken.dropzoneRadius,
     padding: sizeToken.dropzonePadding,
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     gap: sizeToken.cardGap,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     backgroundColor: isDragging
-      ? 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, transparent)'
-      : 'color-mix(in srgb, var(--ktn-bg-muted, #f3f4f6) 44%, transparent)',
+      ? "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, transparent)"
+      : "color-mix(in srgb, var(--ktn-bg-muted, #f3f4f6) 44%, transparent)",
     opacity: disabled ? 0.62 : 1,
   };
 
   const dropzoneHeaderStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '0.6rem',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "0.6rem",
     minWidth: 0,
   };
 
   const dropzoneHeaderMainStyle: CSSProperties = {
     minWidth: 0,
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.52rem',
+    display: "flex",
+    alignItems: "center",
+    gap: "0.52rem",
   };
 
   const dropzoneTitleStyle: CSSProperties = {
     margin: 0,
     fontSize: sizeToken.dropzoneTitleFontSize,
     lineHeight: 1.25,
-    color: 'var(--ktn-text-primary)',
+    color: "var(--ktn-text-primary)",
     fontWeight: 600,
   };
 
@@ -629,13 +659,13 @@ export function FileUpload({
     margin: 0,
     fontSize: sizeToken.dropzoneHintFontSize,
     lineHeight: 1.35,
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   };
 
   const dropzoneFileListWrapStyle: CSSProperties = {
-    width: '100%',
+    width: "100%",
     minWidth: 0,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
   };
 
   const composedClassName = `${baseClasses} ${className}`.trim();
@@ -649,11 +679,11 @@ export function FileUpload({
     ) : (
       <>
         <Tooltip
-          label={firstFile?.name ?? ''}
+          label={firstFile?.name ?? ""}
           size="xs"
           side="top"
-          disabled={firstFile == null || firstFile.name.trim() === ''}
-          style={{ minWidth: 0, maxWidth: '100%' }}
+          disabled={firstFile == null || firstFile.name.trim() === ""}
+          style={{ minWidth: 0, maxWidth: "100%" }}
         >
           <button
             type="button"
@@ -700,11 +730,12 @@ export function FileUpload({
         <DialogHeader>
           <DialogTitle>Uploaded Files</DialogTitle>
           <DialogDescription>
-            Click filename or thumbnail to open preview. Use the trash action to remove files.
+            Click filename or thumbnail to open preview. Use the trash action to
+            remove files.
           </DialogDescription>
         </DialogHeader>
 
-        <div style={{ marginTop: '0.15rem' }}>
+        <div style={{ marginTop: "0.15rem" }}>
           <FileList
             files={fileListItems}
             variant="detailed"
@@ -733,7 +764,7 @@ export function FileUpload({
       multiple={multiple}
       accept={accept}
       disabled={disabled}
-      style={{ display: 'none' }}
+      style={{ display: "none" }}
       onChange={handleInputChange}
     />
   );
@@ -775,7 +806,7 @@ export function FileUpload({
       >
         <div style={dropzoneHeaderStyle}>
           <div style={dropzoneHeaderMainStyle}>
-            <span aria-hidden style={{ display: 'inline-flex', lineHeight: 0 }}>
+            <span aria-hidden style={{ display: "inline-flex", lineHeight: 0 }}>
               <FiUploadCloud size={sizeToken.dropzoneIconSize} />
             </span>
 

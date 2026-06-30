@@ -34,6 +34,26 @@ Peer dependencies:
 1. react ^18
 2. react-dom ^18
 
+Optional peer dependencies (only needed for Table xlsx/pdf export addon):
+
+1. xlsx ^0.18.5
+2. jspdf ^4.2.1
+3. jspdf-autotable ^5.0.8
+
+Use the optional addon entry only when required:
+
+```tsx
+import { Table } from '@keytuno/ui-react';
+import { tableExportHandlers } from '@keytuno/ui-react/addons/table-exporters';
+
+<Table
+	showExport
+	exportable
+	exportFormats={['csv', 'xlsx', 'pdf']}
+	exportHandlers={tableExportHandlers}
+/>
+```
+
 ## Local Development
 
 ```bash

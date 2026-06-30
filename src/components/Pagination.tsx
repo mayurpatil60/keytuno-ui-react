@@ -5,23 +5,28 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from 'react-icons/fi';
+import {
+  FiChevronLeft,
+  FiChevronRight,
+  FiChevronsLeft,
+  FiChevronsRight,
+} from "./icons/feather";
 
-import { Button } from './Button';
-import { Select, type SelectOption, type SelectValue } from './Select';
+import { Button } from "./Button";
+import { Select, type SelectOption, type SelectValue } from "./Select";
 
-export type PaginationVariant = 'basic' | 'advance' | 'compact';
-export type PaginationSize = 'xs' | 'sm' | 'md' | 'lg';
+export type PaginationVariant = "basic" | "advance" | "compact";
+export type PaginationSize = "xs" | "sm" | "md" | "lg";
 export type PaginationActionSource =
-  | 'first'
-  | 'previous'
-  | 'next'
-  | 'last'
-  | 'page-number'
-  | 'page-size'
-  | 'page-size-reset';
+  | "first"
+  | "previous"
+  | "next"
+  | "last"
+  | "page-number"
+  | "page-size"
+  | "page-size-reset";
 
 export interface PaginationActionContext {
   source: PaginationActionSource;
@@ -51,7 +56,7 @@ export interface PaginationLabels {
 
 export interface PaginationProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  'children' | 'defaultValue' | 'onChange'
+  "children" | "defaultValue" | "onChange"
 > {
   variant?: PaginationVariant;
   size?: PaginationSize;
@@ -75,18 +80,18 @@ export interface PaginationProps extends Omit<
   showingPageFormatter?: (context: PaginationTextContext) => ReactNode;
 }
 
-type PageToken = number | 'ellipsis';
+type PageToken = number | "ellipsis";
 
 type PaginationSizeTokens = {
   fontSize: string;
   gap: string;
   controlGap: string;
   selectorWidth: string;
-  buttonSize: 'xs' | 'sm' | 'md' | 'lg';
+  buttonSize: "xs" | "sm" | "md" | "lg";
   symbolButtonMinWidth: string;
 };
 
-const baseClasses = 'flex w-full min-w-0';
+const baseClasses = "flex w-full min-w-0";
 
 const defaultPageSizeOptions = [10, 20, 50, 100];
 
@@ -99,36 +104,36 @@ const iconSizeByPaginationSize: Record<PaginationSize, number> = {
 
 const sizeTokens: Record<PaginationSize, PaginationSizeTokens> = {
   xs: {
-    fontSize: '0.72rem',
-    gap: '0.45rem',
-    controlGap: '0.3rem',
-    selectorWidth: '7rem',
-    buttonSize: 'xs',
-    symbolButtonMinWidth: '1.55rem',
+    fontSize: "0.72rem",
+    gap: "0.45rem",
+    controlGap: "0.3rem",
+    selectorWidth: "7rem",
+    buttonSize: "xs",
+    symbolButtonMinWidth: "1.55rem",
   },
   sm: {
-    fontSize: '0.78rem',
-    gap: '0.55rem',
-    controlGap: '0.35rem',
-    selectorWidth: '7.4rem',
-    buttonSize: 'sm',
-    symbolButtonMinWidth: '1.8rem',
+    fontSize: "0.78rem",
+    gap: "0.55rem",
+    controlGap: "0.35rem",
+    selectorWidth: "7.4rem",
+    buttonSize: "sm",
+    symbolButtonMinWidth: "1.8rem",
   },
   md: {
-    fontSize: '0.84rem',
-    gap: '0.65rem',
-    controlGap: '0.4rem',
-    selectorWidth: '7.8rem',
-    buttonSize: 'md',
-    symbolButtonMinWidth: '2.05rem',
+    fontSize: "0.84rem",
+    gap: "0.65rem",
+    controlGap: "0.4rem",
+    selectorWidth: "7.8rem",
+    buttonSize: "md",
+    symbolButtonMinWidth: "2.05rem",
   },
   lg: {
-    fontSize: '0.92rem',
-    gap: '0.75rem',
-    controlGap: '0.45rem',
-    selectorWidth: '8.2rem',
-    buttonSize: 'lg',
-    symbolButtonMinWidth: '2.25rem',
+    fontSize: "0.92rem",
+    gap: "0.75rem",
+    controlGap: "0.45rem",
+    selectorWidth: "8.2rem",
+    buttonSize: "lg",
+    symbolButtonMinWidth: "2.25rem",
   },
 };
 
@@ -144,7 +149,9 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-function normalizePageSizeOptions(pageSizeOptions: number[] | undefined): number[] {
+function normalizePageSizeOptions(
+  pageSizeOptions: number[] | undefined,
+): number[] {
   const source =
     pageSizeOptions != null && pageSizeOptions.length > 0
       ? pageSizeOptions
@@ -194,15 +201,19 @@ function buildPageTokens(
   const tokens: PageToken[] = [1];
 
   if (leftBoundary > 2) {
-    tokens.push('ellipsis');
+    tokens.push("ellipsis");
   }
 
-  for (let pageNumber = leftBoundary; pageNumber <= rightBoundary; pageNumber += 1) {
+  for (
+    let pageNumber = leftBoundary;
+    pageNumber <= rightBoundary;
+    pageNumber += 1
+  ) {
     tokens.push(pageNumber);
   }
 
   if (rightBoundary < totalPages - 1) {
-    tokens.push('ellipsis');
+    tokens.push("ellipsis");
   }
 
   tokens.push(totalPages);
@@ -211,8 +222,8 @@ function buildPageTokens(
 }
 
 export function Pagination({
-  variant = 'basic',
-  size = 'md',
+  variant = "basic",
+  size = "md",
   page,
   defaultPage = 1,
   totalPages = 1,
@@ -231,27 +242,27 @@ export function Pagination({
   labels,
   summaryFormatter,
   showingPageFormatter,
-  className = '',
+  className = "",
   style,
   role,
-  ['aria-label']: ariaLabel,
+  ["aria-label"]: ariaLabel,
   ...props
 }: PaginationProps): JSX.Element {
   const resolvedSizeTokens = sizeTokens[size];
   const navigationIconSize = iconSizeByPaginationSize[size];
 
   const navIconWrapStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
     lineHeight: 0,
   };
 
   const resolvedLabels = {
-    item: labels?.item ?? 'items',
-    select: labels?.select ?? 'Page size',
-    perPage: labels?.perPage ?? 'page',
-    showingPage: labels?.showingPage ?? 'Page',
+    item: labels?.item ?? "items",
+    select: labels?.select ?? "Page size",
+    perPage: labels?.perPage ?? "page",
+    showingPage: labels?.showingPage ?? "Page",
     first: labels?.first ?? (
       <span aria-hidden style={navIconWrapStyle}>
         <FiChevronsLeft size={navigationIconSize} />
@@ -282,10 +293,12 @@ export function Pagination({
   const fallbackPageSize = normalizedPageSizeOptions[0] ?? 10;
   const isPageSizeControlled = pageSize !== undefined;
 
-  const [uncontrolledPageSize, setUncontrolledPageSize] = useState<number>(() => {
-    const initial = toInteger(defaultPageSize, fallbackPageSize);
-    return initial > 0 ? initial : fallbackPageSize;
-  });
+  const [uncontrolledPageSize, setUncontrolledPageSize] = useState<number>(
+    () => {
+      const initial = toInteger(defaultPageSize, fallbackPageSize);
+      return initial > 0 ? initial : fallbackPageSize;
+    },
+  );
 
   useEffect(() => {
     if (
@@ -299,14 +312,17 @@ export function Pagination({
   const resolvedPageSizeRaw = isPageSizeControlled
     ? toInteger(pageSize, fallbackPageSize)
     : uncontrolledPageSize;
-  const resolvedPageSize = resolvedPageSizeRaw > 0 ? resolvedPageSizeRaw : fallbackPageSize;
+  const resolvedPageSize =
+    resolvedPageSizeRaw > 0 ? resolvedPageSizeRaw : fallbackPageSize;
 
   const resolvedPageSizeOptions = useMemo(() => {
     if (normalizedPageSizeOptions.includes(resolvedPageSize)) {
       return normalizedPageSizeOptions;
     }
 
-    return [...normalizedPageSizeOptions, resolvedPageSize].sort((left, right) => left - right);
+    return [...normalizedPageSizeOptions, resolvedPageSize].sort(
+      (left, right) => left - right,
+    );
   }, [normalizedPageSizeOptions, resolvedPageSize]);
 
   const resolvedTotalPages = Math.max(1, toInteger(totalPages, 1));
@@ -322,7 +338,10 @@ export function Pagination({
   const resolvedPage = clamp(rawPage, 1, resolvedTotalPages);
 
   useEffect(() => {
-    if (!isPageControlled && unresolvedPageNeedsClamp(uncontrolledPage, resolvedPage)) {
+    if (
+      !isPageControlled &&
+      unresolvedPageNeedsClamp(uncontrolledPage, resolvedPage)
+    ) {
       setUncontrolledPage(resolvedPage);
     }
   }, [isPageControlled, resolvedPage, uncontrolledPage]);
@@ -350,14 +369,18 @@ export function Pagination({
 
   function setPage(
     nextPage: number,
-    source: PaginationActionSource = 'page-number',
+    source: PaginationActionSource = "page-number",
     event?: unknown,
   ): void {
     if (disabled) {
       return;
     }
 
-    const normalizedPage = clamp(toInteger(nextPage, resolvedPage), 1, resolvedTotalPages);
+    const normalizedPage = clamp(
+      toInteger(nextPage, resolvedPage),
+      1,
+      resolvedTotalPages,
+    );
 
     if (!isPageControlled) {
       setUncontrolledPage(normalizedPage);
@@ -380,7 +403,10 @@ export function Pagination({
       return;
     }
 
-    const normalizedPageSize = Math.max(1, toInteger(nextPageSize, resolvedPageSize));
+    const normalizedPageSize = Math.max(
+      1,
+      toInteger(nextPageSize, resolvedPageSize),
+    );
 
     if (!isPageSizeControlled) {
       setUncontrolledPageSize(normalizedPageSize);
@@ -389,7 +415,7 @@ export function Pagination({
     if (normalizedPageSize !== resolvedPageSize || isPageSizeControlled) {
       onPageSizeChange?.(normalizedPageSize);
       onAction?.({
-        source: 'page-size',
+        source: "page-size",
         page: resolvedPage,
         pageSize: normalizedPageSize,
         totalPages: resolvedTotalPages,
@@ -397,7 +423,7 @@ export function Pagination({
     }
 
     if (resetPageOnPageSizeChange) {
-      setPage(1, 'page-size-reset');
+      setPage(1, "page-size-reset");
     }
   }
 
@@ -424,82 +450,82 @@ export function Pagination({
   const composedClassName = `${baseClasses} ${className}`.trim();
 
   const rootStyle: CSSProperties = {
-    width: '100%',
-    maxWidth: '100%',
+    width: "100%",
+    maxWidth: "100%",
     minWidth: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
     gap: resolvedSizeTokens.gap,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     fontSize: resolvedSizeTokens.fontSize,
     ...style,
   };
 
   const infoStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
     gap: resolvedSizeTokens.controlGap,
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     minWidth: 0,
-    maxWidth: '100%',
-    boxSizing: 'border-box',
+    maxWidth: "100%",
+    boxSizing: "border-box",
   };
 
   const summaryStyle: CSSProperties = {
     margin: 0,
     fontWeight: 500,
-    color: 'var(--ktn-text-primary)',
+    color: "var(--ktn-text-primary)",
     minWidth: 0,
   };
 
   const showingPageStyle: CSSProperties = {
     margin: 0,
     fontWeight: 500,
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     minWidth: 0,
   };
 
   const pageSizeSelectWrapStyle: CSSProperties = {
     width: `min(100%, ${resolvedSizeTokens.selectorWidth})`,
-    maxWidth: '100%',
+    maxWidth: "100%",
     minWidth: 0,
   };
 
   const navStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
     gap: resolvedSizeTokens.controlGap,
     minWidth: 0,
-    maxWidth: '100%',
-    boxSizing: 'border-box',
+    maxWidth: "100%",
+    boxSizing: "border-box",
   };
 
   const compactNavStyle: CSSProperties = {
     ...navStyle,
-    marginInlineStart: 'auto',
+    marginInlineStart: "auto",
   };
 
   const ellipsisStyle: CSSProperties = {
     minWidth: resolvedSizeTokens.symbolButtonMinWidth,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingInline: '0.2rem',
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingInline: "0.2rem",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   };
 
   const symbolButtonStyle: CSSProperties = {
     minWidth: resolvedSizeTokens.symbolButtonMinWidth,
-    paddingInline: '0.45rem',
+    paddingInline: "0.45rem",
   };
 
   const pageButtonStyle: CSSProperties = {
     minWidth: resolvedSizeTokens.symbolButtonMinWidth,
-    paddingInline: '0.45rem',
+    paddingInline: "0.45rem",
   };
 
   const pageSizeSelectorNode = showPageSizeSelector ? (
@@ -512,7 +538,7 @@ export function Pagination({
         disabled={disabled}
         placeholder={resolvedLabels.select}
         searchPlaceholder={resolvedLabels.select}
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
       />
     </div>
   ) : null;
@@ -521,14 +547,16 @@ export function Pagination({
     <div
       className={composedClassName}
       style={rootStyle}
-      role={role ?? 'navigation'}
-      aria-label={ariaLabel ?? 'Pagination'}
+      role={role ?? "navigation"}
+      aria-label={ariaLabel ?? "Pagination"}
       {...props}
     >
-      {variant === 'basic' ? (
+      {variant === "basic" ? (
         <>
           <div style={infoStyle}>
-            {showSummary ? <span style={summaryStyle}>{summaryText}</span> : null}
+            {showSummary ? (
+              <span style={summaryStyle}>{summaryText}</span>
+            ) : null}
             {pageSizeSelectorNode}
           </div>
 
@@ -538,7 +566,7 @@ export function Pagination({
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage <= 1}
               onAction={(event) => {
-                setPage(1, 'first', event);
+                setPage(1, "first", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to first page"
@@ -551,7 +579,7 @@ export function Pagination({
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage <= 1}
               onAction={(event) => {
-                setPage(resolvedPage - 1, 'previous', event);
+                setPage(resolvedPage - 1, "previous", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to previous page"
@@ -560,9 +588,13 @@ export function Pagination({
             </Button>
 
             {pageTokens.map((token, tokenIndex) => {
-              if (token === 'ellipsis') {
+              if (token === "ellipsis") {
                 return (
-                  <span key={`ellipsis-${tokenIndex}`} aria-hidden style={ellipsisStyle}>
+                  <span
+                    key={`ellipsis-${tokenIndex}`}
+                    aria-hidden
+                    style={ellipsisStyle}
+                  >
                     ...
                   </span>
                 );
@@ -574,15 +606,15 @@ export function Pagination({
               return (
                 <Button
                   key={`page-${pageNumber}`}
-                  variant={isActive ? 'primary' : 'outline'}
+                  variant={isActive ? "primary" : "outline"}
                   size={resolvedSizeTokens.buttonSize}
                   disabled={disabled}
                   onAction={(event) => {
-                    setPage(pageNumber, 'page-number', event);
+                    setPage(pageNumber, "page-number", event);
                   }}
                   style={pageButtonStyle}
                   aria-label={`Go to page ${pageNumber}`}
-                  aria-current={isActive ? 'page' : undefined}
+                  aria-current={isActive ? "page" : undefined}
                 >
                   {pageNumber}
                 </Button>
@@ -594,7 +626,7 @@ export function Pagination({
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage >= resolvedTotalPages}
               onAction={(event) => {
-                setPage(resolvedPage + 1, 'next', event);
+                setPage(resolvedPage + 1, "next", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to next page"
@@ -607,7 +639,7 @@ export function Pagination({
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage >= resolvedTotalPages}
               onAction={(event) => {
-                setPage(resolvedTotalPages, 'last', event);
+                setPage(resolvedTotalPages, "last", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to last page"
@@ -618,19 +650,21 @@ export function Pagination({
         </>
       ) : null}
 
-      {variant === 'advance' ? (
+      {variant === "advance" ? (
         <>
           <div style={infoStyle}>{pageSizeSelectorNode}</div>
 
           <div style={navStyle}>
-            {showShowingPage ? <span style={showingPageStyle}>{showingPageText}</span> : null}
+            {showShowingPage ? (
+              <span style={showingPageStyle}>{showingPageText}</span>
+            ) : null}
 
             <Button
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage <= 1}
               onAction={(event) => {
-                setPage(resolvedPage - 1, 'previous', event);
+                setPage(resolvedPage - 1, "previous", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to previous page"
@@ -643,7 +677,7 @@ export function Pagination({
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage >= resolvedTotalPages}
               onAction={(event) => {
-                setPage(resolvedPage + 1, 'next', event);
+                setPage(resolvedPage + 1, "next", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to next page"
@@ -654,7 +688,7 @@ export function Pagination({
         </>
       ) : null}
 
-      {variant === 'compact' ? (
+      {variant === "compact" ? (
         <>
           {pageSizeSelectorNode}
 
@@ -664,7 +698,7 @@ export function Pagination({
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage <= 1}
               onAction={(event) => {
-                setPage(resolvedPage - 1, 'previous', event);
+                setPage(resolvedPage - 1, "previous", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to previous page"
@@ -672,14 +706,16 @@ export function Pagination({
               {resolvedLabels.previous}
             </Button>
 
-            {showSummary ? <span style={summaryStyle}>{summaryText}</span> : null}
+            {showSummary ? (
+              <span style={summaryStyle}>{summaryText}</span>
+            ) : null}
 
             <Button
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
               disabled={disabled || resolvedPage >= resolvedTotalPages}
               onAction={(event) => {
-                setPage(resolvedPage + 1, 'next', event);
+                setPage(resolvedPage + 1, "next", event);
               }}
               style={symbolButtonStyle}
               aria-label="Go to next page"
@@ -693,6 +729,9 @@ export function Pagination({
   );
 }
 
-function unresolvedPageNeedsClamp(uncontrolledPage: number, resolvedPage: number): boolean {
+function unresolvedPageNeedsClamp(
+  uncontrolledPage: number,
+  resolvedPage: number,
+): boolean {
   return uncontrolledPage !== resolvedPage;
 }

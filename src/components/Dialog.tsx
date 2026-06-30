@@ -12,17 +12,28 @@ import {
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { FiX } from 'react-icons/fi';
+import { FiX } from "./icons/feather";
 
-import { Button } from './Button';
-import { Scrollbar } from './Scrollbar';
+import { Button } from "./Button";
+import { Scrollbar } from "./Scrollbar";
 
-export type DialogVariant = 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link';
+export type DialogVariant =
+  | "primary"
+  | "secondary"
+  | "destructive"
+  | "outline"
+  | "ghost"
+  | "link";
 
-export type DialogSize = 'xs' | 'sm' | 'md' | 'lg';
-export type DialogActionSource = 'trigger' | 'overlay' | 'escape' | 'close-button' | 'open-change';
+export type DialogSize = "xs" | "sm" | "md" | "lg";
+export type DialogActionSource =
+  | "trigger"
+  | "overlay"
+  | "escape"
+  | "close-button"
+  | "open-change";
 
 export interface DialogActionContext {
   source: DialogActionSource;
@@ -30,7 +41,10 @@ export interface DialogActionContext {
   event?: unknown;
 }
 
-export interface DialogProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface DialogProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -81,7 +95,11 @@ type DialogVariantTokens = {
 
 interface DialogContextValue {
   open: boolean;
-  setOpen: (open: boolean, source?: DialogActionSource, event?: unknown) => void;
+  setOpen: (
+    open: boolean,
+    source?: DialogActionSource,
+    event?: unknown,
+  ) => void;
   size: DialogSize;
   variant: DialogVariant;
   disabled: boolean;
@@ -93,88 +111,89 @@ interface DialogContextValue {
 
 const sizeTokens: Record<DialogSize, DialogSizeTokens> = {
   xs: {
-    maxWidth: '21rem',
-    titleFontSize: '0.925rem',
-    descriptionFontSize: '0.76rem',
-    bodyFontSize: '0.76rem',
-    sectionPadding: '0.7rem',
-    sectionGap: '0.45rem',
-    footerGap: '0.35rem',
-    closeButtonSize: '1.6rem',
+    maxWidth: "21rem",
+    titleFontSize: "0.925rem",
+    descriptionFontSize: "0.76rem",
+    bodyFontSize: "0.76rem",
+    sectionPadding: "0.7rem",
+    sectionGap: "0.45rem",
+    footerGap: "0.35rem",
+    closeButtonSize: "1.6rem",
   },
   sm: {
-    maxWidth: '25rem',
-    titleFontSize: '1rem',
-    descriptionFontSize: '0.82rem',
-    bodyFontSize: '0.82rem',
-    sectionPadding: '0.8rem',
-    sectionGap: '0.52rem',
-    footerGap: '0.45rem',
-    closeButtonSize: '1.72rem',
+    maxWidth: "25rem",
+    titleFontSize: "1rem",
+    descriptionFontSize: "0.82rem",
+    bodyFontSize: "0.82rem",
+    sectionPadding: "0.8rem",
+    sectionGap: "0.52rem",
+    footerGap: "0.45rem",
+    closeButtonSize: "1.72rem",
   },
   md: {
-    maxWidth: '30rem',
-    titleFontSize: '1.08rem',
-    descriptionFontSize: '0.875rem',
-    bodyFontSize: '0.875rem',
-    sectionPadding: '0.95rem',
-    sectionGap: '0.6rem',
-    footerGap: '0.5rem',
-    closeButtonSize: '1.82rem',
+    maxWidth: "30rem",
+    titleFontSize: "1.08rem",
+    descriptionFontSize: "0.875rem",
+    bodyFontSize: "0.875rem",
+    sectionPadding: "0.95rem",
+    sectionGap: "0.6rem",
+    footerGap: "0.5rem",
+    closeButtonSize: "1.82rem",
   },
   lg: {
-    maxWidth: '37rem',
-    titleFontSize: '1.17rem',
-    descriptionFontSize: '0.94rem',
-    bodyFontSize: '0.94rem',
-    sectionPadding: '1.1rem',
-    sectionGap: '0.7rem',
-    footerGap: '0.6rem',
-    closeButtonSize: '1.92rem',
+    maxWidth: "37rem",
+    titleFontSize: "1.17rem",
+    descriptionFontSize: "0.94rem",
+    bodyFontSize: "0.94rem",
+    sectionPadding: "1.1rem",
+    sectionGap: "0.7rem",
+    footerGap: "0.6rem",
+    closeButtonSize: "1.92rem",
   },
 };
 
 const variantTokens: Record<DialogVariant, DialogVariantTokens> = {
   primary: {
-    borderColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 44%, var(--ktn-border-muted))',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg) 44%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   },
   secondary: {
-    borderColor: 'var(--ktn-border-muted)',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    borderColor: "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   },
   destructive: {
     borderColor:
-      'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 45%, var(--ktn-border-muted))',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    titleColor: 'var(--ktn-action-danger-bg, #dc2626)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 45%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-action-danger-bg, #dc2626)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   },
   outline: {
-    borderColor: 'var(--ktn-border-muted)',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    borderColor: "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   },
   ghost: {
-    borderColor: 'transparent',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    titleColor: 'var(--ktn-text-primary)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    borderColor: "transparent",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-text-primary)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   },
   link: {
-    borderColor: 'transparent',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    titleColor: 'var(--ktn-action-primary-bg)',
-    descriptionColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    borderColor: "transparent",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-action-primary-bg)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   },
 };
 
-const baseDialogClasses = 'relative inline-flex';
+const baseDialogClasses = "relative inline-flex";
 
 const DialogContext = createContext<DialogContextValue | null>(null);
 
@@ -188,12 +207,12 @@ function useDialogContextValue(): DialogContextValue {
   return {
     open: false,
     setOpen: () => {},
-    size: 'md',
-    variant: 'primary',
+    size: "md",
+    variant: "primary",
     disabled: false,
-    contentId: '',
-    titleId: '',
-    descriptionId: '',
+    contentId: "",
+    titleId: "",
+    descriptionId: "",
     setContentNode: () => {},
   };
 }
@@ -202,12 +221,18 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
   const focusableSelector =
     'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-  return Array.from(container.querySelectorAll<HTMLElement>(focusableSelector)).filter(
-    (element) => !element.hasAttribute('disabled') && !element.getAttribute('aria-hidden'),
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(focusableSelector),
+  ).filter(
+    (element) =>
+      !element.hasAttribute("disabled") && !element.getAttribute("aria-hidden"),
   );
 }
 
-function containsComponentType(node: ReactNode, targetComponent: unknown): boolean {
+function containsComponentType(
+  node: ReactNode,
+  targetComponent: unknown,
+): boolean {
   if (!isValidElement(node)) {
     return false;
   }
@@ -225,28 +250,28 @@ function containsComponentType(node: ReactNode, targetComponent: unknown): boole
 
 function resolveTriggerVariant(
   variant: DialogVariant,
-): 'primary' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link' {
-  if (variant === 'secondary') {
-    return 'secondary';
+): "primary" | "secondary" | "destructive" | "outline" | "ghost" | "link" {
+  if (variant === "secondary") {
+    return "secondary";
   }
 
-  if (variant === 'destructive') {
-    return 'destructive';
+  if (variant === "destructive") {
+    return "destructive";
   }
 
-  if (variant === 'outline') {
-    return 'outline';
+  if (variant === "outline") {
+    return "outline";
   }
 
-  if (variant === 'ghost') {
-    return 'ghost';
+  if (variant === "ghost") {
+    return "ghost";
   }
 
-  if (variant === 'link') {
-    return 'link';
+  if (variant === "link") {
+    return "link";
   }
 
-  return 'primary';
+  return "primary";
 }
 
 export function Dialog({
@@ -258,15 +283,15 @@ export function Dialog({
   trigger,
   variant,
   varient,
-  size = 'md',
+  size = "md",
   disabled = false,
   closeOnOverlayClick = true,
   closeOnEscape = true,
-  className = '',
+  className = "",
   style,
   ...props
 }: DialogProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? 'primary';
+  const resolvedVariant = variant ?? varient ?? "primary";
   const isControlled = open !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = isControlled ? open === true : uncontrolledOpen;
@@ -279,7 +304,7 @@ export function Dialog({
 
   function setDialogOpen(
     nextOpen: boolean,
-    source: DialogActionSource = 'open-change',
+    source: DialogActionSource = "open-change",
     event?: unknown,
   ): void {
     if (disabled) {
@@ -308,16 +333,16 @@ export function Dialog({
     }
 
     function handleKeyDown(event: KeyboardEvent): void {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         event.preventDefault();
-        setDialogOpen(false, 'escape', event);
+        setDialogOpen(false, "escape", event);
       }
     }
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
     };
   }, [closeOnEscape, disabled, isOpen, onAction, onOpenChange]);
 
@@ -327,7 +352,9 @@ export function Dialog({
     }
 
     previousFocusedElementRef.current =
-      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
 
     const frameId = window.requestAnimationFrame(() => {
       const focusableElements = getFocusableElements(contentNode);
@@ -362,13 +389,16 @@ export function Dialog({
     const focusTrapNode = contentNode;
 
     function handleFocusTrap(event: KeyboardEvent): void {
-      if (event.key !== 'Tab') {
+      if (event.key !== "Tab") {
         return;
       }
 
       const activeElement = document.activeElement;
 
-      if (!(activeElement instanceof HTMLElement) || !focusTrapNode.contains(activeElement)) {
+      if (
+        !(activeElement instanceof HTMLElement) ||
+        !focusTrapNode.contains(activeElement)
+      ) {
         return;
       }
 
@@ -398,10 +428,10 @@ export function Dialog({
       }
     }
 
-    document.addEventListener('keydown', handleFocusTrap);
+    document.addEventListener("keydown", handleFocusTrap);
 
     return () => {
-      document.removeEventListener('keydown', handleFocusTrap);
+      document.removeEventListener("keydown", handleFocusTrap);
     };
   }, [contentNode, isOpen]);
 
@@ -411,7 +441,7 @@ export function Dialog({
     }
 
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.body.style.overflow = previousOverflow;
@@ -426,28 +456,28 @@ export function Dialog({
     if (isValidElement(trigger)) {
       const triggerElement = trigger as ReactElement<{
         onClick?: (event: unknown) => void;
-        'aria-haspopup'?: 'dialog';
-        'aria-expanded'?: boolean;
-        'aria-controls'?: string;
-        'aria-disabled'?: boolean;
+        "aria-haspopup"?: "dialog";
+        "aria-expanded"?: boolean;
+        "aria-controls"?: string;
+        "aria-disabled"?: boolean;
       }>;
 
       return cloneElement(triggerElement, {
-        'aria-haspopup': 'dialog',
-        'aria-expanded': isOpen,
-        'aria-controls': contentId,
-        'aria-disabled': disabled,
+        "aria-haspopup": "dialog",
+        "aria-expanded": isOpen,
+        "aria-controls": contentId,
+        "aria-disabled": disabled,
         onClick: (event: unknown) => {
           triggerElement.props.onClick?.(event);
 
           const defaultPrevented =
-            typeof event === 'object' &&
+            typeof event === "object" &&
             event != null &&
-            'defaultPrevented' in event &&
+            "defaultPrevented" in event &&
             (event as { defaultPrevented?: boolean }).defaultPrevented === true;
 
           if (!defaultPrevented) {
-            setDialogOpen(true, 'trigger', event);
+            setDialogOpen(true, "trigger", event);
           }
         },
       });
@@ -463,7 +493,7 @@ export function Dialog({
         aria-expanded={isOpen}
         aria-controls={contentId}
         onAction={(event) => {
-          setDialogOpen(true, 'trigger', event);
+          setDialogOpen(true, "trigger", event);
         }}
       >
         {trigger}
@@ -472,34 +502,34 @@ export function Dialog({
   }
 
   const rootStyle: CSSProperties = {
-    position: 'relative',
+    position: "relative",
     ...style,
   };
 
   const layerStyle: CSSProperties = {
-    position: 'fixed',
+    position: "fixed",
     inset: 0,
     zIndex: 80,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '1rem',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "1rem",
   };
 
   const backdropStyle: CSSProperties = {
-    position: 'absolute',
+    position: "absolute",
     inset: 0,
-    backgroundColor: 'rgba(2, 6, 23, 0.58)',
-    backdropFilter: 'blur(2px)',
+    backgroundColor: "rgba(2, 6, 23, 0.58)",
+    backdropFilter: "blur(2px)",
   };
 
   const viewportStyle: CSSProperties = {
-    position: 'relative',
+    position: "relative",
     zIndex: 1,
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    pointerEvents: 'none',
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    pointerEvents: "none",
   };
 
   const contextValue: DialogContextValue = {
@@ -528,7 +558,7 @@ export function Dialog({
               style={backdropStyle}
               onClick={(event) => {
                 if (closeOnOverlayClick) {
-                  setDialogOpen(false, 'overlay', event);
+                  setDialogOpen(false, "overlay", event);
                 }
               }}
             />
@@ -545,13 +575,21 @@ export function DialogContent({
   children,
   showCloseButton = true,
   scrollable = false,
-  maxContentHeight = '70vh',
-  className = '',
+  maxContentHeight = "70vh",
+  className = "",
   style,
   ...props
 }: DialogContentProps): JSX.Element {
-  const { setOpen, size, variant, disabled, contentId, titleId, descriptionId, setContentNode } =
-    useDialogContextValue();
+  const {
+    setOpen,
+    size,
+    variant,
+    disabled,
+    contentId,
+    titleId,
+    descriptionId,
+    setContentNode,
+  } = useDialogContextValue();
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[variant];
   const hasTitle = Children.toArray(children).some((child) =>
@@ -560,8 +598,8 @@ export function DialogContent({
   const hasDescription = Children.toArray(children).some((child) =>
     containsComponentType(child, DialogDescription),
   );
-  const labelledByFromProps = props['aria-labelledby'];
-  const describedByFromProps = props['aria-describedby'];
+  const labelledByFromProps = props["aria-labelledby"];
+  const describedByFromProps = props["aria-describedby"];
 
   const headerChildren: ReactNode[] = [];
   const bodyChildren: ReactNode[] = [];
@@ -583,7 +621,7 @@ export function DialogContent({
 
   function closeDialog(event?: unknown): void {
     if (!disabled) {
-      setOpen(false, 'close-button', event);
+      setOpen(false, "close-button", event);
     }
   }
 
@@ -605,15 +643,15 @@ export function DialogContent({
           minHeight: sizeToken.closeButtonSize,
           paddingInline: 0,
           paddingBlock: 0,
-          borderRadius: '999px',
-          color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+          borderRadius: "999px",
+          color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
           lineHeight: 0,
         }}
         onAction={(event) => {
           closeDialog(event);
         }}
       >
-        <span aria-hidden style={{ display: 'inline-flex', lineHeight: 0 }}>
+        <span aria-hidden style={{ display: "inline-flex", lineHeight: 0 }}>
           <FiX size={14} />
         </span>
       </Button>
@@ -621,49 +659,49 @@ export function DialogContent({
   }
 
   const contentStyle: CSSProperties = {
-    position: 'relative',
-    pointerEvents: 'auto',
+    position: "relative",
+    pointerEvents: "auto",
     width: `min(100%, ${sizeToken.maxWidth})`,
     maxHeight: scrollable ? maxContentHeight : undefined,
-    overflow: scrollable ? 'hidden' : undefined,
-    borderWidth: '1px',
-    borderStyle: 'solid',
+    overflow: scrollable ? "hidden" : undefined,
+    borderWidth: "1px",
+    borderStyle: "solid",
     borderColor: variantToken.borderColor,
-    borderRadius: 'var(--ktn-radius-lg, 0.75rem)',
+    borderRadius: "var(--ktn-radius-lg, 0.75rem)",
     backgroundColor: variantToken.backgroundColor,
-    boxShadow: '0 24px 56px rgba(15, 23, 42, 0.28)',
-    color: 'var(--ktn-text-primary)',
-    display: 'flex',
-    flexDirection: 'column',
+    boxShadow: "0 24px 56px rgba(15, 23, 42, 0.28)",
+    color: "var(--ktn-text-primary)",
+    display: "flex",
+    flexDirection: "column",
     gap: sizeToken.sectionGap,
     padding: sizeToken.sectionPadding,
     fontSize: sizeToken.bodyFontSize,
     lineHeight: 1.5,
     opacity: disabled ? 0.72 : 1,
-    ['--ktn-dialog-close-space' as string]: showCloseButton
+    ["--ktn-dialog-close-space" as string]: showCloseButton
       ? `calc(${sizeToken.closeButtonSize} + 0.5rem)`
-      : '0px',
+      : "0px",
     ...style,
   };
 
   const closeWrapStyle: CSSProperties = {
-    position: 'absolute',
-    insetInlineEnd: '0.55rem',
-    insetBlockStart: '0.55rem',
+    position: "absolute",
+    insetInlineEnd: "0.55rem",
+    insetBlockStart: "0.55rem",
     zIndex: 1,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
   };
 
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const sectionStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     gap: sizeToken.sectionGap,
     minWidth: 0,
-    width: '100%',
+    width: "100%",
   };
 
   const bodySectionStyle: CSSProperties = {
@@ -672,7 +710,7 @@ export function DialogContent({
       ? {
           flex: 1,
           minHeight: 0,
-          paddingInlineEnd: '0.2rem',
+          paddingInlineEnd: "0.2rem",
         }
       : {}),
   };
@@ -687,14 +725,20 @@ export function DialogContent({
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelledByFromProps ?? (hasTitle ? titleId : undefined)}
-      aria-describedby={describedByFromProps ?? (hasDescription ? descriptionId : undefined)}
+      aria-describedby={
+        describedByFromProps ?? (hasDescription ? descriptionId : undefined)
+      }
       tabIndex={-1}
       className={composedClassName}
       style={contentStyle}
     >
-      {showCloseButton ? <div style={closeWrapStyle}>{renderCloseButton()}</div> : null}
+      {showCloseButton ? (
+        <div style={closeWrapStyle}>{renderCloseButton()}</div>
+      ) : null}
 
-      {headerChildren.length > 0 ? <div style={sectionStyle}>{headerChildren}</div> : null}
+      {headerChildren.length > 0 ? (
+        <div style={sectionStyle}>{headerChildren}</div>
+      ) : null}
 
       {bodyChildren.length > 0 ? (
         scrollable ? (
@@ -706,27 +750,29 @@ export function DialogContent({
         )
       ) : null}
 
-      {footerChildren.length > 0 ? <div style={sectionStyle}>{footerChildren}</div> : null}
+      {footerChildren.length > 0 ? (
+        <div style={sectionStyle}>{footerChildren}</div>
+      ) : null}
     </div>
   );
 }
 
 export function DialogHeader({
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: DialogHeaderProps): JSX.Element {
   const { size } = useDialogContextValue();
   const sizeToken = sizeTokens[size];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const headerStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.25rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.25rem",
     margin: 0,
-    paddingInlineEnd: 'var(--ktn-dialog-close-space, 0px)',
+    paddingInlineEnd: "var(--ktn-dialog-close-space, 0px)",
     ...style,
   };
 
@@ -739,14 +785,14 @@ export function DialogHeader({
 
 export function DialogTitle({
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: DialogTitleProps): JSX.Element {
   const { size, variant, titleId } = useDialogContextValue();
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[variant];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const titleStyle: CSSProperties = {
     margin: 0,
@@ -758,7 +804,12 @@ export function DialogTitle({
   };
 
   return (
-    <h3 id={titleId} className={composedClassName} style={titleStyle} {...props}>
+    <h3
+      id={titleId}
+      className={composedClassName}
+      style={titleStyle}
+      {...props}
+    >
       {children}
     </h3>
   );
@@ -766,14 +817,14 @@ export function DialogTitle({
 
 export function DialogDescription({
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: DialogDescriptionProps): JSX.Element {
   const { size, variant, descriptionId } = useDialogContextValue();
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[variant];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const descriptionStyle: CSSProperties = {
     margin: 0,
@@ -785,7 +836,12 @@ export function DialogDescription({
   };
 
   return (
-    <p id={descriptionId} className={composedClassName} style={descriptionStyle} {...props}>
+    <p
+      id={descriptionId}
+      className={composedClassName}
+      style={descriptionStyle}
+      {...props}
+    >
       {children}
     </p>
   );
@@ -794,29 +850,29 @@ export function DialogDescription({
 export function DialogFooter({
   children,
   sticky = false,
-  className = '',
+  className = "",
   style,
   ...props
 }: DialogFooterProps): JSX.Element {
   const { size, variant } = useDialogContextValue();
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[variant];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const footerStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    width: '100%',
-    boxSizing: 'border-box',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    flexWrap: "wrap",
+    width: "100%",
+    boxSizing: "border-box",
     gap: sizeToken.footerGap,
-    marginTop: '0.15rem',
+    marginTop: "0.15rem",
     ...(sticky
       ? {
           backgroundColor: variantToken.backgroundColor,
-          paddingBlockStart: '0.65rem',
-          borderTop: '1px solid var(--ktn-border-muted)',
+          paddingBlockStart: "0.65rem",
+          borderTop: "1px solid var(--ktn-border-muted)",
         }
       : {}),
     ...style,

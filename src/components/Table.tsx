@@ -5,7 +5,7 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
-} from 'react';
+} from "react";
 
 import {
   flexRender,
@@ -22,7 +22,7 @@ import {
   type RowSelectionState,
   type SortingState,
   type VisibilityState,
-} from '@tanstack/react-table';
+} from "@tanstack/react-table";
 import {
   FiChevronDown,
   FiChevronUp,
@@ -33,9 +33,9 @@ import {
   FiMinimize2,
   FiRefreshCw,
   FiSearch,
-} from 'react-icons/fi';
+} from "./icons/feather";
 
-import { Button, type ButtonProps } from './Button';
+import { Button, type ButtonProps } from "./Button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -44,34 +44,40 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './DropdownMenu';
-import { Input } from './Input';
+} from "./DropdownMenu";
+import { Input } from "./Input";
 import {
   Pagination,
   type PaginationActionContext,
   type PaginationProps,
   type PaginationSize,
-} from './Pagination';
-import { Skeleton } from './Skeleton';
-import { Spinner } from './Spinner';
-import { Tooltip } from './Tooltip';
+} from "./Pagination";
+import { Skeleton } from "./Skeleton";
+import { Spinner } from "./Spinner";
+import { Tooltip } from "./Tooltip";
 
-export type TableVariant = 'basic' | 'outline' | 'ghost' | 'filled' | 'minimal' | 'striped';
-export type TableSize = 'xs' | 'sm' | 'md' | 'lg';
-export type TableExportFormat = 'csv' | 'xlsx' | 'pdf';
+export type TableVariant =
+  | "basic"
+  | "outline"
+  | "ghost"
+  | "filled"
+  | "minimal"
+  | "striped";
+export type TableSize = "xs" | "sm" | "md" | "lg";
+export type TableExportFormat = "csv" | "xlsx" | "pdf";
 export type TableActionSource =
-  | 'search'
-  | 'sort'
-  | 'filter'
-  | 'selection'
-  | 'column-visibility'
-  | 'column-filters-toggle'
-  | 'refresh'
-  | 'export'
-  | 'fullscreen'
-  | 'pagination'
-  | 'page-size'
-  | 'row-action';
+  | "search"
+  | "sort"
+  | "filter"
+  | "selection"
+  | "column-visibility"
+  | "column-filters-toggle"
+  | "refresh"
+  | "export"
+  | "fullscreen"
+  | "pagination"
+  | "page-size"
+  | "row-action";
 
 export interface TableActionContext<TData extends object = object> {
   source: TableActionSource;
@@ -91,9 +97,26 @@ export interface TableActionContext<TData extends object = object> {
   event?: unknown;
 }
 
-export type TableColumnDef<TData extends object = object> = ColumnDef<TData, unknown>;
+export interface TableExportRows {
+  headers: string[];
+  records: string[][];
+}
 
-type TableButtonVariant = NonNullable<ButtonProps['variant']>;
+export interface TableExportPayload {
+  rows: TableExportRows;
+  fileNameBase: string;
+}
+
+export type TableExportHandler = (
+  payload: TableExportPayload,
+) => Promise<void> | void;
+
+export type TableColumnDef<TData extends object = object> = ColumnDef<
+  TData,
+  unknown
+>;
+
+type TableButtonVariant = NonNullable<ButtonProps["variant"]>;
 
 export interface RowAction<TData extends object = object> {
   id: string;
@@ -103,20 +126,20 @@ export interface RowAction<TData extends object = object> {
   compact?: boolean;
   iconOnly?: boolean;
   iconOnlyTone?: boolean;
-  iconColor?: CSSProperties['color'];
-  tooltip?: ButtonProps['tooltip'];
-  tooltipSide?: ButtonProps['tooltipSide'];
-  tooltipSize?: ButtonProps['tooltipSize'];
-  tooltipDisabled?: ButtonProps['tooltipDisabled'];
-  tooltipOpenDelay?: ButtonProps['tooltipOpenDelay'];
-  tooltipCloseDelay?: ButtonProps['tooltipCloseDelay'];
+  iconColor?: CSSProperties["color"];
+  tooltip?: ButtonProps["tooltip"];
+  tooltipSide?: ButtonProps["tooltipSide"];
+  tooltipSize?: ButtonProps["tooltipSize"];
+  tooltipDisabled?: ButtonProps["tooltipDisabled"];
+  tooltipOpenDelay?: ButtonProps["tooltipOpenDelay"];
+  tooltipCloseDelay?: ButtonProps["tooltipCloseDelay"];
   onClick: (row: TData, rowIndex: number) => void;
   disabled?: (row: TData, rowIndex: number) => boolean;
 }
 
 export interface TableProps<TData extends object = object> extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  'children'
+  "children"
 > {
   data?: TData[];
   columns: TableColumnDef<TData>[];
@@ -153,6 +176,8 @@ export interface TableProps<TData extends object = object> extends Omit<
 
   exportable?: boolean;
   exportFormats?: TableExportFormat[];
+  exportHandlers?: Partial<Record<TableExportFormat, TableExportHandler>>;
+  exportFileName?: string;
 
   loading?: boolean;
   loadingRows?: number;
@@ -172,7 +197,7 @@ export interface TableProps<TData extends object = object> extends Omit<
   onPageChange?: (page: number) => void;
   onPageSizeChange?: (pageSize: number) => void;
   showPagination?: boolean;
-  paginationVariant?: PaginationProps['variant'];
+  paginationVariant?: PaginationProps["variant"];
   paginationDefaultPageSize?: number;
   paginationPageSizeOptions?: number[];
   paginationMaxVisiblePages?: number;
@@ -180,9 +205,9 @@ export interface TableProps<TData extends object = object> extends Omit<
   paginationShowSummary?: boolean;
   paginationShowShowingPage?: boolean;
   paginationResetPageOnPageSizeChange?: boolean;
-  paginationLabels?: PaginationProps['labels'];
-  paginationSummaryFormatter?: PaginationProps['summaryFormatter'];
-  paginationShowingPageFormatter?: PaginationProps['showingPageFormatter'];
+  paginationLabels?: PaginationProps["labels"];
+  paginationSummaryFormatter?: PaginationProps["summaryFormatter"];
+  paginationShowingPageFormatter?: PaginationProps["showingPageFormatter"];
   onSortChange?: (sort: SortingState) => void;
   onFilterChange?: (filters: ColumnFiltersState) => void;
 
@@ -194,7 +219,7 @@ type TableSizeTokens = {
   headerFontSize: string;
   cellPadding: string;
   toolbarGap: string;
-  controlSize: 'xs' | 'sm' | 'md' | 'lg';
+  controlSize: "xs" | "sm" | "md" | "lg";
   paginationSize: PaginationSize;
   iconSize: number;
 };
@@ -211,121 +236,141 @@ type TableVariantTokens = {
   hoverRowColor: string;
 };
 
-const baseClasses = 'flex w-full min-w-0 flex-col';
-const SPECIAL_SELECT_COLUMN_ID = '__select';
-const SPECIAL_ACTIONS_COLUMN_ID = '__actions';
-const GLOBAL_FILTER_ID = '__global';
+const baseClasses = "flex w-full min-w-0 flex-col";
+const SPECIAL_SELECT_COLUMN_ID = "__select";
+const SPECIAL_ACTIONS_COLUMN_ID = "__actions";
+const GLOBAL_FILTER_ID = "__global";
 const DEFAULT_PAGE_SIZE = 10;
-const DEFAULT_EXPORT_FORMATS: TableExportFormat[] = ['csv'];
-const DEFAULT_EMPTY_TEXT = 'No records found.';
+const DEFAULT_EXPORT_FORMATS: TableExportFormat[] = ["csv"];
+const DEFAULT_EXPORT_FILE_NAME = "table-export";
+const DEFAULT_EMPTY_TEXT = "No records found.";
 
 const sizeTokens: Record<TableSize, TableSizeTokens> = {
   xs: {
-    tableFontSize: '0.75rem',
-    headerFontSize: '0.7rem',
-    cellPadding: '0.38rem 0.45rem',
-    toolbarGap: '0.45rem',
-    controlSize: 'xs',
-    paginationSize: 'xs',
+    tableFontSize: "0.75rem",
+    headerFontSize: "0.7rem",
+    cellPadding: "0.38rem 0.45rem",
+    toolbarGap: "0.45rem",
+    controlSize: "xs",
+    paginationSize: "xs",
     iconSize: 12,
   },
   sm: {
-    tableFontSize: '0.8125rem',
-    headerFontSize: '0.74rem',
-    cellPadding: '0.45rem 0.55rem',
-    toolbarGap: '0.55rem',
-    controlSize: 'sm',
-    paginationSize: 'sm',
+    tableFontSize: "0.8125rem",
+    headerFontSize: "0.74rem",
+    cellPadding: "0.45rem 0.55rem",
+    toolbarGap: "0.55rem",
+    controlSize: "sm",
+    paginationSize: "sm",
     iconSize: 13,
   },
   md: {
-    tableFontSize: '0.875rem',
-    headerFontSize: '0.78rem',
-    cellPadding: '0.55rem 0.65rem',
-    toolbarGap: '0.65rem',
-    controlSize: 'md',
-    paginationSize: 'md',
+    tableFontSize: "0.875rem",
+    headerFontSize: "0.78rem",
+    cellPadding: "0.55rem 0.65rem",
+    toolbarGap: "0.65rem",
+    controlSize: "md",
+    paginationSize: "md",
     iconSize: 14,
   },
   lg: {
-    tableFontSize: '0.9375rem',
-    headerFontSize: '0.84rem',
-    cellPadding: '0.65rem 0.8rem',
-    toolbarGap: '0.75rem',
-    controlSize: 'lg',
-    paginationSize: 'lg',
+    tableFontSize: "0.9375rem",
+    headerFontSize: "0.84rem",
+    cellPadding: "0.65rem 0.8rem",
+    toolbarGap: "0.75rem",
+    controlSize: "lg",
+    paginationSize: "lg",
     iconSize: 15,
   },
 };
 
 const variantTokens: Record<TableVariant, TableVariantTokens> = {
   basic: {
-    rootBackgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    headerBackgroundColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 85%, #ffffff)',
-    headerTextColor: 'var(--ktn-text-primary)',
-    textColor: 'var(--ktn-text-primary)',
-    mutedTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    borderColor: 'var(--ktn-border-muted)',
-    rowBorderColor: 'color-mix(in srgb, var(--ktn-border-muted) 88%, transparent)',
-    stripedRowColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 62%, transparent)',
-    hoverRowColor: 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, transparent)',
+    rootBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    headerBackgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 85%, #ffffff)",
+    headerTextColor: "var(--ktn-text-primary)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    borderColor: "var(--ktn-border-muted)",
+    rowBorderColor:
+      "color-mix(in srgb, var(--ktn-border-muted) 88%, transparent)",
+    stripedRowColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 62%, transparent)",
+    hoverRowColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, transparent)",
   },
   outline: {
-    rootBackgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    headerBackgroundColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 90%, #ffffff)',
-    headerTextColor: 'var(--ktn-text-primary)',
-    textColor: 'var(--ktn-text-primary)',
-    mutedTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    borderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
-    rowBorderColor: 'var(--ktn-border-muted)',
-    stripedRowColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 58%, transparent)',
-    hoverRowColor: 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 11%, transparent)',
+    rootBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    headerBackgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 90%, #ffffff)",
+    headerTextColor: "var(--ktn-text-primary)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
+    rowBorderColor: "var(--ktn-border-muted)",
+    stripedRowColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 58%, transparent)",
+    hoverRowColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 11%, transparent)",
   },
   ghost: {
-    rootBackgroundColor: 'transparent',
-    headerBackgroundColor: 'transparent',
-    headerTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    textColor: 'var(--ktn-text-primary)',
-    mutedTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    borderColor: 'transparent',
-    rowBorderColor: 'transparent',
-    stripedRowColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 46%, transparent)',
-    hoverRowColor: 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 8%, transparent)',
+    rootBackgroundColor: "transparent",
+    headerBackgroundColor: "transparent",
+    headerTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    borderColor: "transparent",
+    rowBorderColor: "transparent",
+    stripedRowColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 46%, transparent)",
+    hoverRowColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 8%, transparent)",
   },
   filled: {
     rootBackgroundColor:
-      'color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, var(--ktn-bg-muted, #f8fafc))',
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, var(--ktn-bg-muted, #f8fafc))",
     headerBackgroundColor:
-      'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 14%, var(--ktn-bg-surface, #ffffff))',
-    headerTextColor: 'var(--ktn-text-primary)',
-    textColor: 'var(--ktn-text-primary)',
-    mutedTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    borderColor: 'color-mix(in srgb, var(--ktn-border-muted) 92%, transparent)',
-    rowBorderColor: 'color-mix(in srgb, var(--ktn-border-muted) 86%, transparent)',
-    stripedRowColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 54%, transparent)',
-    hoverRowColor: 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 9%, transparent)',
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 14%, var(--ktn-bg-surface, #ffffff))",
+    headerTextColor: "var(--ktn-text-primary)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    borderColor: "color-mix(in srgb, var(--ktn-border-muted) 92%, transparent)",
+    rowBorderColor:
+      "color-mix(in srgb, var(--ktn-border-muted) 86%, transparent)",
+    stripedRowColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 54%, transparent)",
+    hoverRowColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 9%, transparent)",
   },
   minimal: {
-    rootBackgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    headerBackgroundColor: 'transparent',
-    headerTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    textColor: 'var(--ktn-text-primary)',
-    mutedTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    borderColor: 'color-mix(in srgb, var(--ktn-border-muted) 68%, transparent)',
-    rowBorderColor: 'color-mix(in srgb, var(--ktn-border-muted) 52%, transparent)',
-    stripedRowColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 38%, transparent)',
-    hoverRowColor: 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 7%, transparent)',
+    rootBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    headerBackgroundColor: "transparent",
+    headerTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    borderColor: "color-mix(in srgb, var(--ktn-border-muted) 68%, transparent)",
+    rowBorderColor:
+      "color-mix(in srgb, var(--ktn-border-muted) 52%, transparent)",
+    stripedRowColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 38%, transparent)",
+    hoverRowColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 7%, transparent)",
   },
   striped: {
-    rootBackgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    headerBackgroundColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 84%, #ffffff)',
-    headerTextColor: 'var(--ktn-text-primary)',
-    textColor: 'var(--ktn-text-primary)',
-    mutedTextColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    borderColor: 'var(--ktn-border-muted)',
-    rowBorderColor: 'color-mix(in srgb, var(--ktn-border-muted) 86%, transparent)',
-    stripedRowColor: 'color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 72%, transparent)',
-    hoverRowColor: 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, transparent)',
+    rootBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    headerBackgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 84%, #ffffff)",
+    headerTextColor: "var(--ktn-text-primary)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    borderColor: "var(--ktn-border-muted)",
+    rowBorderColor:
+      "color-mix(in srgb, var(--ktn-border-muted) 86%, transparent)",
+    stripedRowColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #f8fafc) 72%, transparent)",
+    hoverRowColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, transparent)",
   },
 };
 
@@ -333,7 +378,10 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-function normalizePositiveInteger(value: number | undefined, fallback: number): number {
+function normalizePositiveInteger(
+  value: number | undefined,
+  fallback: number,
+): number {
   if (value == null || Number.isNaN(value) || !Number.isFinite(value)) {
     return fallback;
   }
@@ -348,31 +396,35 @@ function normalizePositiveInteger(value: number | undefined, fallback: number): 
 }
 
 function splitColumnFilterTerms(filterValue: unknown): string[] {
-  if (typeof filterValue !== 'string') {
+  if (typeof filterValue !== "string") {
     return [];
   }
 
   return filterValue
-    .split(',')
+    .split(",")
     .map((term) => term.trim())
-    .filter((term) => term !== '');
+    .filter((term) => term !== "");
 }
 
-type NumericFilterOperator = 'gt' | 'lt' | 'eq';
+type NumericFilterOperator = "gt" | "lt" | "eq";
 
 type ParsedNumericCondition = {
   operator: NumericFilterOperator;
   value: number;
 };
 
-function parseNumericFilterCondition(term: string): ParsedNumericCondition | null {
+function parseNumericFilterCondition(
+  term: string,
+): ParsedNumericCondition | null {
   const normalizedTerm = term.trim();
 
-  if (normalizedTerm === '') {
+  if (normalizedTerm === "") {
     return null;
   }
 
-  const prefixedMatch = normalizedTerm.match(/^([><=])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/);
+  const prefixedMatch = normalizedTerm.match(
+    /^([><=])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/,
+  );
 
   if (prefixedMatch != null) {
     const [, operatorToken, valueToken] = prefixedMatch;
@@ -382,22 +434,22 @@ function parseNumericFilterCondition(term: string): ParsedNumericCondition | nul
       return null;
     }
 
-    if (operatorToken === '>') {
+    if (operatorToken === ">") {
       return {
-        operator: 'gt',
+        operator: "gt",
         value: numericValue,
       };
     }
 
-    if (operatorToken === '<') {
+    if (operatorToken === "<") {
       return {
-        operator: 'lt',
+        operator: "lt",
         value: numericValue,
       };
     }
 
     return {
-      operator: 'eq',
+      operator: "eq",
       value: numericValue,
     };
   }
@@ -415,17 +467,17 @@ function parseNumericFilterCondition(term: string): ParsedNumericCondition | nul
   }
 
   return {
-    operator: 'eq',
+    operator: "eq",
     value: numericValue,
   };
 }
 
 function toFiniteNumber(value: unknown): number | null {
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     return Number.isFinite(value) ? value : null;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     const normalizedValue = value.trim();
 
     if (!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalizedValue)) {
@@ -443,44 +495,44 @@ function matchesStringCondition(source: string, term: string): boolean {
   const normalizedSource = source.toLowerCase();
   const normalizedTerm = term.trim();
 
-  if (normalizedTerm === '') {
+  if (normalizedTerm === "") {
     return true;
   }
 
-  if (normalizedTerm.startsWith('=')) {
+  if (normalizedTerm.startsWith("=")) {
     const expected = normalizedTerm.slice(1).trim().toLowerCase();
 
-    if (expected === '') {
+    if (expected === "") {
       return true;
     }
 
     return normalizedSource === expected;
   }
 
-  if (normalizedTerm.startsWith('^')) {
+  if (normalizedTerm.startsWith("^")) {
     const expected = normalizedTerm.slice(1).trim().toLowerCase();
 
-    if (expected === '') {
+    if (expected === "") {
       return true;
     }
 
     return normalizedSource.startsWith(expected);
   }
 
-  if (normalizedTerm.startsWith('~')) {
+  if (normalizedTerm.startsWith("~")) {
     const expected = normalizedTerm.slice(1).trim().toLowerCase();
 
-    if (expected === '') {
+    if (expected === "") {
       return true;
     }
 
     return normalizedSource.includes(expected);
   }
 
-  if (normalizedTerm.endsWith('$')) {
+  if (normalizedTerm.endsWith("$")) {
     const expected = normalizedTerm.slice(0, -1).trim().toLowerCase();
 
-    if (expected === '') {
+    if (expected === "") {
       return true;
     }
 
@@ -490,19 +542,25 @@ function matchesStringCondition(source: string, term: string): boolean {
   return normalizedSource.includes(normalizedTerm.toLowerCase());
 }
 
-function matchesNumericCondition(value: number, condition: ParsedNumericCondition): boolean {
-  if (condition.operator === 'gt') {
+function matchesNumericCondition(
+  value: number,
+  condition: ParsedNumericCondition,
+): boolean {
+  if (condition.operator === "gt") {
     return value > condition.value;
   }
 
-  if (condition.operator === 'lt') {
+  if (condition.operator === "lt") {
     return value < condition.value;
   }
 
   return value === condition.value;
 }
 
-function matchesAdvancedColumnFilter(cellValue: unknown, filterValue: unknown): boolean {
+function matchesAdvancedColumnFilter(
+  cellValue: unknown,
+  filterValue: unknown,
+): boolean {
   const terms = splitColumnFilterTerms(filterValue);
 
   if (terms.length === 0) {
@@ -538,30 +596,30 @@ function resolveColumnFilterPlaceholder<TData extends object>(
       continue;
     }
 
-    if (typeof rowValue === 'string' && rowValue.trim() === '') {
+    if (typeof rowValue === "string" && rowValue.trim() === "") {
       continue;
     }
 
     if (toFiniteNumber(rowValue) != null) {
-      return '>,<,= num (e.g. >10,=25)';
+      return ">,<,= num (e.g. >10,=25)";
     }
 
     break;
   }
 
-  return '^$~= text (e.g. ^abc,abc$,~abc,=abc)';
+  return "^$~= text (e.g. ^abc,abc$,~abc,=abc)";
 }
 
 function toCompactTableSize(size: TableSize): TableSize {
-  if (size === 'lg') {
-    return 'md';
+  if (size === "lg") {
+    return "md";
   }
 
-  if (size === 'md') {
-    return 'sm';
+  if (size === "md") {
+    return "sm";
   }
 
-  return 'xs';
+  return "xs";
 }
 
 function resolveColumnId<TData extends object>(
@@ -570,23 +628,25 @@ function resolveColumnId<TData extends object>(
 ): string {
   const maybeId = (column as { id?: unknown }).id;
 
-  if (typeof maybeId === 'string' && maybeId.trim() !== '') {
+  if (typeof maybeId === "string" && maybeId.trim() !== "") {
     return maybeId;
   }
 
   const maybeAccessorKey = (column as { accessorKey?: unknown }).accessorKey;
 
-  if (typeof maybeAccessorKey === 'string' && maybeAccessorKey.trim() !== '') {
+  if (typeof maybeAccessorKey === "string" && maybeAccessorKey.trim() !== "") {
     return maybeAccessorKey;
   }
 
   return `column-${index + 1}`;
 }
 
-function toHeaderLabel<TData extends object>(column: Column<TData, unknown>): string {
+function toHeaderLabel<TData extends object>(
+  column: Column<TData, unknown>,
+): string {
   const header = column.columnDef.header;
 
-  if (typeof header === 'string' || typeof header === 'number') {
+  if (typeof header === "string" || typeof header === "number") {
     return String(header);
   }
 
@@ -595,10 +655,14 @@ function toHeaderLabel<TData extends object>(column: Column<TData, unknown>): st
 
 function toCellText(value: unknown): string {
   if (value == null) {
-    return '';
+    return "";
   }
 
-  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+  if (
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  ) {
     return String(value);
   }
 
@@ -623,8 +687,8 @@ function isRowActionLabelEmpty(label: ReactNode): boolean {
     return true;
   }
 
-  if (typeof label === 'string') {
-    return label.trim() === '';
+  if (typeof label === "string") {
+    return label.trim() === "";
   }
 
   return false;
@@ -633,13 +697,13 @@ function isRowActionLabelEmpty(label: ReactNode): boolean {
 function humanizeActionId(actionId: string): string {
   const trimmed = actionId.trim();
 
-  if (trimmed === '') {
-    return '';
+  if (trimmed === "") {
+    return "";
   }
 
   return trimmed
-    .replaceAll(/[_-]+/g, ' ')
-    .replaceAll(/\s+/g, ' ')
+    .replaceAll(/[_-]+/g, " ")
+    .replaceAll(/\s+/g, " ")
     .trim()
     .replaceAll(/\b\w/g, (character) => character.toUpperCase());
 }
@@ -647,31 +711,35 @@ function humanizeActionId(actionId: string): string {
 function resolveRowActionTooltip<TData extends object>(
   action: RowAction<TData>,
   isIconOnlyAction: boolean,
-): ButtonProps['tooltip'] {
+): ButtonProps["tooltip"] {
   if (!isIconOnlyAction) {
     return undefined;
   }
 
   if (
     action.tooltip != null &&
-    !(typeof action.tooltip === 'string' && action.tooltip.trim() === '')
+    !(typeof action.tooltip === "string" && action.tooltip.trim() === "")
   ) {
     return action.tooltip;
   }
 
-  if (typeof action.label === 'string' && action.label.trim() !== '') {
+  if (typeof action.label === "string" && action.label.trim() !== "") {
     return action.label;
   }
 
   const readableActionId = humanizeActionId(action.id);
 
-  return readableActionId === '' ? undefined : readableActionId;
+  return readableActionId === "" ? undefined : readableActionId;
 }
 
-function triggerDownload(fileName: string, mimeType: string, content: BlobPart): void {
+function triggerDownload(
+  fileName: string,
+  mimeType: string,
+  content: BlobPart,
+): void {
   const blob = new Blob([content], { type: mimeType });
   const objectUrl = URL.createObjectURL(blob);
-  const anchorElement = document.createElement('a');
+  const anchorElement = document.createElement("a");
   anchorElement.href = objectUrl;
   anchorElement.download = fileName;
   document.body.appendChild(anchorElement);
@@ -680,19 +748,38 @@ function triggerDownload(fileName: string, mimeType: string, content: BlobPart):
   URL.revokeObjectURL(objectUrl);
 }
 
+function exportTableAsCsv({ rows, fileNameBase }: TableExportPayload): void {
+  const csvLines = [
+    rows.headers.map(escapeCsvValue).join(","),
+    ...rows.records.map((row) => row.map(escapeCsvValue).join(",")),
+  ];
+
+  triggerDownload(
+    `${fileNameBase}.csv`,
+    "text/csv;charset=utf-8",
+    csvLines.join("\n"),
+  );
+}
+
+const defaultTableExportHandlers: Partial<
+  Record<TableExportFormat, TableExportHandler>
+> = {
+  csv: exportTableAsCsv,
+};
+
 export function Table<TData extends object = object>({
   data = [],
   columns,
   rowKey,
   variant,
-  size = 'md',
+  size = "md",
   compact = false,
   sortable = false,
   filterable = false,
   columnFilters,
   globalFilter,
   searchable = false,
-  searchPlaceholder = 'Search table...',
+  searchPlaceholder = "Search table...",
   selectable = false,
   multiSelect = true,
   onSelectionChange,
@@ -707,6 +794,8 @@ export function Table<TData extends object = object>({
   showExport = false,
   exportable = false,
   exportFormats = DEFAULT_EXPORT_FORMATS,
+  exportHandlers,
+  exportFileName = DEFAULT_EXPORT_FILE_NAME,
   loading = false,
   loadingRows = 6,
   skeleton = true,
@@ -722,7 +811,7 @@ export function Table<TData extends object = object>({
   onPageChange,
   onPageSizeChange,
   showPagination = true,
-  paginationVariant = 'advance',
+  paginationVariant = "advance",
   paginationDefaultPageSize = DEFAULT_PAGE_SIZE,
   paginationPageSizeOptions,
   paginationMaxVisiblePages = 5,
@@ -736,16 +825,16 @@ export function Table<TData extends object = object>({
   onSortChange,
   onFilterChange,
   emptyText = DEFAULT_EMPTY_TEXT,
-  className = '',
+  className = "",
   style,
   ...props
 }: TableProps<TData>): JSX.Element {
-  const resolvedVariant = variant ?? 'basic';
+  const resolvedVariant = variant ?? "basic";
   const resolvedSize = compact ? toCompactTableSize(size) : size;
   const sizeToken = sizeTokens[resolvedSize];
   const colorToken = variantTokens[resolvedVariant];
 
-  const shouldStriped = striped ?? resolvedVariant === 'striped';
+  const shouldStriped = striped ?? resolvedVariant === "striped";
   const canUseGlobalFilter = globalFilter ?? searchable;
   const showSearchInput = searchable && canUseGlobalFilter;
   const hasRowActions = rowActions != null && rowActions.length > 0;
@@ -754,13 +843,16 @@ export function Table<TData extends object = object>({
     DEFAULT_PAGE_SIZE,
   );
 
-  const filterableColumnSet = useMemo(() => new Set(columnFilters ?? []), [columnFilters]);
+  const filterableColumnSet = useMemo(
+    () => new Set(columnFilters ?? []),
+    [columnFilters],
+  );
 
   const initialVisibilityState = useMemo<VisibilityState>(() => {
     const nextState: VisibilityState = {};
 
     defaultHiddenColumns?.forEach((columnId) => {
-      if (columnId.trim() !== '') {
+      if (columnId.trim() !== "") {
         nextState[columnId] = false;
       }
     });
@@ -769,18 +861,26 @@ export function Table<TData extends object = object>({
   }, [defaultHiddenColumns]);
 
   const [sortingState, setSortingState] = useState<SortingState>([]);
-  const [columnFilterState, setColumnFilterState] = useState<ColumnFiltersState>([]);
-  const [globalSearch, setGlobalSearch] = useState('');
-  const [rowSelectionState, setRowSelectionState] = useState<RowSelectionState>({});
-  const [visibilityState, setVisibilityState] = useState<VisibilityState>(initialVisibilityState);
+  const [columnFilterState, setColumnFilterState] =
+    useState<ColumnFiltersState>([]);
+  const [globalSearch, setGlobalSearch] = useState("");
+  const [rowSelectionState, setRowSelectionState] = useState<RowSelectionState>(
+    {},
+  );
+  const [visibilityState, setVisibilityState] = useState<VisibilityState>(
+    initialVisibilityState,
+  );
   const [paginationState, setPaginationState] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: normalizedDefaultPageSize,
   });
-  const [uncontrolledPage, setUncontrolledPage] = useState(Math.max(1, pageIndex ?? 1));
+  const [uncontrolledPage, setUncontrolledPage] = useState(
+    Math.max(1, pageIndex ?? 1),
+  );
   const [isFullscreenActive, setIsFullscreenActive] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [exportingFormat, setExportingFormat] = useState<TableExportFormat | null>(null);
+  const [exportingFormat, setExportingFormat] =
+    useState<TableExportFormat | null>(null);
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
   const [showColumnFilterRow, setShowColumnFilterRow] = useState(false);
   const isFullscreenMode = fullscreen && isFullscreenActive;
@@ -801,7 +901,7 @@ export function Table<TData extends object = object>({
     }
 
     const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
 
     return () => {
       document.body.style.overflow = previousOverflow;
@@ -814,15 +914,15 @@ export function Table<TData extends object = object>({
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setIsFullscreenActive(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener("keydown", handleKeyDown);
     };
   }, [fullscreen, isFullscreenActive]);
 
@@ -850,8 +950,15 @@ export function Table<TData extends object = object>({
         }
 
         if (canFilterColumn && nextColumn.filterFn === undefined) {
-          nextColumn.filterFn = ((row: Row<TData>, columnId: string, filterValue: unknown) => {
-            return matchesAdvancedColumnFilter(row.getValue(columnId), filterValue);
+          nextColumn.filterFn = ((
+            row: Row<TData>,
+            columnId: string,
+            filterValue: unknown,
+          ) => {
+            return matchesAdvancedColumnFilter(
+              row.getValue(columnId),
+              filterValue,
+            );
           }) as NonNullable<typeof nextColumn.filterFn>;
         }
       } else if (nextColumn.enableColumnFilter === undefined) {
@@ -864,7 +971,14 @@ export function Table<TData extends object = object>({
 
       return nextColumn;
     });
-  }, [columnFilters, columnVisibility, columns, filterable, filterableColumnSet, sortable]);
+  }, [
+    columnFilters,
+    columnVisibility,
+    columns,
+    filterable,
+    filterableColumnSet,
+    sortable,
+  ]);
 
   const selectionColumn = useMemo<TableColumnDef<TData> | null>(() => {
     if (!selectable) {
@@ -882,23 +996,26 @@ export function Table<TData extends object = object>({
             ref={(element) => {
               if (element != null) {
                 element.indeterminate =
-                  table.getIsSomePageRowsSelected() && !table.getIsAllPageRowsSelected();
+                  table.getIsSomePageRowsSelected() &&
+                  !table.getIsAllPageRowsSelected();
               }
             }}
             onChange={(event) => {
               table.toggleAllPageRowsSelected(event.currentTarget.checked);
 
               onAction?.({
-                source: 'selection',
-                actionId: event.currentTarget.checked ? 'select-all-page' : 'clear-page-selection',
+                source: "selection",
+                actionId: event.currentTarget.checked
+                  ? "select-all-page"
+                  : "clear-page-selection",
                 event,
               });
             }}
             style={{
-              width: '0.9rem',
-              height: '0.9rem',
-              cursor: 'pointer',
-              accentColor: 'var(--ktn-action-primary-bg, #2563eb)',
+              width: "0.9rem",
+              height: "0.9rem",
+              cursor: "pointer",
+              accentColor: "var(--ktn-action-primary-bg, #2563eb)",
             }}
           />
         ) : null,
@@ -911,18 +1028,20 @@ export function Table<TData extends object = object>({
             row.toggleSelected(event.currentTarget.checked);
 
             onAction?.({
-              source: 'selection',
-              actionId: event.currentTarget.checked ? 'select-row' : 'clear-row-selection',
+              source: "selection",
+              actionId: event.currentTarget.checked
+                ? "select-row"
+                : "clear-row-selection",
               row: row.original,
               rowIndex: row.index,
               event,
             });
           }}
           style={{
-            width: '0.9rem',
-            height: '0.9rem',
-            cursor: 'pointer',
-            accentColor: 'var(--ktn-action-primary-bg, #2563eb)',
+            width: "0.9rem",
+            height: "0.9rem",
+            cursor: "pointer",
+            accentColor: "var(--ktn-action-primary-bg, #2563eb)",
           }}
         />
       ),
@@ -940,28 +1059,34 @@ export function Table<TData extends object = object>({
 
     return {
       id: SPECIAL_ACTIONS_COLUMN_ID,
-      header: 'Actions',
+      header: "Actions",
       cell: ({ row }) => (
         <div
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
+            display: "inline-flex",
+            alignItems: "center",
             gap: 0,
-            flexWrap: 'nowrap',
-            whiteSpace: 'nowrap',
+            flexWrap: "nowrap",
+            whiteSpace: "nowrap",
           }}
         >
           {rowActions.map((action) => {
-            const isDisabled = action.disabled?.(row.original, row.index) ?? false;
+            const isDisabled =
+              action.disabled?.(row.original, row.index) ?? false;
             const isCompactAction = action.compact ?? true;
             const isIconOnlyAction =
-              action.iconOnly ?? (action.icon != null && isRowActionLabelEmpty(action.label));
-            const actionTooltip = resolveRowActionTooltip(action, isIconOnlyAction);
-            const actionTooltipSize = action.tooltipSize ?? (isIconOnlyAction ? 'xs' : undefined);
+              action.iconOnly ??
+              (action.icon != null && isRowActionLabelEmpty(action.label));
+            const actionTooltip = resolveRowActionTooltip(
+              action,
+              isIconOnlyAction,
+            );
+            const actionTooltipSize =
+              action.tooltipSize ?? (isIconOnlyAction ? "xs" : undefined);
             const actionAriaLabel =
               isIconOnlyAction &&
               isRowActionLabelEmpty(action.label) &&
-              typeof actionTooltip === 'string'
+              typeof actionTooltip === "string"
                 ? actionTooltip
                 : undefined;
 
@@ -969,7 +1094,7 @@ export function Table<TData extends object = object>({
               <Button
                 key={`${row.id}-${action.id}`}
                 size={sizeToken.controlSize}
-                variant={action.variant ?? 'secondary'}
+                variant={action.variant ?? "secondary"}
                 compact={isCompactAction}
                 iconOnly={isIconOnlyAction}
                 iconOnlyTone={action.iconOnlyTone ?? isIconOnlyAction}
@@ -986,7 +1111,7 @@ export function Table<TData extends object = object>({
                   event.stopPropagation();
 
                   onAction?.({
-                    source: 'row-action',
+                    source: "row-action",
                     actionId: action.id,
                     row: row.original,
                     rowIndex: row.index,
@@ -1028,9 +1153,14 @@ export function Table<TData extends object = object>({
 
   const isPageControlled = pageIndex !== undefined;
   const resolvedServerRowCount = Math.max(0, totalRows ?? data.length);
-  const serverPageCount = Math.max(1, Math.ceil(resolvedServerRowCount / paginationState.pageSize));
+  const serverPageCount = Math.max(
+    1,
+    Math.ceil(resolvedServerRowCount / paginationState.pageSize),
+  );
 
-  const currentServerPageRaw = isPageControlled ? Math.max(1, pageIndex ?? 1) : uncontrolledPage;
+  const currentServerPageRaw = isPageControlled
+    ? Math.max(1, pageIndex ?? 1)
+    : uncontrolledPage;
   const currentServerPage = clamp(currentServerPageRaw, 1, serverPageCount);
 
   const tablePaginationState: PaginationState = {
@@ -1042,7 +1172,9 @@ export function Table<TData extends object = object>({
     filters: ColumnFiltersState,
     searchValue: string,
   ): ColumnFiltersState {
-    const withoutGlobal = filters.filter((item) => item.id !== GLOBAL_FILTER_ID);
+    const withoutGlobal = filters.filter(
+      (item) => item.id !== GLOBAL_FILTER_ID,
+    );
 
     if (!canUseGlobalFilter) {
       return withoutGlobal;
@@ -1050,11 +1182,14 @@ export function Table<TData extends object = object>({
 
     const normalizedSearch = searchValue.trim();
 
-    if (normalizedSearch === '') {
+    if (normalizedSearch === "") {
       return withoutGlobal;
     }
 
-    return [...withoutGlobal, { id: GLOBAL_FILTER_ID, value: normalizedSearch }];
+    return [
+      ...withoutGlobal,
+      { id: GLOBAL_FILTER_ID, value: normalizedSearch },
+    ];
   }
 
   const table = useReactTable<TData>({
@@ -1076,7 +1211,7 @@ export function Table<TData extends object = object>({
     enableSortingRemoval: true,
     enableRowSelection: selectable,
     enableMultiRowSelection: multiSelect,
-    globalFilterFn: 'includesString',
+    globalFilterFn: "includesString",
     manualSorting: serverSide,
     manualFiltering: serverSide,
     manualPagination: serverSide,
@@ -1084,10 +1219,10 @@ export function Table<TData extends object = object>({
     autoResetPageIndex: !serverSide,
     onSortingChange: (updater) => {
       setSortingState((current) => {
-        const next = typeof updater === 'function' ? updater(current) : updater;
+        const next = typeof updater === "function" ? updater(current) : updater;
         onSortChange?.(next);
         onAction?.({
-          source: 'sort',
+          source: "sort",
           sort: next,
         });
 
@@ -1104,12 +1239,12 @@ export function Table<TData extends object = object>({
     },
     onColumnFiltersChange: (updater) => {
       setColumnFilterState((current) => {
-        const next = typeof updater === 'function' ? updater(current) : updater;
+        const next = typeof updater === "function" ? updater(current) : updater;
         const externalFilters = buildExternalFilterState(next, globalSearch);
 
         onFilterChange?.(externalFilters);
         onAction?.({
-          source: 'filter',
+          source: "filter",
           filters: externalFilters,
           search: globalSearch,
         });
@@ -1127,12 +1262,18 @@ export function Table<TData extends object = object>({
     },
     onGlobalFilterChange: (updater) => {
       setGlobalSearch((current) => {
-        const next = typeof updater === 'function' ? updater(current) : String(updater ?? '');
-        const externalFilters = buildExternalFilterState(columnFilterState, next);
+        const next =
+          typeof updater === "function"
+            ? updater(current)
+            : String(updater ?? "");
+        const externalFilters = buildExternalFilterState(
+          columnFilterState,
+          next,
+        );
 
         onFilterChange?.(externalFilters);
         onAction?.({
-          source: 'search',
+          source: "search",
           search: next,
           filters: externalFilters,
         });
@@ -1150,19 +1291,19 @@ export function Table<TData extends object = object>({
     },
     onRowSelectionChange: (updater) => {
       setRowSelectionState((current) =>
-        typeof updater === 'function' ? updater(current) : updater,
+        typeof updater === "function" ? updater(current) : updater,
       );
     },
     onColumnVisibilityChange: (updater) => {
       setVisibilityState((current) => {
-        const next = typeof updater === 'function' ? updater(current) : updater;
+        const next = typeof updater === "function" ? updater(current) : updater;
 
         const visibleColumnIds = tableColumns
           .map((column, index) => resolveColumnId(column, index))
           .filter((columnId) => next[columnId] !== false);
 
         onAction?.({
-          source: 'column-visibility',
+          source: "column-visibility",
           visibleColumnIds,
         });
 
@@ -1170,14 +1311,14 @@ export function Table<TData extends object = object>({
       });
     },
     getRowId: (row, index, parent) => {
-      if (typeof rowKey === 'function') {
+      if (typeof rowKey === "function") {
         return String(rowKey(row, index));
       }
 
       if (rowKey != null) {
         const keyValue = row[rowKey];
 
-        if (typeof keyValue === 'string' || typeof keyValue === 'number') {
+        if (typeof keyValue === "string" || typeof keyValue === "number") {
           return String(keyValue);
         }
       }
@@ -1187,7 +1328,10 @@ export function Table<TData extends object = object>({
   });
 
   const filteredRowCount = table.getFilteredRowModel().rows.length;
-  const clientPageCount = Math.max(1, Math.ceil(filteredRowCount / paginationState.pageSize));
+  const clientPageCount = Math.max(
+    1,
+    Math.ceil(filteredRowCount / paginationState.pageSize),
+  );
 
   useEffect(() => {
     if (serverSide) {
@@ -1213,7 +1357,9 @@ export function Table<TData extends object = object>({
       return;
     }
 
-    const selectedRows = table.getSelectedRowModel().rows.map((row) => row.original);
+    const selectedRows = table
+      .getSelectedRowModel()
+      .rows.map((row) => row.original);
     onSelectionChange?.(selectedRows);
   }, [onSelectionChange, rowSelectionState, selectable, table]);
 
@@ -1222,17 +1368,9 @@ export function Table<TData extends object = object>({
 
   const totalRowsCount = serverSide ? resolvedServerRowCount : filteredRowCount;
   const totalPages = serverSide ? serverPageCount : clientPageCount;
-  const currentPage = serverSide ? currentServerPage : table.getState().pagination.pageIndex + 1;
-
-  const canShowToolbar =
-    showToolbar &&
-    (filterable ||
-      showSearchInput ||
-      (columnVisibility && showColumnToggle) ||
-      showRefresh ||
-      (showExport && exportable) ||
-      fullscreen ||
-      selectionCount > 0);
+  const currentPage = serverSide
+    ? currentServerPage
+    : table.getState().pagination.pageIndex + 1;
 
   const togglableColumns = table
     .getAllLeafColumns()
@@ -1244,19 +1382,39 @@ export function Table<TData extends object = object>({
     );
 
   const resolvedExportFormats = useMemo(() => {
+    const requestedFormats =
+      exportFormats.length > 0 ? exportFormats : [...DEFAULT_EXPORT_FORMATS];
     const nextFormats: TableExportFormat[] = [];
 
-    exportFormats.forEach((format) => {
+    requestedFormats.forEach((format) => {
       if (
-        (format === 'csv' || format === 'xlsx' || format === 'pdf') &&
+        (format === "csv" || format === "xlsx" || format === "pdf") &&
         !nextFormats.includes(format)
       ) {
-        nextFormats.push(format);
+        const handler =
+          exportHandlers?.[format] ?? defaultTableExportHandlers[format];
+
+        if (handler != null) {
+          nextFormats.push(format);
+        }
       }
     });
 
-    return nextFormats.length > 0 ? nextFormats : [...DEFAULT_EXPORT_FORMATS];
-  }, [exportFormats]);
+    return nextFormats;
+  }, [exportFormats, exportHandlers]);
+
+  const canRenderExportControl =
+    showExport && exportable && resolvedExportFormats.length > 0;
+
+  const canShowToolbar =
+    showToolbar &&
+    (filterable ||
+      showSearchInput ||
+      (columnVisibility && showColumnToggle) ||
+      showRefresh ||
+      canRenderExportControl ||
+      fullscreen ||
+      selectionCount > 0);
 
   const exportRows = useMemo(() => {
     const rowsToExport = serverSide
@@ -1267,13 +1425,16 @@ export function Table<TData extends object = object>({
       .getVisibleLeafColumns()
       .filter(
         (column) =>
-          column.id !== SPECIAL_SELECT_COLUMN_ID && column.id !== SPECIAL_ACTIONS_COLUMN_ID,
+          column.id !== SPECIAL_SELECT_COLUMN_ID &&
+          column.id !== SPECIAL_ACTIONS_COLUMN_ID,
       );
 
     const headers = exportableColumns.map((column) => toHeaderLabel(column));
 
     const records = rowsToExport.map((row) => {
-      return exportableColumns.map((column) => toCellText(row.getValue(column.id)));
+      return exportableColumns.map((column) =>
+        toCellText(row.getValue(column.id)),
+      );
     });
 
     return {
@@ -1283,66 +1444,34 @@ export function Table<TData extends object = object>({
   }, [serverSide, table]);
 
   async function handleExport(format: TableExportFormat): Promise<void> {
-    if (!exportable || exportRows.headers.length === 0 || exportRows.records.length === 0) {
+    if (
+      !exportable ||
+      exportRows.headers.length === 0 ||
+      exportRows.records.length === 0
+    ) {
       return;
     }
+
+    const handler =
+      exportHandlers?.[format] ?? defaultTableExportHandlers[format];
+
+    if (handler == null) {
+      return;
+    }
+
+    const trimmedFileName = exportFileName.trim();
+    const fileNameBase =
+      trimmedFileName === "" ? DEFAULT_EXPORT_FILE_NAME : trimmedFileName;
 
     setExportingFormat(format);
 
     try {
-      if (format === 'csv') {
-        const csvLines = [
-          exportRows.headers.map(escapeCsvValue).join(','),
-          ...exportRows.records.map((row) => row.map(escapeCsvValue).join(',')),
-        ];
-
-        triggerDownload('table-export.csv', 'text/csv;charset=utf-8', csvLines.join('\n'));
-        return;
-      }
-
-      if (format === 'xlsx') {
-        const xlsxModule = await import('xlsx');
-
-        const records = exportRows.records.map((row) => {
-          const record: Record<string, string> = {};
-
-          exportRows.headers.forEach((header, headerIndex) => {
-            record[header] = row[headerIndex] ?? '';
-          });
-
-          return record;
-        });
-
-        const worksheet = xlsxModule.utils.json_to_sheet(records);
-        const workbook = xlsxModule.utils.book_new();
-        xlsxModule.utils.book_append_sheet(workbook, worksheet, 'Table');
-        xlsxModule.writeFile(workbook, 'table-export.xlsx');
-        return;
-      }
-
-      if (format === 'pdf') {
-        const [{ jsPDF }, autoTableModule] = await Promise.all([
-          import('jspdf'),
-          import('jspdf-autotable'),
-        ]);
-
-        const doc = new jsPDF({ orientation: 'landscape' });
-        const autoTable = autoTableModule.default;
-
-        autoTable(doc, {
-          head: [exportRows.headers],
-          body: exportRows.records,
-          margin: { top: 16, right: 10, bottom: 10, left: 10 },
-          styles: { fontSize: 8, cellPadding: 2.5 },
-          headStyles: {
-            fillColor: [37, 99, 235],
-            textColor: [255, 255, 255],
-            fontStyle: 'bold',
-          },
-        });
-
-        doc.save('table-export.pdf');
-      }
+      await Promise.resolve(
+        handler({
+          rows: exportRows,
+          fileNameBase,
+        }),
+      );
     } finally {
       setExportingFormat(null);
     }
@@ -1404,9 +1533,9 @@ export function Table<TData extends object = object>({
 
   function handlePaginationAction(context: PaginationActionContext): void {
     const source =
-      context.source === 'page-size' || context.source === 'page-size-reset'
-        ? 'page-size'
-        : 'pagination';
+      context.source === "page-size" || context.source === "page-size-reset"
+        ? "page-size"
+        : "pagination";
 
     onAction?.({
       source,
@@ -1417,110 +1546,116 @@ export function Table<TData extends object = object>({
   }
 
   const rootStyle: CSSProperties = {
-    width: isFullscreenMode ? 'auto' : '100%',
-    maxWidth: '100%',
+    width: isFullscreenMode ? "auto" : "100%",
+    maxWidth: "100%",
     minWidth: 0,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.55rem',
-    boxSizing: 'border-box',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.55rem",
+    boxSizing: "border-box",
     color: colorToken.textColor,
     fontSize: sizeToken.tableFontSize,
-    position: isFullscreenMode ? 'fixed' : undefined,
-    inset: isFullscreenMode ? '1rem' : undefined,
+    position: isFullscreenMode ? "fixed" : undefined,
+    inset: isFullscreenMode ? "1rem" : undefined,
     zIndex: isFullscreenMode ? 220 : undefined,
-    padding: isFullscreenMode ? '0.8rem' : undefined,
-    backgroundColor: isFullscreenMode ? colorToken.rootBackgroundColor : undefined,
-    borderRadius: isFullscreenMode ? 'var(--ktn-radius-lg, 0.625rem)' : undefined,
-    boxShadow: isFullscreenMode ? '0 28px 60px rgba(15, 23, 42, 0.28)' : undefined,
-    overflow: isFullscreenMode ? 'hidden' : undefined,
+    padding: isFullscreenMode ? "0.8rem" : undefined,
+    backgroundColor: isFullscreenMode
+      ? colorToken.rootBackgroundColor
+      : undefined,
+    borderRadius: isFullscreenMode
+      ? "var(--ktn-radius-lg, 0.625rem)"
+      : undefined,
+    boxShadow: isFullscreenMode
+      ? "0 28px 60px rgba(15, 23, 42, 0.28)"
+      : undefined,
+    overflow: isFullscreenMode ? "hidden" : undefined,
     minHeight: isFullscreenMode ? 0 : undefined,
     ...style,
   };
 
   const containerStyle: CSSProperties = {
-    position: 'relative',
-    width: '100%',
-    maxWidth: '100%',
+    position: "relative",
+    width: "100%",
+    maxWidth: "100%",
     minWidth: 0,
-    boxSizing: 'border-box',
+    boxSizing: "border-box",
     backgroundColor: colorToken.rootBackgroundColor,
     border:
-      bordered && resolvedVariant !== 'ghost'
+      bordered && resolvedVariant !== "ghost"
         ? `1px solid ${colorToken.borderColor}`
-        : '1px solid transparent',
-    borderRadius: rounded ? 'var(--ktn-radius-lg, 0.625rem)' : 0,
-    overflow: 'hidden',
-    display: 'flex',
-    flexDirection: 'column',
+        : "1px solid transparent",
+    borderRadius: rounded ? "var(--ktn-radius-lg, 0.625rem)" : 0,
+    overflow: "hidden",
+    display: "flex",
+    flexDirection: "column",
     flex: isFullscreenMode ? 1 : undefined,
     minHeight: isFullscreenMode ? 0 : undefined,
   };
 
   const toolbarStyle: CSSProperties = {
-    width: '100%',
-    maxWidth: '100%',
+    width: "100%",
+    maxWidth: "100%",
     minWidth: 0,
-    boxSizing: 'border-box',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    flexWrap: 'wrap',
+    boxSizing: "border-box",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexWrap: "wrap",
     gap: sizeToken.toolbarGap,
-    padding: '0.25rem 0.2rem',
+    padding: "0.25rem 0.2rem",
   };
 
   const toolbarLeftStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
     gap: sizeToken.toolbarGap,
     minWidth: 0,
-    maxWidth: '100%',
+    maxWidth: "100%",
   };
 
   const toolbarRightStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '0.4rem',
-    marginInlineStart: 'auto',
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: "0.4rem",
+    marginInlineStart: "auto",
     minWidth: 0,
-    maxWidth: '100%',
+    maxWidth: "100%",
   };
 
   const toolbarIconTriggerStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
     lineHeight: 0,
   };
 
   const compactDropdownContentStyle: CSSProperties = {
-    width: 'max-content',
-    minWidth: 'fit-content',
+    width: "max-content",
+    minWidth: "fit-content",
   };
 
   const searchWrapStyle: CSSProperties = {
-    position: 'relative',
-    flex: '1 1 10rem',
-    width: '100%',
-    boxSizing: 'border-box',
+    position: "relative",
+    flex: "1 1 10rem",
+    width: "100%",
+    boxSizing: "border-box",
     minInlineSize: 0,
-    inlineSize: 'min(18rem, 100%)',
-    maxWidth: '100%',
+    inlineSize: "min(18rem, 100%)",
+    maxWidth: "100%",
     minWidth: 0,
   };
 
   const searchIconStyle: CSSProperties = {
-    position: 'absolute',
-    insetInlineStart: '0.65rem',
-    insetBlockStart: '50%',
-    transform: 'translateY(-50%)',
-    display: 'inline-flex',
-    alignItems: 'center',
+    position: "absolute",
+    insetInlineStart: "0.65rem",
+    insetBlockStart: "50%",
+    transform: "translateY(-50%)",
+    display: "inline-flex",
+    alignItems: "center",
     color: colorToken.mutedTextColor,
-    pointerEvents: 'none',
+    pointerEvents: "none",
     lineHeight: 0,
   };
 
@@ -1531,121 +1666,133 @@ export function Table<TData extends object = object>({
   };
 
   const tableViewportStyle: CSSProperties = {
-    width: '100%',
-    maxWidth: '100%',
+    width: "100%",
+    maxWidth: "100%",
     minWidth: 0,
-    boxSizing: 'border-box',
-    overflow: 'auto',
+    boxSizing: "border-box",
+    overflow: "auto",
     backgroundColor: colorToken.rootBackgroundColor,
     flex: isFullscreenMode ? 1 : undefined,
     minHeight: isFullscreenMode ? 0 : undefined,
-    maxHeight: stickyHeader ? (isFullscreenMode ? 'calc(100vh - 14rem)' : '34rem') : undefined,
+    maxHeight: stickyHeader
+      ? isFullscreenMode
+        ? "calc(100vh - 14rem)"
+        : "34rem"
+      : undefined,
   };
 
   const tableStyle: CSSProperties = {
-    width: '100%',
-    minWidth: '100%',
-    borderCollapse: 'separate',
+    width: "100%",
+    minWidth: "100%",
+    borderCollapse: "separate",
     borderSpacing: 0,
-    tableLayout: 'auto',
+    tableLayout: "auto",
     fontSize: sizeToken.tableFontSize,
   };
 
   const tableHeaderCellStyle: CSSProperties = {
     padding: sizeToken.cellPadding,
-    textAlign: 'left',
+    textAlign: "left",
     fontSize: sizeToken.headerFontSize,
     lineHeight: 1.2,
-    letterSpacing: '0.01em',
+    letterSpacing: "0.01em",
     color: colorToken.headerTextColor,
     backgroundColor: colorToken.headerBackgroundColor,
     borderBottom:
-      resolvedVariant === 'ghost' ? undefined : `1px solid ${colorToken.rowBorderColor}`,
-    position: stickyHeader ? 'sticky' : undefined,
-    top: stickyHeader ? '0px' : undefined,
+      resolvedVariant === "ghost"
+        ? undefined
+        : `1px solid ${colorToken.rowBorderColor}`,
+    position: stickyHeader ? "sticky" : undefined,
+    top: stickyHeader ? "0px" : undefined,
     zIndex: stickyHeader ? 5 : undefined,
-    whiteSpace: 'nowrap',
+    whiteSpace: "nowrap",
   };
 
   const tableHeadStyle: CSSProperties = {
-    position: stickyHeader ? 'sticky' : undefined,
-    top: stickyHeader ? '0px' : undefined,
+    position: stickyHeader ? "sticky" : undefined,
+    top: stickyHeader ? "0px" : undefined,
     zIndex: stickyHeader ? 4 : undefined,
   };
 
   const filterCellStyle: CSSProperties = {
-    padding: '0.35rem 0.45rem',
+    padding: "0.35rem 0.45rem",
     backgroundColor: colorToken.rootBackgroundColor,
     borderBottom:
-      resolvedVariant === 'ghost' ? undefined : `1px solid ${colorToken.rowBorderColor}`,
+      resolvedVariant === "ghost"
+        ? undefined
+        : `1px solid ${colorToken.rowBorderColor}`,
   };
 
   const tableBodyCellStyle: CSSProperties = {
     padding: sizeToken.cellPadding,
-    textAlign: 'left',
+    textAlign: "left",
     color: colorToken.textColor,
     borderBottom:
-      resolvedVariant === 'ghost' ? undefined : `1px solid ${colorToken.rowBorderColor}`,
-    verticalAlign: 'middle',
+      resolvedVariant === "ghost"
+        ? undefined
+        : `1px solid ${colorToken.rowBorderColor}`,
+    verticalAlign: "middle",
   };
 
   const sortableHeaderContentStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.35rem',
-    userSelect: 'none',
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.35rem",
+    userSelect: "none",
   };
 
   const sortableHeaderButtonStyle: CSSProperties = {
     margin: 0,
     padding: 0,
-    border: 'none',
-    background: 'transparent',
-    color: 'inherit',
-    font: 'inherit',
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
+    border: "none",
+    background: "transparent",
+    color: "inherit",
+    font: "inherit",
+    cursor: "pointer",
+    display: "inline-flex",
+    alignItems: "center",
   };
 
   const sortIconWrapStyle: CSSProperties = {
-    display: 'inline-flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
+    display: "inline-flex",
+    flexDirection: "column",
+    justifyContent: "center",
     lineHeight: 0,
-    marginInlineStart: '0.08rem',
+    marginInlineStart: "0.08rem",
   };
 
   const emptyRowStyle: CSSProperties = {
     ...tableBodyCellStyle,
-    textAlign: 'center',
+    textAlign: "center",
     color: colorToken.mutedTextColor,
-    paddingBlock: '1.2rem',
+    paddingBlock: "1.2rem",
   };
 
   const loadingRowStyle: CSSProperties = {
     ...tableBodyCellStyle,
-    paddingBlock: '0.7rem',
+    paddingBlock: "0.7rem",
   };
 
-  const actionsColumnRightPadding = '1.35rem';
+  const actionsColumnRightPadding = "1.35rem";
 
   function renderSortIcon(column: Column<TData, unknown>): ReactNode {
     const state = column.getIsSorted();
     const iconSize = Math.max(10, sizeToken.iconSize - 1);
 
-    const upOpacity = state === 'asc' ? 1 : state === 'desc' ? 0.38 : 0.62;
-    const downOpacity = state === 'desc' ? 1 : state === 'asc' ? 0.38 : 0.62;
+    const upOpacity = state === "asc" ? 1 : state === "desc" ? 0.38 : 0.62;
+    const downOpacity = state === "desc" ? 1 : state === "asc" ? 0.38 : 0.62;
 
-    const upColor = state === 'asc' ? colorToken.headerTextColor : colorToken.mutedTextColor;
-    const downColor = state === 'desc' ? colorToken.headerTextColor : colorToken.mutedTextColor;
+    const upColor =
+      state === "asc" ? colorToken.headerTextColor : colorToken.mutedTextColor;
+    const downColor =
+      state === "desc" ? colorToken.headerTextColor : colorToken.mutedTextColor;
 
     return (
       <span style={sortIconWrapStyle} aria-hidden>
         <span
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
+            display: "inline-flex",
+            alignItems: "center",
             color: upColor,
             opacity: upOpacity,
           }}
@@ -1655,9 +1802,9 @@ export function Table<TData extends object = object>({
 
         <span
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            marginTop: '-0.24rem',
+            display: "inline-flex",
+            alignItems: "center",
+            marginTop: "-0.24rem",
             color: downColor,
             opacity: downOpacity,
           }}
@@ -1669,11 +1816,16 @@ export function Table<TData extends object = object>({
   }
 
   const headerGroups = table.getHeaderGroups();
-  const leafHeaderGroup = headerGroups.length > 0 ? headerGroups[headerGroups.length - 1] : null;
+  const leafHeaderGroup =
+    headerGroups.length > 0 ? headerGroups[headerGroups.length - 1] : null;
   const preFilteredRows = table.getPreFilteredRowModel().rows;
 
   return (
-    <div className={`${baseClasses} ${className}`.trim()} style={rootStyle} {...props}>
+    <div
+      className={`${baseClasses} ${className}`.trim()}
+      style={rootStyle}
+      {...props}
+    >
       {canShowToolbar ? (
         <div style={toolbarStyle}>
           <div style={toolbarLeftStyle}>
@@ -1691,7 +1843,7 @@ export function Table<TData extends object = object>({
                   onChange={(event) => {
                     table.setGlobalFilter(event.currentTarget.value);
                   }}
-                  style={{ paddingInlineStart: '1.95rem' }}
+                  style={{ paddingInlineStart: "1.95rem" }}
                 />
               </div>
             ) : null}
@@ -1705,18 +1857,20 @@ export function Table<TData extends object = object>({
             {filterable ? (
               <Button
                 size={sizeToken.controlSize}
-                variant={showColumnFilterRow ? 'primary' : 'outline'}
+                variant={showColumnFilterRow ? "primary" : "outline"}
                 iconOnly
-                tooltip={showColumnFilterRow ? 'Hide Filters' : 'Show Filters'}
+                tooltip={showColumnFilterRow ? "Hide Filters" : "Show Filters"}
                 tooltipSide="top"
                 tooltipSize="xs"
-                aria-label={showColumnFilterRow ? 'Hide filters' : 'Show filters'}
+                aria-label={
+                  showColumnFilterRow ? "Hide filters" : "Show filters"
+                }
                 onClick={() => {
                   setShowColumnFilterRow((current) => {
                     const next = !current;
 
                     onAction?.({
-                      source: 'column-filters-toggle',
+                      source: "column-filters-toggle",
                       showColumnFilters: next,
                     });
 
@@ -1731,18 +1885,18 @@ export function Table<TData extends object = object>({
             {fullscreen ? (
               <Button
                 size={sizeToken.controlSize}
-                variant={isFullscreenActive ? 'primary' : 'outline'}
+                variant={isFullscreenActive ? "primary" : "outline"}
                 iconOnly
-                tooltip={isFullscreenActive ? 'Reset Screen' : 'Fullscreen'}
+                tooltip={isFullscreenActive ? "Reset Screen" : "Fullscreen"}
                 tooltipSide="top"
                 tooltipSize="xs"
-                aria-label={isFullscreenActive ? 'Reset screen' : 'Fullscreen'}
+                aria-label={isFullscreenActive ? "Reset screen" : "Fullscreen"}
                 onClick={() => {
                   setIsFullscreenActive((current) => {
                     const next = !current;
 
                     onAction?.({
-                      source: 'fullscreen',
+                      source: "fullscreen",
                       fullscreen: next,
                     });
 
@@ -1758,7 +1912,9 @@ export function Table<TData extends object = object>({
               </Button>
             ) : null}
 
-            {columnVisibility && showColumnToggle && togglableColumns.length > 0 ? (
+            {columnVisibility &&
+            showColumnToggle &&
+            togglableColumns.length > 0 ? (
               <DropdownMenu size={sizeToken.controlSize}>
                 <DropdownMenuTrigger>
                   <Tooltip label="Columns" side="top" size="xs">
@@ -1768,7 +1924,10 @@ export function Table<TData extends object = object>({
                   </Tooltip>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" style={compactDropdownContentStyle}>
+                <DropdownMenuContent
+                  align="end"
+                  style={compactDropdownContentStyle}
+                >
                   <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
                   <DropdownMenuSeparator />
 
@@ -1792,14 +1951,14 @@ export function Table<TData extends object = object>({
                 size={sizeToken.controlSize}
                 variant="outline"
                 iconOnly
-                tooltip={isRefreshing ? 'Refreshing...' : 'Refresh'}
+                tooltip={isRefreshing ? "Refreshing..." : "Refresh"}
                 tooltipSide="top"
                 tooltipSize="xs"
-                aria-label={isRefreshing ? 'Refreshing' : 'Refresh'}
+                aria-label={isRefreshing ? "Refreshing" : "Refresh"}
                 disabled={loading || isRefreshing}
                 onClick={(event) => {
                   onAction?.({
-                    source: 'refresh',
+                    source: "refresh",
                     event,
                   });
 
@@ -1810,13 +1969,15 @@ export function Table<TData extends object = object>({
               </Button>
             ) : null}
 
-            {showExport && exportable ? (
+            {canRenderExportControl ? (
               <DropdownMenu size={sizeToken.controlSize}>
-                <DropdownMenuTrigger disabled={loading || exportingFormat != null}>
+                <DropdownMenuTrigger
+                  disabled={loading || exportingFormat != null}
+                >
                   <Tooltip
                     label={
                       exportingFormat == null
-                        ? 'Download'
+                        ? "Download"
                         : `Exporting ${exportingFormat.toUpperCase()}...`
                     }
                     side="top"
@@ -1829,7 +1990,10 @@ export function Table<TData extends object = object>({
                   </Tooltip>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent align="end" style={compactDropdownContentStyle}>
+                <DropdownMenuContent
+                  align="end"
+                  style={compactDropdownContentStyle}
+                >
                   <DropdownMenuLabel>Export Format</DropdownMenuLabel>
                   <DropdownMenuSeparator />
 
@@ -1838,7 +2002,7 @@ export function Table<TData extends object = object>({
                       key={format}
                       onSelect={() => {
                         onAction?.({
-                          source: 'export',
+                          source: "export",
                           exportFormat: format,
                         });
 
@@ -1857,21 +2021,27 @@ export function Table<TData extends object = object>({
 
       <div style={containerStyle}>
         <div style={tableViewportStyle}>
-          <table style={tableStyle} aria-busy={loading || undefined} aria-rowcount={totalRowsCount}>
+          <table
+            style={tableStyle}
+            aria-busy={loading || undefined}
+            aria-rowcount={totalRowsCount}
+          >
             <thead style={tableHeadStyle}>
               {headerGroups.map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
                     const canSort = sortable && header.column.getCanSort();
-                    const sortIcon = canSort ? renderSortIcon(header.column) : null;
+                    const sortIcon = canSort
+                      ? renderSortIcon(header.column)
+                      : null;
                     const sortState = header.column.getIsSorted();
                     const sortAriaState =
-                      canSort && sortState === 'asc'
-                        ? 'ascending'
-                        : canSort && sortState === 'desc'
-                          ? 'descending'
+                      canSort && sortState === "asc"
+                        ? "ascending"
+                        : canSort && sortState === "desc"
+                          ? "descending"
                           : canSort
-                            ? 'none'
+                            ? "none"
                             : undefined;
                     const columnLabel = toHeaderLabel(header.column);
 
@@ -1889,9 +2059,9 @@ export function Table<TData extends object = object>({
                               : undefined,
                           width:
                             header.column.id === SPECIAL_SELECT_COLUMN_ID
-                              ? '2.4rem'
+                              ? "2.4rem"
                               : header.column.id === SPECIAL_ACTIONS_COLUMN_ID
-                                ? '1%'
+                                ? "1%"
                                 : undefined,
                         }}
                       >
@@ -1903,21 +2073,27 @@ export function Table<TData extends object = object>({
                               header.column.toggleSorting();
                             }}
                             aria-label={
-                              sortState === 'asc'
+                              sortState === "asc"
                                 ? `Sort ${columnLabel} descending`
-                                : sortState === 'desc'
+                                : sortState === "desc"
                                   ? `Clear sorting for ${columnLabel}`
                                   : `Sort ${columnLabel} ascending`
                             }
                           >
                             <span style={sortableHeaderContentStyle}>
-                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              )}
                               {sortIcon}
                             </span>
                           </button>
                         ) : (
                           <span style={sortableHeaderContentStyle}>
-                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                           </span>
                         )}
                       </th>
@@ -1957,14 +2133,18 @@ export function Table<TData extends object = object>({
                         {resolvedCanFilter ? (
                           <Input
                             size={sizeToken.controlSize}
-                            value={typeof filterValue === 'string' ? filterValue : ''}
+                            value={
+                              typeof filterValue === "string" ? filterValue : ""
+                            }
                             placeholder={resolveColumnFilterPlaceholder(
                               header.column,
                               preFilteredRows,
                             )}
                             aria-label={`Filter ${toHeaderLabel(header.column)}`}
                             onChange={(event) => {
-                              header.column.setFilterValue(event.currentTarget.value);
+                              header.column.setFilterValue(
+                                event.currentTarget.value,
+                              );
                             }}
                           />
                         ) : null}
@@ -1978,38 +2158,48 @@ export function Table<TData extends object = object>({
             <tbody>
               {loading ? (
                 skeleton ? (
-                  Array.from({ length: Math.max(1, loadingRows) }, (_, rowIndex) => (
-                    <tr key={`loading-skeleton-${rowIndex}`}>
-                      {visibleColumns.map((column) => (
-                        <td
-                          key={`loading-skeleton-${rowIndex}-${column.id}`}
-                          style={{
-                            ...loadingRowStyle,
-                            paddingInlineEnd:
-                              column.id === SPECIAL_ACTIONS_COLUMN_ID
-                                ? actionsColumnRightPadding
-                                : undefined,
-                          }}
-                        >
-                          <Skeleton
-                            width="100%"
-                            height={
-                              size === 'xs' ? '0.7rem' : size === 'lg' ? '0.95rem' : '0.82rem'
-                            }
-                            radius="full"
-                          />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
+                  Array.from(
+                    { length: Math.max(1, loadingRows) },
+                    (_, rowIndex) => (
+                      <tr key={`loading-skeleton-${rowIndex}`}>
+                        {visibleColumns.map((column) => (
+                          <td
+                            key={`loading-skeleton-${rowIndex}-${column.id}`}
+                            style={{
+                              ...loadingRowStyle,
+                              paddingInlineEnd:
+                                column.id === SPECIAL_ACTIONS_COLUMN_ID
+                                  ? actionsColumnRightPadding
+                                  : undefined,
+                            }}
+                          >
+                            <Skeleton
+                              width="100%"
+                              height={
+                                size === "xs"
+                                  ? "0.7rem"
+                                  : size === "lg"
+                                    ? "0.95rem"
+                                    : "0.82rem"
+                              }
+                              radius="full"
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ),
+                  )
                 ) : (
                   <tr>
-                    <td colSpan={Math.max(1, visibleColumns.length)} style={emptyRowStyle}>
+                    <td
+                      colSpan={Math.max(1, visibleColumns.length)}
+                      style={emptyRowStyle}
+                    >
                       <span
                         style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.5rem",
                         }}
                       >
                         <Spinner size={sizeToken.controlSize} />
@@ -2020,7 +2210,10 @@ export function Table<TData extends object = object>({
                 )
               ) : table.getRowModel().rows.length === 0 ? (
                 <tr>
-                  <td colSpan={Math.max(1, visibleColumns.length)} style={emptyRowStyle}>
+                  <td
+                    colSpan={Math.max(1, visibleColumns.length)}
+                    style={emptyRowStyle}
+                  >
                     {emptyText}
                   </td>
                 </tr>
@@ -2035,13 +2228,13 @@ export function Table<TData extends object = object>({
                       aria-selected={selectable ? isRowSelected : undefined}
                       style={{
                         backgroundColor: isRowSelected
-                          ? 'color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 16%, transparent)'
+                          ? "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 16%, transparent)"
                           : isHovered && hoverable
                             ? colorToken.hoverRowColor
                             : shouldStriped && row.index % 2 === 1
                               ? colorToken.stripedRowColor
-                              : 'transparent',
-                        transition: 'background-color 100ms ease',
+                              : "transparent",
+                        transition: "background-color 100ms ease",
                       }}
                       onMouseEnter={() => {
                         if (hoverable) {
@@ -2050,7 +2243,9 @@ export function Table<TData extends object = object>({
                       }}
                       onMouseLeave={() => {
                         if (hoverable) {
-                          setHoveredRowId((current) => (current === row.id ? null : current));
+                          setHoveredRowId((current) =>
+                            current === row.id ? null : current,
+                          );
                         }
                       }}
                     >
@@ -2065,7 +2260,10 @@ export function Table<TData extends object = object>({
                                 : undefined,
                           }}
                         >
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
                         </td>
                       ))}
                     </tr>
@@ -2092,7 +2290,7 @@ export function Table<TData extends object = object>({
           showShowingPage={paginationShowShowingPage}
           showPageSizeSelector={paginationShowPageSizeSelector}
           resetPageOnPageSizeChange={paginationResetPageOnPageSizeChange}
-          labels={paginationLabels ?? { item: 'rows', perPage: 'page' }}
+          labels={paginationLabels ?? { item: "rows", perPage: "page" }}
           summaryFormatter={paginationSummaryFormatter}
           showingPageFormatter={paginationShowingPageFormatter}
           onAction={handlePaginationAction}

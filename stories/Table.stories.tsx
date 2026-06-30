@@ -1,8 +1,12 @@
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useState, type CSSProperties } from "react";
 
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import type { Meta, StoryObj } from '@storybook/react';
-import { FiEdit3, FiEye, FiTrash2 } from 'react-icons/fi';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+import type { Meta, StoryObj } from "@storybook/react";
+import { FiEdit3, FiEye, FiTrash2 } from "react-icons/fi";
 
 import {
   Field,
@@ -13,7 +17,8 @@ import {
   type RowAction,
   type TableColumnDef,
   type TableProps,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
+import { tableExportHandlers } from "@keytuno/ui-react/addons/table-exporters";
 
 interface TradeRow {
   id: string;
@@ -22,157 +27,165 @@ interface TradeRow {
   price: number;
   change: number;
   volume: number;
-  status: 'Open' | 'Paused' | 'Closed';
+  status: "Open" | "Paused" | "Closed";
   trader: string;
   updatedAt: string;
 }
 
-type TableSortState = Parameters<NonNullable<TableProps<TradeRow>['onSortChange']>>[0];
-type TableFilterState = Parameters<NonNullable<TableProps<TradeRow>['onFilterChange']>>[0];
+type TableSortState = Parameters<
+  NonNullable<TableProps<TradeRow>["onSortChange"]>
+>[0];
+type TableFilterState = Parameters<
+  NonNullable<TableProps<TradeRow>["onFilterChange"]>
+>[0];
 
-const sectors = ['Banking', 'IT', 'Energy', 'Pharma', 'Auto'];
-const statuses: TradeRow['status'][] = ['Open', 'Paused', 'Closed'];
-const traders = ['Mayur', 'Anaya', 'Vivaan', 'Aditi', 'Ishaan'];
+const sectors = ["Banking", "IT", "Energy", "Pharma", "Auto"];
+const statuses: TradeRow["status"][] = ["Open", "Paused", "Closed"];
+const traders = ["Mayur", "Anaya", "Vivaan", "Aditi", "Ishaan"];
 
 const mockRows: TradeRow[] = Array.from({ length: 96 }, (_, index) => {
   const seed = index + 1;
-  const sector = sectors[index % sectors.length] ?? 'Banking';
+  const sector = sectors[index % sectors.length] ?? "Banking";
   const price = 120 + ((seed * 17) % 1430);
   const signedChange = ((seed % 2 === 0 ? 1 : -1) * ((seed * 11) % 145)) / 10;
 
   return {
-    id: `TRADE-${String(seed).padStart(4, '0')}`,
+    id: `TRADE-${String(seed).padStart(4, "0")}`,
     symbol: `STK${String(100 + seed)}`,
     sector,
     price,
     change: signedChange,
     volume: 1200 + ((seed * 7531) % 89000),
-    status: statuses[index % statuses.length] ?? 'Open',
-    trader: traders[index % traders.length] ?? 'Mayur',
-    updatedAt: `2026-06-${String((seed % 28) + 1).padStart(2, '0')}`,
+    status: statuses[index % statuses.length] ?? "Open",
+    trader: traders[index % traders.length] ?? "Mayur",
+    updatedAt: `2026-06-${String((seed % 28) + 1).padStart(2, "0")}`,
   };
 });
 
 const baseColumns: TableColumnDef<TradeRow>[] = [
   {
-    accessorKey: 'symbol',
-    header: 'Symbol',
+    accessorKey: "symbol",
+    header: "Symbol",
   },
   {
-    accessorKey: 'sector',
-    header: 'Sector',
+    accessorKey: "sector",
+    header: "Sector",
   },
   {
-    accessorKey: 'price',
-    header: 'Price',
+    accessorKey: "price",
+    header: "Price",
     cell: ({ getValue }) => {
       const value = Number(getValue() ?? 0);
       return `₹${value.toFixed(2)}`;
     },
   },
   {
-    accessorKey: 'change',
-    header: 'Change %',
+    accessorKey: "change",
+    header: "Change %",
     cell: ({ getValue }) => {
       const value = Number(getValue() ?? 0);
       const color =
         value > 0
-          ? 'var(--ktn-action-success-bg, #16a34a)'
+          ? "var(--ktn-action-success-bg, #16a34a)"
           : value < 0
-            ? 'var(--ktn-action-danger-bg, #dc2626)'
-            : 'var(--ktn-text-secondary, var(--ktn-text-primary))';
+            ? "var(--ktn-action-danger-bg, #dc2626)"
+            : "var(--ktn-text-secondary, var(--ktn-text-primary))";
 
-      return <span style={{ color }}>{`${value > 0 ? '+' : ''}${value.toFixed(2)}%`}</span>;
+      return (
+        <span
+          style={{ color }}
+        >{`${value > 0 ? "+" : ""}${value.toFixed(2)}%`}</span>
+      );
     },
   },
   {
-    accessorKey: 'volume',
-    header: 'Volume',
+    accessorKey: "volume",
+    header: "Volume",
     cell: ({ getValue }) => {
       const value = Number(getValue() ?? 0);
-      return value.toLocaleString('en-IN');
+      return value.toLocaleString("en-IN");
     },
   },
   {
-    accessorKey: 'status',
-    header: 'Status',
+    accessorKey: "status",
+    header: "Status",
   },
   {
-    accessorKey: 'trader',
-    header: 'Trader',
+    accessorKey: "trader",
+    header: "Trader",
   },
   {
-    accessorKey: 'updatedAt',
-    header: 'Updated',
+    accessorKey: "updatedAt",
+    header: "Updated",
   },
 ];
 
 const tableRowActions: RowAction<TradeRow>[] = [
   {
-    id: 'view',
-    label: '',
+    id: "view",
+    label: "",
     icon: <FiEye size={13} />,
-    variant: 'secondary',
+    variant: "secondary",
     compact: true,
     iconOnly: true,
     iconOnlyTone: true,
-    tooltip: 'View',
+    tooltip: "View",
     onClick: () => {},
   },
   {
-    id: 'edit',
-    label: '',
+    id: "edit",
+    label: "",
     icon: <FiEdit3 size={13} />,
-    variant: 'primary',
+    variant: "primary",
     compact: true,
     iconOnly: true,
     iconOnlyTone: true,
-    tooltip: 'Edit',
+    tooltip: "Edit",
     onClick: () => {},
   },
   {
-    id: 'remove',
-    label: '',
+    id: "remove",
+    label: "",
     icon: <FiTrash2 size={13} />,
-    variant: 'destructive',
+    variant: "destructive",
     compact: true,
     iconOnly: true,
     iconOnlyTone: true,
-    tooltip: 'Remove',
+    tooltip: "Remove",
     onClick: () => {},
   },
 ];
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: '100%',
-  maxWidth: '1200px',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "100%",
+  maxWidth: "1200px",
   minWidth: 0,
-  marginInline: 'auto',
-  paddingInline: 'clamp(0.75rem, 2.5vw, 1.5rem)',
-  boxSizing: 'border-box',
+  marginInline: "auto",
+  paddingInline: "clamp(0.75rem, 2.5vw, 1.5rem)",
+  boxSizing: "border-box",
 };
 
 const frameStyle: CSSProperties = {
-  width: '100%',
-  maxWidth: '1200px',
+  width: "100%",
+  maxWidth: "1200px",
   minWidth: 0,
-  marginInline: 'auto',
-  boxSizing: 'border-box',
+  marginInline: "auto",
+  boxSizing: "border-box",
 };
 
 const tableFrameStyle: CSSProperties = {
-  width: '100%',
+  width: "100%",
 };
 
 const meta: Meta<TableProps<TradeRow>> = {
-  title: 'Data/Table',
-  component: Table as unknown as Meta<TableProps<TradeRow>>['component'],
-  tags: ['autodocs'],
+  title: "Data/Table",
+  component: Table as unknown as Meta<TableProps<TradeRow>>["component"],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'padded',
+    layout: "padded",
   },
 };
 
@@ -180,7 +193,7 @@ export default meta;
 
 type Story = StoryObj<TableProps<TradeRow>>;
 
-type NumericFilterOperator = 'gt' | 'lt' | 'eq';
+type NumericFilterOperator = "gt" | "lt" | "eq";
 
 type ParsedNumericFilterCondition = {
   operator: NumericFilterOperator;
@@ -188,22 +201,22 @@ type ParsedNumericFilterCondition = {
 };
 
 function splitFilterTerms(filterValue: unknown): string[] {
-  if (typeof filterValue !== 'string') {
+  if (typeof filterValue !== "string") {
     return [];
   }
 
   return filterValue
-    .split(',')
+    .split(",")
     .map((term) => term.trim())
-    .filter((term) => term !== '');
+    .filter((term) => term !== "");
 }
 
 function toFiniteNumber(value: unknown): number | null {
-  if (typeof value === 'number') {
+  if (typeof value === "number") {
     return Number.isFinite(value) ? value : null;
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     const normalizedValue = value.trim();
 
     if (!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalizedValue)) {
@@ -217,14 +230,18 @@ function toFiniteNumber(value: unknown): number | null {
   return null;
 }
 
-function parseNumericFilterCondition(term: string): ParsedNumericFilterCondition | null {
+function parseNumericFilterCondition(
+  term: string,
+): ParsedNumericFilterCondition | null {
   const normalizedTerm = term.trim();
 
-  if (normalizedTerm === '') {
+  if (normalizedTerm === "") {
     return null;
   }
 
-  const prefixedMatch = normalizedTerm.match(/^([><=])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/);
+  const prefixedMatch = normalizedTerm.match(
+    /^([><=])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/,
+  );
 
   if (prefixedMatch != null) {
     const [, operatorToken, valueToken] = prefixedMatch;
@@ -234,15 +251,15 @@ function parseNumericFilterCondition(term: string): ParsedNumericFilterCondition
       return null;
     }
 
-    if (operatorToken === '>') {
-      return { operator: 'gt', value: numericValue };
+    if (operatorToken === ">") {
+      return { operator: "gt", value: numericValue };
     }
 
-    if (operatorToken === '<') {
-      return { operator: 'lt', value: numericValue };
+    if (operatorToken === "<") {
+      return { operator: "lt", value: numericValue };
     }
 
-    return { operator: 'eq', value: numericValue };
+    return { operator: "eq", value: numericValue };
   }
 
   if (!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalizedTerm)) {
@@ -255,53 +272,59 @@ function parseNumericFilterCondition(term: string): ParsedNumericFilterCondition
     return null;
   }
 
-  return { operator: 'eq', value: numericValue };
+  return { operator: "eq", value: numericValue };
 }
 
 function matchesStringCondition(value: string, term: string): boolean {
   const normalizedValue = value.toLowerCase();
   const normalizedTerm = term.trim();
 
-  if (normalizedTerm === '') {
+  if (normalizedTerm === "") {
     return true;
   }
 
-  if (normalizedTerm.startsWith('=')) {
+  if (normalizedTerm.startsWith("=")) {
     const expected = normalizedTerm.slice(1).trim().toLowerCase();
-    return expected === '' ? true : normalizedValue === expected;
+    return expected === "" ? true : normalizedValue === expected;
   }
 
-  if (normalizedTerm.startsWith('^')) {
+  if (normalizedTerm.startsWith("^")) {
     const expected = normalizedTerm.slice(1).trim().toLowerCase();
-    return expected === '' ? true : normalizedValue.startsWith(expected);
+    return expected === "" ? true : normalizedValue.startsWith(expected);
   }
 
-  if (normalizedTerm.startsWith('~')) {
+  if (normalizedTerm.startsWith("~")) {
     const expected = normalizedTerm.slice(1).trim().toLowerCase();
-    return expected === '' ? true : normalizedValue.includes(expected);
+    return expected === "" ? true : normalizedValue.includes(expected);
   }
 
-  if (normalizedTerm.endsWith('$')) {
+  if (normalizedTerm.endsWith("$")) {
     const expected = normalizedTerm.slice(0, -1).trim().toLowerCase();
-    return expected === '' ? true : normalizedValue.endsWith(expected);
+    return expected === "" ? true : normalizedValue.endsWith(expected);
   }
 
   return normalizedValue.includes(normalizedTerm.toLowerCase());
 }
 
-function matchesNumericCondition(value: number, condition: ParsedNumericFilterCondition): boolean {
-  if (condition.operator === 'gt') {
+function matchesNumericCondition(
+  value: number,
+  condition: ParsedNumericFilterCondition,
+): boolean {
+  if (condition.operator === "gt") {
     return value > condition.value;
   }
 
-  if (condition.operator === 'lt') {
+  if (condition.operator === "lt") {
     return value < condition.value;
   }
 
   return value === condition.value;
 }
 
-function matchesAdvancedColumnFilter(rowValue: unknown, filterValue: unknown): boolean {
+function matchesAdvancedColumnFilter(
+  rowValue: unknown,
+  filterValue: unknown,
+): boolean {
   const terms = splitFilterTerms(filterValue);
 
   if (terms.length === 0) {
@@ -309,7 +332,7 @@ function matchesAdvancedColumnFilter(rowValue: unknown, filterValue: unknown): b
   }
 
   const numericValue = toFiniteNumber(rowValue);
-  const stringValue = String(rowValue ?? '');
+  const stringValue = String(rowValue ?? "");
 
   return terms.some((term) => {
     const numericCondition = parseNumericFilterCondition(term);
@@ -326,18 +349,23 @@ function matchesAdvancedColumnFilter(rowValue: unknown, filterValue: unknown): b
   });
 }
 
-function applyServerFilters(rows: TradeRow[], filters: TableFilterState): TradeRow[] {
-  const globalSearch = String(filters.find((filter) => filter.id === '__global')?.value ?? '')
+function applyServerFilters(
+  rows: TradeRow[],
+  filters: TableFilterState,
+): TradeRow[] {
+  const globalSearch = String(
+    filters.find((filter) => filter.id === "__global")?.value ?? "",
+  )
     .trim()
     .toLowerCase();
 
-  const scopedFilters = filters.filter((filter) => filter.id !== '__global');
+  const scopedFilters = filters.filter((filter) => filter.id !== "__global");
 
   return rows.filter((row) => {
-    if (globalSearch !== '') {
+    if (globalSearch !== "") {
       const searchableText = Object.values(row)
         .map((value) => String(value).toLowerCase())
-        .join(' ');
+        .join(" ");
 
       if (!searchableText.includes(globalSearch)) {
         return false;
@@ -351,7 +379,10 @@ function applyServerFilters(rows: TradeRow[], filters: TableFilterState): TradeR
   });
 }
 
-function applyServerSorting(rows: TradeRow[], sorting: TableSortState): TradeRow[] {
+function applyServerSorting(
+  rows: TradeRow[],
+  sorting: TableSortState,
+): TradeRow[] {
   if (sorting.length === 0) {
     return rows;
   }
@@ -362,22 +393,32 @@ function applyServerSorting(rows: TradeRow[], sorting: TableSortState): TradeRow
     const left = leftRow[id as keyof TradeRow];
     const right = rightRow[id as keyof TradeRow];
 
-    if (typeof left === 'number' && typeof right === 'number') {
+    if (typeof left === "number" && typeof right === "number") {
       return desc ? right - left : left - right;
     }
 
-    const leftText = String(left ?? '').toLowerCase();
-    const rightText = String(right ?? '').toLowerCase();
+    const leftText = String(left ?? "").toLowerCase();
+    const rightText = String(right ?? "").toLowerCase();
 
     if (leftText === rightText) {
       return 0;
     }
 
-    return desc ? (leftText < rightText ? 1 : -1) : leftText < rightText ? -1 : 1;
+    return desc
+      ? leftText < rightText
+        ? 1
+        : -1
+      : leftText < rightText
+        ? -1
+        : 1;
   });
 }
 
-function paginateRows(rows: TradeRow[], page: number, pageSize: number): TradeRow[] {
+function paginateRows(
+  rows: TradeRow[],
+  page: number,
+  pageSize: number,
+): TradeRow[] {
   const safePageSize = Math.max(1, pageSize);
   const safePage = Math.max(1, page);
 
@@ -407,16 +448,17 @@ function SelectionDemo(): JSX.Element {
             rowActions={tableRowActions}
             sortable
             filterable
-            columnFilters={['symbol', 'sector', 'status', 'trader']}
+            columnFilters={["symbol", "sector", "status", "trader"]}
             searchable
             searchPlaceholder="Search selected-grid..."
             showToolbar
             showColumnToggle
             columnVisibility
-            defaultHiddenColumns={['updatedAt']}
+            defaultHiddenColumns={["updatedAt"]}
             showExport
             exportable
-            exportFormats={['csv', 'xlsx', 'pdf']}
+            exportFormats={["csv", "xlsx", "pdf"]}
+            exportHandlers={tableExportHandlers}
           />
 
           <FieldDescription>{`Selected Rows: ${selectedRows.length}`}</FieldDescription>
@@ -434,7 +476,7 @@ function ServerSideTableInner(): JSX.Element {
   const [refreshToken, setRefreshToken] = useState(0);
 
   const query = useQuery({
-    queryKey: ['table-server', page, pageSize, sorting, filters, refreshToken],
+    queryKey: ["table-server", page, pageSize, sorting, filters, refreshToken],
     queryFn: async () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 220);
@@ -461,7 +503,7 @@ function ServerSideTableInner(): JSX.Element {
       size="md"
       sortable
       filterable
-      columnFilters={['symbol', 'sector', 'status', 'trader']}
+      columnFilters={["symbol", "sector", "status", "trader"]}
       globalFilter
       searchable
       searchPlaceholder="Server search (TanStack Query)..."
@@ -480,7 +522,7 @@ function ServerSideTableInner(): JSX.Element {
       showToolbar
       showColumnToggle
       columnVisibility
-      defaultHiddenColumns={['updatedAt']}
+      defaultHiddenColumns={["updatedAt"]}
     />
   );
 }
@@ -513,7 +555,7 @@ export const Basic: Story = {
             size="md"
             sortable
             filterable
-            columnFilters={['symbol', 'sector', 'status']}
+            columnFilters={["symbol", "sector", "status"]}
             searchable
             searchPlaceholder="Search symbol, sector, status..."
             hoverable
@@ -522,11 +564,12 @@ export const Basic: Story = {
             showToolbar
             showColumnToggle
             columnVisibility
-            defaultHiddenColumns={['updatedAt']}
+            defaultHiddenColumns={["updatedAt"]}
           />
 
           <FieldDescription>
-            Basic variant with sorting, filtering, search, pagination, and column visibility.
+            Basic variant with sorting, filtering, search, pagination, and
+            column visibility.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -539,7 +582,9 @@ export const Variants: Story = {
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Variants</h3>
 
-      {(['basic', 'outline', 'ghost', 'filled', 'minimal', 'striped'] as const).map((variant) => (
+      {(
+        ["basic", "outline", "ghost", "filled", "minimal", "striped"] as const
+      ).map((variant) => (
         <Field key={variant} style={frameStyle}>
           <FieldLabel>{variant.toUpperCase()}</FieldLabel>
 
@@ -551,7 +596,7 @@ export const Variants: Story = {
               size="sm"
               sortable
               hoverable
-              bordered={variant !== 'ghost'}
+              bordered={variant !== "ghost"}
               showToolbar={false}
             />
           </FieldContent>
@@ -562,12 +607,12 @@ export const Variants: Story = {
 };
 
 export const SelectionAndActions: Story = {
-  name: 'Selection + Row Actions',
+  name: "Selection + Row Actions",
   render: () => <SelectionDemo />,
 };
 
 export const LoadingSkeleton: Story = {
-  name: 'Loading + Skeleton',
+  name: "Loading + Skeleton",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Loading + Skeleton</h3>
@@ -610,7 +655,7 @@ export const LoadingSkeleton: Story = {
 };
 
 export const StickyHeaderFullscreen: Story = {
-  name: 'Sticky Header + Fullscreen',
+  name: "Sticky Header + Fullscreen",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Sticky Header + Fullscreen</h3>
@@ -626,14 +671,14 @@ export const StickyHeaderFullscreen: Story = {
             size="sm"
             sortable
             filterable
-            columnFilters={['symbol', 'sector', 'trader']}
+            columnFilters={["symbol", "sector", "trader"]}
             searchable
             stickyHeader
             fullscreen
             showToolbar
             showColumnToggle
             columnVisibility
-            defaultHiddenColumns={['updatedAt']}
+            defaultHiddenColumns={["updatedAt"]}
           />
 
           <FieldDescription>
@@ -646,7 +691,7 @@ export const StickyHeaderFullscreen: Story = {
 };
 
 export const ServerSideTanstackQuery: Story = {
-  name: 'Server-Side (TanStack Query)',
+  name: "Server-Side (TanStack Query)",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Server-Side (TanStack Query)</h3>
@@ -658,8 +703,8 @@ export const ServerSideTanstackQuery: Story = {
           <ServerSideQueryDemo />
 
           <FieldDescription>
-            Server-side mode with TanStack Query for data fetching and TanStack Table for table
-            state.
+            Server-side mode with TanStack Query for data fetching and TanStack
+            Table for table state.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -668,11 +713,11 @@ export const ServerSideTanstackQuery: Story = {
 };
 
 export const TablePlayground: Story = {
-  name: 'Table Playground',
+  name: "Table Playground",
   args: {
-    variant: 'striped',
+    variant: "striped",
     compact: true,
-    size: 'md',
+    size: "md",
     sortable: true,
     filterable: true,
     searchable: true,
@@ -685,7 +730,7 @@ export const TablePlayground: Story = {
     showExport: true,
     exportable: true,
     showPagination: true,
-    paginationVariant: 'advance',
+    paginationVariant: "advance",
     paginationDefaultPageSize: 10,
     paginationPageSizeOptions: [10, 20, 50, 100],
     paginationMaxVisiblePages: 5,
@@ -703,67 +748,67 @@ export const TablePlayground: Story = {
     fullscreen: true,
     serverSide: false,
     globalFilter: true,
-    columnFilters: ['symbol', 'sector', 'status', 'price'],
-    defaultHiddenColumns: ['updatedAt'],
-    exportFormats: ['csv', 'xlsx', 'pdf'],
+    columnFilters: ["symbol", "sector", "status", "price"],
+    defaultHiddenColumns: ["updatedAt"],
+    exportFormats: ["csv", "xlsx", "pdf"],
   },
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['basic', 'outline', 'ghost', 'filled', 'minimal', 'striped'],
+      control: "select",
+      options: ["basic", "outline", "ghost", "filled", "minimal", "striped"],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    compact: { control: 'boolean' },
+    compact: { control: "boolean" },
     exportFormats: {
-      control: 'check',
-      options: ['csv', 'xlsx', 'pdf'],
+      control: "check",
+      options: ["csv", "xlsx", "pdf"],
     },
-    sortable: { control: 'boolean' },
-    filterable: { control: 'boolean' },
-    searchable: { control: 'boolean' },
-    globalFilter: { control: 'boolean' },
-    selectable: { control: 'boolean' },
-    multiSelect: { control: 'boolean' },
-    columnVisibility: { control: 'boolean' },
-    showToolbar: { control: 'boolean' },
-    showColumnToggle: { control: 'boolean' },
-    showRefresh: { control: 'boolean' },
-    showExport: { control: 'boolean' },
-    exportable: { control: 'boolean' },
-    showPagination: { control: 'boolean' },
+    sortable: { control: "boolean" },
+    filterable: { control: "boolean" },
+    searchable: { control: "boolean" },
+    globalFilter: { control: "boolean" },
+    selectable: { control: "boolean" },
+    multiSelect: { control: "boolean" },
+    columnVisibility: { control: "boolean" },
+    showToolbar: { control: "boolean" },
+    showColumnToggle: { control: "boolean" },
+    showRefresh: { control: "boolean" },
+    showExport: { control: "boolean" },
+    exportable: { control: "boolean" },
+    showPagination: { control: "boolean" },
     paginationVariant: {
-      control: 'select',
-      options: ['basic', 'advance', 'compact'],
+      control: "select",
+      options: ["basic", "advance", "compact"],
     },
     paginationDefaultPageSize: {
-      control: { type: 'number', min: 1, max: 200, step: 1 },
+      control: { type: "number", min: 1, max: 200, step: 1 },
     },
-    paginationPageSizeOptions: { control: 'object' },
+    paginationPageSizeOptions: { control: "object" },
     paginationMaxVisiblePages: {
-      control: { type: 'number', min: 3, max: 15, step: 1 },
+      control: { type: "number", min: 3, max: 15, step: 1 },
     },
-    paginationShowPageSizeSelector: { control: 'boolean' },
-    paginationShowSummary: { control: 'boolean' },
-    paginationShowShowingPage: { control: 'boolean' },
-    paginationResetPageOnPageSizeChange: { control: 'boolean' },
-    loading: { control: 'boolean' },
-    loadingRows: { control: { type: 'number', min: 1, max: 20, step: 1 } },
-    skeleton: { control: 'boolean' },
-    hoverable: { control: 'boolean' },
-    bordered: { control: 'boolean' },
-    rounded: { control: 'boolean' },
-    stickyHeader: { control: 'boolean' },
-    fullscreen: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onPageChange: { action: 'page-change' },
-    onPageSizeChange: { action: 'page-size-change' },
-    onSortChange: { action: 'sort-change' },
-    onFilterChange: { action: 'filter-change' },
-    onSelectionChange: { action: 'selection-change' },
-    onRefresh: { action: 'refresh' },
+    paginationShowPageSizeSelector: { control: "boolean" },
+    paginationShowSummary: { control: "boolean" },
+    paginationShowShowingPage: { control: "boolean" },
+    paginationResetPageOnPageSizeChange: { control: "boolean" },
+    loading: { control: "boolean" },
+    loadingRows: { control: { type: "number", min: 1, max: 20, step: 1 } },
+    skeleton: { control: "boolean" },
+    hoverable: { control: "boolean" },
+    bordered: { control: "boolean" },
+    rounded: { control: "boolean" },
+    stickyHeader: { control: "boolean" },
+    fullscreen: { control: "boolean" },
+    onAction: { action: "action" },
+    onPageChange: { action: "page-change" },
+    onPageSizeChange: { action: "page-size-change" },
+    onSortChange: { action: "sort-change" },
+    onFilterChange: { action: "filter-change" },
+    onSelectionChange: { action: "selection-change" },
+    onRefresh: { action: "refresh" },
     serverSide: { table: { disable: true } },
     totalRows: { table: { disable: true } },
     pageIndex: { table: { disable: true } },
@@ -775,7 +820,12 @@ export const TablePlayground: Story = {
     className: { table: { disable: true } },
   },
   render: (args) => {
-    const { data: _data, columns: _columns, rowActions: _rowActions, ...restArgs } = args;
+    const {
+      data: _data,
+      columns: _columns,
+      rowActions: _rowActions,
+      ...restArgs
+    } = args;
 
     return (
       <div style={stackStyle}>
@@ -789,10 +839,13 @@ export const TablePlayground: Story = {
               data={mockRows}
               columns={baseColumns}
               rowActions={tableRowActions}
+              exportHandlers={tableExportHandlers}
               onRefresh={args.onRefresh ?? (() => {})}
             />
 
-            <FieldDescription>Validate each prop quickly using controls.</FieldDescription>
+            <FieldDescription>
+              Validate each prop quickly using controls.
+            </FieldDescription>
           </FieldContent>
         </Field>
       </div>

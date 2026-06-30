@@ -10,22 +10,22 @@ import {
   type HTMLAttributes,
   type MouseEvent,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { createPortal } from 'react-dom';
-import { FiCheck, FiChevronRight } from 'react-icons/fi';
+import { createPortal } from "react-dom";
+import { FiCheck, FiChevronRight } from "./icons/feather";
 
-import { Button } from './Button';
+import { Button } from "./Button";
 
-export type DropdownMenuVariant = 'default' | 'outline' | 'soft';
-export type DropdownMenuSize = 'xs' | 'sm' | 'md' | 'lg';
-export type DropdownMenuSide = 'auto' | 'bottom' | 'top' | 'left' | 'right';
+export type DropdownMenuVariant = "default" | "outline" | "soft";
+export type DropdownMenuSize = "xs" | "sm" | "md" | "lg";
+export type DropdownMenuSide = "auto" | "bottom" | "top" | "left" | "right";
 export type DropdownMenuActionSource =
-  | 'trigger'
-  | 'outside-click'
-  | 'escape'
-  | 'item-select'
-  | 'open-change';
+  | "trigger"
+  | "outside-click"
+  | "escape"
+  | "item-select"
+  | "open-change";
 
 export interface DropdownMenuActionContext {
   source: DropdownMenuActionSource;
@@ -35,9 +35,12 @@ export interface DropdownMenuActionContext {
   event?: unknown;
 }
 
-type DropdownMenuResolvedSide = Exclude<DropdownMenuSide, 'auto'>;
+type DropdownMenuResolvedSide = Exclude<DropdownMenuSide, "auto">;
 
-export interface DropdownMenuProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface DropdownMenuProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -51,23 +54,35 @@ export interface DropdownMenuProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   disabled?: boolean;
 }
 
-export interface DropdownMenuTriggerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface DropdownMenuTriggerProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   disabled?: boolean;
 }
 
-export interface DropdownMenuContentProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface DropdownMenuContentProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   side?: DropdownMenuSide;
   sideOffset?: number;
-  align?: 'start' | 'center' | 'end';
+  align?: "start" | "center" | "end";
 }
 
-export interface DropdownMenuGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface DropdownMenuGroupProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
 }
 
-export interface DropdownMenuItemProps extends Omit<HTMLAttributes<HTMLButtonElement>, 'children'> {
+export interface DropdownMenuItemProps extends Omit<
+  HTMLAttributes<HTMLButtonElement>,
+  "children"
+> {
   children?: ReactNode;
   disabled?: boolean;
   destructive?: boolean;
@@ -83,7 +98,10 @@ export interface DropdownMenuItemProps extends Omit<HTMLAttributes<HTMLButtonEle
   submenuOffset?: number;
 }
 
-export interface DropdownMenuLabelProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface DropdownMenuLabelProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   inset?: boolean;
 }
@@ -92,7 +110,7 @@ export interface DropdownMenuSeparatorProps extends HTMLAttributes<HTMLDivElemen
 
 export interface DropdownMenuCheckboxItemProps extends Omit<
   DropdownMenuItemProps,
-  'checked' | 'onSelect' | 'keepOpenOnSelect' | 'submenu'
+  "checked" | "onSelect" | "keepOpenOnSelect" | "submenu"
 > {
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
@@ -102,7 +120,7 @@ export interface DropdownMenuCheckboxItemProps extends Omit<
 
 export interface DropdownMenuRadioGroupProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
-  'children'
+  "children"
 > {
   children?: ReactNode;
   value?: string;
@@ -112,14 +130,14 @@ export interface DropdownMenuRadioGroupProps extends Omit<
 
 export interface DropdownMenuRadioItemProps extends Omit<
   DropdownMenuItemProps,
-  'checked' | 'submenu'
+  "checked" | "submenu"
 > {
   value: string;
   indicatorIcon?: ReactNode;
 }
 
 type DropdownMenuSizeTokens = {
-  triggerSize: 'xs' | 'sm' | 'md' | 'lg';
+  triggerSize: "xs" | "sm" | "md" | "lg";
   panelMinWidth: string;
   panelPadding: string;
   itemHeight: string;
@@ -153,7 +171,11 @@ type FloatingPosition = {
 
 interface DropdownMenuContextValue {
   open: boolean;
-  setOpen: (open: boolean, source?: DropdownMenuActionSource, event?: unknown) => void;
+  setOpen: (
+    open: boolean,
+    source?: DropdownMenuActionSource,
+    event?: unknown,
+  ) => void;
   size: DropdownMenuSize;
   variant: DropdownMenuVariant;
   side: DropdownMenuSide;
@@ -169,109 +191,110 @@ interface DropdownMenuRadioGroupContextValue {
   setValue: (value: string) => void;
 }
 
-const baseClasses = 'inline-flex min-w-0';
+const baseClasses = "inline-flex min-w-0";
 
 const sizeTokens: Record<DropdownMenuSize, DropdownMenuSizeTokens> = {
   xs: {
-    triggerSize: 'xs',
-    panelMinWidth: '11.5rem',
-    panelPadding: '0.2rem',
-    itemHeight: '1.7rem',
-    itemFontSize: '0.75rem',
-    itemPaddingInline: '0.4rem',
-    labelFontSize: '0.68rem',
-    shortcutFontSize: '0.65rem',
+    triggerSize: "xs",
+    panelMinWidth: "11.5rem",
+    panelPadding: "0.2rem",
+    itemHeight: "1.7rem",
+    itemFontSize: "0.75rem",
+    itemPaddingInline: "0.4rem",
+    labelFontSize: "0.68rem",
+    shortcutFontSize: "0.65rem",
     iconSize: 13,
   },
   sm: {
-    triggerSize: 'sm',
-    panelMinWidth: '12rem',
-    panelPadding: '0.25rem',
-    itemHeight: '1.95rem',
-    itemFontSize: '0.8125rem',
-    itemPaddingInline: '0.45rem',
-    labelFontSize: '0.72rem',
-    shortcutFontSize: '0.7rem',
+    triggerSize: "sm",
+    panelMinWidth: "12rem",
+    panelPadding: "0.25rem",
+    itemHeight: "1.95rem",
+    itemFontSize: "0.8125rem",
+    itemPaddingInline: "0.45rem",
+    labelFontSize: "0.72rem",
+    shortcutFontSize: "0.7rem",
     iconSize: 14,
   },
   md: {
-    triggerSize: 'md',
-    panelMinWidth: '13rem',
-    panelPadding: '0.3rem',
-    itemHeight: '2.15rem',
-    itemFontSize: '0.875rem',
-    itemPaddingInline: '0.5rem',
-    labelFontSize: '0.76rem',
-    shortcutFontSize: '0.74rem',
+    triggerSize: "md",
+    panelMinWidth: "13rem",
+    panelPadding: "0.3rem",
+    itemHeight: "2.15rem",
+    itemFontSize: "0.875rem",
+    itemPaddingInline: "0.5rem",
+    labelFontSize: "0.76rem",
+    shortcutFontSize: "0.74rem",
     iconSize: 15,
   },
   lg: {
-    triggerSize: 'lg',
-    panelMinWidth: '14rem',
-    panelPadding: '0.35rem',
-    itemHeight: '2.35rem',
-    itemFontSize: '0.9375rem',
-    itemPaddingInline: '0.6rem',
-    labelFontSize: '0.8rem',
-    shortcutFontSize: '0.78rem',
+    triggerSize: "lg",
+    panelMinWidth: "14rem",
+    panelPadding: "0.35rem",
+    itemHeight: "2.35rem",
+    itemFontSize: "0.9375rem",
+    itemPaddingInline: "0.6rem",
+    labelFontSize: "0.8rem",
+    shortcutFontSize: "0.78rem",
     iconSize: 16,
   },
 };
 
 const variantTokens: Record<DropdownMenuVariant, DropdownMenuVariantTokens> = {
   default: {
-    panelBackgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    panelBorderColor: 'var(--ktn-border-muted)',
-    panelShadow: '0 12px 28px rgba(15, 23, 42, 0.16)',
-    itemTextColor: 'var(--ktn-text-primary)',
-    itemHoverBackgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))',
-    itemHoverTextColor: 'var(--ktn-text-primary)',
-    itemDisabledColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    separatorColor: 'var(--ktn-border-muted)',
-    labelColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    shortcutColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    destructiveTextColor: 'var(--ktn-action-danger-bg, #dc2626)',
+    panelBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    panelBorderColor: "var(--ktn-border-muted)",
+    panelShadow: "0 12px 28px rgba(15, 23, 42, 0.16)",
+    itemTextColor: "var(--ktn-text-primary)",
+    itemHoverBackgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))",
+    itemHoverTextColor: "var(--ktn-text-primary)",
+    itemDisabledColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    separatorColor: "var(--ktn-border-muted)",
+    labelColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    shortcutColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    destructiveTextColor: "var(--ktn-action-danger-bg, #dc2626)",
     destructiveHoverBackgroundColor:
-      'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 14%, transparent)',
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 14%, transparent)",
   },
   outline: {
-    panelBackgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    panelBorderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
-    panelShadow: '0 10px 24px rgba(15, 23, 42, 0.14)',
-    itemTextColor: 'var(--ktn-text-primary)',
-    itemHoverBackgroundColor: 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))',
-    itemHoverTextColor: 'var(--ktn-text-primary)',
-    itemDisabledColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    separatorColor: 'var(--ktn-border-muted)',
-    labelColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    shortcutColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    destructiveTextColor: 'var(--ktn-action-danger-bg, #dc2626)',
+    panelBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    panelBorderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
+    panelShadow: "0 10px 24px rgba(15, 23, 42, 0.14)",
+    itemTextColor: "var(--ktn-text-primary)",
+    itemHoverBackgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))",
+    itemHoverTextColor: "var(--ktn-text-primary)",
+    itemDisabledColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    separatorColor: "var(--ktn-border-muted)",
+    labelColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    shortcutColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    destructiveTextColor: "var(--ktn-action-danger-bg, #dc2626)",
     destructiveHoverBackgroundColor:
-      'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 14%, transparent)',
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 14%, transparent)",
   },
   soft: {
     panelBackgroundColor:
-      'color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 90%, var(--ktn-bg-muted, #f1f5f9))',
-    panelBorderColor: 'var(--ktn-border-muted)',
-    panelShadow: '0 10px 24px rgba(15, 23, 42, 0.14)',
-    itemTextColor: 'var(--ktn-text-primary)',
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 90%, var(--ktn-bg-muted, #f1f5f9))",
+    panelBorderColor: "var(--ktn-border-muted)",
+    panelShadow: "0 10px 24px rgba(15, 23, 42, 0.14)",
+    itemTextColor: "var(--ktn-text-primary)",
     itemHoverBackgroundColor:
-      'color-mix(in srgb, var(--ktn-bg-muted, rgba(100, 116, 139, 0.14)) 88%, transparent)',
-    itemHoverTextColor: 'var(--ktn-text-primary)',
-    itemDisabledColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    separatorColor: 'var(--ktn-border-muted)',
-    labelColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    shortcutColor: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    destructiveTextColor: 'var(--ktn-action-danger-bg, #dc2626)',
+      "color-mix(in srgb, var(--ktn-bg-muted, rgba(100, 116, 139, 0.14)) 88%, transparent)",
+    itemHoverTextColor: "var(--ktn-text-primary)",
+    itemDisabledColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    separatorColor: "var(--ktn-border-muted)",
+    labelColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    shortcutColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    destructiveTextColor: "var(--ktn-action-danger-bg, #dc2626)",
     destructiveHoverBackgroundColor:
-      'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 14%, transparent)',
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 14%, transparent)",
   },
 };
 
-const DropdownMenuContext = createContext<DropdownMenuContextValue | null>(null);
-const DropdownMenuRadioGroupContext = createContext<DropdownMenuRadioGroupContextValue | null>(
+const DropdownMenuContext = createContext<DropdownMenuContextValue | null>(
   null,
 );
+const DropdownMenuRadioGroupContext =
+  createContext<DropdownMenuRadioGroupContextValue | null>(null);
 const FLOATING_VIEWPORT_MARGIN = 8;
 const SUBMENU_HOVER_CLOSE_DELAY_MS = 120;
 
@@ -279,19 +302,22 @@ function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
 
-function getSideSpace(side: DropdownMenuResolvedSide, anchorRect: DOMRect): number {
+function getSideSpace(
+  side: DropdownMenuResolvedSide,
+  anchorRect: DOMRect,
+): number {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
 
-  if (side === 'bottom') {
+  if (side === "bottom") {
     return viewportHeight - anchorRect.bottom;
   }
 
-  if (side === 'top') {
+  if (side === "top") {
     return anchorRect.top;
   }
 
-  if (side === 'right') {
+  if (side === "right") {
     return viewportWidth - anchorRect.right;
   }
 
@@ -302,20 +328,28 @@ function getSidePriority(
   preferredSide: DropdownMenuSide,
   anchorRect: DOMRect,
 ): DropdownMenuResolvedSide[] {
-  const allSides: DropdownMenuResolvedSide[] = ['bottom', 'top', 'right', 'left'];
+  const allSides: DropdownMenuResolvedSide[] = [
+    "bottom",
+    "top",
+    "right",
+    "left",
+  ];
 
-  function sortBySpace(candidates: DropdownMenuResolvedSide[]): DropdownMenuResolvedSide[] {
+  function sortBySpace(
+    candidates: DropdownMenuResolvedSide[],
+  ): DropdownMenuResolvedSide[] {
     return [...candidates].sort(
       (leftSide, rightSide) =>
-        getSideSpace(rightSide, anchorRect) - getSideSpace(leftSide, anchorRect),
+        getSideSpace(rightSide, anchorRect) -
+        getSideSpace(leftSide, anchorRect),
     );
   }
 
-  if (preferredSide === 'auto') {
+  if (preferredSide === "auto") {
     // In auto mode, always try bottom first. If it cannot fit, fallback to sides with more space.
-    const fallbackSides = allSides.filter((side) => side !== 'bottom');
+    const fallbackSides = allSides.filter((side) => side !== "bottom");
 
-    return ['bottom', ...sortBySpace(fallbackSides)];
+    return ["bottom", ...sortBySpace(fallbackSides)];
   }
 
   // For explicit side requests: try requested side first, then fallback by available space.
@@ -329,38 +363,38 @@ function getSideCoordinates(
   anchorRect: DOMRect,
   menuWidth: number,
   menuHeight: number,
-  align: 'start' | 'center' | 'end',
+  align: "start" | "center" | "end",
   sideOffset: number,
 ): { x: number; y: number } {
   const horizontalCoordinate =
-    align === 'center'
+    align === "center"
       ? anchorRect.left + (anchorRect.width - menuWidth) / 2
-      : align === 'end'
+      : align === "end"
         ? anchorRect.right - menuWidth
         : anchorRect.left;
 
   const verticalCoordinate =
-    align === 'center'
+    align === "center"
       ? anchorRect.top + (anchorRect.height - menuHeight) / 2
-      : align === 'end'
+      : align === "end"
         ? anchorRect.bottom - menuHeight
         : anchorRect.top;
 
-  if (side === 'bottom') {
+  if (side === "bottom") {
     return {
       x: horizontalCoordinate,
       y: anchorRect.bottom + sideOffset,
     };
   }
 
-  if (side === 'top') {
+  if (side === "top") {
     return {
       x: horizontalCoordinate,
       y: anchorRect.top - menuHeight - sideOffset,
     };
   }
 
-  if (side === 'right') {
+  if (side === "right") {
     return {
       x: anchorRect.right + sideOffset,
       y: verticalCoordinate,
@@ -378,7 +412,7 @@ function resolveFloatingPosition(
   menuWidth: number,
   menuHeight: number,
   preferredSide: DropdownMenuSide,
-  align: 'start' | 'center' | 'end',
+  align: "start" | "center" | "end",
   sideOffset: number,
 ): FloatingPosition {
   const viewportMargin = FLOATING_VIEWPORT_MARGIN;
@@ -414,7 +448,8 @@ function resolveFloatingPosition(
       rawCoordinates.y + menuHeight - (viewportHeight - viewportMargin),
       0,
     );
-    const overflowScore = overflowLeft + overflowRight + overflowTop + overflowBottom;
+    const overflowScore =
+      overflowLeft + overflowRight + overflowTop + overflowBottom;
 
     const clampedX = clamp(
       rawCoordinates.x,
@@ -435,7 +470,9 @@ function resolveFloatingPosition(
     });
   });
 
-  const firstFitCandidate = candidates.find((candidate) => candidate.overflowScore === 0);
+  const firstFitCandidate = candidates.find(
+    (candidate) => candidate.overflowScore === 0,
+  );
 
   if (firstFitCandidate != null) {
     return {
@@ -462,7 +499,7 @@ function resolveFloatingPosition(
     return {
       x: viewportMargin,
       y: viewportMargin,
-      side: 'bottom',
+      side: "bottom",
     };
   }
 
@@ -475,9 +512,14 @@ function resolveFloatingPosition(
 
 function getFocusableMenuItems(container: HTMLElement): HTMLButtonElement[] {
   return Array.from(
-    container.querySelectorAll<HTMLButtonElement>('button[data-ktn-dropdown-item="true"]'),
+    container.querySelectorAll<HTMLButtonElement>(
+      'button[data-ktn-dropdown-item="true"]',
+    ),
   ).filter((buttonElement) => {
-    return !buttonElement.disabled && buttonElement.getAttribute('aria-disabled') !== 'true';
+    return (
+      !buttonElement.disabled &&
+      buttonElement.getAttribute("aria-disabled") !== "true"
+    );
   });
 }
 
@@ -491,13 +533,13 @@ function useDropdownMenuContextValue(): DropdownMenuContextValue {
   return {
     open: false,
     setOpen: () => {},
-    size: 'md',
-    variant: 'default',
-    side: 'auto',
+    size: "md",
+    variant: "default",
+    side: "auto",
     closeOnSelect: true,
     disabled: false,
     triggerRef: { current: null },
-    contentId: '',
+    contentId: "",
     onAction: undefined,
   };
 }
@@ -507,7 +549,7 @@ function useDropdownMenuRadioGroupContextValue(): DropdownMenuRadioGroupContextV
 }
 
 function renderPortal(children: ReactNode): JSX.Element | null {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return null;
   }
 
@@ -523,30 +565,30 @@ function getPanelStyle(
   minWidth?: string,
 ): CSSProperties {
   return {
-    position: 'fixed',
+    position: "fixed",
     insetInlineStart: `${x}px`,
     insetBlockStart: `${y}px`,
     zIndex: 120,
     minWidth: minWidth ?? sizeToken.panelMinWidth,
     maxWidth: `calc(100vw - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
     maxHeight: `calc(100vh - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
-    overflowY: visible ? 'auto' : 'hidden',
-    overflowX: 'hidden',
-    overscrollBehavior: 'contain',
-    scrollbarGutter: 'stable both-edges',
-    scrollbarWidth: 'thin',
+    overflowY: visible ? "auto" : "hidden",
+    overflowX: "hidden",
+    overscrollBehavior: "contain",
+    scrollbarGutter: "stable both-edges",
+    scrollbarWidth: "thin",
     scrollbarColor:
-      'color-mix(in srgb, var(--ktn-text-secondary, #94a3b8) 58%, transparent) transparent',
-    borderWidth: '1px',
-    borderStyle: 'solid',
+      "color-mix(in srgb, var(--ktn-text-secondary, #94a3b8) 58%, transparent) transparent",
+    borderWidth: "1px",
+    borderStyle: "solid",
     borderColor: variantToken.panelBorderColor,
-    borderRadius: 'var(--ktn-radius-md, 0.5rem)',
+    borderRadius: "var(--ktn-radius-md, 0.5rem)",
     backgroundColor: variantToken.panelBackgroundColor,
     boxShadow: `${variantToken.panelShadow}, 0 0 0 1px color-mix(in srgb, var(--ktn-border-muted) 50%, transparent)`,
     padding: sizeToken.panelPadding,
-    visibility: visible ? 'visible' : 'hidden',
+    visibility: visible ? "visible" : "hidden",
     opacity: visible ? 1 : 0,
-    transition: 'opacity 120ms ease',
+    transition: "opacity 120ms ease",
   };
 }
 
@@ -556,17 +598,17 @@ export function DropdownMenu({
   defaultOpen = false,
   onOpenChange,
   onAction,
-  size = 'md',
+  size = "md",
   variant,
   varient,
-  side = 'auto',
+  side = "auto",
   closeOnSelect = true,
   disabled = false,
-  className = '',
+  className = "",
   style,
   ...props
 }: DropdownMenuProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? 'default';
+  const resolvedVariant = variant ?? varient ?? "default";
   const isControlled = open !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const triggerRef = useRef<HTMLDivElement | null>(null);
@@ -575,7 +617,7 @@ export function DropdownMenu({
 
   function setDropdownOpen(
     nextOpen: boolean,
-    source: DropdownMenuActionSource = 'open-change',
+    source: DropdownMenuActionSource = "open-change",
     event?: unknown,
   ): void {
     if (disabled) {
@@ -597,9 +639,9 @@ export function DropdownMenu({
       event,
     });
 
-    if (!nextOpen && source !== 'outside-click') {
+    if (!nextOpen && source !== "outside-click") {
       window.requestAnimationFrame(() => {
-        const triggerButton = triggerRef.current?.querySelector('button');
+        const triggerButton = triggerRef.current?.querySelector("button");
 
         if (triggerButton instanceof HTMLButtonElement) {
           triggerButton.focus();
@@ -628,22 +670,22 @@ export function DropdownMenu({
         return;
       }
 
-      setDropdownOpen(false, 'outside-click', event);
+      setDropdownOpen(false, "outside-click", event);
     }
 
     function handleEscape(event: KeyboardEvent): void {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         event.preventDefault();
-        setDropdownOpen(false, 'escape', event);
+        setDropdownOpen(false, "escape", event);
       }
     }
 
-    document.addEventListener('pointerdown', handlePointerDown, true);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("pointerdown", handlePointerDown, true);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener('pointerdown', handlePointerDown, true);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("pointerdown", handlePointerDown, true);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [isOpen, isControlled, disabled, onOpenChange, onAction]);
 
@@ -661,15 +703,19 @@ export function DropdownMenu({
   };
 
   const rootStyle: CSSProperties = {
-    position: 'relative',
-    display: 'inline-flex',
+    position: "relative",
+    display: "inline-flex",
     minWidth: 0,
     ...style,
   };
 
   return (
     <DropdownMenuContext.Provider value={contextValue}>
-      <div className={`${baseClasses} ${className}`.trim()} style={rootStyle} {...props}>
+      <div
+        className={`${baseClasses} ${className}`.trim()}
+        style={rootStyle}
+        {...props}
+      >
         {children}
       </div>
     </DropdownMenuContext.Provider>
@@ -679,7 +725,7 @@ export function DropdownMenu({
 export function DropdownMenuTrigger({
   children,
   disabled = false,
-  className = '',
+  className = "",
   style,
   ...props
 }: DropdownMenuTriggerProps): JSX.Element {
@@ -694,7 +740,7 @@ export function DropdownMenuTrigger({
   const isDisabled = menuDisabled || disabled;
 
   const triggerWrapperStyle: CSSProperties = {
-    display: 'inline-flex',
+    display: "inline-flex",
     minWidth: 0,
     ...style,
   };
@@ -702,12 +748,16 @@ export function DropdownMenuTrigger({
   const sizeToken = sizeTokens[size];
 
   const triggerContent =
-    children != null ? children : <span>{open ? 'Close menu' : 'Open menu'}</span>;
+    children != null ? (
+      children
+    ) : (
+      <span>{open ? "Close menu" : "Open menu"}</span>
+    );
 
   return (
     <div
       ref={triggerRef}
-      className={className.trim() === '' ? undefined : className}
+      className={className.trim() === "" ? undefined : className}
       style={triggerWrapperStyle}
       {...props}
     >
@@ -721,7 +771,7 @@ export function DropdownMenuTrigger({
         aria-controls={contentId}
         onAction={(event) => {
           if (!isDisabled) {
-            setOpen(!open, 'trigger', event);
+            setOpen(!open, "trigger", event);
           }
         }}
         onKeyDown={(event) => {
@@ -729,14 +779,14 @@ export function DropdownMenuTrigger({
             return;
           }
 
-          if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
             event.preventDefault();
-            setOpen(true, 'trigger', event);
+            setOpen(true, "trigger", event);
           }
 
-          if (event.key === 'Escape' && open) {
+          if (event.key === "Escape" && open) {
             event.preventDefault();
-            setOpen(false, 'escape', event);
+            setOpen(false, "escape", event);
           }
         }}
       >
@@ -750,8 +800,8 @@ export function DropdownMenuContent({
   children,
   side,
   sideOffset = 6,
-  align = 'start',
-  className = '',
+  align = "start",
+  className = "",
   style,
   ...props
 }: DropdownMenuContentProps): JSX.Element | null {
@@ -804,13 +854,13 @@ export function DropdownMenuContent({
 
     const rafId = window.requestAnimationFrame(updatePosition);
 
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
 
     return () => {
       window.cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
     };
   }, [align, open, resolvedSide, sideOffset, triggerRef]);
 
@@ -864,7 +914,7 @@ export function DropdownMenuContent({
       tabIndex={-1}
       aria-orientation="vertical"
       data-ktn-dropdown-layer="true"
-      className={className.trim() === '' ? undefined : className}
+      className={className.trim() === "" ? undefined : className}
       style={composedStyle}
       {...props}
       onKeyDown={(event) => {
@@ -874,22 +924,22 @@ export function DropdownMenuContent({
           return;
         }
 
-        if (event.key === 'Escape') {
+        if (event.key === "Escape") {
           event.preventDefault();
-          setOpen(false, 'escape', event);
+          setOpen(false, "escape", event);
           return;
         }
 
-        if (event.key === 'Tab') {
-          setOpen(false, 'open-change', event);
+        if (event.key === "Tab") {
+          setOpen(false, "open-change", event);
           return;
         }
 
         if (
-          event.key !== 'ArrowDown' &&
-          event.key !== 'ArrowUp' &&
-          event.key !== 'Home' &&
-          event.key !== 'End'
+          event.key !== "ArrowDown" &&
+          event.key !== "ArrowUp" &&
+          event.key !== "Home" &&
+          event.key !== "End"
         ) {
           return;
         }
@@ -908,22 +958,25 @@ export function DropdownMenuContent({
 
         event.preventDefault();
 
-        if (event.key === 'Home') {
+        if (event.key === "Home") {
           focusableItems[0]?.focus();
           return;
         }
 
-        if (event.key === 'End') {
+        if (event.key === "End") {
           focusableItems[focusableItems.length - 1]?.focus();
           return;
         }
 
         const activeElement = document.activeElement;
         const currentIndex =
-          activeElement instanceof HTMLButtonElement ? focusableItems.indexOf(activeElement) : -1;
+          activeElement instanceof HTMLButtonElement
+            ? focusableItems.indexOf(activeElement)
+            : -1;
 
-        if (event.key === 'ArrowDown') {
-          const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % focusableItems.length;
+        if (event.key === "ArrowDown") {
+          const nextIndex =
+            currentIndex < 0 ? 0 : (currentIndex + 1) % focusableItems.length;
           focusableItems[nextIndex]?.focus();
           return;
         }
@@ -931,7 +984,8 @@ export function DropdownMenuContent({
         const previousIndex =
           currentIndex < 0
             ? focusableItems.length - 1
-            : (currentIndex - 1 + focusableItems.length) % focusableItems.length;
+            : (currentIndex - 1 + focusableItems.length) %
+              focusableItems.length;
         focusableItems[previousIndex]?.focus();
       }}
     >
@@ -944,20 +998,24 @@ export function DropdownMenuContent({
 
 export function DropdownMenuGroup({
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: DropdownMenuGroupProps): JSX.Element {
   const groupStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.05rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.05rem",
     minWidth: 0,
     ...style,
   };
 
   return (
-    <div className={className.trim() === '' ? undefined : className} style={groupStyle} {...props}>
+    <div
+      className={className.trim() === "" ? undefined : className}
+      style={groupStyle}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -966,7 +1024,7 @@ export function DropdownMenuGroup({
 export function DropdownMenuLabel({
   children,
   inset = false,
-  className = '',
+  className = "",
   style,
   ...props
 }: DropdownMenuLabelProps): JSX.Element {
@@ -977,8 +1035,8 @@ export function DropdownMenuLabel({
   const labelStyle: CSSProperties = {
     margin: 0,
     minWidth: 0,
-    display: 'inline-flex',
-    alignItems: 'center',
+    display: "inline-flex",
+    alignItems: "center",
     minHeight: `calc(${sizeToken.itemHeight} - 0.35rem)`,
     paddingInline: inset
       ? `calc(${sizeToken.itemPaddingInline} + ${sizeToken.iconSize + 8}px)`
@@ -991,14 +1049,18 @@ export function DropdownMenuLabel({
   };
 
   return (
-    <div className={className.trim() === '' ? undefined : className} style={labelStyle} {...props}>
+    <div
+      className={className.trim() === "" ? undefined : className}
+      style={labelStyle}
+      {...props}
+    >
       {children}
     </div>
   );
 }
 
 export function DropdownMenuSeparator({
-  className = '',
+  className = "",
   style,
   ...props
 }: DropdownMenuSeparatorProps): JSX.Element {
@@ -1006,18 +1068,18 @@ export function DropdownMenuSeparator({
   const variantToken = variantTokens[variant];
 
   const separatorStyle: CSSProperties = {
-    width: '100%',
-    height: '1px',
+    width: "100%",
+    height: "1px",
     backgroundColor: variantToken.separatorColor,
-    marginBlock: '0.18rem',
-    borderRadius: '999px',
+    marginBlock: "0.18rem",
+    borderRadius: "999px",
     ...style,
   };
 
   return (
     <div
       role="separator"
-      className={className.trim() === '' ? undefined : className}
+      className={className.trim() === "" ? undefined : className}
       style={separatorStyle}
       {...props}
     />
@@ -1036,13 +1098,19 @@ export function DropdownMenuItem({
   keepOpenOnSelect,
   onSelect,
   submenu,
-  submenuSide = 'auto',
+  submenuSide = "auto",
   submenuOffset = 6,
-  className = '',
+  className = "",
   style,
   ...props
 }: DropdownMenuItemProps): JSX.Element {
-  const { role, onClick, onKeyDown, ['aria-label']: ariaLabel, ...restProps } = props;
+  const {
+    role,
+    onClick,
+    onKeyDown,
+    ["aria-label"]: ariaLabel,
+    ...restProps
+  } = props;
   const {
     size,
     variant,
@@ -1057,23 +1125,27 @@ export function DropdownMenuItem({
 
   const [isHovered, setIsHovered] = useState(false);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
-  const [submenuPosition, setSubmenuPosition] = useState<FloatingPosition | null>(null);
+  const [submenuPosition, setSubmenuPosition] =
+    useState<FloatingPosition | null>(null);
   const [isSubmenuReady, setIsSubmenuReady] = useState(false);
   const itemRef = useRef<HTMLButtonElement | null>(null);
   const submenuRef = useRef<HTMLDivElement | null>(null);
-  const submenuCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const submenuCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const hasSubmenu = submenu != null;
   const isSelectableItem = checked !== undefined;
   const resolvedDisabled = menuDisabled || disabled;
-  const shouldCloseOnSelect = keepOpenOnSelect ?? (!hasSubmenu && !isSelectableItem);
-  const resolvedRole = role ?? 'menuitem';
+  const shouldCloseOnSelect =
+    keepOpenOnSelect ?? (!hasSubmenu && !isSelectableItem);
+  const resolvedRole = role ?? "menuitem";
   const isSelectionItemRole =
-    resolvedRole === 'menuitemcheckbox' || resolvedRole === 'menuitemradio';
+    resolvedRole === "menuitemcheckbox" || resolvedRole === "menuitemradio";
   const itemText =
-    typeof ariaLabel === 'string' && ariaLabel.trim() !== ''
+    typeof ariaLabel === "string" && ariaLabel.trim() !== ""
       ? ariaLabel
-      : typeof children === 'string'
+      : typeof children === "string"
         ? children
         : undefined;
 
@@ -1082,11 +1154,16 @@ export function DropdownMenuItem({
   }
 
   function isWithinDropdownLayer(target: EventTarget | null): boolean {
-    return isHtmlElement(target) && target.closest('[data-ktn-dropdown-layer="true"]') != null;
+    return (
+      isHtmlElement(target) &&
+      target.closest('[data-ktn-dropdown-layer="true"]') != null
+    );
   }
 
   function isMovingIntoOwnSubmenu(target: EventTarget | null): boolean {
-    return isHtmlElement(target) && submenuRef.current?.contains(target) === true;
+    return (
+      isHtmlElement(target) && submenuRef.current?.contains(target) === true
+    );
   }
 
   function clearSubmenuCloseTimer(): void {
@@ -1136,14 +1213,15 @@ export function DropdownMenuItem({
         return;
       }
 
-      const preferredSubmenuSide = submenuSide === 'auto' ? 'right' : submenuSide;
+      const preferredSubmenuSide =
+        submenuSide === "auto" ? "right" : submenuSide;
 
       const nextPosition = resolveFloatingPosition(
         anchorRect,
         submenuRect.width,
         submenuRect.height,
         preferredSubmenuSide,
-        'start',
+        "start",
         submenuOffset,
       );
 
@@ -1153,39 +1231,41 @@ export function DropdownMenuItem({
 
     const rafId = window.requestAnimationFrame(updateSubmenuPosition);
 
-    window.addEventListener('resize', updateSubmenuPosition);
-    window.addEventListener('scroll', updateSubmenuPosition, true);
+    window.addEventListener("resize", updateSubmenuPosition);
+    window.addEventListener("scroll", updateSubmenuPosition, true);
 
     return () => {
       window.cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', updateSubmenuPosition);
-      window.removeEventListener('scroll', updateSubmenuPosition, true);
+      window.removeEventListener("resize", updateSubmenuPosition);
+      window.removeEventListener("scroll", updateSubmenuPosition, true);
     };
   }, [isSubmenuOpen, submenuOffset, submenuSide]);
 
   const rowStyle: CSSProperties = {
-    width: '100%',
+    width: "100%",
     minWidth: 0,
     minHeight: sizeToken.itemHeight,
-    border: 'none',
+    border: "none",
     backgroundColor: isHovered
       ? destructive
         ? variantToken.destructiveHoverBackgroundColor
         : variantToken.itemHoverBackgroundColor
-      : 'transparent',
-    color: destructive ? variantToken.destructiveTextColor : variantToken.itemTextColor,
-    cursor: resolvedDisabled ? 'not-allowed' : 'pointer',
+      : "transparent",
+    color: destructive
+      ? variantToken.destructiveTextColor
+      : variantToken.itemTextColor,
+    cursor: resolvedDisabled ? "not-allowed" : "pointer",
     opacity: resolvedDisabled ? 0.62 : 1,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: '0.35rem',
-    borderRadius: 'var(--ktn-radius-sm, 0.375rem)',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "0.35rem",
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
     paddingInline: sizeToken.itemPaddingInline,
     fontSize: sizeToken.itemFontSize,
     lineHeight: 1.3,
-    textAlign: 'start',
-    transition: 'background-color 120ms ease, color 120ms ease',
+    textAlign: "start",
+    transition: "background-color 120ms ease, color 120ms ease",
     ...(inset
       ? {
           paddingInlineStart: `calc(${sizeToken.itemPaddingInline} + ${sizeToken.iconSize + 8}px)`,
@@ -1196,9 +1276,9 @@ export function DropdownMenuItem({
 
   const leftWrapStyle: CSSProperties = {
     minWidth: 0,
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.45rem',
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.45rem",
     flex: 1,
   };
 
@@ -1206,35 +1286,39 @@ export function DropdownMenuItem({
     width: `${sizeToken.iconSize}px`,
     minWidth: `${sizeToken.iconSize}px`,
     height: `${sizeToken.iconSize}px`,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
     lineHeight: 0,
-    color: destructive ? variantToken.destructiveTextColor : variantToken.itemTextColor,
+    color: destructive
+      ? variantToken.destructiveTextColor
+      : variantToken.itemTextColor,
   };
 
   const selectionIndicatorWrapStyle: CSSProperties = {
     width: `${sizeToken.iconSize}px`,
     minWidth: `${sizeToken.iconSize}px`,
     height: `${sizeToken.iconSize}px`,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
     lineHeight: 0,
-    color: destructive ? variantToken.destructiveTextColor : variantToken.itemTextColor,
+    color: destructive
+      ? variantToken.destructiveTextColor
+      : variantToken.itemTextColor,
   };
 
   const labelWrapStyle: CSSProperties = {
     minWidth: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   };
 
   const trailingWrapStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '0.35rem',
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.35rem",
     minWidth: 0,
     color: variantToken.shortcutColor,
   };
@@ -1243,7 +1327,7 @@ export function DropdownMenuItem({
     fontSize: sizeToken.shortcutFontSize,
     lineHeight: 1.2,
     color: variantToken.shortcutColor,
-    whiteSpace: 'nowrap',
+    whiteSpace: "nowrap",
   };
 
   const hasLeadingIcon = icon != null;
@@ -1261,15 +1345,15 @@ export function DropdownMenuItem({
     onSelect?.();
 
     const nextChecked =
-      resolvedRole === 'menuitemcheckbox'
+      resolvedRole === "menuitemcheckbox"
         ? !Boolean(checked)
-        : resolvedRole === 'menuitemradio'
+        : resolvedRole === "menuitemradio"
           ? true
           : checked;
     const willCloseMenu = closeOnSelect && shouldCloseOnSelect;
 
     onAction?.({
-      source: 'item-select',
+      source: "item-select",
       open: !willCloseMenu,
       itemText,
       checked: isSelectionItemRole ? nextChecked : undefined,
@@ -1277,7 +1361,7 @@ export function DropdownMenuItem({
     });
 
     if (willCloseMenu) {
-      setOpen(false, 'item-select', event);
+      setOpen(false, "item-select", event);
     }
   }
 
@@ -1298,9 +1382,9 @@ export function DropdownMenuItem({
         role={resolvedRole}
         aria-checked={isSelectionItemRole ? checked === true : undefined}
         aria-disabled={resolvedDisabled}
-        aria-haspopup={hasSubmenu ? 'menu' : undefined}
+        aria-haspopup={hasSubmenu ? "menu" : undefined}
         aria-expanded={hasSubmenu ? isSubmenuOpen : undefined}
-        className={className.trim() === '' ? undefined : className}
+        className={className.trim() === "" ? undefined : className}
         style={rowStyle}
         {...restProps}
         onMouseEnter={() => {
@@ -1335,7 +1419,7 @@ export function DropdownMenuItem({
             return;
           }
 
-          if (event.key === 'ArrowRight') {
+          if (event.key === "ArrowRight") {
             event.preventDefault();
             openSubmenu();
 
@@ -1352,7 +1436,7 @@ export function DropdownMenuItem({
             });
           }
 
-          if (event.key === 'ArrowLeft' && isSubmenuOpen) {
+          if (event.key === "ArrowLeft" && isSubmenuOpen) {
             event.preventDefault();
             closeSubmenu(false);
           }
@@ -1365,7 +1449,9 @@ export function DropdownMenuItem({
         </span>
 
         <span style={trailingWrapStyle}>
-          {shortcut != null ? <span style={shortcutStyle}>{shortcut}</span> : null}
+          {shortcut != null ? (
+            <span style={shortcutStyle}>{shortcut}</span>
+          ) : null}
           {checked === true ? (
             <span style={selectionIndicatorWrapStyle}>
               {checkIcon ?? <FiCheck size={sizeToken.iconSize} />}
@@ -1394,14 +1480,14 @@ export function DropdownMenuItem({
                 closeSubmenu(true);
               }}
               onKeyDown={(event) => {
-                if (event.key === 'Escape') {
+                if (event.key === "Escape") {
                   event.preventDefault();
                   closeSubmenu(false);
                   itemRef.current?.focus();
                   return;
                 }
 
-                if (event.key === 'ArrowLeft') {
+                if (event.key === "ArrowLeft") {
                   event.preventDefault();
                   closeSubmenu(false);
                   itemRef.current?.focus();
@@ -1443,12 +1529,14 @@ export function DropdownMenuRadioGroup({
   value,
   defaultValue,
   onValueChange,
-  className = '',
+  className = "",
   style,
   ...props
 }: DropdownMenuRadioGroupProps): JSX.Element {
   const isControlled = value !== undefined;
-  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue ?? null);
+  const [uncontrolledValue, setUncontrolledValue] = useState(
+    defaultValue ?? null,
+  );
   const resolvedValue = isControlled ? (value ?? null) : uncontrolledValue;
 
   function setValue(nextValue: string): void {
@@ -1465,16 +1553,16 @@ export function DropdownMenuRadioGroup({
   };
 
   const groupStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.05rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.05rem",
     ...style,
   };
 
   return (
     <DropdownMenuRadioGroupContext.Provider value={contextValue}>
       <div
-        className={className.trim() === '' ? undefined : className}
+        className={className.trim() === "" ? undefined : className}
         style={groupStyle}
         {...props}
       >

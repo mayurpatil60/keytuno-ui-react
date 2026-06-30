@@ -9,16 +9,21 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { FiX } from 'react-icons/fi';
+import { FiX } from "./icons/feather";
 
-import { Button } from './Button';
-import { Dialog, type DialogActionContext } from './Dialog';
-import { Scrollbar } from './Scrollbar';
+import { Button } from "./Button";
+import { Dialog, type DialogActionContext } from "./Dialog";
+import { Scrollbar } from "./Scrollbar";
 
-export type SheetSide = 'top' | 'bottom' | 'left' | 'right';
-export type SheetActionSource = 'trigger' | 'overlay' | 'escape' | 'close-button' | 'open-change';
+export type SheetSide = "top" | "bottom" | "left" | "right";
+export type SheetActionSource =
+  | "trigger"
+  | "overlay"
+  | "escape"
+  | "close-button"
+  | "open-change";
 
 export interface SheetActionContext {
   source: SheetActionSource;
@@ -28,7 +33,10 @@ export interface SheetActionContext {
   event?: unknown;
 }
 
-export interface SheetProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface SheetProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -83,75 +91,75 @@ function useSheetContextValue(): SheetContextValue {
   return {
     open: false,
     setOpen: () => {},
-    side: 'right',
+    side: "right",
     disabled: false,
     showCloseButton: true,
-    titleId: '',
-    descriptionId: '',
+    titleId: "",
+    descriptionId: "",
   };
 }
 
 function getSheetContainerStyle(side: SheetSide): CSSProperties {
-  if (side === 'left') {
+  if (side === "left") {
     return {
-      alignItems: 'stretch',
-      justifyContent: 'flex-start',
+      alignItems: "stretch",
+      justifyContent: "flex-start",
     };
   }
 
-  if (side === 'top') {
+  if (side === "top") {
     return {
-      alignItems: 'flex-start',
-      justifyContent: 'center',
+      alignItems: "flex-start",
+      justifyContent: "center",
     };
   }
 
-  if (side === 'bottom') {
+  if (side === "bottom") {
     return {
-      alignItems: 'flex-end',
-      justifyContent: 'center',
+      alignItems: "flex-end",
+      justifyContent: "center",
     };
   }
 
   return {
-    alignItems: 'stretch',
-    justifyContent: 'flex-end',
+    alignItems: "stretch",
+    justifyContent: "flex-end",
   };
 }
 
 function getSheetPanelStyle(side: SheetSide): CSSProperties {
-  if (side === 'left' || side === 'right') {
+  if (side === "left" || side === "right") {
     return {
-      width: 'min(94vw, 30rem)',
-      height: '100vh',
-      maxHeight: '100vh',
+      width: "min(94vw, 30rem)",
+      height: "100vh",
+      maxHeight: "100vh",
     };
   }
 
   return {
-    width: '100vw',
-    maxWidth: '100vw',
-    minHeight: '10rem',
-    maxHeight: 'min(85vh, 32rem)',
+    width: "100vw",
+    maxWidth: "100vw",
+    minHeight: "10rem",
+    maxHeight: "min(85vh, 32rem)",
   };
 }
 
 function getSheetPanelRadiusStyle(side: SheetSide): CSSProperties {
-  if (side === 'left') {
+  if (side === "left") {
     return {
       borderTopLeftRadius: 0,
       borderBottomLeftRadius: 0,
     };
   }
 
-  if (side === 'right') {
+  if (side === "right") {
     return {
       borderTopRightRadius: 0,
       borderBottomRightRadius: 0,
     };
   }
 
-  if (side === 'top') {
+  if (side === "top") {
     return {
       borderTopLeftRadius: 0,
       borderTopRightRadius: 0,
@@ -165,19 +173,19 @@ function getSheetPanelRadiusStyle(side: SheetSide): CSSProperties {
 }
 
 function getSheetHiddenTransform(side: SheetSide): string {
-  if (side === 'left') {
-    return 'translate3d(-100%, 0, 0)';
+  if (side === "left") {
+    return "translate3d(-100%, 0, 0)";
   }
 
-  if (side === 'right') {
-    return 'translate3d(100%, 0, 0)';
+  if (side === "right") {
+    return "translate3d(100%, 0, 0)";
   }
 
-  if (side === 'top') {
-    return 'translate3d(0, -100%, 0)';
+  if (side === "top") {
+    return "translate3d(0, -100%, 0)";
   }
 
-  return 'translate3d(0, 100%, 0)';
+  return "translate3d(0, 100%, 0)";
 }
 
 export function Sheet({
@@ -187,12 +195,12 @@ export function Sheet({
   onOpenChange,
   onAction,
   trigger,
-  side = 'right',
+  side = "right",
   showCloseButton = true,
   disabled = false,
   closeOnOverlayClick = true,
   closeOnEscape = true,
-  className = '',
+  className = "",
   style,
   ...props
 }: SheetProps): JSX.Element {
@@ -231,7 +239,7 @@ export function Sheet({
 
   function setSheetOpen(
     nextOpen: boolean,
-    source: SheetActionSource = 'open-change',
+    source: SheetActionSource = "open-change",
     event?: unknown,
   ): void {
     if (disabled) {
@@ -296,8 +304,8 @@ export function SheetContent({
   side,
   showCloseButton,
   scrollable = false,
-  maxContentHeight = 'min(85vh, 32rem)',
-  className = '',
+  maxContentHeight = "min(85vh, 32rem)",
+  className = "",
   style,
   ...props
 }: SheetContentProps): JSX.Element {
@@ -333,66 +341,70 @@ export function SheetContent({
   });
 
   const shellStyle: CSSProperties = {
-    position: 'fixed',
+    position: "fixed",
     inset: 0,
-    width: '100vw',
-    height: '100vh',
-    pointerEvents: 'none',
-    display: 'flex',
+    width: "100vw",
+    height: "100vh",
+    pointerEvents: "none",
+    display: "flex",
     ...getSheetContainerStyle(resolvedSide),
   };
 
   const panelStyle: CSSProperties = {
-    position: 'relative',
-    pointerEvents: 'auto',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'var(--ktn-border-muted)',
-    borderRadius: 'var(--ktn-radius-lg, 0.75rem)',
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    boxShadow: '0 24px 56px rgba(15, 23, 42, 0.28)',
-    color: 'var(--ktn-text-primary)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.6rem',
-    padding: '0.95rem',
-    fontSize: '0.875rem',
+    position: "relative",
+    pointerEvents: "auto",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "var(--ktn-border-muted)",
+    borderRadius: "var(--ktn-radius-lg, 0.75rem)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    boxShadow: "0 24px 56px rgba(15, 23, 42, 0.28)",
+    color: "var(--ktn-text-primary)",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.6rem",
+    padding: "0.95rem",
+    fontSize: "0.875rem",
     lineHeight: 1.5,
     opacity: isVisible ? (disabled ? 0.72 : 1) : 0.98,
-    transform: isVisible ? 'translate3d(0, 0, 0)' : getSheetHiddenTransform(resolvedSide),
-    willChange: 'transform, opacity',
+    transform: isVisible
+      ? "translate3d(0, 0, 0)"
+      : getSheetHiddenTransform(resolvedSide),
+    willChange: "transform, opacity",
     transition: `transform ${SHEET_ANIMATION_MS}ms cubic-bezier(0.16, 1, 0.3, 1), opacity 260ms cubic-bezier(0.22, 1, 0.36, 1)`,
-    ['--ktn-sheet-close-space' as string]: resolvedShowCloseButton
-      ? 'calc(1.82rem + 0.5rem)'
-      : '0px',
+    ["--ktn-sheet-close-space" as string]: resolvedShowCloseButton
+      ? "calc(1.82rem + 0.5rem)"
+      : "0px",
     ...getSheetPanelStyle(resolvedSide),
     ...getSheetPanelRadiusStyle(resolvedSide),
-    ...(resolvedSide === 'top' || resolvedSide === 'bottom'
+    ...(resolvedSide === "top" || resolvedSide === "bottom"
       ? {
-          ...(scrollable ? { overflow: 'hidden', maxHeight: maxContentHeight } : {}),
+          ...(scrollable
+            ? { overflow: "hidden", maxHeight: maxContentHeight }
+            : {}),
         }
       : {
-          ...(scrollable ? { overflow: 'hidden' } : {}),
+          ...(scrollable ? { overflow: "hidden" } : {}),
         }),
     ...style,
   };
 
   const closeWrapStyle: CSSProperties = {
-    position: 'absolute',
-    insetInlineEnd: '0.55rem',
-    insetBlockStart: '0.55rem',
+    position: "absolute",
+    insetInlineEnd: "0.55rem",
+    insetBlockStart: "0.55rem",
     zIndex: 1,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
   };
 
   const sectionStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.6rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.6rem",
     minWidth: 0,
-    width: '100%',
+    width: "100%",
   };
 
   const bodySectionStyle: CSSProperties = {
@@ -401,12 +413,12 @@ export function SheetContent({
       ? {
           flex: 1,
           minHeight: 0,
-          paddingInlineEnd: '0.2rem',
+          paddingInlineEnd: "0.2rem",
         }
       : {}),
   };
 
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   return (
     <div style={shellStyle}>
@@ -429,29 +441,34 @@ export function SheetContent({
               disabled={disabled}
               aria-label="Close sheet"
               style={{
-                width: '1.82rem',
-                height: '1.82rem',
-                minHeight: '1.82rem',
+                width: "1.82rem",
+                height: "1.82rem",
+                minHeight: "1.82rem",
                 paddingInline: 0,
                 paddingBlock: 0,
-                borderRadius: '999px',
-                color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+                borderRadius: "999px",
+                color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
                 lineHeight: 0,
               }}
               onClick={(event) => {
                 if (!disabled) {
-                  setOpen(false, 'close-button', event);
+                  setOpen(false, "close-button", event);
                 }
               }}
             >
-              <span aria-hidden style={{ display: 'inline-flex', lineHeight: 0 }}>
+              <span
+                aria-hidden
+                style={{ display: "inline-flex", lineHeight: 0 }}
+              >
                 <FiX size={14} />
               </span>
             </Button>
           </div>
         ) : null}
 
-        {headerChildren.length > 0 ? <div style={sectionStyle}>{headerChildren}</div> : null}
+        {headerChildren.length > 0 ? (
+          <div style={sectionStyle}>{headerChildren}</div>
+        ) : null}
 
         {bodyChildren.length > 0 ? (
           scrollable ? (
@@ -463,7 +480,9 @@ export function SheetContent({
           )
         ) : null}
 
-        {footerChildren.length > 0 ? <div style={sectionStyle}>{footerChildren}</div> : null}
+        {footerChildren.length > 0 ? (
+          <div style={sectionStyle}>{footerChildren}</div>
+        ) : null}
       </div>
     </div>
   );
@@ -471,18 +490,18 @@ export function SheetContent({
 
 export function SheetHeader({
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: SheetHeaderProps): JSX.Element {
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const headerStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.25rem',
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.25rem",
     margin: 0,
-    paddingInlineEnd: 'var(--ktn-sheet-close-space, 0px)',
+    paddingInlineEnd: "var(--ktn-sheet-close-space, 0px)",
     ...style,
   };
 
@@ -495,26 +514,31 @@ export function SheetHeader({
 
 export function SheetTitle({
   children,
-  className = '',
+  className = "",
   style,
   id,
   ...props
 }: SheetTitleProps): JSX.Element {
   const { titleId } = useSheetContextValue();
-  const composedClassName = className.trim() === '' ? undefined : className;
-  const resolvedId = id ?? (titleId === '' ? undefined : titleId);
+  const composedClassName = className.trim() === "" ? undefined : className;
+  const resolvedId = id ?? (titleId === "" ? undefined : titleId);
 
   const titleStyle: CSSProperties = {
     margin: 0,
     fontWeight: 600,
-    fontSize: '1.08rem',
+    fontSize: "1.08rem",
     lineHeight: 1.3,
-    color: 'var(--ktn-text-primary)',
+    color: "var(--ktn-text-primary)",
     ...style,
   };
 
   return (
-    <h3 id={resolvedId} className={composedClassName} style={titleStyle} {...props}>
+    <h3
+      id={resolvedId}
+      className={composedClassName}
+      style={titleStyle}
+      {...props}
+    >
       {children}
     </h3>
   );
@@ -522,26 +546,31 @@ export function SheetTitle({
 
 export function SheetDescription({
   children,
-  className = '',
+  className = "",
   style,
   id,
   ...props
 }: SheetDescriptionProps): JSX.Element {
   const { descriptionId } = useSheetContextValue();
-  const composedClassName = className.trim() === '' ? undefined : className;
-  const resolvedId = id ?? (descriptionId === '' ? undefined : descriptionId);
+  const composedClassName = className.trim() === "" ? undefined : className;
+  const resolvedId = id ?? (descriptionId === "" ? undefined : descriptionId);
 
   const descriptionStyle: CSSProperties = {
     margin: 0,
     fontWeight: 400,
-    fontSize: '0.875rem',
+    fontSize: "0.875rem",
     lineHeight: 1.45,
-    color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     ...style,
   };
 
   return (
-    <p id={resolvedId} className={composedClassName} style={descriptionStyle} {...props}>
+    <p
+      id={resolvedId}
+      className={composedClassName}
+      style={descriptionStyle}
+      {...props}
+    >
       {children}
     </p>
   );
@@ -550,26 +579,26 @@ export function SheetDescription({
 export function SheetFooter({
   children,
   sticky = false,
-  className = '',
+  className = "",
   style,
   ...props
 }: SheetFooterProps): JSX.Element {
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const footerStyle: CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    width: '100%',
-    boxSizing: 'border-box',
-    gap: '0.5rem',
-    marginTop: '0.15rem',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    flexWrap: "wrap",
+    width: "100%",
+    boxSizing: "border-box",
+    gap: "0.5rem",
+    marginTop: "0.15rem",
     ...(sticky
       ? {
-          backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-          paddingBlockStart: '0.65rem',
-          borderTop: '1px solid var(--ktn-border-muted)',
+          backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+          paddingBlockStart: "0.65rem",
+          borderTop: "1px solid var(--ktn-border-muted)",
         }
       : {}),
     ...style,
