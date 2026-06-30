@@ -91,6 +91,18 @@ export type {
   SidebarSize,
   SidebarVariant,
 } from "./components/Sidebar";
+export { Stepper } from "./components/Stepper";
+export type {
+  StepperActionContext,
+  StepperActionSource,
+  StepperControlButtonConfig,
+  StepperControls,
+  StepperProps,
+  StepperSize,
+  StepperStep,
+  StepperSubstep,
+  StepperVariant,
+} from "./components/Stepper";
 export {
   Card,
   CardAction,

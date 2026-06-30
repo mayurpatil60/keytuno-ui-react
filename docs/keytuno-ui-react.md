@@ -522,6 +522,177 @@ interface BreadcrumbItem {
 />
 ```
 
+### Stepper
+
+```ts
+import { Stepper } from '@keytuno/ui-react';
+
+interface StepperSubstep {
+  id: string;
+  title: ReactNode;
+  shortDescription?: ReactNode;
+  description?: ReactNode;
+  icon?: ReactNode;
+  completed?: boolean;
+  disabled?: boolean;
+  ariaLabel?: string;
+}
+
+interface StepperStep {
+  id: string;
+  title: ReactNode;
+  shortDescription?: ReactNode;
+  description?: ReactNode;
+  content?: ReactNode;
+  icon?: ReactNode;
+  substeps?: StepperSubstep[];
+  completed?: boolean;
+  disabled?: boolean;
+  collapsible?: boolean;
+  keepOpen?: boolean;             // seeds initial open state, not a permanent lock
+  defaultOpen?: boolean;
+  open?: boolean;                 // true seeds initial open state
+  ariaLabel?: string;
+}
+
+<Stepper
+  steps={StepperStep[]}
+  variant?={'vertical'|'horizontal'|'compact-vertical'|'compact-horizontal'}
+  size?={'xs'|'sm'|'md'|'lg'}
+  activeStepId?={string}
+  defaultActiveStepId?={string}
+  onActiveStepChange?={(stepId: string) => void}
+  activeSubstepId?={string}
+  defaultActiveSubstepId?={string}
+  onActiveSubstepChange?={(substepId: string, stepId: string) => void}
+  openStepIds?={string[]}
+  defaultOpenStepIds?={string[]}
+  onOpenStepIdsChange?={(ids: string[]) => void}
+  collapsible?={boolean}
+  allowMultipleOpen?={boolean}
+  disabled?={boolean}
+  showDescriptions?={boolean}
+  showShortDescriptions?={boolean}
+  showSubsteps?={boolean}
+  showDisabledSteps?={boolean}     // include disabled step cards in layout
+  showDisabledSubsteps?={boolean}  // include disabled substeps in panel lists
+  showStepNumbers?={boolean}
+  showIndicators?={boolean}
+  showControls?={boolean}
+  showControlsInside?={boolean}    // render action controls inside each open step card
+  showControlsOutside?={boolean}   // render action controls below the stepper
+  showPrevious?={boolean}          // show/hide previous button
+  showNext?={boolean}              // show/hide next button
+  showSubmit?={boolean}            // show/hide submit button
+  controls?={{ previous, next, submit }} // supports with-icon, text-only, icon-only
+  submitOnLastStep?={boolean}
+  hideNextWhenLastStep?={boolean}
+  onSubmit?={(activeStepId: string | null) => void}
+  onAction?={(ctx: StepperActionContext) => void}
+/>
+```
+
+Stepper behavior notes:
+
+- Any collapsible step card can be opened or closed from the step header (title/indicator area) or the up/down toggle button.
+- Disabled steps are non-selectable as active steps, but their cards can still be expanded or collapsed when the Stepper itself is not globally disabled.
+- First, middle, and last steps follow the same open/close behavior with no position-based lock.
+- `defaultOpen`, `open`, and `keepOpen` are treated as initial open seeds. Runtime expand/collapse is driven by user interaction or `openStepIds` control.
+- Action controls are right-aligned and include only previous, next, and submit.
+- Submit button uses success styling by default, and completed step tick indicators use success styling.
+
+### Navbar
+
+```ts
+import { Navbar } from '@keytuno/ui-react';
+
+interface NavbarItem {
+  id: string;
+  label: ReactNode;
+  icon?: ReactNode;
+  badge?: ReactNode;
+  href?: string;
+  disabled?: boolean;
+  active?: boolean;
+  items?: NavbarItem[];
+  onAction?: (event?: MouseEvent) => void;
+}
+
+<Navbar
+  brand?={ReactNode}
+  items?={NavbarItem[]}
+  actions?={ReactNode}
+  size?={'sm'|'md'|'lg'}
+  variant?={'default'|'outline'|'soft'}
+  sticky?={boolean}
+  responsive?={boolean}
+  mobileBreakpoint?={number}
+  mobileMenuSide?={'left'|'right'}
+  mobileTitle?={ReactNode}
+  showMobileToggle?={boolean}
+  mobileToggleLabel?={string}
+  mobileOpen?={boolean}
+  defaultMobileOpen?={boolean}
+  onMobileOpenChange?={(open: boolean) => void}
+  closeMobileOnSelect?={boolean}
+  activeItemId?={string}
+  defaultActiveItemId?={string}
+  onActiveItemChange?={(itemId: string) => void}
+  onItemSelect?={(item: NavbarItem, parentItem?: NavbarItem) => void}
+  onAction?={(ctx: NavbarActionContext) => void}
+/>
+```
+
+### Sidebar
+
+```ts
+import { Sidebar } from '@keytuno/ui-react';
+
+interface SidebarItem {
+  id: string;
+  label: ReactNode;
+  icon?: ReactNode;
+  badge?: ReactNode;
+  href?: string;
+  disabled?: boolean;
+  active?: boolean;
+  items?: SidebarItem[];
+}
+
+interface SidebarSection {
+  id?: string;
+  title?: ReactNode;
+  items: SidebarItem[];
+}
+
+<Sidebar
+  sections?={SidebarSection[]}
+  header?={ReactNode}
+  footer?={ReactNode}
+  size?={'sm'|'md'|'lg'}
+  variant?={'default'|'outline'|'soft'}
+  collapsed?={boolean}
+  defaultCollapsed?={boolean}
+  onCollapsedChange?={(collapsed: boolean) => void}
+  mobileOpen?={boolean}
+  defaultMobileOpen?={boolean}
+  onMobileOpenChange?={(open: boolean) => void}
+  responsive?={boolean}
+  collapseBreakpoint?={number}
+  iconOnly?={boolean}
+  showCollapseToggle?={boolean}
+  showMobileToggle?={boolean}
+  closeMobileOnSelect?={boolean}
+  activeItemId?={string}
+  defaultActiveItemId?={string}
+  onActiveItemChange?={(itemId: string) => void}
+  onItemSelect?={(item: SidebarItem) => void}
+  showSectionSeparators?={boolean}
+  sectionSeparatorSize?={'xs'|'sm'|'md'|'lg'}
+  onAction?={(ctx: SidebarActionContext) => void}
+/>
+```
+
 ### Card
 
 ```ts
@@ -670,6 +841,26 @@ import { Alert, AlertTitle, AlertDescription, AlertAction } from '@keytuno/ui-re
 </Alert>
 ```
 
+### Toast
+
+```ts
+import { Toast } from '@keytuno/ui-react';
+
+<Toast
+  open?={boolean}
+  defaultOpen?={boolean}
+  onOpenChange?={(open: boolean) => void}
+  onAction?={(ctx: ToastActionContext) => void}
+  variant?={'default'|'success'|'warning'|'danger'}
+  size?={'xs'|'sm'|'md'}
+  duration?={number}
+  bottomOffset?={number}
+  bordered?={boolean}
+>
+  Saved successfully.
+</Toast>
+```
+
 ### DropdownMenu
 
 ```ts
@@ -814,6 +1005,48 @@ import { exportTableAsXlsx, exportTableAsPdf } from '@keytuno/ui-react/addons/ta
   exportable
   exportFormats={['csv', 'xlsx', 'pdf']}
   exportHandlers={{ xlsx: exportTableAsXlsx, pdf: exportTableAsPdf }}
+/>
+```
+
+### List
+
+```ts
+import { List } from '@keytuno/ui-react';
+
+interface ListLine {
+  values: [ReactNode] | [ReactNode, ReactNode] | [ReactNode, ReactNode, ReactNode];
+  size?: 'xs'|'sm'|'md'|'lg';
+  tone?: 'default'|'muted'|'positive'|'negative';
+}
+
+interface ListItem {
+  id?: string | number;
+  values?: [ReactNode] | [ReactNode, ReactNode] | [ReactNode, ReactNode, ReactNode];
+  lines?: ListLine[];
+  disabled?: boolean;
+  collapsible?: boolean;
+  defaultCollapsed?: boolean;
+}
+
+<List
+  items={ListItem[]}
+  columns?={'auto'|'one'|'two'|'three'}
+  size?={'xs'|'sm'|'md'|'lg'}
+  secondaryLineSize?={'xs'|'sm'|'md'|'lg'}
+  secondaryLineTone?={'default'|'muted'|'positive'|'negative'}
+  disabled?={boolean}
+  rowDivider?={boolean}
+  collapsible?={boolean}
+  defaultCollapsed?={boolean}
+  showCollapseIndicator?={boolean}
+  showHoverActions?={boolean}
+  hoverActionIds?={('view'|'edit'|'delete')[]}
+  virtualized?={boolean}
+  virtualizedMaxHeight?={number | string}
+  virtualizedEstimateSize?={number}
+  virtualizedOverscan?={number}
+  emptyText?={ReactNode}
+  onAction?={(ctx: ListActionContext) => void}
 />
 ```
 
