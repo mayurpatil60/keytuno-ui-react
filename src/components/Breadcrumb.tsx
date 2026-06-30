@@ -8,9 +8,9 @@ import {
   type HTMLAttributes,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
-} from 'react';
+} from "react";
 
-export type BreadcrumbSize = 'xs' | 'sm' | 'md' | 'lg';
+export type BreadcrumbSize = "xs" | "sm" | "md" | "lg";
 
 export interface BreadcrumbItem {
   label: ReactNode;
@@ -28,10 +28,22 @@ export interface BreadcrumbActionContext {
   event: ReactMouseEvent<Element>;
 }
 
-export interface BreadcrumbProps extends Omit<HTMLAttributes<HTMLElement>, 'children'> {
+export interface BreadcrumbProps extends Omit<
+  HTMLAttributes<HTMLElement>,
+  "children"
+> {
   items: BreadcrumbItem[];
   size?: BreadcrumbSize;
   separator?: ReactNode;
+  separatorFallback?: ReactNode;
+  ellipsisContent?: ReactNode;
+  ellipsisAriaLabelFormatter?: (hiddenItemsCount: number) => string;
+  itemAriaLabelFormatter?: (context: {
+    item: BreadcrumbItem;
+    index: number;
+    isCurrentPage: boolean;
+  }) => string | undefined;
+  navigationAriaLabel?: string;
   maxVisibleItems?: number;
   onAction?: (context: BreadcrumbActionContext) => void;
 }
@@ -52,49 +64,50 @@ type BreadcrumbSizeTokens = {
 
 type BreadcrumbRenderEntry =
   | {
-      kind: 'item';
+      kind: "item";
       item: BreadcrumbItem;
     }
   | {
-      kind: 'ellipsis';
+      kind: "ellipsis";
+      hiddenItemsCount: number;
     };
 
 const sizeTokens: Record<BreadcrumbSize, BreadcrumbSizeTokens> = {
   xs: {
-    fontSize: '0.75rem',
-    separatorPaddingInline: '0.3rem',
-    ellipsisMinWidth: '1.15rem',
+    fontSize: "0.75rem",
+    separatorPaddingInline: "0.3rem",
+    ellipsisMinWidth: "1.15rem",
   },
   sm: {
-    fontSize: '0.8125rem',
-    separatorPaddingInline: '0.375rem',
-    ellipsisMinWidth: '1.25rem',
+    fontSize: "0.8125rem",
+    separatorPaddingInline: "0.375rem",
+    ellipsisMinWidth: "1.25rem",
   },
   md: {
-    fontSize: '0.875rem',
-    separatorPaddingInline: '0.45rem',
-    ellipsisMinWidth: '1.35rem',
+    fontSize: "0.875rem",
+    separatorPaddingInline: "0.45rem",
+    ellipsisMinWidth: "1.35rem",
   },
   lg: {
-    fontSize: '0.9375rem',
-    separatorPaddingInline: '0.5rem',
-    ellipsisMinWidth: '1.45rem',
+    fontSize: "0.9375rem",
+    separatorPaddingInline: "0.5rem",
+    ellipsisMinWidth: "1.45rem",
   },
 };
 
 const currentPageStyle: CSSProperties = {
-  color: 'var(--ktn-text-primary)',
+  color: "var(--ktn-text-primary)",
   fontWeight: 500,
   lineHeight: 1.25,
 };
 
 const textItemStyle: CSSProperties = {
-  color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+  color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   fontWeight: 400,
   lineHeight: 1.25,
 };
 
-const BreadcrumbSizeContext = createContext<BreadcrumbSize>('md');
+const BreadcrumbSizeContext = createContext<BreadcrumbSize>("md");
 
 function useResolvedSize(size?: BreadcrumbSize): BreadcrumbSize {
   const inheritedSize = useContext(BreadcrumbSizeContext);
@@ -109,31 +122,61 @@ function buildRenderableItems(
   const normalizedItems = items.filter((item) => item.label != null);
 
   if (maxVisibleItems == null || normalizedItems.length <= maxVisibleItems) {
-    return normalizedItems.map((item) => ({ kind: 'item', item }));
+    return normalizedItems.map((item) => ({ kind: "item", item }));
   }
 
   if (maxVisibleItems <= 2) {
     return normalizedItems
       .slice(Math.max(0, normalizedItems.length - maxVisibleItems))
-      .map((item) => ({ kind: 'item', item }));
+      .map((item) => ({ kind: "item", item }));
   }
 
   const trailingItemCount = Math.max(maxVisibleItems - 2, 1);
-  const trailingItems = normalizedItems.slice(normalizedItems.length - trailingItemCount);
+  const trailingItems = normalizedItems.slice(
+    normalizedItems.length - trailingItemCount,
+  );
+  const hiddenItemsCount = Math.max(
+    normalizedItems.length - (1 + trailingItems.length),
+    0,
+  );
 
   return [
     {
-      kind: 'item',
+      kind: "item",
       item: normalizedItems[0],
     },
     {
-      kind: 'ellipsis',
+      kind: "ellipsis",
+      hiddenItemsCount,
     },
     ...trailingItems.map<BreadcrumbRenderEntry>((item) => ({
-      kind: 'item',
+      kind: "item",
       item,
     })),
   ];
+}
+
+function getTextLabel(label: ReactNode): string | undefined {
+  if (typeof label === "string") {
+    const trimmed = label.trim();
+    return trimmed === "" ? undefined : trimmed;
+  }
+
+  if (typeof label === "number") {
+    return String(label);
+  }
+
+  if (Array.isArray(label)) {
+    const joined = label
+      .map((value) => getTextLabel(value) ?? "")
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    return joined === "" ? undefined : joined;
+  }
+
+  return undefined;
 }
 
 interface BreadcrumbLinkNodeProps {
@@ -160,22 +203,23 @@ function BreadcrumbLinkNode({
 
   const linkStyle: CSSProperties = {
     color: isInteractive
-      ? 'var(--ktn-action-primary-bg)'
-      : 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    textDecoration: isInteractive ? 'underline' : 'none',
-    textUnderlineOffset: '0.14em',
-    textDecorationThickness: '1px',
-    borderRadius: '0.25rem',
-    outline: 'none',
+      ? "var(--ktn-action-primary-bg)"
+      : "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    textDecoration: isInteractive ? "underline" : "none",
+    textUnderlineOffset: "0.14em",
+    textDecorationThickness: "1px",
+    borderRadius: "0.25rem",
+    outline: "none",
     boxShadow: isFocused
-      ? '0 0 0 2px color-mix(in srgb, var(--ktn-action-primary-bg) 35%, transparent)'
-      : 'none',
+      ? "0 0 0 2px color-mix(in srgb, var(--ktn-action-primary-bg) 35%, transparent)"
+      : "none",
     lineHeight: 1.25,
-    cursor: 'pointer',
-    transition: 'color 120ms ease, text-decoration-color 120ms ease',
+    cursor: "pointer",
+    transition: "color 120ms ease, text-decoration-color 120ms ease",
   };
 
-  const resolvedRel = target === '_blank' ? (rel ?? 'noreferrer noopener') : rel;
+  const resolvedRel =
+    target === "_blank" ? (rel ?? "noreferrer noopener") : rel;
 
   return (
     <a
@@ -221,22 +265,22 @@ function BreadcrumbActionNode({
 
   const actionStyle: CSSProperties = {
     color: isInteractive
-      ? 'var(--ktn-action-primary-bg)'
-      : 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-    textDecoration: isInteractive ? 'underline' : 'none',
-    textUnderlineOffset: '0.14em',
-    textDecorationThickness: '1px',
-    borderRadius: '0.25rem',
-    outline: 'none',
+      ? "var(--ktn-action-primary-bg)"
+      : "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    textDecoration: isInteractive ? "underline" : "none",
+    textUnderlineOffset: "0.14em",
+    textDecorationThickness: "1px",
+    borderRadius: "0.25rem",
+    outline: "none",
     border: 0,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     padding: 0,
     lineHeight: 1.25,
     boxShadow: isFocused
-      ? '0 0 0 2px color-mix(in srgb, var(--ktn-action-primary-bg) 35%, transparent)'
-      : 'none',
-    cursor: 'pointer',
-    transition: 'color 120ms ease, text-decoration-color 120ms ease',
+      ? "0 0 0 2px color-mix(in srgb, var(--ktn-action-primary-bg) 35%, transparent)"
+      : "none",
+    cursor: "pointer",
+    transition: "color 120ms ease, text-decoration-color 120ms ease",
   };
 
   return (
@@ -266,21 +310,22 @@ function BreadcrumbActionNode({
 export function BreadcrumbSeparator({
   size,
   children,
-  className = '',
+  className = "",
   style,
   ...props
 }: BreadcrumbSeparatorProps): JSX.Element {
   const resolvedSize = useResolvedSize(size);
   const tokens = sizeTokens[resolvedSize];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const separatorStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: 'var(--ktn-text-muted, var(--ktn-text-secondary, var(--ktn-text-primary)))',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    color:
+      "var(--ktn-text-muted, var(--ktn-text-secondary, var(--ktn-text-primary)))",
     lineHeight: 1,
-    userSelect: 'none',
+    userSelect: "none",
     fontSize: tokens.fontSize,
     paddingInline: tokens.separatorPaddingInline,
     ...style,
@@ -294,58 +339,60 @@ export function BreadcrumbSeparator({
       style={separatorStyle}
       {...props}
     >
-      {children ?? '/'}
+      {children}
     </li>
   );
 }
 
 export function BreadcrumbEllipsis({
   size,
-  className = '',
+  children,
+  className = "",
   style,
   ...props
 }: BreadcrumbEllipsisProps): JSX.Element {
   const resolvedSize = useResolvedSize(size);
   const tokens = sizeTokens[resolvedSize];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const ellipsisStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
     minWidth: tokens.ellipsisMinWidth,
-    color: 'var(--ktn-text-muted, var(--ktn-text-secondary, var(--ktn-text-primary)))',
-    letterSpacing: '0.06em',
+    color:
+      "var(--ktn-text-muted, var(--ktn-text-secondary, var(--ktn-text-primary)))",
+    letterSpacing: "0.06em",
     lineHeight: 1,
-    userSelect: 'none',
+    userSelect: "none",
     ...style,
   };
 
   return (
-    <li
-      role="presentation"
-      aria-hidden
-      className={composedClassName}
-      style={ellipsisStyle}
-      {...props}
-    >
-      ...
+    <li className={composedClassName} style={ellipsisStyle} {...props}>
+      {children}
     </li>
   );
 }
 
 export function Breadcrumb({
   items,
-  size = 'md',
+  size = "md",
   separator,
+  separatorFallback,
+  ellipsisContent,
+  ellipsisAriaLabelFormatter,
+  itemAriaLabelFormatter,
+  navigationAriaLabel,
   maxVisibleItems,
   onAction,
-  className = '',
+  className = "",
   style,
+  ["aria-label"]: ariaLabel,
   ...props
 }: BreadcrumbProps): JSX.Element {
   const tokens = sizeTokens[size];
-  const composedClassName = className.trim() === '' ? undefined : className;
+  const composedClassName = className.trim() === "" ? undefined : className;
 
   const renderableItems = useMemo(
     () => buildRenderableItems(items, maxVisibleItems),
@@ -353,26 +400,31 @@ export function Breadcrumb({
   );
 
   const navStyle: CSSProperties = {
-    display: 'block',
-    width: '100%',
+    display: "block",
+    width: "100%",
     ...style,
   };
+
+  const resolvedNavigationAriaLabel =
+    navigationAriaLabel ??
+    ariaLabel ??
+    getTextLabel(items[items.length - 1]?.label);
 
   const listStyle: CSSProperties = {
     margin: 0,
     padding: 0,
-    listStyle: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    width: '100%',
-    color: 'var(--ktn-text-primary)',
+    listStyle: "none",
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    width: "100%",
+    color: "var(--ktn-text-primary)",
     fontSize: tokens.fontSize,
   };
 
   const itemStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
+    display: "inline-flex",
+    alignItems: "center",
     minWidth: 0,
   };
 
@@ -392,55 +444,100 @@ export function Breadcrumb({
   }
 
   return (
-    <nav aria-label="breadcrumb" className={composedClassName} style={navStyle} {...props}>
+    <nav
+      aria-label={resolvedNavigationAriaLabel}
+      className={composedClassName}
+      style={navStyle}
+      {...props}
+    >
       <BreadcrumbSizeContext.Provider value={size}>
         <ol style={listStyle}>
           {renderableItems.map((entry, index) => {
             const isLast = index === renderableItems.length - 1;
+            const resolvedSeparator = separator ?? separatorFallback;
+
+            if (entry.kind === "ellipsis") {
+              const resolvedEllipsisAriaLabel = ellipsisAriaLabelFormatter?.(
+                entry.hiddenItemsCount,
+              );
+              const resolvedEllipsisContent =
+                ellipsisContent ?? String(entry.hiddenItemsCount);
+
+              return (
+                <Fragment key={`breadcrumb-entry-${index}`}>
+                  <BreadcrumbEllipsis
+                    size={size}
+                    aria-label={resolvedEllipsisAriaLabel}
+                    aria-hidden={
+                      resolvedEllipsisAriaLabel == null ? true : undefined
+                    }
+                  >
+                    {resolvedEllipsisContent}
+                  </BreadcrumbEllipsis>
+
+                  {!isLast && resolvedSeparator != null ? (
+                    <BreadcrumbSeparator size={size}>
+                      {resolvedSeparator}
+                    </BreadcrumbSeparator>
+                  ) : null}
+                </Fragment>
+              );
+            }
+
+            const resolvedItemAriaLabel =
+              itemAriaLabelFormatter?.({
+                item: entry.item,
+                index,
+                isCurrentPage: isLast,
+              }) ??
+              entry.item.ariaLabel ??
+              getTextLabel(entry.item.label);
+
+            const itemNode =
+              !isLast &&
+              entry.item.href != null &&
+              entry.item.href.trim() !== "" ? (
+                <BreadcrumbLinkNode
+                  href={entry.item.href}
+                  target={entry.item.target}
+                  rel={entry.item.rel}
+                  ariaLabel={resolvedItemAriaLabel}
+                  onAction={(event) => {
+                    handleItemAction(entry.item, index, isLast, event);
+                  }}
+                >
+                  {entry.item.label}
+                </BreadcrumbLinkNode>
+              ) : !isLast &&
+                (entry.item.onAction != null || onAction != null) ? (
+                <BreadcrumbActionNode
+                  ariaLabel={resolvedItemAriaLabel}
+                  onAction={(event) => {
+                    handleItemAction(entry.item, index, isLast, event);
+                  }}
+                >
+                  {entry.item.label}
+                </BreadcrumbActionNode>
+              ) : isLast ? (
+                <span
+                  aria-current="page"
+                  aria-label={resolvedItemAriaLabel}
+                  style={currentPageStyle}
+                >
+                  {entry.item.label}
+                </span>
+              ) : (
+                <span style={textItemStyle}>{entry.item.label}</span>
+              );
 
             return (
               <Fragment key={`breadcrumb-entry-${index}`}>
-                {entry.kind === 'ellipsis' ? (
-                  <BreadcrumbEllipsis size={size} />
-                ) : (
-                  <li style={itemStyle}>
-                    {!isLast && entry.item.href != null && entry.item.href.trim() !== '' ? (
-                      <BreadcrumbLinkNode
-                        href={entry.item.href}
-                        target={entry.item.target}
-                        rel={entry.item.rel}
-                        ariaLabel={entry.item.ariaLabel}
-                        onAction={(event) => {
-                          handleItemAction(entry.item, index, isLast, event);
-                        }}
-                      >
-                        {entry.item.label}
-                      </BreadcrumbLinkNode>
-                    ) : !isLast && (entry.item.onAction != null || onAction != null) ? (
-                      <BreadcrumbActionNode
-                        ariaLabel={entry.item.ariaLabel}
-                        onAction={(event) => {
-                          handleItemAction(entry.item, index, isLast, event);
-                        }}
-                      >
-                        {entry.item.label}
-                      </BreadcrumbActionNode>
-                    ) : isLast ? (
-                      <span aria-current="page" style={currentPageStyle}>
-                        {entry.item.label}
-                      </span>
-                    ) : (
-                      <span style={textItemStyle}>{entry.item.label}</span>
-                    )}
-                  </li>
-                )}
+                <li style={itemStyle}>{itemNode}</li>
 
-                {!isLast ? (
-                  separator == null ? (
-                    <BreadcrumbSeparator size={size} />
-                  ) : (
-                    <BreadcrumbSeparator size={size}>{separator}</BreadcrumbSeparator>
-                  )
+                {!isLast && resolvedSeparator != null ? (
+                  <BreadcrumbSeparator size={size}>
+                    {resolvedSeparator}
+                  </BreadcrumbSeparator>
                 ) : null}
               </Fragment>
             );

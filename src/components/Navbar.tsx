@@ -62,6 +62,7 @@ export interface NavbarProps extends Omit<
   "children" | "onChange"
 > {
   brand?: ReactNode;
+  defaultBrandName?: ReactNode;
   showBrand?: boolean;
   brandLogo?: ReactNode;
   brandName?: ReactNode;
@@ -78,6 +79,9 @@ export interface NavbarProps extends Omit<
   mobileTitle?: ReactNode;
   showMobileToggle?: boolean;
   mobileToggleLabel?: string;
+  mobileCloseLabel?: string;
+  desktopNavigationLabel?: string;
+  mobileNavigationLabel?: string;
   mobileOpen?: boolean;
   defaultMobileOpen?: boolean;
   onMobileOpenChange?: (open: boolean) => void;
@@ -393,6 +397,7 @@ function itemContainsActive(
 
 export function Navbar({
   brand,
+  defaultBrandName,
   showBrand = true,
   brandLogo,
   brandName,
@@ -409,6 +414,9 @@ export function Navbar({
   mobileTitle = "Navigation",
   showMobileToggle = true,
   mobileToggleLabel = "Menu",
+  mobileCloseLabel = "Close",
+  desktopNavigationLabel = "Navbar",
+  mobileNavigationLabel = "Mobile navigation",
   mobileOpen,
   defaultMobileOpen = false,
   onMobileOpenChange,
@@ -501,7 +509,7 @@ export function Navbar({
   const resolvedBrandName: ReactNode | undefined = hasBrandName
     ? brandName
     : !hasCustomBrand && !hasAnyStructuredBrandValue
-      ? "Keytuno"
+      ? defaultBrandName
       : undefined;
   const hasResolvedBrandName = hasRenderableContent(resolvedBrandName);
   const shouldRenderStructuredBrand =
@@ -1048,7 +1056,7 @@ export function Navbar({
 
         {!showMobileSheet ? (
           <div style={desktopRightClusterStyle}>
-            <nav aria-label="Navbar" style={desktopNavStyle}>
+            <nav aria-label={desktopNavigationLabel} style={desktopNavStyle}>
               {items.length > 0 ? (
                 items.map((item) => renderDesktopItem(item))
               ) : (
@@ -1077,7 +1085,7 @@ export function Navbar({
               aria-expanded={resolvedMobileOpen}
             >
               <FiMenu size={tokens.iconSize} aria-hidden />
-              {resolvedMobileOpen ? "Close" : mobileToggleLabel}
+              {resolvedMobileOpen ? mobileCloseLabel : mobileToggleLabel}
             </Button>
           </div>
         )}
@@ -1115,7 +1123,7 @@ export function Navbar({
 
             <nav
               id={mobileNavigationId}
-              aria-label="Mobile navigation"
+              aria-label={mobileNavigationLabel}
               style={{
                 display: "flex",
                 flexDirection: "column",

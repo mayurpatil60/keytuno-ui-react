@@ -10,13 +10,13 @@ import {
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
-} from 'react';
+} from "react";
 
-export type TabsVariant = 'line' | 'button' | 'only icon';
-export type TabsOrientation = 'horizontal' | 'vertical';
-export type TabsSize = 'xs' | 'sm' | 'md' | 'lg';
-export type TabsSide = 'left' | 'top' | 'bottom' | 'right';
-export type TabsActionSource = 'value-change' | 'tab-focus' | 'tab-blur';
+export type TabsVariant = "line" | "button" | "only icon";
+export type TabsOrientation = "horizontal" | "vertical";
+export type TabsSize = "xs" | "sm" | "md" | "lg";
+export type TabsSide = "left" | "top" | "bottom" | "right";
+export type TabsActionSource = "value-change" | "tab-focus" | "tab-blur";
 
 export interface TabsActionContext {
   source: TabsActionSource;
@@ -39,7 +39,10 @@ export interface TabsItem {
   disabled?: boolean;
 }
 
-export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
+export interface TabsProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children" | "onChange"
+> {
   items: TabsItem[];
   value?: string;
   defaultValue?: string;
@@ -51,6 +54,7 @@ export interface TabsProps extends Omit<HTMLAttributes<HTMLDivElement>, 'childre
   size?: TabsSize;
   side?: TabsSide;
   disabled?: boolean;
+  emptyText?: ReactNode;
 }
 
 type TabsSizeTokens = {
@@ -66,44 +70,44 @@ type TabsSizeTokens = {
 
 const sizeTokens: Record<TabsSize, TabsSizeTokens> = {
   xs: {
-    triggerHeight: '1.75rem',
-    fontSize: '0.75rem',
-    paddingInline: '0.5rem',
-    radius: 'var(--ktn-radius-sm, 0.375rem)',
-    panelPadding: '0.6rem',
-    iconButtonSize: '1.75rem',
-    gap: '0.35rem',
-    indicatorThickness: '2px',
+    triggerHeight: "1.75rem",
+    fontSize: "0.75rem",
+    paddingInline: "0.5rem",
+    radius: "var(--ktn-radius-sm, 0.375rem)",
+    panelPadding: "0.6rem",
+    iconButtonSize: "1.75rem",
+    gap: "0.35rem",
+    indicatorThickness: "2px",
   },
   sm: {
-    triggerHeight: '2.05rem',
-    fontSize: '0.8125rem',
-    paddingInline: '0.6rem',
-    radius: 'var(--ktn-radius-sm, 0.375rem)',
-    panelPadding: '0.7rem',
-    iconButtonSize: '2.05rem',
-    gap: '0.4rem',
-    indicatorThickness: '2px',
+    triggerHeight: "2.05rem",
+    fontSize: "0.8125rem",
+    paddingInline: "0.6rem",
+    radius: "var(--ktn-radius-sm, 0.375rem)",
+    panelPadding: "0.7rem",
+    iconButtonSize: "2.05rem",
+    gap: "0.4rem",
+    indicatorThickness: "2px",
   },
   md: {
-    triggerHeight: '2.3rem',
-    fontSize: '0.875rem',
-    paddingInline: '0.7rem',
-    radius: 'var(--ktn-radius-md, 0.5rem)',
-    panelPadding: '0.85rem',
-    iconButtonSize: '2.3rem',
-    gap: '0.45rem',
-    indicatorThickness: '2px',
+    triggerHeight: "2.3rem",
+    fontSize: "0.875rem",
+    paddingInline: "0.7rem",
+    radius: "var(--ktn-radius-md, 0.5rem)",
+    panelPadding: "0.85rem",
+    iconButtonSize: "2.3rem",
+    gap: "0.45rem",
+    indicatorThickness: "2px",
   },
   lg: {
-    triggerHeight: '2.55rem',
-    fontSize: '0.9375rem',
-    paddingInline: '0.8rem',
-    radius: 'var(--ktn-radius-md, 0.5rem)',
-    panelPadding: '1rem',
-    iconButtonSize: '2.55rem',
-    gap: '0.5rem',
-    indicatorThickness: '2px',
+    triggerHeight: "2.55rem",
+    fontSize: "0.9375rem",
+    paddingInline: "0.8rem",
+    radius: "var(--ktn-radius-md, 0.5rem)",
+    panelPadding: "1rem",
+    iconButtonSize: "2.55rem",
+    gap: "0.5rem",
+    indicatorThickness: "2px",
   },
 };
 
@@ -119,14 +123,17 @@ function resolveVariant(
     return varient;
   }
 
-  return 'line';
+  return "line";
 }
 
 function isItemDisabled(item: TabsItem, disabled: boolean): boolean {
   return disabled || item.disabled === true;
 }
 
-function getFirstEnabledValue(items: TabsItem[], disabled: boolean): string | null {
+function getFirstEnabledValue(
+  items: TabsItem[],
+  disabled: boolean,
+): string | null {
   const firstEnabled = items.find((item) => !isItemDisabled(item, disabled));
   return firstEnabled?.value ?? null;
 }
@@ -148,39 +155,42 @@ function resolveActiveValue(
 }
 
 function getTextLabel(label: ReactNode, fallback: string): string {
-  if (typeof label === 'string') {
+  if (typeof label === "string") {
     const trimmed = label.trim();
-    return trimmed === '' ? fallback : trimmed;
+    return trimmed === "" ? fallback : trimmed;
   }
 
-  if (typeof label === 'number') {
+  if (typeof label === "number") {
     return String(label);
   }
 
   return fallback;
 }
 
-function getLineTrackStyle(orientation: TabsOrientation, side: TabsSide): CSSProperties {
-  if (orientation === 'horizontal') {
-    if (side === 'bottom') {
+function getLineTrackStyle(
+  orientation: TabsOrientation,
+  side: TabsSide,
+): CSSProperties {
+  if (orientation === "horizontal") {
+    if (side === "bottom") {
       return {
-        borderTop: '1px solid var(--ktn-border-muted)',
+        borderTop: "1px solid var(--ktn-border-muted)",
       };
     }
 
     return {
-      borderBottom: '1px solid var(--ktn-border-muted)',
+      borderBottom: "1px solid var(--ktn-border-muted)",
     };
   }
 
-  if (side === 'right') {
+  if (side === "right") {
     return {
-      borderLeft: '1px solid var(--ktn-border-muted)',
+      borderLeft: "1px solid var(--ktn-border-muted)",
     };
   }
 
   return {
-    borderRight: '1px solid var(--ktn-border-muted)',
+    borderRight: "1px solid var(--ktn-border-muted)",
   };
 }
 
@@ -190,10 +200,10 @@ function getLineIndicatorStyle(
   thickness: string,
   isActive: boolean,
 ): CSSProperties {
-  const color = isActive ? 'var(--ktn-action-primary-bg)' : 'transparent';
+  const color = isActive ? "var(--ktn-action-primary-bg)" : "transparent";
 
-  if (orientation === 'horizontal') {
-    if (side === 'bottom') {
+  if (orientation === "horizontal") {
+    if (side === "bottom") {
       return {
         borderTop: `${thickness} solid ${color}`,
       };
@@ -204,7 +214,7 @@ function getLineIndicatorStyle(
     };
   }
 
-  if (side === 'right') {
+  if (side === "right") {
     return {
       borderLeft: `${thickness} solid ${color}`,
     };
@@ -215,20 +225,20 @@ function getLineIndicatorStyle(
   };
 }
 
-function getRootDirection(side: TabsSide): CSSProperties['flexDirection'] {
-  if (side === 'bottom') {
-    return 'column-reverse';
+function getRootDirection(side: TabsSide): CSSProperties["flexDirection"] {
+  if (side === "bottom") {
+    return "column-reverse";
   }
 
-  if (side === 'left') {
-    return 'row';
+  if (side === "left") {
+    return "row";
   }
 
-  if (side === 'right') {
-    return 'row-reverse';
+  if (side === "right") {
+    return "row-reverse";
   }
 
-  return 'column';
+  return "column";
 }
 
 export function Tabs({
@@ -239,11 +249,12 @@ export function Tabs({
   onAction,
   variant,
   varient,
-  orientation = 'horizontal',
-  size = 'md',
-  side = 'top',
+  orientation = "horizontal",
+  size = "md",
+  side = "top",
   disabled = false,
-  className = '',
+  emptyText = "No tab available.",
+  className = "",
   style,
   ...props
 }: TabsProps): JSX.Element {
@@ -251,13 +262,15 @@ export function Tabs({
   const triggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const isControlled = value !== undefined;
 
-  const [uncontrolledValue, setUncontrolledValue] = useState<string | null>(() =>
-    resolveActiveValue(defaultValue, items, disabled),
+  const [uncontrolledValue, setUncontrolledValue] = useState<string | null>(
+    () => resolveActiveValue(defaultValue, items, disabled),
   );
 
   useEffect(() => {
     if (!isControlled) {
-      setUncontrolledValue((current) => resolveActiveValue(current ?? undefined, items, disabled));
+      setUncontrolledValue((current) =>
+        resolveActiveValue(current ?? undefined, items, disabled),
+      );
     }
   }, [disabled, isControlled, items]);
 
@@ -272,9 +285,13 @@ export function Tabs({
 
   const activeItem = items.find((item) => item.value === activeValue) ?? null;
   const activeItemIndex =
-    activeItem != null ? items.findIndex((item) => item.value === activeItem.value) : -1;
-  const activePanelId = activeItemIndex >= 0 ? `${baseId}-panel-${activeItemIndex}` : undefined;
-  const activeTriggerId = activeItemIndex >= 0 ? `${baseId}-tab-${activeItemIndex}` : undefined;
+    activeItem != null
+      ? items.findIndex((item) => item.value === activeItem.value)
+      : -1;
+  const activePanelId =
+    activeItemIndex >= 0 ? `${baseId}-panel-${activeItemIndex}` : undefined;
+  const activeTriggerId =
+    activeItemIndex >= 0 ? `${baseId}-tab-${activeItemIndex}` : undefined;
 
   const enabledItems = useMemo(
     () => items.filter((item) => !isItemDisabled(item, disabled)),
@@ -312,7 +329,7 @@ export function Tabs({
     }
 
     onValueChange?.(nextValue);
-    emitAction('value-change', {
+    emitAction("value-change", {
       value: nextValue,
       previousValue,
       triggerValue: nextValue,
@@ -325,7 +342,8 @@ export function Tabs({
       return;
     }
 
-    const normalizedIndex = (nextIndex + enabledItems.length) % enabledItems.length;
+    const normalizedIndex =
+      (nextIndex + enabledItems.length) % enabledItems.length;
     const nextItem = enabledItems[normalizedIndex];
 
     if (nextItem == null) {
@@ -341,11 +359,13 @@ export function Tabs({
       return;
     }
 
-    const currentIndex = enabledItems.findIndex((item) => item.value === activeValue);
+    const currentIndex = enabledItems.findIndex(
+      (item) => item.value === activeValue,
+    );
     const fallbackIndex = currentIndex >= 0 ? currentIndex : 0;
 
-    const nextKey = orientation === 'horizontal' ? 'ArrowRight' : 'ArrowDown';
-    const prevKey = orientation === 'horizontal' ? 'ArrowLeft' : 'ArrowUp';
+    const nextKey = orientation === "horizontal" ? "ArrowRight" : "ArrowDown";
+    const prevKey = orientation === "horizontal" ? "ArrowLeft" : "ArrowUp";
 
     if (event.key === nextKey) {
       event.preventDefault();
@@ -359,35 +379,40 @@ export function Tabs({
       return;
     }
 
-    if (event.key === 'Home') {
+    if (event.key === "Home") {
       event.preventDefault();
       focusAndSelectIndex(0, event);
       return;
     }
 
-    if (event.key === 'End') {
+    if (event.key === "End") {
       event.preventDefault();
       focusAndSelectIndex(enabledItems.length - 1, event);
     }
   }
 
   const rootStyle: CSSProperties = {
-    display: 'flex',
+    display: "flex",
     flexDirection: getRootDirection(side),
-    alignItems: 'stretch',
-    gap: resolvedVariant === 'line' ? '0.5rem' : '0.75rem',
-    width: '100%',
+    alignItems: "stretch",
+    gap: resolvedVariant === "line" ? "0.5rem" : "0.75rem",
+    width: "100%",
     ...style,
   };
 
   const listStyle: CSSProperties = {
-    display: 'inline-flex',
-    flexDirection: orientation === 'horizontal' ? 'row' : 'column',
-    alignItems: 'stretch',
-    width: orientation === 'horizontal' ? '100%' : 'auto',
+    display: "inline-flex",
+    flexDirection: orientation === "horizontal" ? "row" : "column",
+    alignItems: "stretch",
+    width: orientation === "horizontal" ? "100%" : "auto",
     flexShrink: 0,
-    gap: orientation === 'vertical' ? 0 : resolvedVariant === 'line' ? 0 : tokens.gap,
-    ...(resolvedVariant === 'line' ? getLineTrackStyle(orientation, side) : {}),
+    gap:
+      orientation === "vertical"
+        ? 0
+        : resolvedVariant === "line"
+          ? 0
+          : tokens.gap,
+    ...(resolvedVariant === "line" ? getLineTrackStyle(orientation, side) : {}),
   };
 
   const panelWrapStyle: CSSProperties = {
@@ -400,7 +425,11 @@ export function Tabs({
   };
 
   return (
-    <div className={className.trim() === '' ? undefined : className} style={rootStyle} {...props}>
+    <div
+      className={className.trim() === "" ? undefined : className}
+      style={rootStyle}
+      {...props}
+    >
       <div
         role="tablist"
         aria-orientation={orientation}
@@ -414,59 +443,73 @@ export function Tabs({
           const panelId = `${baseId}-panel-${index}`;
 
           const triggerBaseStyle: CSSProperties = {
-            position: 'relative',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            position: "relative",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
             gap: tokens.gap,
-            border: '1px solid transparent',
-            backgroundColor: 'transparent',
-            color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-            height: resolvedVariant === 'only icon' ? tokens.iconButtonSize : tokens.triggerHeight,
-            paddingInline: resolvedVariant === 'only icon' ? 0 : tokens.paddingInline,
-            minWidth: resolvedVariant === 'only icon' ? tokens.iconButtonSize : undefined,
-            borderRadius: resolvedVariant === 'line' ? 0 : tokens.radius,
+            border: "1px solid transparent",
+            backgroundColor: "transparent",
+            color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+            height:
+              resolvedVariant === "only icon"
+                ? tokens.iconButtonSize
+                : tokens.triggerHeight,
+            paddingInline:
+              resolvedVariant === "only icon" ? 0 : tokens.paddingInline,
+            minWidth:
+              resolvedVariant === "only icon"
+                ? tokens.iconButtonSize
+                : undefined,
+            borderRadius: resolvedVariant === "line" ? 0 : tokens.radius,
             fontSize: tokens.fontSize,
             fontWeight: 500,
             lineHeight: 1.2,
             opacity: itemDisabled ? 0.58 : 1,
-            cursor: itemDisabled ? 'not-allowed' : 'pointer',
+            cursor: itemDisabled ? "not-allowed" : "pointer",
             transition:
-              'background-color 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease',
+              "background-color 120ms ease, color 120ms ease, border-color 120ms ease, box-shadow 120ms ease",
           };
 
           const triggerVariantStyle: CSSProperties =
-            resolvedVariant === 'line'
+            resolvedVariant === "line"
               ? {
                   color: isActive
-                    ? 'var(--ktn-action-primary-bg)'
-                    : 'var(--ktn-text-secondary, var(--ktn-text-primary))',
-                  ...getLineIndicatorStyle(orientation, side, tokens.indicatorThickness, isActive),
+                    ? "var(--ktn-action-primary-bg)"
+                    : "var(--ktn-text-secondary, var(--ktn-text-primary))",
+                  ...getLineIndicatorStyle(
+                    orientation,
+                    side,
+                    tokens.indicatorThickness,
+                    isActive,
+                  ),
                 }
-              : resolvedVariant === 'button'
+              : resolvedVariant === "button"
                 ? {
                     borderColor: isActive
-                      ? 'var(--ktn-action-primary-bg)'
-                      : 'var(--ktn-border-muted)',
+                      ? "var(--ktn-action-primary-bg)"
+                      : "var(--ktn-border-muted)",
                     backgroundColor: isActive
-                      ? 'var(--ktn-action-primary-bg)'
-                      : 'var(--ktn-bg-surface, #ffffff)',
-                    color: isActive ? 'var(--ktn-action-primary-fg)' : 'var(--ktn-text-primary)',
+                      ? "var(--ktn-action-primary-bg)"
+                      : "var(--ktn-bg-surface, #ffffff)",
+                    color: isActive
+                      ? "var(--ktn-action-primary-fg)"
+                      : "var(--ktn-text-primary)",
                   }
                 : {
                     borderColor: isActive
-                      ? 'var(--ktn-border-strong, var(--ktn-border-muted))'
-                      : 'var(--ktn-border-muted)',
+                      ? "var(--ktn-border-strong, var(--ktn-border-muted))"
+                      : "var(--ktn-border-muted)",
                     backgroundColor: isActive
-                      ? 'var(--ktn-bg-muted, rgba(100, 116, 139, 0.1))'
-                      : 'transparent',
+                      ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.1))"
+                      : "transparent",
                     color: isActive
-                      ? 'var(--ktn-text-primary)'
-                      : 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+                      ? "var(--ktn-text-primary)"
+                      : "var(--ktn-text-secondary, var(--ktn-text-primary))",
                   };
 
           const verticalGroupStyle: CSSProperties =
-            orientation === 'vertical' && resolvedVariant !== 'line'
+            orientation === "vertical" && resolvedVariant !== "line"
               ? {
                   borderRadius: 0,
                   ...(index === 0
@@ -475,7 +518,7 @@ export function Tabs({
                         borderTopRightRadius: tokens.radius,
                       }
                     : {
-                        marginTop: '-1px',
+                        marginTop: "-1px",
                       }),
                   ...(index === items.length - 1
                     ? {
@@ -488,12 +531,14 @@ export function Tabs({
 
           const iconStyle: CSSProperties = {
             lineHeight: 0,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
           };
 
-          const iconFallbackText = getTextLabel(item.label, item.value).slice(0, 1).toUpperCase();
+          const iconFallbackText = getTextLabel(item.label, item.value)
+            .slice(0, 1)
+            .toUpperCase();
 
           return (
             <button
@@ -508,24 +553,30 @@ export function Tabs({
               aria-controls={panelId}
               aria-disabled={itemDisabled || undefined}
               aria-label={
-                resolvedVariant === 'only icon' ? getTextLabel(item.label, item.value) : undefined
+                resolvedVariant === "only icon"
+                  ? getTextLabel(item.label, item.value)
+                  : undefined
               }
               tabIndex={isActive ? 0 : -1}
               disabled={itemDisabled}
-              style={{ ...triggerBaseStyle, ...triggerVariantStyle, ...verticalGroupStyle }}
+              style={{
+                ...triggerBaseStyle,
+                ...triggerVariantStyle,
+                ...verticalGroupStyle,
+              }}
               onClick={(event: MouseEvent<HTMLButtonElement>) => {
                 if (!itemDisabled) {
                   setActiveValue(item.value, event);
                 }
               }}
               onFocus={(event: FocusEvent<HTMLButtonElement>) => {
-                emitAction('tab-focus', {
+                emitAction("tab-focus", {
                   triggerValue: item.value,
                   event,
                 });
               }}
               onBlur={(event: FocusEvent<HTMLButtonElement>) => {
-                emitAction('tab-blur', {
+                emitAction("tab-blur", {
                   triggerValue: item.value,
                   event,
                 });
@@ -534,10 +585,12 @@ export function Tabs({
             >
               {item.icon != null ? (
                 <span style={iconStyle}>{item.icon}</span>
-              ) : resolvedVariant === 'only icon' ? (
+              ) : resolvedVariant === "only icon" ? (
                 <span style={iconStyle}>{iconFallbackText}</span>
               ) : null}
-              {resolvedVariant !== 'only icon' ? <span>{item.label}</span> : null}
+              {resolvedVariant !== "only icon" ? (
+                <span>{item.label}</span>
+              ) : null}
             </button>
           );
         })}
@@ -554,7 +607,7 @@ export function Tabs({
             {activeItem.content}
           </div>
         ) : (
-          <div style={panelStyle}>No tab available.</div>
+          <div style={panelStyle}>{emptyText}</div>
         )}
       </div>
     </div>

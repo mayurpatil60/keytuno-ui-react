@@ -86,6 +86,12 @@ export interface FilePreviewProps extends Omit<
   linkLabel?: ReactNode;
   showLinkIcons?: boolean;
   linkButtonStyle?: CSSProperties;
+  previewAriaLabelFormatter?: (fileName: string) => string;
+  closeButtonLabel?: string;
+  openInNewTabLabel?: ReactNode;
+  typeDescriptionFormatter?: (typeLabel: string) => ReactNode;
+  imageInteractionHint?: ReactNode;
+  defaultInteractionHint?: ReactNode;
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
 }
@@ -289,6 +295,14 @@ export function FilePreview({
   linkLabel,
   showLinkIcons = true,
   linkButtonStyle,
+  previewAriaLabelFormatter = (resolvedFileName) =>
+    `Preview ${resolvedFileName}`,
+  closeButtonLabel = "Close preview",
+  openInNewTabLabel = "Open in New Tab",
+  typeDescriptionFormatter = (resolvedTypeLabel) =>
+    `Type: ${resolvedTypeLabel}`,
+  imageInteractionHint = "Use mouse wheel, touchpad pinch, or touch pinch to zoom. Drag to pan. Double-click to toggle quick zoom.",
+  defaultInteractionHint = "Press Escape or click outside to close this preview.",
   closeOnOverlayClick = true,
   closeOnEscape = true,
   className = "",
@@ -324,6 +338,8 @@ export function FilePreview({
   const typeLabel = formatTypeLabel(resolvedType, fileExtension);
   const triggerThumbnailSource =
     thumbnailSrc ?? (resolvedType === "image" ? src : undefined);
+  const previewAriaLabel = previewAriaLabelFormatter(fileName);
+  const typeDescription = typeDescriptionFormatter(typeLabel);
 
   function setImageTransform(
     nextScale: number,
@@ -901,7 +917,7 @@ export function FilePreview({
         ...linkButtonStyle,
       }}
       disabled={disabled}
-      aria-label={`Preview ${fileName}`}
+      aria-label={previewAriaLabel}
       onClick={handleTriggerClick}
     >
       {showLinkIcons ? (
@@ -936,7 +952,7 @@ export function FilePreview({
       type="button"
       style={triggerCardStyle}
       disabled={disabled}
-      aria-label={`Preview ${fileName}`}
+      aria-label={previewAriaLabel}
       onClick={handleTriggerClick}
     >
       <span style={thumbnailStyle}>
@@ -984,9 +1000,7 @@ export function FilePreview({
   );
 
   const interactionHint =
-    resolvedType === "image"
-      ? "Use mouse wheel, touchpad pinch, or touch pinch to zoom. Drag to pan. Double-click to toggle quick zoom."
-      : "Press Escape or click outside to close this preview.";
+    resolvedType === "image" ? imageInteractionHint : defaultInteractionHint;
 
   const composedClassName = `${baseClasses} ${className}`.trim();
 
@@ -1013,13 +1027,13 @@ export function FilePreview({
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={`Preview ${fileName}`}
+          aria-label={previewAriaLabel}
           style={previewShellStyle}
         >
           <div style={previewHeaderStyle}>
             <div style={previewHeaderInfoStyle}>
               <p style={previewTitleStyle}>{fileName}</p>
-              <p style={previewSubtitleStyle}>{`Type: ${typeLabel}`}</p>
+              <p style={previewSubtitleStyle}>{typeDescription}</p>
             </div>
 
             <div style={previewHeaderActionsStyle}>
@@ -1028,7 +1042,7 @@ export function FilePreview({
                 variant="outline"
                 onClick={openInNewTab}
               >
-                Open in New Tab
+                {openInNewTabLabel}
                 <FiExternalLink size={14} />
               </Button>
 
@@ -1036,7 +1050,7 @@ export function FilePreview({
                 size={toButtonSize(size)}
                 variant="ghost"
                 iconOnly
-                aria-label="Close preview"
+                aria-label={closeButtonLabel}
                 onClick={() => {
                   setIsOpen(false);
                 }}

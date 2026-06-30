@@ -93,6 +93,13 @@ export interface SidebarProps extends Omit<
   iconOnly?: boolean;
   showCollapseToggle?: boolean;
   showMobileToggle?: boolean;
+  mobileOpenLabel?: string;
+  mobileCloseLabel?: string;
+  panelAriaLabel?: string;
+  navigationAriaLabel?: string;
+  collapseExpandLabel?: string;
+  collapseCollapseLabel?: string;
+  collapseLockedLabel?: string;
   closeMobileOnSelect?: boolean;
   activeItemId?: string;
   defaultActiveItemId?: string;
@@ -489,6 +496,13 @@ export function Sidebar({
   iconOnly = false,
   showCollapseToggle = true,
   showMobileToggle = true,
+  mobileOpenLabel = "Open menu",
+  mobileCloseLabel = "Hide menu",
+  panelAriaLabel = "Sidebar",
+  navigationAriaLabel = "Sidebar navigation",
+  collapseExpandLabel = "Expand sidebar",
+  collapseCollapseLabel = "Collapse sidebar",
+  collapseLockedLabel = "Icon-only mode is controlled by prop",
   closeMobileOnSelect = true,
   activeItemId,
   defaultActiveItemId,
@@ -1012,13 +1026,13 @@ export function Sidebar({
             iconOnly={false}
           >
             <FiMenu size={tokens.iconSize} aria-hidden />
-            {resolvedMobileOpen ? "Hide menu" : "Open menu"}
+            {resolvedMobileOpen ? mobileCloseLabel : mobileOpenLabel}
           </Button>
         </div>
       ) : null}
 
       {shouldRenderPanel ? (
-        <aside style={panelStyle} aria-label="Sidebar">
+        <aside style={panelStyle} aria-label={panelAriaLabel}>
           <div
             style={{
               display: "flex",
@@ -1047,10 +1061,10 @@ export function Sidebar({
                 iconOnlyTone
                 tooltip={
                   collapseToggleLocked
-                    ? "Icon-only mode is controlled by prop"
+                    ? collapseLockedLabel
                     : resolvedIconOnly
-                      ? "Expand sidebar"
-                      : "Collapse sidebar"
+                      ? collapseExpandLabel
+                      : collapseCollapseLabel
                 }
                 disabled={collapseToggleLocked}
                 onAction={(event) => {
@@ -1071,7 +1085,7 @@ export function Sidebar({
           </div>
 
           <nav
-            aria-label="Sidebar navigation"
+            aria-label={navigationAriaLabel}
             style={{
               display: "flex",
               flexDirection: "column",

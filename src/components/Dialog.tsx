@@ -63,6 +63,7 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDivElement> {
   showCloseButton?: boolean;
   scrollable?: boolean;
   maxContentHeight?: string;
+  closeButtonLabel?: string;
 }
 
 export interface DialogHeaderProps extends HTMLAttributes<HTMLDivElement> {}
@@ -576,6 +577,7 @@ export function DialogContent({
   showCloseButton = true,
   scrollable = false,
   maxContentHeight = "70vh",
+  closeButtonLabel = "Close dialog",
   className = "",
   style,
   ...props
@@ -636,7 +638,7 @@ export function DialogContent({
         variant="ghost"
         size="xs"
         disabled={disabled}
-        aria-label="Close dialog"
+        aria-label={closeButtonLabel}
         style={{
           width: sizeToken.closeButtonSize,
           height: sizeToken.closeButtonSize,

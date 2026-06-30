@@ -57,6 +57,9 @@ export interface SelectProps extends Omit<
   invalid?: boolean;
   multiple?: boolean;
   showClear?: boolean;
+  clearLabel?: string;
+  openOptionsLabel?: string;
+  closeOptionsLabel?: string;
   placeholder?: string;
   searchPlaceholder?: string;
   emptyText?: string;
@@ -221,6 +224,9 @@ export function Select({
   invalid = false,
   multiple = false,
   showClear = false,
+  clearLabel = "Clear selection",
+  openOptionsLabel = "Open options",
+  closeOptionsLabel = "Close options",
   placeholder = "Select an option",
   searchPlaceholder = "Search...",
   emptyText = "No items found.",
@@ -744,7 +750,7 @@ export function Select({
             type="button"
             variant="ghost"
             size="xs"
-            aria-label="Clear selection"
+            aria-label={clearLabel}
             style={clearButtonStyle}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -773,7 +779,7 @@ export function Select({
           variant="ghost"
           size="xs"
           disabled={disabled}
-          aria-label={isOpen ? "Close options" : "Open options"}
+          aria-label={isOpen ? closeOptionsLabel : openOptionsLabel}
           style={chevronButtonStyle}
           onMouseDown={(event) => {
             event.preventDefault();

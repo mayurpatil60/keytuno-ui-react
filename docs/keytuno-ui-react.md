@@ -484,6 +484,9 @@ interface SelectGroup  { label: string; options: SelectOption[]; }
   defaultValue?={string | string[] | null}
   multiple?={boolean}
   showClear?={boolean}
+  clearLabel?={string}
+  openOptionsLabel?={string}
+  closeOptionsLabel?={string}
   placeholder?={string}
   searchPlaceholder?={string}
   emptyText?={string}
@@ -514,6 +517,20 @@ import { DatePicker } from '@keytuno/ui-react';
   disabled?={boolean}
   invalid?={boolean}
   placeholder?={string}
+  datePlaceholder?={string}
+  rangePlaceholder?={string}
+  timePlaceholder?={string}
+  inputAriaLabel?={string}
+  panelAriaLabel?={string}
+  clearLabel?={string}
+  openPickerLabel?={string}
+  closePickerLabel?={string}
+  rangeFromLabel?={string}
+  rangeToLabel?={string}
+  rangeStartEmptyText?={string}
+  rangeEndEmptyText?={string}
+  timePanelTitle?={string}
+  timeOptionAriaFormatter?={(time12Hour, time24Hour) => string}
   rangeSeparator?={string}           // separator shown between start and end dates
 />
 ```
@@ -567,6 +584,12 @@ import { ColorPicker } from '@keytuno/ui-react';
   required?={boolean}
   invalid?={boolean}
   placeholder?={string}              // used in detailed hex input
+  colorInputAriaLabel?={string}
+  hexInputAriaLabel?={string}
+  emptyValueLabel?={ReactNode}
+  clearButtonLabel?={ReactNode}
+  clearButtonAriaLabel?={string}
+  chooseColorAriaFormatter?={(hexColor: string) => string}
   onValueChange?={(value: string | null) => void}
   onAction?={(context: ColorPickerActionContext) => void}
   // action sources: picker-change | hex-input | swatch-select | clear | focus | blur
@@ -607,7 +630,7 @@ import { Pagination } from '@keytuno/ui-react';
   showPageSizeSelector?={boolean}
   showSummary?={boolean}
   showShowingPage?={boolean}
-  labels?={PaginationLabels}
+  labels?={PaginationLabels}        // includes text labels + navigation/first/previous/next/last aria labels + pageAriaFormatter
 />
 ```
 
@@ -658,6 +681,7 @@ interface TabsItem {
   size?={'xs'|'sm'|'md'|'lg'}
   side?={'left'|'top'|'bottom'|'right'}
   disabled?={boolean}
+  emptyText?={ReactNode}
 />
 ```
 
@@ -671,13 +695,19 @@ interface BreadcrumbItem {
   href?: string;
   target?: string;
   rel?: string;
+  ariaLabel?: string;
   onAction?: (e: MouseEvent) => void;
 }
 
 <Breadcrumb
   items={BreadcrumbItem[]}
   size?={'xs'|'sm'|'md'|'lg'}
-  separator?={ReactNode}
+  separator?={ReactNode}            // primary separator content
+  separatorFallback?={ReactNode}    // used when separator is not provided
+  ellipsisContent?={ReactNode}      // visual content for collapsed entries
+  ellipsisAriaLabelFormatter?={(hiddenItemsCount: number) => string}
+  itemAriaLabelFormatter?={({ item, index, isCurrentPage }) => string | undefined}
+  navigationAriaLabel?={string}
   maxVisibleItems?={number}
   onAction?={(ctx: BreadcrumbActionContext) => void}
 />
@@ -781,6 +811,7 @@ interface NavbarItem {
 
 <Navbar
   brand?={ReactNode}                // custom brand node (overrides structured brand props)
+  defaultBrandName?={ReactNode}     // fallback brand text when no custom brand/brandName is provided
   showBrand?={boolean}              // set false to hide brand block completely
   brandLogo?={ReactNode}            // logo/icon on the left side of brand block
   brandName?={ReactNode}            // company name/title on top row
@@ -796,6 +827,9 @@ interface NavbarItem {
   mobileTitle?={ReactNode}
   showMobileToggle?={boolean}
   mobileToggleLabel?={string}
+  mobileCloseLabel?={string}
+  desktopNavigationLabel?={string}  // aria-label for desktop nav region
+  mobileNavigationLabel?={string}   // aria-label for mobile nav region
   mobileOpen?={boolean}
   defaultMobileOpen?={boolean}
   onMobileOpenChange?={(open: boolean) => void}
@@ -811,6 +845,7 @@ interface NavbarItem {
 // - Brand shows on the left (logo + text stack where tagline appears below name)
 // - Menu/actions area is right-aligned on desktop
 // - Set showBrand={false} when you want only right-aligned controls
+// - Set defaultBrandName when you need fallback brand text (no project name is hardcoded)
 ```
 
 ### Sidebar
@@ -852,6 +887,13 @@ interface SidebarSection {
   iconOnly?={boolean}
   showCollapseToggle?={boolean}
   showMobileToggle?={boolean}
+  mobileOpenLabel?={string}
+  mobileCloseLabel?={string}
+  panelAriaLabel?={string}
+  navigationAriaLabel?={string}
+  collapseExpandLabel?={string}
+  collapseCollapseLabel?={string}
+  collapseLockedLabel?={string}
   closeMobileOnSelect?={boolean}
   activeItemId?={string}
   defaultActiveItemId?={string}
@@ -946,7 +988,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
   closeOnOverlayClick?={boolean}
   closeOnEscape?={boolean}
 >
-  <DialogContent showCloseButton?={boolean} scrollable?={boolean} maxContentHeight?={string}>
+  <DialogContent showCloseButton?={boolean} scrollable?={boolean} maxContentHeight?={string} closeButtonLabel?={string}>
     <DialogHeader>
       <DialogTitle>Title</DialogTitle>
       <DialogDescription>Description</DialogDescription>
@@ -971,10 +1013,11 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
   onOpenChange?={(open: boolean) => void}
   trigger?={ReactNode}
   side?={'top'|'bottom'|'left'|'right'}  // default 'right'
+  closeButtonLabel?={string}
   closeOnOverlayClick?={boolean}
   closeOnEscape?={boolean}
 >
-  <SheetContent showCloseButton?={boolean} scrollable?={boolean} maxContentHeight?={string}>
+  <SheetContent showCloseButton?={boolean} closeButtonLabel?={string} scrollable?={boolean} maxContentHeight?={string}>
     <SheetHeader>
       <SheetTitle>Title</SheetTitle>
       <SheetDescription>Description</SheetDescription>
@@ -1050,7 +1093,7 @@ import {
   side?={'auto'|'bottom'|'top'|'left'|'right'}
   closeOnSelect?={boolean}
 >
-  <DropdownMenuTrigger>
+  <DropdownMenuTrigger openLabel?={ReactNode} closeLabel?={ReactNode}>
     <Button>Open</Button>
   </DropdownMenuTrigger>
   <DropdownMenuContent align?={'start'|'center'|'end'} sideOffset?={number}>
@@ -1114,11 +1157,16 @@ const rowActions: RowAction<User>[] = [
   // Features (all off by default)
   sortable?={boolean}
   searchable?={boolean}             // global text search input
+  searchPlaceholder?={string}
+  searchAriaLabel?={string}
   filterable?={boolean}             // per-column filter dropdowns
   columnFilters?={string[]}         // limit filterable columns by id
   globalFilter?={boolean}
   selectable?={boolean}
   multiSelect?={boolean}
+  selectAllRowsAriaLabel?={string}
+  selectRowAriaLabelFormatter?={(rowNumber: number) => string}
+  selectedCountFormatter?={(count: number) => ReactNode}
   columnVisibility?={boolean}
   defaultHiddenColumns?={string[]}
   fullscreen?={boolean}
@@ -1126,7 +1174,18 @@ const rowActions: RowAction<User>[] = [
   // Toolbar controls
   showToolbar?={boolean}
   showColumnToggle?={boolean}
+  columnsLabel?={string}
+  toggleColumnsLabel?={string}
+  showFiltersLabel?={string}
+  hideFiltersLabel?={string}
   showRefresh?={boolean}
+  refreshLabel?={string}
+  refreshingLabel?={string}
+  fullscreenLabel?={string}
+  resetScreenLabel?={string}
+  downloadLabel?={string}
+  exportingLabelFormatter?={(format: 'csv'|'xlsx'|'pdf') => string}
+  exportFormatLabel?={string}
   onRefresh?={() => void | Promise<void>}
   showExport?={boolean}
   exportable?={boolean}
@@ -1140,6 +1199,7 @@ const rowActions: RowAction<User>[] = [
   loading?={boolean}
   skeleton?={boolean}               // show skeleton rows while loading
   loadingRows?={number}
+  loadingText?={ReactNode}
 
   // Pagination (built-in, enabled by default)
   showPagination?={boolean}
@@ -1237,7 +1297,14 @@ import { FilePreview } from '@keytuno/ui-react';
   thumbnailSrc?={string}
   asLink?={boolean}                 // show as external link instead of in-page viewer
   linkLabel?={ReactNode}
+  previewAriaLabelFormatter?={(fileName: string) => string}
+  closeButtonLabel?={string}
+  openInNewTabLabel?={ReactNode}
+  typeDescriptionFormatter?={(typeLabel: string) => ReactNode}
+  imageInteractionHint?={ReactNode}
+  defaultInteractionHint?={ReactNode}
   disabled?={boolean}
+  closeOnOverlayClick?={boolean}
   closeOnEscape?={boolean}
 />
 ```
@@ -1303,7 +1370,11 @@ interface FileUploadFile {
   disabled?={boolean}
   placeholder?={ReactNode}
   dropzoneHint?={ReactNode}
+  dropzoneTitle?={ReactNode}
   browseLabel?={ReactNode}
+  dialogTitle?={ReactNode}
+  dialogDescription?={ReactNode}
+  fileListEmptyText?={ReactNode}
   onFilesChange?={(files: FileUploadFile[]) => void}
 />
 ```

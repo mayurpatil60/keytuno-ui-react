@@ -69,7 +69,21 @@ export interface DatePickerProps extends Omit<
   required?: boolean;
   invalid?: boolean;
   placeholder?: string;
+  datePlaceholder?: string;
+  rangePlaceholder?: string;
+  timePlaceholder?: string;
   rangeSeparator?: string;
+  inputAriaLabel?: string;
+  panelAriaLabel?: string;
+  clearLabel?: string;
+  openPickerLabel?: string;
+  closePickerLabel?: string;
+  rangeFromLabel?: string;
+  rangeToLabel?: string;
+  rangeStartEmptyText?: string;
+  rangeEndEmptyText?: string;
+  timePanelTitle?: string;
+  timeOptionAriaFormatter?: (time12Hour: string, time24Hour: string) => string;
   value?: DatePickerValue;
   defaultValue?: DatePickerValue;
   onValueChange?: (value: DatePickerValue) => void;
@@ -594,7 +608,21 @@ export function DatePicker({
   required = false,
   invalid = false,
   placeholder,
+  datePlaceholder = "Select date",
+  rangePlaceholder = "Select date range",
+  timePlaceholder = "Select time",
   rangeSeparator = " - ",
+  inputAriaLabel,
+  panelAriaLabel,
+  clearLabel = "Clear value",
+  openPickerLabel = "Open picker",
+  closePickerLabel = "Close picker",
+  rangeFromLabel = "From",
+  rangeToLabel = "To",
+  rangeStartEmptyText = "Start date",
+  rangeEndEmptyText = "End date",
+  timePanelTitle = "Select Time",
+  timeOptionAriaFormatter,
   value,
   defaultValue,
   onValueChange,
@@ -685,14 +713,15 @@ export function DatePicker({
   const idBase = id ?? pickerId;
   const inputElementId = `${idBase}-input`;
   const panelElementId = `${idBase}-panel`;
-  const panelAriaLabel =
-    mode === "time"
+  const resolvedPanelAriaLabel =
+    (panelAriaLabel ?? mode === "time")
       ? "Time picker panel"
       : mode === "range"
         ? "Date range picker panel"
         : "Date picker panel";
-  const inputAriaLabel =
+  const resolvedInputAriaLabel =
     ariaLabel ??
+    inputAriaLabel ??
     (ariaLabelledBy == null
       ? mode === "time"
         ? "Time picker"
@@ -1365,10 +1394,10 @@ export function DatePicker({
   const resolvedPlaceholder =
     placeholder ??
     (mode === "time"
-      ? "Select time"
+      ? timePlaceholder
       : mode === "range"
-        ? "Select date range"
-        : "Select date");
+        ? rangePlaceholder
+        : datePlaceholder);
 
   const leftMonthCells = buildCalendarCells(leftMonth);
   const rightMonthCells = buildCalendarCells(rightMonth);
@@ -1624,7 +1653,7 @@ export function DatePicker({
           required={required}
           aria-invalid={invalid ? true : undefined}
           aria-required={required || undefined}
-          aria-label={inputAriaLabel}
+          aria-label={resolvedInputAriaLabel}
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
           aria-haspopup="dialog"
@@ -1667,7 +1696,7 @@ export function DatePicker({
               variant="ghost"
               size="xs"
               disabled={disabled}
-              aria-label="Clear value"
+              aria-label={clearLabel}
               style={iconButtonStyle}
               onMouseDown={(event) => {
                 event.preventDefault();
@@ -1691,7 +1720,7 @@ export function DatePicker({
             variant="ghost"
             size="xs"
             disabled={disabled}
-            aria-label={isOpen ? "Close picker" : "Open picker"}
+            aria-label={isOpen ? closePickerLabel : openPickerLabel}
             style={iconButtonStyle}
             onMouseDown={(event) => {
               event.preventDefault();
@@ -1727,7 +1756,7 @@ export function DatePicker({
           id={panelElementId}
           role="dialog"
           aria-modal={false}
-          aria-label={panelAriaLabel}
+          aria-label={resolvedPanelAriaLabel}
           style={panelStyle}
         >
           {mode === "date" || mode === "range" ? (
@@ -1736,16 +1765,18 @@ export function DatePicker({
                 {mode === "range" ? (
                   <div style={rangeSummaryStyle}>
                     <div style={rangeSummaryItemStyle}>
-                      <span style={rangeSummaryLabelStyle}>From</span>
+                      <span style={rangeSummaryLabelStyle}>
+                        {rangeFromLabel}
+                      </span>
                       <span style={rangeSummaryValueStyle}>
-                        {rangeValue.start ?? "Start date"}
+                        {rangeValue.start ?? rangeStartEmptyText}
                       </span>
                     </div>
 
                     <div style={rangeSummaryItemStyle}>
-                      <span style={rangeSummaryLabelStyle}>To</span>
+                      <span style={rangeSummaryLabelStyle}>{rangeToLabel}</span>
                       <span style={rangeSummaryValueStyle}>
-                        {rangeValue.end ?? "End date"}
+                        {rangeValue.end ?? rangeEndEmptyText}
                       </span>
                     </div>
                   </div>
@@ -1795,7 +1826,7 @@ export function DatePicker({
               <div style={panelHeaderStyle}>
                 <div style={panelHeaderTitleStyle}>
                   <FiClock size={13} />
-                  Select Time
+                  {timePanelTitle}
                 </div>
               </div>
 
@@ -1817,7 +1848,11 @@ export function DatePicker({
                       onClick={() => {
                         handleTimeSelect(timeValue);
                       }}
-                      aria-label={`Select ${time12Hour} (${timeValue})`}
+                      aria-label={
+                        timeOptionAriaFormatter != null
+                          ? timeOptionAriaFormatter(time12Hour, timeValue)
+                          : `Select ${time12Hour} (${timeValue})`
+                      }
                       aria-pressed={selected}
                       style={{
                         ...timeButtonStyle,

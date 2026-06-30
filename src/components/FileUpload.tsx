@@ -54,7 +54,11 @@ export interface FileUploadProps extends Omit<
   accept?: string;
   placeholder?: ReactNode;
   dropzoneHint?: ReactNode;
+  dropzoneTitle?: ReactNode;
   browseLabel?: ReactNode;
+  dialogTitle?: ReactNode;
+  dialogDescription?: ReactNode;
+  fileListEmptyText?: ReactNode;
   onFilesChange?: (files: FileUploadFile[]) => void;
   browseButtonProps?: Omit<
     ButtonProps,
@@ -279,7 +283,11 @@ export function FileUpload({
   accept,
   placeholder,
   dropzoneHint,
+  dropzoneTitle = "Drop files here",
   browseLabel = "Upload",
+  dialogTitle = "Uploaded Files",
+  dialogDescription = "Click filename or thumbnail to open preview. Use the trash action to remove files.",
+  fileListEmptyText = "No files uploaded yet.",
   onFilesChange,
   browseButtonProps,
   dialogProps,
@@ -730,11 +738,8 @@ export function FileUpload({
     >
       <DialogContent showCloseButton scrollable maxContentHeight="70vh">
         <DialogHeader>
-          <DialogTitle>Uploaded Files</DialogTitle>
-          <DialogDescription>
-            Click filename or thumbnail to open preview. Use the trash action to
-            remove files.
-          </DialogDescription>
+          <DialogTitle>{dialogTitle}</DialogTitle>
+          <DialogDescription>{dialogDescription}</DialogDescription>
         </DialogHeader>
 
         <div style={{ marginTop: "0.15rem" }}>
@@ -751,7 +756,7 @@ export function FileUpload({
             onRemove={(fileToRemove) => {
               removeFile(fileToRemove.id);
             }}
-            emptyText="No files uploaded yet."
+            emptyText={fileListEmptyText}
           />
         </div>
       </DialogContent>
@@ -815,7 +820,7 @@ export function FileUpload({
             </span>
 
             <div style={{ minWidth: 0 }}>
-              <p style={dropzoneTitleStyle}>Drop files here</p>
+              <p style={dropzoneTitleStyle}>{dropzoneTitle}</p>
               <p style={dropzoneHintStyle}>{resolvedDropzoneHint}</p>
             </div>
           </div>
@@ -831,7 +836,7 @@ export function FileUpload({
             onClick={openFilePicker}
             {...browseButtonRestProps}
           >
-            Browse
+            {browseLabel}
           </Button>
         </div>
 
@@ -850,7 +855,7 @@ export function FileUpload({
               onRemove={(fileToRemove) => {
                 removeFile(fileToRemove.id);
               }}
-              emptyText="No files uploaded yet."
+              emptyText={fileListEmptyText}
             />
           </div>
         ) : null}

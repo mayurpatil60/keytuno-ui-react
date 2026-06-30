@@ -65,6 +65,8 @@ export interface DropdownMenuTriggerProps extends Omit<
   children?: ReactNode;
   disabled?: boolean;
   asChild?: boolean;
+  openLabel?: ReactNode;
+  closeLabel?: ReactNode;
 }
 
 export interface DropdownMenuContentProps extends Omit<
@@ -773,6 +775,8 @@ export function DropdownMenuTrigger({
   children,
   disabled = false,
   asChild,
+  openLabel = "Open menu",
+  closeLabel = "Close menu",
   className = "",
   style,
   ...props
@@ -796,11 +800,7 @@ export function DropdownMenuTrigger({
   const sizeToken = sizeTokens[size];
 
   const triggerContent =
-    children != null ? (
-      children
-    ) : (
-      <span>{open ? "Close menu" : "Open menu"}</span>
-    );
+    children != null ? children : <span>{open ? closeLabel : openLabel}</span>;
 
   const shouldUseCustomTrigger = asChild ?? isValidElement(triggerContent);
   const shouldWrapAsFocusable =

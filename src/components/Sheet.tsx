@@ -45,6 +45,7 @@ export interface SheetProps extends Omit<
   trigger?: ReactNode;
   side?: SheetSide;
   showCloseButton?: boolean;
+  closeButtonLabel?: string;
   disabled?: boolean;
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
@@ -53,6 +54,7 @@ export interface SheetProps extends Omit<
 export interface SheetContentProps extends HTMLAttributes<HTMLDivElement> {
   side?: SheetSide;
   showCloseButton?: boolean;
+  closeButtonLabel?: string;
   scrollable?: boolean;
   maxContentHeight?: string;
 }
@@ -73,6 +75,7 @@ interface SheetContextValue {
   side: SheetSide;
   disabled: boolean;
   showCloseButton: boolean;
+  closeButtonLabel: string;
   titleId: string;
   descriptionId: string;
 }
@@ -94,6 +97,7 @@ function useSheetContextValue(): SheetContextValue {
     side: "right",
     disabled: false,
     showCloseButton: true,
+    closeButtonLabel: "Close sheet",
     titleId: "",
     descriptionId: "",
   };
@@ -197,6 +201,7 @@ export function Sheet({
   trigger,
   side = "right",
   showCloseButton = true,
+  closeButtonLabel = "Close sheet",
   disabled = false,
   closeOnOverlayClick = true,
   closeOnEscape = true,
@@ -274,6 +279,7 @@ export function Sheet({
     side,
     disabled,
     showCloseButton,
+    closeButtonLabel,
     titleId,
     descriptionId,
   };
@@ -303,6 +309,7 @@ export function SheetContent({
   children,
   side,
   showCloseButton,
+  closeButtonLabel,
   scrollable = false,
   maxContentHeight = "min(85vh, 32rem)",
   className = "",
@@ -315,12 +322,14 @@ export function SheetContent({
     side: contextSide,
     disabled,
     showCloseButton: contextShowCloseButton,
+    closeButtonLabel: contextCloseButtonLabel,
     titleId,
     descriptionId,
   } = useSheetContextValue();
 
   const resolvedSide = side ?? contextSide;
   const resolvedShowCloseButton = showCloseButton ?? contextShowCloseButton;
+  const resolvedCloseButtonLabel = closeButtonLabel ?? contextCloseButtonLabel;
 
   const headerChildren: ReactNode[] = [];
   const bodyChildren: ReactNode[] = [];
@@ -439,7 +448,7 @@ export function SheetContent({
               variant="ghost"
               size="xs"
               disabled={disabled}
-              aria-label="Close sheet"
+              aria-label={resolvedCloseButtonLabel}
               style={{
                 width: "1.82rem",
                 height: "1.82rem",

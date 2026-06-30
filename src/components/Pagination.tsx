@@ -48,6 +48,12 @@ export interface PaginationLabels {
   select?: string;
   perPage?: string;
   showingPage?: string;
+  navigation?: string;
+  firstAria?: string;
+  previousAria?: string;
+  nextAria?: string;
+  lastAria?: string;
+  pageAriaFormatter?: (page: number) => string;
   first?: ReactNode;
   previous?: ReactNode;
   next?: ReactNode;
@@ -263,6 +269,14 @@ export function Pagination({
     select: labels?.select ?? "Page size",
     perPage: labels?.perPage ?? "page",
     showingPage: labels?.showingPage ?? "Page",
+    navigation: labels?.navigation ?? "Pagination",
+    firstAria: labels?.firstAria ?? "Go to first page",
+    previousAria: labels?.previousAria ?? "Go to previous page",
+    nextAria: labels?.nextAria ?? "Go to next page",
+    lastAria: labels?.lastAria ?? "Go to last page",
+    pageAriaFormatter:
+      labels?.pageAriaFormatter ??
+      ((pageNumber: number) => `Go to page ${pageNumber}`),
     first: labels?.first ?? (
       <span aria-hidden style={navIconWrapStyle}>
         <FiChevronsLeft size={navigationIconSize} />
@@ -548,7 +562,7 @@ export function Pagination({
       className={composedClassName}
       style={rootStyle}
       role={role ?? "navigation"}
-      aria-label={ariaLabel ?? "Pagination"}
+      aria-label={ariaLabel ?? resolvedLabels.navigation}
       {...props}
     >
       {variant === "basic" ? (
@@ -569,7 +583,7 @@ export function Pagination({
                 setPage(1, "first", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to first page"
+              aria-label={resolvedLabels.firstAria}
             >
               {resolvedLabels.first}
             </Button>
@@ -582,7 +596,7 @@ export function Pagination({
                 setPage(resolvedPage - 1, "previous", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to previous page"
+              aria-label={resolvedLabels.previousAria}
             >
               {resolvedLabels.previous}
             </Button>
@@ -613,7 +627,7 @@ export function Pagination({
                     setPage(pageNumber, "page-number", event);
                   }}
                   style={pageButtonStyle}
-                  aria-label={`Go to page ${pageNumber}`}
+                  aria-label={resolvedLabels.pageAriaFormatter(pageNumber)}
                   aria-current={isActive ? "page" : undefined}
                 >
                   {pageNumber}
@@ -629,7 +643,7 @@ export function Pagination({
                 setPage(resolvedPage + 1, "next", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to next page"
+              aria-label={resolvedLabels.nextAria}
             >
               {resolvedLabels.next}
             </Button>
@@ -642,7 +656,7 @@ export function Pagination({
                 setPage(resolvedTotalPages, "last", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to last page"
+              aria-label={resolvedLabels.lastAria}
             >
               {resolvedLabels.last}
             </Button>
@@ -667,7 +681,7 @@ export function Pagination({
                 setPage(resolvedPage - 1, "previous", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to previous page"
+              aria-label={resolvedLabels.previousAria}
             >
               {resolvedLabels.previous}
             </Button>
@@ -680,7 +694,7 @@ export function Pagination({
                 setPage(resolvedPage + 1, "next", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to next page"
+              aria-label={resolvedLabels.nextAria}
             >
               {resolvedLabels.next}
             </Button>
@@ -701,7 +715,7 @@ export function Pagination({
                 setPage(resolvedPage - 1, "previous", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to previous page"
+              aria-label={resolvedLabels.previousAria}
             >
               {resolvedLabels.previous}
             </Button>
@@ -718,7 +732,7 @@ export function Pagination({
                 setPage(resolvedPage + 1, "next", event);
               }}
               style={symbolButtonStyle}
-              aria-label="Go to next page"
+              aria-label={resolvedLabels.nextAria}
             >
               {resolvedLabels.next}
             </Button>

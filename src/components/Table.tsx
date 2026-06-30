@@ -157,9 +157,13 @@ export interface TableProps<TData extends object = object> extends Omit<
 
   searchable?: boolean;
   searchPlaceholder?: string;
+  searchAriaLabel?: string;
 
   selectable?: boolean;
   multiSelect?: boolean;
+  selectAllRowsAriaLabel?: string;
+  selectRowAriaLabelFormatter?: (rowNumber: number) => string;
+  selectedCountFormatter?: (count: number) => ReactNode;
   onSelectionChange?: (selectedRows: TData[]) => void;
   onAction?: (context: TableActionContext<TData>) => void;
 
@@ -170,6 +174,17 @@ export interface TableProps<TData extends object = object> extends Omit<
 
   showToolbar?: boolean;
   showColumnToggle?: boolean;
+  columnsLabel?: string;
+  toggleColumnsLabel?: string;
+  showFiltersLabel?: string;
+  hideFiltersLabel?: string;
+  refreshLabel?: string;
+  refreshingLabel?: string;
+  fullscreenLabel?: string;
+  resetScreenLabel?: string;
+  downloadLabel?: string;
+  exportingLabelFormatter?: (format: TableExportFormat) => string;
+  exportFormatLabel?: string;
   showRefresh?: boolean;
   onRefresh?: () => void | Promise<void>;
   showExport?: boolean;
@@ -181,6 +196,7 @@ export interface TableProps<TData extends object = object> extends Omit<
 
   loading?: boolean;
   loadingRows?: number;
+  loadingText?: ReactNode;
   skeleton?: boolean;
 
   striped?: boolean;
@@ -780,8 +796,13 @@ export function Table<TData extends object = object>({
   globalFilter,
   searchable = false,
   searchPlaceholder = "Search table...",
+  searchAriaLabel = "Search table",
   selectable = false,
   multiSelect = true,
+  selectAllRowsAriaLabel = "Select all rows on current page",
+  selectRowAriaLabelFormatter = (rowNumber: number) =>
+    `Select row ${rowNumber}`,
+  selectedCountFormatter = (count: number) => `${count} selected`,
   onSelectionChange,
   onAction,
   rowActions,
@@ -789,6 +810,18 @@ export function Table<TData extends object = object>({
   defaultHiddenColumns,
   showToolbar = true,
   showColumnToggle = true,
+  columnsLabel = "Columns",
+  toggleColumnsLabel = "Toggle Columns",
+  showFiltersLabel = "Show filters",
+  hideFiltersLabel = "Hide filters",
+  refreshLabel = "Refresh",
+  refreshingLabel = "Refreshing",
+  fullscreenLabel = "Fullscreen",
+  resetScreenLabel = "Reset screen",
+  downloadLabel = "Download",
+  exportingLabelFormatter = (format: TableExportFormat) =>
+    `Exporting ${format.toUpperCase()}...`,
+  exportFormatLabel = "Export Format",
   showRefresh = false,
   onRefresh,
   showExport = false,
@@ -798,6 +831,7 @@ export function Table<TData extends object = object>({
   exportFileName = DEFAULT_EXPORT_FILE_NAME,
   loading = false,
   loadingRows = 6,
+  loadingText = "Loading table...",
   skeleton = true,
   striped,
   hoverable = true,
@@ -991,7 +1025,7 @@ export function Table<TData extends object = object>({
         multiSelect ? (
           <input
             type="checkbox"
-            aria-label="Select all rows on current page"
+            aria-label={selectAllRowsAriaLabel}
             checked={table.getIsAllPageRowsSelected()}
             ref={(element) => {
               if (element != null) {
@@ -1022,7 +1056,7 @@ export function Table<TData extends object = object>({
       cell: ({ row }) => (
         <input
           type="checkbox"
-          aria-label={`Select row ${row.index + 1}`}
+          aria-label={selectRowAriaLabelFormatter(row.index + 1)}
           checked={row.getIsSelected()}
           onChange={(event) => {
             row.toggleSelected(event.currentTarget.checked);
@@ -1839,7 +1873,7 @@ export function Table<TData extends object = object>({
                   size={sizeToken.controlSize}
                   value={globalSearch}
                   placeholder={searchPlaceholder}
-                  aria-label="Search table"
+                  aria-label={searchAriaLabel}
                   onChange={(event) => {
                     table.setGlobalFilter(event.currentTarget.value);
                   }}
@@ -1849,7 +1883,9 @@ export function Table<TData extends object = object>({
             ) : null}
 
             {selectable && selectionCount > 0 ? (
-              <p style={selectedCountStyle}>{`${selectionCount} selected`}</p>
+              <p style={selectedCountStyle}>
+                {selectedCountFormatter(selectionCount)}
+              </p>
             ) : null}
           </div>
 
@@ -1859,11 +1895,13 @@ export function Table<TData extends object = object>({
                 size={sizeToken.controlSize}
                 variant={showColumnFilterRow ? "primary" : "outline"}
                 iconOnly
-                tooltip={showColumnFilterRow ? "Hide Filters" : "Show Filters"}
+                tooltip={
+                  showColumnFilterRow ? hideFiltersLabel : showFiltersLabel
+                }
                 tooltipSide="top"
                 tooltipSize="xs"
                 aria-label={
-                  showColumnFilterRow ? "Hide filters" : "Show filters"
+                  showColumnFilterRow ? hideFiltersLabel : showFiltersLabel
                 }
                 onClick={() => {
                   setShowColumnFilterRow((current) => {
@@ -1887,10 +1925,14 @@ export function Table<TData extends object = object>({
                 size={sizeToken.controlSize}
                 variant={isFullscreenActive ? "primary" : "outline"}
                 iconOnly
-                tooltip={isFullscreenActive ? "Reset Screen" : "Fullscreen"}
+                tooltip={
+                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
+                }
                 tooltipSide="top"
                 tooltipSize="xs"
-                aria-label={isFullscreenActive ? "Reset screen" : "Fullscreen"}
+                aria-label={
+                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
+                }
                 onClick={() => {
                   setIsFullscreenActive((current) => {
                     const next = !current;
@@ -1917,7 +1959,7 @@ export function Table<TData extends object = object>({
             togglableColumns.length > 0 ? (
               <DropdownMenu size={sizeToken.controlSize}>
                 <DropdownMenuTrigger>
-                  <Tooltip label="Columns" side="top" size="xs">
+                  <Tooltip label={columnsLabel} side="top" size="xs">
                     <span style={toolbarIconTriggerStyle}>
                       <FiColumns size={sizeToken.iconSize} />
                     </span>
@@ -1928,7 +1970,7 @@ export function Table<TData extends object = object>({
                   align="end"
                   style={compactDropdownContentStyle}
                 >
-                  <DropdownMenuLabel>Toggle Columns</DropdownMenuLabel>
+                  <DropdownMenuLabel>{toggleColumnsLabel}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
 
                   {togglableColumns.map((column) => (
@@ -1951,10 +1993,10 @@ export function Table<TData extends object = object>({
                 size={sizeToken.controlSize}
                 variant="outline"
                 iconOnly
-                tooltip={isRefreshing ? "Refreshing..." : "Refresh"}
+                tooltip={isRefreshing ? `${refreshingLabel}...` : refreshLabel}
                 tooltipSide="top"
                 tooltipSize="xs"
-                aria-label={isRefreshing ? "Refreshing" : "Refresh"}
+                aria-label={isRefreshing ? refreshingLabel : refreshLabel}
                 disabled={loading || isRefreshing}
                 onClick={(event) => {
                   onAction?.({
@@ -1977,8 +2019,8 @@ export function Table<TData extends object = object>({
                   <Tooltip
                     label={
                       exportingFormat == null
-                        ? "Download"
-                        : `Exporting ${exportingFormat.toUpperCase()}...`
+                        ? downloadLabel
+                        : exportingLabelFormatter(exportingFormat)
                     }
                     side="top"
                     size="xs"
@@ -1994,7 +2036,7 @@ export function Table<TData extends object = object>({
                   align="end"
                   style={compactDropdownContentStyle}
                 >
-                  <DropdownMenuLabel>Export Format</DropdownMenuLabel>
+                  <DropdownMenuLabel>{exportFormatLabel}</DropdownMenuLabel>
                   <DropdownMenuSeparator />
 
                   {resolvedExportFormats.map((format) => (
@@ -2203,7 +2245,7 @@ export function Table<TData extends object = object>({
                         }}
                       >
                         <Spinner size={sizeToken.controlSize} />
-                        Loading table...
+                        {loadingText}
                       </span>
                     </td>
                   </tr>

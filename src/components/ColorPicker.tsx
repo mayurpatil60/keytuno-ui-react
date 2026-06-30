@@ -7,6 +7,7 @@ import {
   type CSSProperties,
   type FocusEvent,
   type HTMLAttributes,
+  type ReactNode,
 } from "react";
 
 import { Button } from "./Button";
@@ -48,6 +49,12 @@ export interface ColorPickerProps extends Omit<
   showClear?: boolean;
   showSwatches?: boolean;
   placeholder?: string;
+  colorInputAriaLabel?: string;
+  hexInputAriaLabel?: string;
+  emptyValueLabel?: ReactNode;
+  clearButtonLabel?: ReactNode;
+  clearButtonAriaLabel?: string;
+  chooseColorAriaFormatter?: (hexColor: string) => string;
   swatches?: string[];
   value?: string | null;
   defaultValue?: string | null;
@@ -176,6 +183,13 @@ export function ColorPicker({
   showClear = true,
   showSwatches = true,
   placeholder = "#2563EB",
+  colorInputAriaLabel = "Color value",
+  hexInputAriaLabel = "Hex color value",
+  emptyValueLabel = "No color selected",
+  clearButtonLabel = "Clear",
+  clearButtonAriaLabel = "Clear color",
+  chooseColorAriaFormatter = (hexColor) =>
+    `Choose color ${hexColor.toUpperCase()}`,
   swatches = DEFAULT_SWATCHES,
   value,
   defaultValue,
@@ -391,7 +405,8 @@ export function ColorPicker({
           disabled={disabled}
           required={required}
           aria-label={
-            ariaLabel ?? (ariaLabelledBy == null ? "Color value" : undefined)
+            ariaLabel ??
+            (ariaLabelledBy == null ? colorInputAriaLabel : undefined)
           }
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
@@ -414,7 +429,7 @@ export function ColorPicker({
             inputMode="text"
             spellCheck={false}
             autoComplete="off"
-            aria-label={ariaLabelledBy == null ? "Hex color value" : undefined}
+            aria-label={ariaLabelledBy == null ? hexInputAriaLabel : undefined}
             aria-labelledby={ariaLabelledBy}
             aria-describedby={ariaDescribedBy}
             onChange={handleHexInputChange}
@@ -430,7 +445,7 @@ export function ColorPicker({
         ) : (
           <span style={compactValueStyle}>
             {resolvedValue == null
-              ? "No color selected"
+              ? emptyValueLabel
               : resolvedValue.toUpperCase()}
           </span>
         )}
@@ -444,9 +459,9 @@ export function ColorPicker({
               setValue(null, "clear", event);
             }}
             disabled={disabled}
-            aria-label="Clear color"
+            aria-label={clearButtonAriaLabel}
           >
-            Clear
+            {clearButtonLabel}
           </Button>
         ) : null}
       </div>
@@ -466,7 +481,7 @@ export function ColorPicker({
                 onAction={(event) => {
                   setValue(swatch, "swatch-select", event, swatch);
                 }}
-                aria-label={`Choose color ${swatch.toUpperCase()}`}
+                aria-label={chooseColorAriaFormatter(swatch)}
                 aria-pressed={selected}
                 style={{
                   width: tokens.swatchSize,
