@@ -4,6 +4,14 @@
 
 This document defines the release policy, version bump rules, and rollback steps for `@keytuno/ui-react`.
 
+Current stable release: `v1.0.0`.
+
+## Release Ownership
+
+1. Release contributor for v1.0.0: Mayur Patil.
+2. Contact email: mayurpatil60@gmail.com.
+3. GitHub profile: https://github.com/mayurpatil60.
+
 ## Versioning Policy
 
 The package uses Semantic Versioning.
@@ -47,6 +55,8 @@ pnpm audit --prod --audit-level high
 
 ```bash
 pnpm version <patch|minor|major>
+# or explicit version
+pnpm version 1.0.0 --no-git-tag-version
 ```
 
 3. Push commit and tag:

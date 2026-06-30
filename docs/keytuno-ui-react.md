@@ -8,7 +8,7 @@
 
 ```bash
 # private GitHub tag install (current recommended release path)
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v0.1.0
+pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.0
 
 # optional registry install (only if your environment publishes @keytuno/ui-react)
 pnpm add @keytuno/ui-react
@@ -109,6 +109,8 @@ const myTheme: ThemeContract = {
 
 ## Release verification snapshot (2026-07-01)
 
+Release baseline: `@keytuno/ui-react` v1.0.0.
+
 - `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
 - `pnpm typecheck`: pass.
 - `pnpm test`: pass (2 tests in `Spinner.test.tsx`).
@@ -121,6 +123,14 @@ Follow-up quality debt before broader adoption:
 
 - Reduce lint warnings (primarily hook dependency warnings and unused symbols).
 - Increase unit/integration coverage beyond the current spinner-only test file.
+
+---
+
+## Release contributor (v1.0.0)
+
+- Name: Mayur Patil
+- Email: mayurpatil60@gmail.com
+- GitHub: https://github.com/mayurpatil60
 
 ---
 

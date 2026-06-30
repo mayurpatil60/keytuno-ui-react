@@ -6,13 +6,13 @@
 2. pnpm: 9+
 3. TypeScript: 5.x toolchain in this repository
 4. Storybook: 8.x
-5. React peer range in `@keytuno/ui-react@0.1.0`: `^18.0.0`
+5. React peer range in `@keytuno/ui-react@1.0.0`: `^18.0.0`
 6. Test stack verified in repository: Vitest + Testing Library (unit), Storybook build (UI docs)
 
-## Consumer Reality (as of 2026-06-24)
+## Consumer Reality (as of 2026-07-01)
 
 1. `finvesto-frontend` currently uses React 19.
-2. Installing `@keytuno/ui-react@0.1.0` in that app requires `--legacy-peer-deps` until peer range support is widened.
+2. Installing `@keytuno/ui-react@1.0.0` in that app requires `--legacy-peer-deps` until peer range support is widened.
 
 ## Framework Upgrade Checklist
 
@@ -40,7 +40,7 @@ pnpm build-storybook
 2. Keep component behavior stable while adjusting internals for React API changes.
 3. If runtime behavior changes for consumers, release as a major version.
 
-## API Consistency Notes (v0.1.0)
+## API Consistency Notes (v1.0.0)
 
 1. Most stateful components expose direct change callbacks and `onAction(context)`.
 2. Event-style `onAction(event)` remains intentional for `Button`, `Badge`, `Avatar`, and item-level actions in `Breadcrumb`, `Navbar`, and `Sidebar`.
@@ -73,3 +73,9 @@ Minimum matrix before declaring compatibility changes complete:
 2. Web consumer (`finvesto-frontend`): install from tag + build pass.
 3. Runtime smoke route or equivalent integration check pass in one consumer app.
 4. Repeated-component test flow validated in one consumer page (Playwright or Testing Library scoped queries).
+
+## Release Contributor (v1.0.0)
+
+1. Name: Mayur Patil
+2. Email: mayurpatil60@gmail.com
+3. GitHub: https://github.com/mayurpatil60

@@ -7,9 +7,17 @@ This repository provides the standalone `@keytuno/ui-react` package used by Keyt
 ## Ownership and Review
 
 1. Primary maintainer: Mayur Patil.
-2. Source of ownership truth: `.github/CODEOWNERS`.
-3. All pull requests should be reviewed by a code owner before merge.
-4. Escalation path for release blockers: open an issue labeled `release-blocker` and notify the maintainer.
+2. Maintainer email: mayurpatil60@gmail.com.
+3. Maintainer GitHub: https://github.com/mayurpatil60.
+4. Source of ownership truth: `.github/CODEOWNERS`.
+5. All pull requests should be reviewed by a code owner before merge.
+6. Escalation path for release blockers: open an issue labeled `release-blocker` and notify the maintainer.
+
+## Release Contributor Record
+
+1. v1.0.0 contributor: Mayur Patil.
+2. Contact: mayurpatil60@gmail.com.
+3. Profile: https://github.com/mayurpatil60.
 
 ## Branching and Naming
 

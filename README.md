@@ -23,10 +23,10 @@ This repository has completed Phase 1 (standalone skeleton), Phase 2 (source mig
 ## Install (private GitHub tag)
 
 ```bash
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v0.1.0
+pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.0
 
 # or use SSH if your local git auth is SSH-based
-pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v0.1.0
+pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v1.0.0
 ```
 
 Peer dependencies:
@@ -89,12 +89,12 @@ pnpm storybook
 ## Release Notes Process (lightweight)
 
 1. Keep a short summary in commit messages for each phase.
-2. Tag stable milestones (for example: v0.1.0, v0.1.1).
+2. Tag stable milestones (for example: v1.0.0, v1.0.1).
 3. Update this README when install instructions or package scope changes.
 
 Release baseline (Phase 5):
 
-1. Initial standalone release tag prepared: v0.1.0.
+1. First stable release tag prepared: v1.0.0.
 2. Standard release validation gate:
 
 ```bash
@@ -110,7 +110,7 @@ pnpm audit --prod --audit-level high
 
 ## Quality Snapshot (2026-07-01)
 
-Pre-release verification status for v0.1.0:
+Release verification status for v1.0.0:
 
 1. `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
 2. `pnpm typecheck`: pass.
@@ -142,7 +142,7 @@ Example strategy:
 
 ## Create and Push a New Tag
 
-Use these steps whenever you cut a new release tag (for example, `v0.1.1`).
+Use these steps whenever you cut a new release tag (for example, `v1.0.1`).
 
 1. Move to the release branch and sync latest changes:
 
@@ -177,46 +177,46 @@ pnpm version major --no-git-tag-version
 
 ```bash
 git add package.json pnpm-lock.yaml README.md docs/
-git commit -m "release(ui-react): prepare v0.1.1"
+git commit -m "release(ui-react): prepare v1.0.1"
 ```
 
 5. Create annotated tag:
 
 ```bash
-git tag -a v0.1.1 -m "release: @keytuno/ui-react v0.1.1"
+git tag -a v1.0.1 -m "release: @keytuno/ui-react v1.0.1"
 ```
 
 6. Push commit and tag:
 
 ```bash
 git push origin main
-git push origin v0.1.1
+git push origin v1.0.1
 ```
 
 7. Verify tag exists on remote:
 
 ```bash
-git ls-remote --tags origin refs/tags/v0.1.1
+git ls-remote --tags origin refs/tags/v1.0.1
 ```
 
 ## Use a New Tag in Another Project
 
-Example target tag: `v0.1.1`
+Example target tag: `v1.0.1`
 
 1. Install from GitHub tag in consumer project:
 
 ```bash
 # HTTPS (recommended for CI and token-based auth)
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v0.1.1
+pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.1
 
 # or SSH (developer machine with SSH key auth)
-pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v0.1.1
+pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v1.0.1
 ```
 
 2. npm-based consumer apps can use:
 
 ```bash
-npm install "git+https://github.com/mayurpatil60/keytuno-ui-react.git#v0.1.1"
+npm install "git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.1"
 ```
 
 3. If the dependency already exists, update tag in `package.json` and reinstall:
@@ -248,12 +248,19 @@ git config --global url."https://x-access-token:${KEYTUNO_UI_READ_TOKEN}@github.
 npm install --legacy-peer-deps
 ```
 
+## Release Contributor (v1.0.0)
+
+1. Name: Mayur Patil
+2. Email: mayurpatil60@gmail.com
+3. GitHub: https://github.com/mayurpatil60
+
 ## Team-Ready Handover Docs
 
 1. Contribution and ownership: [CONTRIBUTING.md](CONTRIBUTING.md)
 2. Code owners: [.github/CODEOWNERS](.github/CODEOWNERS)
 3. Versioning and rollback playbook: [docs/OPERATIONS.md](docs/OPERATIONS.md)
 4. Framework and consumer compatibility notes: [docs/COMPATIBILITY.md](docs/COMPATIBILITY.md)
+5. Release records: [docs/releases](docs/releases)
 
 ## Compatibility Snapshot
 

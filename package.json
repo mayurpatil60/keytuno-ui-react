@@ -1,6 +1,6 @@
 {
   "name": "@keytuno/ui-react",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "React web components and theme system for Keytuno UI.",
   "type": "module",
   "main": "dist/index.js",
