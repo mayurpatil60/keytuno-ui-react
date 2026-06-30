@@ -26,9 +26,16 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm build-storybook
+pnpm size
+pnpm audit --prod --audit-level high
 ```
 
-3. Required docs updated for user-facing changes:
+3. Accessibility and testability smoke checks pass:
+   - Keyboard-only interaction for at least one overlay component (`Dialog` or `Sheet`).
+   - At least one repeated-component screen test uses scoped selectors (Playwright or Testing Library).
+   - Icon-only controls have explicit accessible labels in stories/examples.
+
+4. Required docs updated for user-facing changes:
    - `README.md`
    - `docs/COMPATIBILITY.md` (if version ranges or framework support changed)
    - `keytuno-ui-library.md` phase or release execution record
@@ -54,6 +61,10 @@ git push origin --tags
 ```bash
 pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#vX.Y.Z
 ```
+
+5. Verify reusable-component behavior in consumer app test flows:
+   - Same component rendered multiple times can be targeted with role/name or scoped selectors.
+   - No selector collisions caused by generic labels.
 
 ## Rollback Playbook
 

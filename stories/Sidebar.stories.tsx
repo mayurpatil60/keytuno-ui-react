@@ -97,7 +97,7 @@ const metricCardStyle: CSSProperties = {
 const actionArgTypes = {
   size: {
     control: "select",
-    options: ["sm", "md", "lg"],
+    options: ["xs", "sm", "md", "lg"],
   },
   variant: {
     control: "select",

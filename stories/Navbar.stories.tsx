@@ -82,7 +82,7 @@ const metricCardStyle: CSSProperties = {
 const actionArgTypes = {
   size: {
     control: "select",
-    options: ["sm", "md", "lg"],
+    options: ["xs", "sm", "md", "lg"],
   },
   variant: {
     control: "select",
@@ -108,6 +108,15 @@ const actionArgTypes = {
     control: "boolean",
   },
   mobileToggleLabel: {
+    control: "text",
+  },
+  showBrand: {
+    control: "boolean",
+  },
+  brandName: {
+    control: "text",
+  },
+  brandTagline: {
     control: "text",
   },
   defaultMobileOpen: {
@@ -142,6 +151,9 @@ const actionArgTypes = {
     action: "active-item-change",
   },
   brand: {
+    table: { disable: true },
+  },
+  brandLogo: {
     table: { disable: true },
   },
   items: {
@@ -219,43 +231,6 @@ const navbarItems: NavbarItem[] = [
     href: "#",
   },
 ];
-
-function NavbarBrand(): JSX.Element {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.55rem" }}>
-      <Badge variant="primary" size="sm">
-        KT
-      </Badge>
-
-      <div style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-        <strong
-          style={{
-            fontSize: "0.86rem",
-            lineHeight: 1.15,
-            color: "var(--ktn-text-primary)",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          Keytuno Workspace
-        </strong>
-
-        <span
-          style={{
-            fontSize: "0.72rem",
-            lineHeight: 1.1,
-            color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-            whiteSpace: "normal",
-            overflowWrap: "anywhere",
-          }}
-        >
-          Navigation shell
-        </span>
-      </div>
-    </div>
-  );
-}
 
 function NavbarActions(): JSX.Element {
   return (
@@ -382,7 +357,16 @@ function renderNavbar(
     <div style={canvasStyle}>
       <Navbar
         {...args}
-        brand={<NavbarBrand />}
+        showBrand={args.showBrand ?? true}
+        brandLogo={
+          args.brandLogo ?? (
+            <Badge variant="primary" size="sm">
+              KT
+            </Badge>
+          )
+        }
+        brandName={args.brandName ?? "Keytuno Workspace"}
+        brandTagline={args.brandTagline ?? "Navigation shell"}
         items={navbarItems}
         actions={<NavbarActions />}
         mobileOpen={storyMobileOpen}

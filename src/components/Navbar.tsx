@@ -21,7 +21,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./Sheet";
 import { FiChevronDown, FiMenu } from "./icons/feather";
 
 export type NavbarVariant = "default" | "outline" | "soft";
-export type NavbarSize = "sm" | "md" | "lg";
+export type NavbarSize = "xs" | "sm" | "md" | "lg";
 export type NavbarMobileMenuSide = "left" | "right";
 export type NavbarActionSource =
   | "item-select"
@@ -62,6 +62,10 @@ export interface NavbarProps extends Omit<
   "children" | "onChange"
 > {
   brand?: ReactNode;
+  showBrand?: boolean;
+  brandLogo?: ReactNode;
+  brandName?: ReactNode;
+  brandTagline?: ReactNode;
   items?: NavbarItem[];
   actions?: ReactNode;
   size?: NavbarSize;
@@ -95,6 +99,9 @@ type NavbarSizeTokens = {
   itemHeight: string;
   itemPaddingInline: string;
   itemFontSize: string;
+  brandNameFontSize: string;
+  brandTaglineFontSize: string;
+  brandLogoSize: string;
   iconSize: number;
   mobileSheetWidth: string;
 };
@@ -117,6 +124,21 @@ interface NavbarItemMatch {
 const baseClasses = "relative block w-full max-w-full";
 
 const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
+  xs: {
+    minHeight: "2.65rem",
+    paddingInline: "0.62rem",
+    paddingBlock: "0.4rem",
+    navGap: "0.26rem",
+    actionGap: "0.3rem",
+    itemHeight: "1.82rem",
+    itemPaddingInline: "0.5rem",
+    itemFontSize: "0.74rem",
+    brandNameFontSize: "0.79rem",
+    brandTaglineFontSize: "0.64rem",
+    brandLogoSize: "1.6rem",
+    iconSize: 13,
+    mobileSheetWidth: "min(92vw, 19rem)",
+  },
   sm: {
     minHeight: "3rem",
     paddingInline: "0.72rem",
@@ -126,6 +148,9 @@ const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
     itemHeight: "2rem",
     itemPaddingInline: "0.56rem",
     itemFontSize: "0.79rem",
+    brandNameFontSize: "0.84rem",
+    brandTaglineFontSize: "0.68rem",
+    brandLogoSize: "1.78rem",
     iconSize: 14,
     mobileSheetWidth: "min(92vw, 20rem)",
   },
@@ -138,6 +163,9 @@ const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
     itemHeight: "2.2rem",
     itemPaddingInline: "0.66rem",
     itemFontSize: "0.86rem",
+    brandNameFontSize: "0.92rem",
+    brandTaglineFontSize: "0.72rem",
+    brandLogoSize: "1.94rem",
     iconSize: 15,
     mobileSheetWidth: "min(92vw, 21.5rem)",
   },
@@ -150,6 +178,9 @@ const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
     itemHeight: "2.38rem",
     itemPaddingInline: "0.72rem",
     itemFontSize: "0.92rem",
+    brandNameFontSize: "0.98rem",
+    brandTaglineFontSize: "0.76rem",
+    brandLogoSize: "2.08rem",
     iconSize: 16,
     mobileSheetWidth: "min(92vw, 22.5rem)",
   },
@@ -234,6 +265,18 @@ function toLabelText(label: ReactNode): string | undefined {
   return undefined;
 }
 
+function hasRenderableContent(content: ReactNode | undefined): boolean {
+  if (content == null || content === false) {
+    return false;
+  }
+
+  if (typeof content === "string") {
+    return content.trim() !== "";
+  }
+
+  return true;
+}
+
 function resolveBadge(badge: NavbarItem["badge"], size: NavbarSize): ReactNode {
   if (badge == null) {
     return null;
@@ -310,7 +353,6 @@ function findExplicitActiveItemId(items: NavbarItem[]): string | null {
 
   return null;
 }
-
 function resolveInitialActiveItemId(
   items: NavbarItem[],
   defaultActiveItemId: string | undefined,
@@ -350,7 +392,11 @@ function itemContainsActive(
 }
 
 export function Navbar({
-  brand = "Keytuno",
+  brand,
+  showBrand = true,
+  brandLogo,
+  brandName,
+  brandTagline,
   items = [],
   actions,
   size = "md",
@@ -446,6 +492,22 @@ export function Navbar({
   const resolvedVariant = resolveVariant(variant, varient);
   const tokens = sizeTokens[size];
   const colors = variantTokens[resolvedVariant];
+  const hasCustomBrand = hasRenderableContent(brand);
+  const hasBrandLogo = hasRenderableContent(brandLogo);
+  const hasBrandTagline = hasRenderableContent(brandTagline);
+  const hasBrandName = hasRenderableContent(brandName);
+  const hasAnyStructuredBrandValue =
+    hasBrandLogo || hasBrandName || hasBrandTagline;
+  const resolvedBrandName: ReactNode | undefined = hasBrandName
+    ? brandName
+    : !hasCustomBrand && !hasAnyStructuredBrandValue
+      ? "Keytuno"
+      : undefined;
+  const hasResolvedBrandName = hasRenderableContent(resolvedBrandName);
+  const shouldRenderStructuredBrand =
+    hasBrandLogo || hasResolvedBrandName || hasBrandTagline;
+  const shouldRenderBrand =
+    showBrand && (hasCustomBrand || shouldRenderStructuredBrand);
   const resolvedMobileOpen = isMobileOpenControlled
     ? (mobileOpen ?? false)
     : uncontrolledMobileOpen;
@@ -641,7 +703,7 @@ export function Navbar({
       return (
         <DropdownMenu
           key={item.id}
-          size={size === "lg" ? "md" : "sm"}
+          size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
           variant={resolvedVariant === "outline" ? "outline" : "soft"}
         >
           <DropdownMenuTrigger asChild>
@@ -856,21 +918,74 @@ export function Navbar({
   const brandStyle: CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
-    gap: "0.48rem",
+    gap: "0.56rem",
     minWidth: 0,
     flexShrink: 0,
     color: colors.textColor,
-    fontSize: tokens.itemFontSize,
+  };
+
+  const brandLogoStyle: CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: tokens.brandLogoSize,
+    height: tokens.brandLogoSize,
+    minWidth: tokens.brandLogoSize,
+    lineHeight: 0,
+    overflow: "hidden",
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    flexShrink: 0,
+  };
+
+  const brandTextWrapStyle: CSSProperties = {
+    display: "inline-flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "center",
+    minWidth: 0,
+    gap: "0.04rem",
+  };
+
+  const brandNameStyle: CSSProperties = {
+    fontSize: tokens.brandNameFontSize,
     fontWeight: 600,
-    lineHeight: 1.2,
+    lineHeight: 1.15,
+    color: colors.textColor,
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    maxWidth: "16rem",
+  };
+
+  const brandTaglineStyle: CSSProperties = {
+    fontSize: tokens.brandTaglineFontSize,
+    fontWeight: 500,
+    lineHeight: 1.15,
+    color: colors.mutedTextColor,
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    maxWidth: "18rem",
+  };
+
+  const desktopRightClusterStyle: CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: tokens.actionGap,
+    marginInlineStart: "auto",
+    flex: "1 1 auto",
+    minWidth: 0,
   };
 
   const desktopNavStyle: CSSProperties = {
     display: "inline-flex",
     alignItems: "center",
+    justifyContent: "flex-end",
     gap: tokens.navGap,
-    flex: "1 1 auto",
+    flex: "0 1 auto",
     minWidth: 0,
+    maxWidth: "100%",
     overflowX: "auto",
     paddingBlock: "0.04rem",
   };
@@ -905,10 +1020,34 @@ export function Navbar({
       {...props}
     >
       <div style={barStyle}>
-        <div style={brandStyle}>{brand}</div>
+        {shouldRenderBrand ? (
+          <div style={brandStyle}>
+            {hasCustomBrand ? (
+              brand
+            ) : (
+              <>
+                {hasBrandLogo ? (
+                  <span style={brandLogoStyle}>{brandLogo}</span>
+                ) : null}
+
+                {hasResolvedBrandName || hasBrandTagline ? (
+                  <span style={brandTextWrapStyle}>
+                    {hasResolvedBrandName ? (
+                      <span style={brandNameStyle}>{resolvedBrandName}</span>
+                    ) : null}
+
+                    {hasBrandTagline ? (
+                      <span style={brandTaglineStyle}>{brandTagline}</span>
+                    ) : null}
+                  </span>
+                ) : null}
+              </>
+            )}
+          </div>
+        ) : null}
 
         {!showMobileSheet ? (
-          <>
+          <div style={desktopRightClusterStyle}>
             <nav aria-label="Navbar" style={desktopNavStyle}>
               {items.length > 0 ? (
                 items.map((item) => renderDesktopItem(item))
@@ -925,12 +1064,12 @@ export function Navbar({
             </nav>
 
             {actions != null ? <div style={actionsStyle}>{actions}</div> : null}
-          </>
+          </div>
         ) : (
           <div style={{ marginInlineStart: "auto" }}>
             <Button
               variant="outline"
-              size={size === "lg" ? "md" : "sm"}
+              size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
               onAction={(event) => {
                 setMobileOpenState(!resolvedMobileOpen, "mobile-toggle", event);
               }}

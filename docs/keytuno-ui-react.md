@@ -7,7 +7,12 @@
 ## Installation
 
 ```bash
+# private GitHub tag install (current recommended release path)
+pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v0.1.0
+
+# optional registry install (only if your environment publishes @keytuno/ui-react)
 pnpm add @keytuno/ui-react
+
 # peer deps: react ^18, react-dom ^18
 # optional heavy peers (only needed if you use table export):
 # pnpm add jspdf jspdf-autotable xlsx
@@ -22,7 +27,8 @@ Prefer **subpath imports** for best tree-shaking:
 ```ts
 import { Button } from '@keytuno/ui-react/components/Button';
 import { Table } from '@keytuno/ui-react/components/Table';
-import { lightTheme, themeToCssVariables } from '@keytuno/ui-react/themes/light';
+import { lightTheme } from '@keytuno/ui-react/themes/light';
+import { themeToCssVariables } from '@keytuno/ui-react/adapters/web';
 ```
 
 Barrel import also works and is fully tree-shakeable when `sideEffects: false`:
@@ -90,16 +96,112 @@ const myTheme: ThemeContract = {
 
 ## Design conventions
 
-- All size props accept `'xs' | 'sm' | 'md' | 'lg'` — default is always `'md'`.
-- All variant props use consistent names: `'primary' | 'outline' | 'ghost' | 'secondary' | 'destructive' | 'link'`.
-- Every interactive component exposes `onAction(context)` for rich event context **and** a simpler `onValueChange` / `onCheckedChange` / `onOpenChange` for direct value binding. Use the simpler callback in most cases.
+- Most controls use size `'xs' | 'sm' | 'md' | 'lg'` with default `'md'`, including navigation/layout components such as `Navbar` and `Sidebar`.
+- Variant names are component-specific. Button-like variants are common, but navigation, tabs, table, alert, and upload components use their own variant unions.
+- State-oriented components expose direct value callbacks (`onValueChange`, `onCheckedChange`, `onOpenChange`, `onPageChange`) and an `onAction(context)` callback for richer telemetry.
+- Some lightweight components use event-style `onAction(event)` by design: `Button`, `Badge`, `Avatar`, and item-level actions in `Breadcrumb`, `Navbar`, and `Sidebar`.
 - Components never import CSS files — all styles are inline or CSS vars. No stylesheet setup required.
 - `sideEffects: false` in package.json — all tree-shaking safe.
-- `Seperator` (typo alias) and `varient` props (typo aliases) exist on several components for backward compatibility — always use the correctly spelled versions (`Separator`, `variant`).
+- `Seperator` (typo alias) and `varient` props (typo aliases) exist for backward compatibility — prefer the correctly spelled versions (`Separator`, `variant`) in all new code.
+- Most component roots accept native HTML attributes (including `aria-*` and `data-*`), which enables custom accessibility wiring and test selectors.
+
+---
+
+## Release verification snapshot (2026-07-01)
+
+- `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
+- `pnpm typecheck`: pass.
+- `pnpm test`: pass (2 tests in `Spinner.test.tsx`).
+- `pnpm build`: pass.
+- `pnpm build-storybook`: pass.
+- `pnpm size`: pass all configured bundle budgets.
+- `pnpm audit --prod --audit-level high`: no known vulnerabilities.
+
+Follow-up quality debt before broader adoption:
+
+- Reduce lint warnings (primarily hook dependency warnings and unused symbols).
+- Increase unit/integration coverage beyond the current spinner-only test file.
+
+---
+
+## Action callback contract
+
+Use this callback priority in consumer apps:
+
+1. Bind state with direct callbacks first (`onValueChange`, `onCheckedChange`, `onOpenChange`, `onPageChange`).
+2. Use `onAction(context)` for analytics/event pipelines.
+3. Use event-style `onAction(event)` only for event-native controls.
+
+Current callback groups:
+
+- Event-style `onAction(event)`: `Button`, `Badge`, `Avatar`, item-level `NavbarItem`, item-level `SidebarItem`, and item-level breadcrumb actions.
+- Context-style `onAction(context)`: all stateful form/data/overlay/navigation containers (`Select`, `DatePicker`, `ColorPicker`, `TimezonePicker`, `Radio`, `Switch`, `Checkbox`, `Slider`, `Table`, `Pagination`, `Dialog`, `Sheet`, `DropdownMenu`, `Tabs`, `Stepper`, `List`, `Field`, etc.).
+
+When adding new components, keep this standard:
+
+- If component value/open/checked state changes, provide both direct callback and context callback.
+- Keep action context serializable and source-driven (`source`, current state, previous state, event optional).
+
+---
+
+## Accessibility contract
+
+- Always provide a readable label for icon-only controls (`aria-label` or explicit visible label).
+- Prefer semantic structures already implemented by components (`role="dialog"`, `role="listbox"`, `role="radiogroup"`, `role="navigation"`, `role="progressbar"`).
+- Use `Field`, `FieldLabel`, `FieldDescription`, and `FieldError` to wire `htmlFor`, `aria-describedby`, and error announcements consistently.
+- For repeated controls on the same page, provide unique accessible names so screen readers and tests can disambiguate actions.
+- Keep `decorative` usage for spinner/skeleton when they should be hidden from assistive tech.
+
+---
+
+## Testing contract (Playwright + React Testing Library)
+
+Prefer role/name selectors first, then fall back to `data-testid` when repeated instances need strict scoping.
+
+Playwright pattern for repeated reusable components:
+
+```ts
+import { expect, test } from '@playwright/test';
+
+test('updates the billing table page size only', async ({ page }) => {
+  await page.goto('/settings');
+
+  const billingPanel = page.getByTestId('billing-table-panel');
+  await billingPanel.getByRole('button', { name: 'Open options' }).click();
+  await billingPanel.getByRole('option', { name: '25' }).click();
+
+  await expect(billingPanel.getByText('Showing page')).toBeVisible();
+});
+```
+
+React Testing Library pattern with scoped queries:
+
+```tsx
+import { render, screen, within } from '@testing-library/react';
+
+it('toggles only the notifications switch in profile card', async () => {
+  render(<SettingsPage />);
+
+  const profileCard = screen.getByTestId('profile-settings-card');
+  const notificationsSwitch = within(profileCard).getByRole('switch', {
+    name: 'Email notifications',
+  });
+
+  expect(notificationsSwitch).toBeInTheDocument();
+});
+```
+
+Recommended selector strategy for reusable components:
+
+- Assign stable container IDs per domain area (`data-testid="billing-table-panel"`).
+- Use accessible names tied to business intent, not generic labels (`Open options` -> `Open billing status options` when needed).
+- Avoid index-based selectors when the same component appears multiple times.
 
 ---
 
 ## Component API
+
+This section is a practical quick reference. For exact source-of-truth props and unions, prefer generated declarations in `dist/components/*.d.ts`.
 
 ### Button
 
@@ -678,10 +780,14 @@ interface NavbarItem {
 }
 
 <Navbar
-  brand?={ReactNode}
+  brand?={ReactNode}                // custom brand node (overrides structured brand props)
+  showBrand?={boolean}              // set false to hide brand block completely
+  brandLogo?={ReactNode}            // logo/icon on the left side of brand block
+  brandName?={ReactNode}            // company name/title on top row
+  brandTagline?={ReactNode}         // optional text below company name
   items?={NavbarItem[]}
   actions?={ReactNode}
-  size?={'sm'|'md'|'lg'}
+  size?={'xs'|'sm'|'md'|'lg'}
   variant?={'default'|'outline'|'soft'}
   sticky?={boolean}
   responsive?={boolean}
@@ -700,6 +806,11 @@ interface NavbarItem {
   onItemSelect?={(item: NavbarItem, parentItem?: NavbarItem) => void}
   onAction?={(ctx: NavbarActionContext) => void}
 />
+
+// Layout behavior:
+// - Brand shows on the left (logo + text stack where tagline appears below name)
+// - Menu/actions area is right-aligned on desktop
+// - Set showBrand={false} when you want only right-aligned controls
 ```
 
 ### Sidebar
@@ -728,7 +839,7 @@ interface SidebarSection {
   sections?={SidebarSection[]}
   header?={ReactNode}
   footer?={ReactNode}
-  size?={'sm'|'md'|'lg'}
+  size?={'xs'|'sm'|'md'|'lg'}
   variant?={'default'|'outline'|'soft'}
   collapsed?={boolean}
   defaultCollapsed?={boolean}
@@ -1015,7 +1126,8 @@ const rowActions: RowAction<User>[] = [
   // Toolbar controls
   showToolbar?={boolean}
   showColumnToggle?={boolean}
-  showRefresh?={boolean}            onRefresh?={() => void | Promise<void>}
+  showRefresh?={boolean}
+  onRefresh?={() => void | Promise<void>}
   showExport?={boolean}
   exportable?={boolean}
   exportFormats?={('csv'|'xlsx'|'pdf')[]}

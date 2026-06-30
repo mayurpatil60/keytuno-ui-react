@@ -20,7 +20,7 @@ import {
 } from "./icons/feather";
 
 export type SidebarVariant = "default" | "outline" | "soft";
-export type SidebarSize = "sm" | "md" | "lg";
+export type SidebarSize = "xs" | "sm" | "md" | "lg";
 export type SidebarActionSource =
   | "item-select"
   | "submenu-toggle"
@@ -140,6 +140,18 @@ type SidebarVariantTokens = {
 const baseClasses = "relative inline-flex min-w-0 max-w-full";
 
 const sizeTokens: Record<SidebarSize, SidebarSizeTokens> = {
+  xs: {
+    expandedWidth: "14rem",
+    collapsedWidth: "3.6rem",
+    mobileWidth: "min(92vw, 15rem)",
+    panelPadding: "0.48rem",
+    sectionGap: "0.38rem",
+    itemHeight: "1.82rem",
+    itemPaddingInline: "0.5rem",
+    itemFontSize: "0.74rem",
+    iconSize: 13,
+    sectionTitleFontSize: "0.62rem",
+  },
   sm: {
     expandedWidth: "15.5rem",
     collapsedWidth: "4rem",
@@ -993,7 +1005,7 @@ export function Sidebar({
         <div style={{ display: "inline-flex", alignItems: "center" }}>
           <Button
             variant="outline"
-            size={size === "lg" ? "md" : "sm"}
+            size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
             onAction={(event) => {
               setMobileOpenState(!resolvedMobileOpen, "mobile-toggle", event);
             }}
@@ -1030,7 +1042,7 @@ export function Sidebar({
             {showCollapseToggle ? (
               <Button
                 variant="ghost"
-                size={size === "lg" ? "md" : "sm"}
+                size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
                 iconOnly
                 iconOnlyTone
                 tooltip={

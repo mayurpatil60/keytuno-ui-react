@@ -39,6 +39,8 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm size
+pnpm audit --prod --audit-level high
 ```
 
 Run Storybook build for component/theme surface changes:
@@ -46,6 +48,8 @@ Run Storybook build for component/theme surface changes:
 ```bash
 pnpm build-storybook
 ```
+
+For reusable component changes (especially components rendered multiple times per page), include at least one scoped selector test (Playwright or Testing Library) that validates stable targeting without index-based selectors.
 
 ## API and Theming Guardrails
 

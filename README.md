@@ -104,7 +104,41 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm build-storybook
+pnpm size
+pnpm audit --prod --audit-level high
 ```
+
+## Quality Snapshot (2026-07-01)
+
+Pre-release verification status for v0.1.0:
+
+1. `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
+2. `pnpm typecheck`: pass.
+3. `pnpm test`: pass (current suite: spinner-focused baseline tests).
+4. `pnpm build`: pass.
+5. `pnpm build-storybook`: pass.
+6. `pnpm size`: pass all configured size budgets.
+7. `pnpm audit --prod --audit-level high`: no known vulnerabilities.
+
+Recommended next hardening before larger rollout:
+
+1. Reduce lint warnings (mainly hook dependency and unused symbol warnings).
+2. Increase test coverage for stateful and composite components (Select, DatePicker, Dialog, DropdownMenu, Table, FileUpload).
+3. Add Playwright smoke scenarios for reusable components rendered multiple times on one page.
+
+## Testing Guidance for Reusable Components
+
+When the same component appears multiple times in one screen:
+
+1. Prefer semantic selectors first (`getByRole`, `getByLabelText`, accessible names).
+2. Scope actions to a container with stable `data-testid` on wrapper sections.
+3. Avoid positional selectors (`nth-child`) for brittle repeated UIs.
+
+Example strategy:
+
+1. Wrap each domain section with `data-testid` (for example: `billing-table-panel`).
+2. Query controls inside that scope by role and accessible name.
+3. Keep action labels specific so tests and assistive tech can disambiguate repeated controls.
 
 ## Create and Push a New Tag
 
@@ -126,6 +160,8 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm build-storybook
+pnpm size
+pnpm audit --prod --audit-level high
 ```
 
 3. Bump version in `package.json` without creating a tag automatically:
