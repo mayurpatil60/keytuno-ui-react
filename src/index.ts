@@ -305,6 +305,14 @@ export type {
   TimezonePickerSize,
   TimezonePickerVariant,
 } from "./components/TimezonePicker";
+export { ColorPicker } from "./components/ColorPicker";
+export type {
+  ColorPickerActionContext,
+  ColorPickerActionSource,
+  ColorPickerProps,
+  ColorPickerSize,
+  ColorPickerVariant,
+} from "./components/ColorPicker";
 export { Scrollbar } from "./components/Scrollbar";
 export type {
   ScrollbarActionContext,

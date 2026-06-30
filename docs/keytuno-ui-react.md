@@ -447,6 +447,34 @@ import { TimezonePicker } from '@keytuno/ui-react';
 // metadata like UTC offset stays in dropdown rows
 ```
 
+### ColorPicker
+
+```ts
+import { ColorPicker } from '@keytuno/ui-react';
+
+<ColorPicker
+  size?={'xs'|'sm'|'md'|'lg'}
+  variant?={'compact'|'detailed'}
+  varient?={'compact'|'detailed'}    // backwards-compatible alias; prefer variant
+  value?={string | null}             // controlled HEX value (for example '#2563eb')
+  defaultValue?={string | null}      // uncontrolled initial HEX value
+  swatches?={string[]}               // optional curated palette
+  showClear?={boolean}
+  showSwatches?={boolean}            // show/hide rounded swatch buttons below picker
+  disabled?={boolean}
+  required?={boolean}
+  invalid?={boolean}
+  placeholder?={string}              // used in detailed hex input
+  onValueChange?={(value: string | null) => void}
+  onAction?={(context: ColorPickerActionContext) => void}
+  // action sources: picker-change | hex-input | swatch-select | clear | focus | blur
+/>
+
+// detailed variant: color control + editable hex input + swatches
+// compact variant: compact inline value with optional swatches
+  // hex input allows free typing and normalizes to valid HEX on commit/blur
+```
+
 ### Scrollbar
 
 ```ts
