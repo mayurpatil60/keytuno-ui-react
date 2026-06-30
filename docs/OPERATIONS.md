@@ -48,6 +48,15 @@ pnpm audit --prod --audit-level high
    - `docs/COMPATIBILITY.md` (if version ranges or framework support changed)
    - `keytuno-ui-library.md` phase or release execution record
 
+5. Git-tag payload sanity checks pass:
+   - `dist/` is tracked in git and not ignored.
+   - `dist/index.js` and `dist/index.d.ts` exist before creating the release tag.
+   - Tag tree contains dist entrypoints:
+
+```bash
+git ls-tree -r --name-only vX.Y.Z dist/index.js dist/index.d.ts
+```
+
 ## Release Procedure
 
 1. Confirm current package version in `package.json`.
@@ -66,13 +75,19 @@ git push origin <branch>
 git push origin --tags
 ```
 
-4. Verify tag install in a consumer app:
+4. Verify release tag includes dist entry files before consumer install tests:
+
+```bash
+git ls-tree -r --name-only vX.Y.Z dist/index.js dist/index.d.ts
+```
+
+5. Verify tag install in a consumer app:
 
 ```bash
 pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#vX.Y.Z
 ```
 
-5. Verify reusable-component behavior in consumer app test flows:
+6. Verify reusable-component behavior in consumer app test flows:
    - Same component rendered multiple times can be targeted with role/name or scoped selectors.
    - No selector collisions caused by generic labels.
 
