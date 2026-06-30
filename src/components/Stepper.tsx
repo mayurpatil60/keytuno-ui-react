@@ -1388,12 +1388,11 @@ export function Stepper({
           const stepActive = step.id === resolvedActiveStepId;
           const stepCompleted = step.completed === true;
           const reachedStepIndex = enabledStepIds.indexOf(step.id);
-          const stepReached =
-            stepCompleted ||
-            stepActive ||
-            (reachedStepIndex >= 0 &&
-              activeEnabledIndex >= 0 &&
-              reachedStepIndex < activeEnabledIndex);
+          const stepPassed =
+            reachedStepIndex >= 0 &&
+            activeEnabledIndex >= 0 &&
+            reachedStepIndex < activeEnabledIndex;
+          const stepReached = stepCompleted || stepActive || stepPassed;
           const stepHasPanel = hasStepPanel(
             step,
             showDescriptions,
@@ -1421,9 +1420,10 @@ export function Stepper({
           const lineActiveColor =
             "color-mix(in srgb, var(--ktn-action-primary-bg) 70%, white)";
           const lineInactiveColor = "var(--ktn-border-muted)";
+          const connectorGapCompensation = `calc(${tokens.stepGap} / 2)`;
 
           const leftLineActive = stepReached;
-          const rightLineActive = stepCompleted;
+          const rightLineActive = stepCompleted || stepPassed;
 
           const markerSize = tokens.indicatorSize;
 
@@ -1676,6 +1676,7 @@ export function Stepper({
                             aria-hidden
                             style={{
                               ...lineStyle,
+                              marginInlineStart: `-${connectorGapCompensation}`,
                               backgroundColor: leftLineActive
                                 ? lineActiveColor
                                 : lineInactiveColor,
@@ -1704,6 +1705,7 @@ export function Stepper({
                             aria-hidden
                             style={{
                               ...lineStyle,
+                              marginInlineEnd: `-${connectorGapCompensation}`,
                               backgroundColor: rightLineActive
                                 ? lineActiveColor
                                 : lineInactiveColor,
@@ -1725,6 +1727,7 @@ export function Stepper({
                             aria-hidden
                             style={{
                               ...verticalLineStyle,
+                              marginBlockStart: `-${connectorGapCompensation}`,
                               backgroundColor: leftLineActive
                                 ? lineActiveColor
                                 : lineInactiveColor,
@@ -1753,6 +1756,7 @@ export function Stepper({
                             aria-hidden
                             style={{
                               ...verticalLineStyle,
+                              marginBlockEnd: `-${connectorGapCompensation}`,
                               backgroundColor: rightLineActive
                                 ? lineActiveColor
                                 : lineInactiveColor,
