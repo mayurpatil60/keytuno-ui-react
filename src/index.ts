@@ -60,6 +60,17 @@ export type {
   BreadcrumbSeparatorProps,
   BreadcrumbSize,
 } from "./components/Breadcrumb";
+export { Navbar } from "./components/Navbar";
+export type {
+  NavbarActionContext,
+  NavbarActionSource,
+  NavbarItem,
+  NavbarItemActionEvent,
+  NavbarMobileMenuSide,
+  NavbarProps,
+  NavbarSize,
+  NavbarVariant,
+} from "./components/Navbar";
 export { Sidebar } from "./components/Sidebar";
 export type {
   SidebarActionContext,

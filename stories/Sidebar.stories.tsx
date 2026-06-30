@@ -663,7 +663,7 @@ export const SeparatorStylePlayground: Story = {
     defaultCollapsed: false,
     iconOnly: false,
     responsive: true,
-    collapseBreakpoint: 992,
+    collapseBreakpoint: 1024,
     showCollapseToggle: true,
     showMobileToggle: true,
     defaultMobileOpen: false,
