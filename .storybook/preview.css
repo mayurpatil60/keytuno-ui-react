@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 :root {
   --ktn-bg-default: #ffffff;
   --ktn-bg-surface: #f8fafc;

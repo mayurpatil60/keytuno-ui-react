@@ -8,7 +8,7 @@ import {
   type ThemeName,
 } from "@keytuno/ui-react";
 
-import "./tailwind.css";
+import "./preview.css";
 
 function applyThemeToDocument(themeName: ThemeName, mode: ThemeMode): void {
   if (typeof document === "undefined") {
