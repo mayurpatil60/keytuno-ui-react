@@ -393,14 +393,27 @@ export type {
   TableActionContext,
   TableActionSource,
   TableColumnDef,
-  TableExportHandler,
-  TableExportFormat,
-  TableExportPayload,
-  TableExportRows,
   TableProps,
   TableSize,
   TableVariant,
 } from "./components/Table";
+export { CardData } from "./components/CardData";
+export type {
+  CardDataAction,
+  CardDataActionAlignment,
+  CardDataActionContext,
+  CardDataActionMode,
+  CardDataActionSource,
+  CardDataBadgeValue,
+  CardDataFieldSchema,
+  CardDataFieldType,
+  CardDataMediaValue,
+  CardDataProgressValue,
+  CardDataProps,
+  CardDataSize,
+  CardDataStatusValue,
+  CardDataVariant,
+} from "./components/CardData";
 export { FilePreview } from "./components/FilePreview";
 export type {
   FilePreviewProps,

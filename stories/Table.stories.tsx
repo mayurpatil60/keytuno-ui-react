@@ -6,7 +6,7 @@ import {
   useQuery,
 } from "@tanstack/react-query";
 import type { Meta, StoryObj } from "@storybook/react";
-import { FiEdit3, FiEye, FiTrash2 } from "react-icons/fi";
+import { FiEdit3, FiEye, FiTrash2 } from "../src/components/icons/feather";
 
 import {
   Card,
@@ -23,7 +23,6 @@ import {
   type TableColumnDef,
   type TableProps,
 } from "../src/index";
-import { tableExportHandlers } from "../src/addons/table-exporters";
 
 interface TradeRow {
   id: string;
@@ -163,7 +162,7 @@ const tableRowActions: RowAction<TradeRow>[] = [
     compact: true,
     iconOnly: true,
     iconOnlyTone: true,
-    tooltip: "Remove",
+    tooltip: "Delete",
     onClick: () => {},
   },
 ];
@@ -501,13 +500,8 @@ function SelectionDemo(): JSX.Element {
             searchable
             searchPlaceholder="Search selected-grid..."
             showToolbar
-            showColumnToggle
             columnVisibility
             defaultHiddenColumns={["updatedAt"]}
-            showExport
-            exportable
-            exportFormats={["csv", "xlsx", "pdf"]}
-            exportHandlers={tableExportHandlers}
           />
 
           <FieldDescription>{`Selected Rows: ${selectedRows.length}`}</FieldDescription>
@@ -569,7 +563,6 @@ function ServerSideTableInner(): JSX.Element {
         setRefreshToken((current) => current + 1);
       }}
       showToolbar
-      showColumnToggle
       columnVisibility
       defaultHiddenColumns={["updatedAt"]}
     />
@@ -611,14 +604,13 @@ export const Basic: Story = {
             bordered
             rounded
             showToolbar
-            showColumnToggle
             columnVisibility
             defaultHiddenColumns={["updatedAt"]}
           />
 
           <FieldDescription>
             Basic variant with sorting, filtering, search, pagination, and
-            column visibility.
+            column visibility state.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -725,7 +717,6 @@ export const StickyHeaderFullscreen: Story = {
             stickyHeader
             fullscreen
             showToolbar
-            showColumnToggle
             columnVisibility
             defaultHiddenColumns={["updatedAt"]}
           />
@@ -772,10 +763,7 @@ const tableInteractiveDefaultArgs: Story["args"] = {
   multiSelect: true,
   columnVisibility: true,
   showToolbar: true,
-  showColumnToggle: true,
   showRefresh: true,
-  showExport: true,
-  exportable: true,
   showPagination: true,
   paginationVariant: "advance",
   paginationDefaultPageSize: 10,
@@ -795,9 +783,15 @@ const tableInteractiveDefaultArgs: Story["args"] = {
   fullscreen: true,
   serverSide: false,
   globalFilter: true,
+  showFiltersLabel: "Filters",
+  hideFiltersLabel: "Close",
+  switchToCardViewLabel: "Cards",
+  refreshLabel: "Refresh",
+  refreshingLabel: "Refreshing",
+  fullscreenLabel: "Fullscreen",
+  resetScreenLabel: "Reset",
   columnFilters: ["symbol", "sector", "status", "price"],
   defaultHiddenColumns: ["updatedAt"],
-  exportFormats: ["csv", "xlsx", "pdf"],
 };
 
 const tableInteractiveArgTypes = {
@@ -810,10 +804,6 @@ const tableInteractiveArgTypes = {
     options: ["xs", "sm", "md", "lg"],
   },
   compact: { control: "boolean" },
-  exportFormats: {
-    control: "check",
-    options: ["csv", "xlsx", "pdf"],
-  },
   sortable: { control: "boolean" },
   filterable: { control: "boolean" },
   searchable: { control: "boolean" },
@@ -822,10 +812,7 @@ const tableInteractiveArgTypes = {
   multiSelect: { control: "boolean" },
   columnVisibility: { control: "boolean" },
   showToolbar: { control: "boolean" },
-  showColumnToggle: { control: "boolean" },
   showRefresh: { control: "boolean" },
-  showExport: { control: "boolean" },
-  exportable: { control: "boolean" },
   showPagination: { control: "boolean" },
   paginationVariant: {
     control: "select",
@@ -912,7 +899,6 @@ export const CardTableFullWidthPlaybook: Story = {
                 data={mockRows}
                 columns={baseColumns}
                 rowActions={tableRowActions}
-                exportHandlers={tableExportHandlers}
                 onRefresh={args.onRefresh ?? (() => {})}
                 style={{ width: "100%", maxWidth: "100%" }}
               />
@@ -948,7 +934,6 @@ export const TablePlayground: Story = {
               data={mockRows}
               columns={baseColumns}
               rowActions={tableRowActions}
-              exportHandlers={tableExportHandlers}
               onRefresh={args.onRefresh ?? (() => {})}
             />
 

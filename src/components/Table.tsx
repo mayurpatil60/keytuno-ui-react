@@ -27,33 +27,19 @@ import {
   FiChevronDown,
   FiChevronUp,
   FiFilter,
-  FiColumns,
-  FiDownload,
+  FiGrid,
   FiMaximize2,
   FiMinimize2,
   FiRefreshCw,
   FiSearch,
-  FiX,
 } from "./icons/feather";
 
 import { Button, type ButtonProps } from "./Button";
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./DropdownMenu";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "./Dialog";
+  DataFilterSortDialog,
+  type DataFilterSortDialogColumn,
+  type DataFilterSortDialogResult,
+} from "./DataFilterSortDialog";
 import { Input } from "./Input";
 import {
   Pagination,
@@ -61,9 +47,9 @@ import {
   type PaginationProps,
   type PaginationSize,
 } from "./Pagination";
+import { Scrollbar } from "./Scrollbar";
 import { Skeleton } from "./Skeleton";
 import { Spinner } from "./Spinner";
-import { Tooltip } from "./Tooltip";
 
 export type TableVariant =
   | "basic"
@@ -73,10 +59,10 @@ export type TableVariant =
   | "minimal"
   | "striped";
 export type TableSize = "xs" | "sm" | "md" | "lg";
-export type TableExportFormat = "csv" | "xlsx" | "pdf";
 export type TableActionSource =
   | "search"
   | "sort"
+  | "sort-reset"
   | "filter"
   | "selection"
   | "column-visibility"
@@ -84,7 +70,7 @@ export type TableActionSource =
   | "column-filters-apply"
   | "column-filters-clear"
   | "refresh"
-  | "export"
+  | "view-switch"
   | "fullscreen"
   | "pagination"
   | "page-size"
@@ -102,25 +88,10 @@ export interface TableActionContext<TData extends object = object> {
   actionId?: string;
   row?: TData;
   rowIndex?: number;
-  exportFormat?: TableExportFormat;
   fullscreen?: boolean;
   showColumnFilters?: boolean;
   event?: unknown;
 }
-
-export interface TableExportRows {
-  headers: string[];
-  records: string[][];
-}
-
-export interface TableExportPayload {
-  rows: TableExportRows;
-  fileNameBase: string;
-}
-
-export type TableExportHandler = (
-  payload: TableExportPayload,
-) => Promise<void> | void;
 
 export type TableColumnDef<TData extends object = object> = ColumnDef<
   TData,
@@ -184,15 +155,17 @@ export interface TableProps<TData extends object = object> extends Omit<
   defaultHiddenColumns?: string[];
 
   showToolbar?: boolean;
-  showColumnToggle?: boolean;
-  columnsLabel?: string;
-  toggleColumnsLabel?: string;
+  showViewSwitch?: boolean;
+  switchToCardViewLabel?: string;
+  onSwitchToCardView?: () => void;
   showFiltersLabel?: string;
   hideFiltersLabel?: string;
   filterDialogTitle?: string;
   filterDialogDescription?: string;
   addFilterLabel?: string;
+  addSortLabel?: string;
   clearFiltersLabel?: string;
+  resetSortingLabel?: string;
   applyFiltersLabel?: string;
   globalFilterLabel?: string;
   globalFilterPlaceholder?: string;
@@ -200,17 +173,8 @@ export interface TableProps<TData extends object = object> extends Omit<
   refreshingLabel?: string;
   fullscreenLabel?: string;
   resetScreenLabel?: string;
-  downloadLabel?: string;
-  exportingLabelFormatter?: (format: TableExportFormat) => string;
-  exportFormatLabel?: string;
   showRefresh?: boolean;
   onRefresh?: () => void | Promise<void>;
-  showExport?: boolean;
-
-  exportable?: boolean;
-  exportFormats?: TableExportFormat[];
-  exportHandlers?: Partial<Record<TableExportFormat, TableExportHandler>>;
-  exportFileName?: string;
 
   loading?: boolean;
   loadingRows?: number;
@@ -275,8 +239,6 @@ const SPECIAL_SELECT_COLUMN_ID = "__select";
 const SPECIAL_ACTIONS_COLUMN_ID = "__actions";
 const GLOBAL_FILTER_ID = "__global";
 const DEFAULT_PAGE_SIZE = 10;
-const DEFAULT_EXPORT_FORMATS: TableExportFormat[] = ["csv"];
-const DEFAULT_EXPORT_FILE_NAME = "table-export";
 const DEFAULT_EMPTY_TEXT = "No records found.";
 
 const sizeTokens: Record<TableSize, TableSizeTokens> = {
@@ -442,259 +404,10 @@ function splitColumnFilterTerms(filterValue: unknown): string[] {
 
 type NumericFilterOperator = "gt" | "gte" | "lt" | "lte" | "eq" | "neq";
 
-type AdvancedFilterOperator =
-  | "contains"
-  | "starts-with"
-  | "ends-with"
-  | "equals"
-  | "not-equals"
-  | "gt"
-  | "gte"
-  | "lt"
-  | "lte";
-
-interface AdvancedFilterRule {
-  id: string;
-  columnId: string;
-  operator: AdvancedFilterOperator;
-  value: string;
-}
-
-type AdvancedFilterOperatorOption = {
-  value: AdvancedFilterOperator;
-  label: string;
-};
-
-const advancedFilterOperatorOptions: AdvancedFilterOperatorOption[] = [
-  { value: "contains", label: "Contains" },
-  { value: "starts-with", label: "Starts with" },
-  { value: "ends-with", label: "Ends with" },
-  { value: "equals", label: "Equals" },
-  { value: "not-equals", label: "Not equals" },
-  { value: "gt", label: "Greater than" },
-  { value: "gte", label: "Greater than or equal" },
-  { value: "lt", label: "Less than" },
-  { value: "lte", label: "Less than or equal" },
-];
-
-const defaultAdvancedFilterOperator: AdvancedFilterOperator = "contains";
-
 type ParsedNumericCondition = {
   operator: NumericFilterOperator;
   value: number;
 };
-
-function createAdvancedFilterRuleId(): string {
-  return `adv-filter-${Date.now().toString(36)}-${Math.random()
-    .toString(36)
-    .slice(2, 9)}`;
-}
-
-function createAdvancedFilterRule(columnId: string): AdvancedFilterRule {
-  return {
-    id: createAdvancedFilterRuleId(),
-    columnId,
-    operator: defaultAdvancedFilterOperator,
-    value: "",
-  };
-}
-
-function toAdvancedFilterToken(
-  operator: AdvancedFilterOperator,
-  rawValue: string,
-): string {
-  const value = rawValue.trim();
-
-  if (value === "") {
-    return "";
-  }
-
-  if (operator === "starts-with") {
-    return `^${value}`;
-  }
-
-  if (operator === "ends-with") {
-    return `${value}$`;
-  }
-
-  if (operator === "equals") {
-    return `=${value}`;
-  }
-
-  if (operator === "not-equals") {
-    return `!=${value}`;
-  }
-
-  if (operator === "gt") {
-    return `>${value}`;
-  }
-
-  if (operator === "gte") {
-    return `>=${value}`;
-  }
-
-  if (operator === "lt") {
-    return `<${value}`;
-  }
-
-  if (operator === "lte") {
-    return `<=${value}`;
-  }
-
-  return `~${value}`;
-}
-
-function parseAdvancedFilterToken(token: string): {
-  operator: AdvancedFilterOperator;
-  value: string;
-} {
-  const normalizedToken = token.trim();
-
-  if (normalizedToken === "") {
-    return {
-      operator: defaultAdvancedFilterOperator,
-      value: "",
-    };
-  }
-
-  if (normalizedToken.startsWith("!=")) {
-    return {
-      operator: "not-equals",
-      value: normalizedToken.slice(2).trim(),
-    };
-  }
-
-  if (normalizedToken.startsWith(">=")) {
-    return {
-      operator: "gte",
-      value: normalizedToken.slice(2).trim(),
-    };
-  }
-
-  if (normalizedToken.startsWith("<=")) {
-    return {
-      operator: "lte",
-      value: normalizedToken.slice(2).trim(),
-    };
-  }
-
-  if (normalizedToken.startsWith(">")) {
-    return {
-      operator: "gt",
-      value: normalizedToken.slice(1).trim(),
-    };
-  }
-
-  if (normalizedToken.startsWith("<")) {
-    return {
-      operator: "lt",
-      value: normalizedToken.slice(1).trim(),
-    };
-  }
-
-  if (normalizedToken.startsWith("=")) {
-    return {
-      operator: "equals",
-      value: normalizedToken.slice(1).trim(),
-    };
-  }
-
-  if (normalizedToken.startsWith("^")) {
-    return {
-      operator: "starts-with",
-      value: normalizedToken.slice(1).trim(),
-    };
-  }
-
-  if (normalizedToken.startsWith("~")) {
-    return {
-      operator: "contains",
-      value: normalizedToken.slice(1).trim(),
-    };
-  }
-
-  if (normalizedToken.endsWith("$")) {
-    return {
-      operator: "ends-with",
-      value: normalizedToken.slice(0, -1).trim(),
-    };
-  }
-
-  return {
-    operator: "contains",
-    value: normalizedToken,
-  };
-}
-
-function extractAdvancedFilterRules(
-  filters: ColumnFiltersState,
-): AdvancedFilterRule[] {
-  const rules: AdvancedFilterRule[] = [];
-
-  filters.forEach((filter) => {
-    if (
-      filter.id === GLOBAL_FILTER_ID ||
-      filter.id === SPECIAL_SELECT_COLUMN_ID ||
-      filter.id === SPECIAL_ACTIONS_COLUMN_ID
-    ) {
-      return;
-    }
-
-    const terms = splitColumnFilterTerms(filter.value);
-
-    terms.forEach((term) => {
-      const parsed = parseAdvancedFilterToken(term);
-
-      rules.push({
-        id: createAdvancedFilterRuleId(),
-        columnId: filter.id,
-        operator: parsed.operator,
-        value: parsed.value,
-      });
-    });
-  });
-
-  return rules;
-}
-
-function buildColumnFiltersFromAdvancedRules(
-  rules: AdvancedFilterRule[],
-): ColumnFiltersState {
-  const groupedByColumn = new Map<string, string[]>();
-
-  rules.forEach((rule) => {
-    const normalizedColumnId = rule.columnId.trim();
-
-    if (
-      normalizedColumnId === "" ||
-      normalizedColumnId === SPECIAL_SELECT_COLUMN_ID ||
-      normalizedColumnId === SPECIAL_ACTIONS_COLUMN_ID ||
-      normalizedColumnId === GLOBAL_FILTER_ID
-    ) {
-      return;
-    }
-
-    const token = toAdvancedFilterToken(rule.operator, rule.value);
-
-    if (token === "") {
-      return;
-    }
-
-    const existingTokens = groupedByColumn.get(normalizedColumnId);
-
-    if (existingTokens == null) {
-      groupedByColumn.set(normalizedColumnId, [token]);
-      return;
-    }
-
-    existingTokens.push(token);
-  });
-
-  return Array.from(groupedByColumn.entries()).map(([columnId, terms]) => ({
-    id: columnId,
-    value: terms.join(","),
-  }));
-}
 
 function parseNumericFilterCondition(
   term: string,
@@ -978,11 +691,6 @@ function toCellText(value: unknown): string {
   }
 }
 
-function escapeCsvValue(value: string): string {
-  const escaped = value.replaceAll('"', '""');
-  return `"${escaped}"`;
-}
-
 function isRowActionLabelEmpty(label: ReactNode): boolean {
   if (label == null) {
     return true;
@@ -1033,41 +741,6 @@ function resolveRowActionTooltip<TData extends object>(
   return readableActionId === "" ? undefined : readableActionId;
 }
 
-function triggerDownload(
-  fileName: string,
-  mimeType: string,
-  content: BlobPart,
-): void {
-  const blob = new Blob([content], { type: mimeType });
-  const objectUrl = URL.createObjectURL(blob);
-  const anchorElement = document.createElement("a");
-  anchorElement.href = objectUrl;
-  anchorElement.download = fileName;
-  document.body.appendChild(anchorElement);
-  anchorElement.click();
-  document.body.removeChild(anchorElement);
-  URL.revokeObjectURL(objectUrl);
-}
-
-function exportTableAsCsv({ rows, fileNameBase }: TableExportPayload): void {
-  const csvLines = [
-    rows.headers.map(escapeCsvValue).join(","),
-    ...rows.records.map((row) => row.map(escapeCsvValue).join(",")),
-  ];
-
-  triggerDownload(
-    `${fileNameBase}.csv`,
-    "text/csv;charset=utf-8",
-    csvLines.join("\n"),
-  );
-}
-
-const defaultTableExportHandlers: Partial<
-  Record<TableExportFormat, TableExportHandler>
-> = {
-  csv: exportTableAsCsv,
-};
-
 export function Table<TData extends object = object>({
   data = [],
   columns,
@@ -1094,33 +767,26 @@ export function Table<TData extends object = object>({
   columnVisibility = false,
   defaultHiddenColumns,
   showToolbar = true,
-  showColumnToggle = true,
-  columnsLabel = "Columns",
-  toggleColumnsLabel = "Toggle Columns",
-  showFiltersLabel = "Show filters",
-  hideFiltersLabel = "Hide filters",
+  showViewSwitch = false,
+  switchToCardViewLabel = "Cards",
+  onSwitchToCardView,
+  showFiltersLabel = "Filters",
+  hideFiltersLabel = "Close",
   filterDialogTitle = "Advanced column filters",
   filterDialogDescription = "Build multiple per-column rules with operators, then apply or clear in one place.",
   addFilterLabel = "Add filter",
+  addSortLabel = "Add sort",
   clearFiltersLabel = "Clear filters",
+  resetSortingLabel = "Reset sorting",
   applyFiltersLabel = "Apply filters",
   globalFilterLabel = "Global search",
   globalFilterPlaceholder = "Search all columns",
   refreshLabel = "Refresh",
   refreshingLabel = "Refreshing",
   fullscreenLabel = "Fullscreen",
-  resetScreenLabel = "Reset screen",
-  downloadLabel = "Download",
-  exportingLabelFormatter = (format: TableExportFormat) =>
-    `Exporting ${format.toUpperCase()}...`,
-  exportFormatLabel = "Export Format",
+  resetScreenLabel = "Reset",
   showRefresh = false,
   onRefresh,
-  showExport = false,
-  exportable = false,
-  exportFormats = DEFAULT_EXPORT_FORMATS,
-  exportHandlers,
-  exportFileName = DEFAULT_EXPORT_FILE_NAME,
   loading = false,
   loadingRows = 6,
   loadingText = "Loading table...",
@@ -1205,15 +871,8 @@ export function Table<TData extends object = object>({
   );
   const [isFullscreenActive, setIsFullscreenActive] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [exportingFormat, setExportingFormat] =
-    useState<TableExportFormat | null>(null);
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
-  const [advancedFilterDraftRules, setAdvancedFilterDraftRules] = useState<
-    AdvancedFilterRule[]
-  >([]);
-  const [advancedFilterDraftSearch, setAdvancedFilterDraftSearch] =
-    useState("");
   const isFullscreenMode = fullscreen && isFullscreenActive;
 
   useEffect(() => {
@@ -1703,15 +1362,6 @@ export function Table<TData extends object = object>({
     ? currentServerPage
     : table.getState().pagination.pageIndex + 1;
 
-  const togglableColumns = table
-    .getAllLeafColumns()
-    .filter(
-      (column) =>
-        column.getCanHide() &&
-        column.id !== SPECIAL_SELECT_COLUMN_ID &&
-        column.id !== SPECIAL_ACTIONS_COLUMN_ID,
-    );
-
   const filterableColumns = table.getAllLeafColumns().filter((column) => {
     if (
       column.id === SPECIAL_SELECT_COLUMN_ID ||
@@ -1731,8 +1381,6 @@ export function Table<TData extends object = object>({
     return filterableColumnSet.has(column.id);
   });
 
-  const firstFilterableColumnId = filterableColumns[0]?.id ?? "";
-
   const activeColumnFilterCount = columnFilterState.reduce((count, filter) => {
     if (filter.id === GLOBAL_FILTER_ID) {
       return count;
@@ -1745,34 +1393,37 @@ export function Table<TData extends object = object>({
     canUseGlobalFilter && globalSearch.trim() !== "";
   const totalActiveAdvancedFilters =
     activeColumnFilterCount + (hasActiveGlobalSearch ? 1 : 0);
+  const showAdvancedFilterTrigger = filterable && filterableColumns.length > 0;
 
-  function getInitialAdvancedFilterRules(): AdvancedFilterRule[] {
-    const allowedColumnIds = new Set(
-      filterableColumns.map((column) => column.id),
-    );
+  const filterSortDialogColumns = useMemo<DataFilterSortDialogColumn[]>(() => {
+    return table
+      .getAllLeafColumns()
+      .filter(
+        (column) =>
+          column.id !== SPECIAL_SELECT_COLUMN_ID &&
+          column.id !== SPECIAL_ACTIONS_COLUMN_ID,
+      )
+      .map((column) => {
+        const canFilterColumn =
+          filterable &&
+          (columnFilters == null ||
+            columnFilters.length === 0 ||
+            filterableColumnSet.has(column.id));
 
-    const nextRules = extractAdvancedFilterRules(columnFilterState).filter(
-      (rule) => allowedColumnIds.has(rule.columnId),
-    );
-
-    if (nextRules.length > 0) {
-      return nextRules;
-    }
-
-    if (firstFilterableColumnId === "") {
-      return [];
-    }
-
-    return [createAdvancedFilterRule(firstFilterableColumnId)];
-  }
+        return {
+          id: column.id,
+          label: toHeaderLabel(column),
+          canFilter: canFilterColumn && column.getCanFilter(),
+          canSort: sortable && column.getCanSort(),
+        };
+      });
+  }, [columnFilters, filterable, filterableColumnSet, sortable, table]);
 
   function handleAdvancedFilterDialogOpen(): void {
     if (!filterable || filterableColumns.length === 0) {
       return;
     }
 
-    setAdvancedFilterDraftRules(getInitialAdvancedFilterRules());
-    setAdvancedFilterDraftSearch(globalSearch);
     setIsFilterDialogOpen(true);
 
     onAction?.({
@@ -1792,191 +1443,58 @@ export function Table<TData extends object = object>({
     }
   }
 
-  function handleAdvancedFilterRuleAdd(): void {
-    if (firstFilterableColumnId === "") {
+  function handleFilterSortDialogApply(
+    result: DataFilterSortDialogResult,
+    reason: "apply" | "clear-filters" | "reset-sorting",
+  ): void {
+    table.setColumnFilters(result.columnFilters);
+
+    if (canUseGlobalFilter) {
+      table.setGlobalFilter(result.globalSearch);
+    }
+
+    if (sortable) {
+      table.setSorting(result.sorting);
+    }
+
+    if (reason === "clear-filters") {
+      onAction?.({
+        source: "column-filters-clear",
+        filters: [],
+        search: "",
+      });
       return;
     }
 
-    setAdvancedFilterDraftRules((current) => [
-      ...current,
-      createAdvancedFilterRule(firstFilterableColumnId),
-    ]);
-  }
-
-  function handleAdvancedFilterRuleChange(
-    ruleId: string,
-    changes: Partial<Omit<AdvancedFilterRule, "id">>,
-  ): void {
-    setAdvancedFilterDraftRules((current) =>
-      current.map((rule) =>
-        rule.id === ruleId
-          ? {
-              ...rule,
-              ...changes,
-            }
-          : rule,
-      ),
-    );
-  }
-
-  function handleAdvancedFilterRuleReset(ruleId: string): void {
-    setAdvancedFilterDraftRules((current) => {
-      if (current.length <= 1) {
-        return current.map((rule) =>
-          rule.id === ruleId
-            ? {
-                ...rule,
-                operator: defaultAdvancedFilterOperator,
-                value: "",
-              }
-            : rule,
-        );
-      }
-
-      return current.filter((rule) => rule.id !== ruleId);
-    });
-  }
-
-  function applyAdvancedFiltersFromDialog(): void {
-    const nextColumnFilters = buildColumnFiltersFromAdvancedRules(
-      advancedFilterDraftRules,
-    );
-
-    table.setColumnFilters(nextColumnFilters);
-
-    if (canUseGlobalFilter) {
-      table.setGlobalFilter(advancedFilterDraftSearch);
+    if (reason === "reset-sorting") {
+      onAction?.({
+        source: "sort-reset",
+        sort: [],
+      });
+      return;
     }
-
-    setIsFilterDialogOpen(false);
 
     onAction?.({
       source: "column-filters-apply",
       filters: buildExternalFilterState(
-        nextColumnFilters,
-        canUseGlobalFilter ? advancedFilterDraftSearch : globalSearch,
+        result.columnFilters,
+        canUseGlobalFilter ? result.globalSearch : "",
       ),
-      search: canUseGlobalFilter ? advancedFilterDraftSearch : undefined,
+      sort: result.sorting,
+      search: canUseGlobalFilter ? result.globalSearch : undefined,
     });
   }
 
-  function clearAdvancedFilters(): void {
-    const fallbackRules =
-      firstFilterableColumnId === ""
-        ? []
-        : [createAdvancedFilterRule(firstFilterableColumnId)];
-
-    setAdvancedFilterDraftRules(fallbackRules);
-    setAdvancedFilterDraftSearch("");
-
-    table.setColumnFilters([]);
-
-    if (canUseGlobalFilter) {
-      table.setGlobalFilter("");
-    }
-
-    onAction?.({
-      source: "column-filters-clear",
-      filters: [],
-      search: "",
-    });
-  }
-
-  const resolvedExportFormats = useMemo(() => {
-    const requestedFormats =
-      exportFormats.length > 0 ? exportFormats : [...DEFAULT_EXPORT_FORMATS];
-    const nextFormats: TableExportFormat[] = [];
-
-    requestedFormats.forEach((format) => {
-      if (
-        (format === "csv" || format === "xlsx" || format === "pdf") &&
-        !nextFormats.includes(format)
-      ) {
-        const handler =
-          exportHandlers?.[format] ?? defaultTableExportHandlers[format];
-
-        if (handler != null) {
-          nextFormats.push(format);
-        }
-      }
-    });
-
-    return nextFormats;
-  }, [exportFormats, exportHandlers]);
-
-  const canRenderExportControl =
-    showExport && exportable && resolvedExportFormats.length > 0;
+  const canShowViewSwitch = showViewSwitch && onSwitchToCardView != null;
 
   const canShowToolbar =
     showToolbar &&
-    (filterable ||
+    (showAdvancedFilterTrigger ||
       showSearchInput ||
-      (columnVisibility && showColumnToggle) ||
       showRefresh ||
-      canRenderExportControl ||
+      canShowViewSwitch ||
       fullscreen ||
       selectionCount > 0);
-
-  const exportRows = useMemo(() => {
-    const rowsToExport = serverSide
-      ? table.getRowModel().rows
-      : table.getPrePaginationRowModel().rows;
-
-    const exportableColumns = table
-      .getVisibleLeafColumns()
-      .filter(
-        (column) =>
-          column.id !== SPECIAL_SELECT_COLUMN_ID &&
-          column.id !== SPECIAL_ACTIONS_COLUMN_ID,
-      );
-
-    const headers = exportableColumns.map((column) => toHeaderLabel(column));
-
-    const records = rowsToExport.map((row) => {
-      return exportableColumns.map((column) =>
-        toCellText(row.getValue(column.id)),
-      );
-    });
-
-    return {
-      headers,
-      records,
-    };
-  }, [serverSide, table]);
-
-  async function handleExport(format: TableExportFormat): Promise<void> {
-    if (
-      !exportable ||
-      exportRows.headers.length === 0 ||
-      exportRows.records.length === 0
-    ) {
-      return;
-    }
-
-    const handler =
-      exportHandlers?.[format] ?? defaultTableExportHandlers[format];
-
-    if (handler == null) {
-      return;
-    }
-
-    const trimmedFileName = exportFileName.trim();
-    const fileNameBase =
-      trimmedFileName === "" ? DEFAULT_EXPORT_FILE_NAME : trimmedFileName;
-
-    setExportingFormat(format);
-
-    try {
-      await Promise.resolve(
-        handler({
-          rows: exportRows,
-          fileNameBase,
-        }),
-      );
-    } finally {
-      setExportingFormat(null);
-    }
-  }
 
   async function handleRefresh(): Promise<void> {
     if (onRefresh == null) {
@@ -2124,18 +1642,6 @@ export function Table<TData extends object = object>({
     maxWidth: "100%",
   };
 
-  const toolbarIconTriggerStyle: CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    lineHeight: 0,
-  };
-
-  const compactDropdownContentStyle: CSSProperties = {
-    width: "max-content",
-    minWidth: "fit-content",
-  };
-
   const searchWrapStyle: CSSProperties = {
     position: "relative",
     flex: "1 1 9rem",
@@ -2235,13 +1741,25 @@ export function Table<TData extends object = object>({
   const sortableHeaderButtonStyle: CSSProperties = {
     margin: 0,
     padding: 0,
+    paddingInline: 0,
+    paddingBlock: 0,
+    minWidth: 0,
+    height: "auto",
     border: "none",
+    borderWidth: 0,
     background: "transparent",
+    backgroundColor: "transparent",
     color: "inherit",
     font: "inherit",
+    fontWeight: "inherit",
+    lineHeight: "inherit",
+    borderRadius: 0,
+    boxShadow: "none",
     cursor: "pointer",
     display: "inline-flex",
     alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 0,
   };
 
   const sortIconWrapStyle: CSSProperties = {
@@ -2265,65 +1783,6 @@ export function Table<TData extends object = object>({
   };
 
   const actionsColumnRightPadding = "0.72rem";
-
-  const filterDialogBodyStyle: CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.72rem",
-    minWidth: 0,
-  };
-
-  const filterDialogTopRowStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "0.5rem",
-    flexWrap: "wrap",
-  };
-
-  const filterDialogRulesWrapStyle: CSSProperties = {
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem",
-  };
-
-  const filterDialogRuleRowStyle: CSSProperties = {
-    display: "grid",
-    gridTemplateColumns:
-      "minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(0, 1.8fr) auto",
-    gap: "0.42rem",
-    alignItems: "center",
-    width: "100%",
-    minWidth: 0,
-  };
-
-  const filterDialogSelectStyle: CSSProperties = {
-    width: "100%",
-    minWidth: 0,
-    height: "2.05rem",
-    border: `1px solid ${colorToken.borderColor}`,
-    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
-    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
-    color: colorToken.textColor,
-    fontSize: "0.83rem",
-    paddingInline: "0.55rem",
-    boxSizing: "border-box",
-  };
-
-  const filterDialogRuleHintStyle: CSSProperties = {
-    margin: 0,
-    fontSize: "0.76rem",
-    color: colorToken.mutedTextColor,
-  };
-
-  const filterDialogFooterStyle: CSSProperties = {
-    display: "flex",
-    width: "100%",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: "0.5rem",
-    flexWrap: "wrap",
-  };
 
   function renderSortIcon(column: Column<TData, unknown>): ReactNode {
     const state = column.getIsSorted();
@@ -2366,12 +1825,13 @@ export function Table<TData extends object = object>({
   }
 
   const headerGroups = table.getHeaderGroups();
-  const showAdvancedFilterTrigger = filterable && filterableColumns.length > 0;
-  const filterTriggerLabel = isFilterDialogOpen
+  const filterTriggerTooltipLabel = isFilterDialogOpen
     ? hideFiltersLabel
-    : totalActiveAdvancedFilters > 0
+    : showFiltersLabel;
+  const filterTriggerAriaLabel =
+    !isFilterDialogOpen && totalActiveAdvancedFilters > 0
       ? `${showFiltersLabel} (${totalActiveAdvancedFilters} active)`
-      : showFiltersLabel;
+      : filterTriggerTooltipLabel;
 
   return (
     <div
@@ -2418,10 +1878,10 @@ export function Table<TData extends object = object>({
                     : "outline"
                 }
                 iconOnly
-                tooltip={filterTriggerLabel}
+                tooltip={filterTriggerTooltipLabel}
                 tooltipSide="top"
                 tooltipSize="xs"
-                aria-label={filterTriggerLabel}
+                aria-label={filterTriggerAriaLabel}
                 onClick={() => {
                   handleAdvancedFilterDialogOpen();
                 }}
@@ -2464,38 +1924,27 @@ export function Table<TData extends object = object>({
               </Button>
             ) : null}
 
-            {columnVisibility &&
-            showColumnToggle &&
-            togglableColumns.length > 0 ? (
-              <DropdownMenu size={sizeToken.controlSize}>
-                <DropdownMenuTrigger>
-                  <Tooltip label={columnsLabel} side="top" size="xs">
-                    <span style={toolbarIconTriggerStyle}>
-                      <FiColumns size={sizeToken.iconSize} />
-                    </span>
-                  </Tooltip>
-                </DropdownMenuTrigger>
+            {canShowViewSwitch ? (
+              <Button
+                size={sizeToken.controlSize}
+                variant="outline"
+                iconOnly
+                tooltip={switchToCardViewLabel}
+                tooltipSide="top"
+                tooltipSize="xs"
+                aria-label={switchToCardViewLabel}
+                onAction={(event) => {
+                  onAction?.({
+                    source: "view-switch",
+                    actionId: "card-data",
+                    event,
+                  });
 
-                <DropdownMenuContent
-                  align="end"
-                  style={compactDropdownContentStyle}
-                >
-                  <DropdownMenuLabel>{toggleColumnsLabel}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-
-                  {togglableColumns.map((column) => (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      checked={column.getIsVisible()}
-                      onCheckedChange={(checked) => {
-                        column.toggleVisibility(checked);
-                      }}
-                    >
-                      {toHeaderLabel(column)}
-                    </DropdownMenuCheckboxItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  onSwitchToCardView?.();
+                }}
+              >
+                <FiGrid size={sizeToken.iconSize} />
+              </Button>
             ) : null}
 
             {showRefresh ? (
@@ -2520,59 +1969,16 @@ export function Table<TData extends object = object>({
                 <FiRefreshCw size={sizeToken.iconSize} />
               </Button>
             ) : null}
-
-            {canRenderExportControl ? (
-              <DropdownMenu size={sizeToken.controlSize}>
-                <DropdownMenuTrigger
-                  disabled={loading || exportingFormat != null}
-                >
-                  <Tooltip
-                    label={
-                      exportingFormat == null
-                        ? downloadLabel
-                        : exportingLabelFormatter(exportingFormat)
-                    }
-                    side="top"
-                    size="xs"
-                    disabled={loading || exportingFormat != null}
-                  >
-                    <span style={toolbarIconTriggerStyle}>
-                      <FiDownload size={sizeToken.iconSize} />
-                    </span>
-                  </Tooltip>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent
-                  align="end"
-                  style={compactDropdownContentStyle}
-                >
-                  <DropdownMenuLabel>{exportFormatLabel}</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-
-                  {resolvedExportFormats.map((format) => (
-                    <DropdownMenuItem
-                      key={format}
-                      onSelect={() => {
-                        onAction?.({
-                          source: "export",
-                          exportFormat: format,
-                        });
-
-                        void handleExport(format);
-                      }}
-                    >
-                      {format.toUpperCase()}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : null}
           </div>
         </div>
       ) : null}
 
       <div style={containerStyle}>
-        <div style={tableViewportStyle}>
+        <Scrollbar
+          axis="both"
+          style={tableViewportStyle}
+          aria-label="Table viewport"
+        >
           <table
             style={tableStyle}
             aria-busy={loading || undefined}
@@ -2618,8 +2024,10 @@ export function Table<TData extends object = object>({
                         }}
                       >
                         {header.isPlaceholder ? null : canSort ? (
-                          <button
-                            type="button"
+                          <Button
+                            size={sizeToken.controlSize}
+                            variant="ghost"
+                            compact
                             style={sortableHeaderButtonStyle}
                             onClick={() => {
                               header.column.toggleSorting();
@@ -2639,7 +2047,7 @@ export function Table<TData extends object = object>({
                               )}
                               {sortIcon}
                             </span>
-                          </button>
+                          </Button>
                         ) : (
                           <span style={sortableHeaderContentStyle}>
                             {flexRender(
@@ -2772,182 +2180,31 @@ export function Table<TData extends object = object>({
               )}
             </tbody>
           </table>
-        </div>
+        </Scrollbar>
       </div>
 
       {showAdvancedFilterTrigger ? (
-        <Dialog
+        <DataFilterSortDialog
           open={isFilterDialogOpen}
           onOpenChange={handleAdvancedFilterDialogOpenChange}
-          variant="outline"
-          size="lg"
-          closeOnEscape
-          closeOnOverlayClick
-        >
-          <DialogContent
-            scrollable
-            maxContentHeight="min(86vh, 38rem)"
-            style={{ width: "min(100%, 56rem)", maxWidth: "56rem" }}
-          >
-            <DialogHeader>
-              <DialogTitle>{filterDialogTitle}</DialogTitle>
-              <DialogDescription>{filterDialogDescription}</DialogDescription>
-            </DialogHeader>
-
-            <div style={filterDialogBodyStyle}>
-              {canUseGlobalFilter ? (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "0.32rem",
-                  }}
-                >
-                  <label
-                    style={{
-                      fontSize: "0.82rem",
-                      fontWeight: 600,
-                      color: colorToken.textColor,
-                    }}
-                  >
-                    {globalFilterLabel}
-                  </label>
-                  <Input
-                    size={sizeToken.controlSize}
-                    value={advancedFilterDraftSearch}
-                    placeholder={globalFilterPlaceholder}
-                    aria-label={globalFilterLabel}
-                    onChange={(event) => {
-                      setAdvancedFilterDraftSearch(event.currentTarget.value);
-                    }}
-                  />
-
-                  <p style={filterDialogRuleHintStyle}>
-                    Applies across all visible table columns.
-                  </p>
-                </div>
-              ) : null}
-
-              <div style={filterDialogTopRowStyle}>
-                <strong
-                  style={{
-                    fontSize: "0.84rem",
-                    color: colorToken.textColor,
-                  }}
-                >
-                  Column rules
-                </strong>
-
-                <Button
-                  size={sizeToken.controlSize}
-                  variant="outline"
-                  onClick={() => {
-                    handleAdvancedFilterRuleAdd();
-                  }}
-                >
-                  + {addFilterLabel}
-                </Button>
-              </div>
-
-              <div style={filterDialogRulesWrapStyle}>
-                {advancedFilterDraftRules.map((rule, index) => (
-                  <div key={rule.id} style={filterDialogRuleRowStyle}>
-                    <select
-                      value={rule.columnId}
-                      aria-label={`Filter column ${index + 1}`}
-                      style={filterDialogSelectStyle}
-                      onChange={(event) => {
-                        handleAdvancedFilterRuleChange(rule.id, {
-                          columnId: event.currentTarget.value,
-                        });
-                      }}
-                    >
-                      {filterableColumns.map((column) => (
-                        <option key={column.id} value={column.id}>
-                          {toHeaderLabel(column)}
-                        </option>
-                      ))}
-                    </select>
-
-                    <select
-                      value={rule.operator}
-                      aria-label={`Filter operator ${index + 1}`}
-                      style={filterDialogSelectStyle}
-                      onChange={(event) => {
-                        handleAdvancedFilterRuleChange(rule.id, {
-                          operator: event.currentTarget
-                            .value as AdvancedFilterOperator,
-                        });
-                      }}
-                    >
-                      {advancedFilterOperatorOptions.map((operator) => (
-                        <option key={operator.value} value={operator.value}>
-                          {operator.label}
-                        </option>
-                      ))}
-                    </select>
-
-                    <Input
-                      size={sizeToken.controlSize}
-                      value={rule.value}
-                      placeholder="Enter value"
-                      aria-label={`Filter value ${index + 1}`}
-                      onChange={(event) => {
-                        handleAdvancedFilterRuleChange(rule.id, {
-                          value: event.currentTarget.value,
-                        });
-                      }}
-                    />
-
-                    <Button
-                      size={sizeToken.controlSize}
-                      variant="ghost"
-                      iconOnly
-                      iconOnlyTone
-                      tooltip="Reset this filter"
-                      tooltipSide="top"
-                      tooltipSize="xs"
-                      aria-label={`Reset filter ${index + 1}`}
-                      onAction={() => {
-                        handleAdvancedFilterRuleReset(rule.id);
-                      }}
-                    >
-                      <FiX size={sizeToken.iconSize} />
-                    </Button>
-                  </div>
-                ))}
-
-                {advancedFilterDraftRules.length === 0 ? (
-                  <p style={filterDialogRuleHintStyle}>
-                    Add a filter row to start applying per-column rules.
-                  </p>
-                ) : null}
-              </div>
-            </div>
-
-            <DialogFooter style={filterDialogFooterStyle} sticky>
-              <Button
-                size={sizeToken.controlSize}
-                variant="outline"
-                onAction={() => {
-                  clearAdvancedFilters();
-                }}
-              >
-                {clearFiltersLabel}
-              </Button>
-
-              <Button
-                size={sizeToken.controlSize}
-                variant="primary"
-                onAction={() => {
-                  applyAdvancedFiltersFromDialog();
-                }}
-              >
-                {applyFiltersLabel}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          columns={filterSortDialogColumns}
+          columnFilters={columnFilterState}
+          sorting={sortingState}
+          globalSearch={globalSearch}
+          canUseGlobalFilter={canUseGlobalFilter}
+          enableSorting={sortable}
+          controlSize={sizeToken.controlSize}
+          title={filterDialogTitle}
+          description={filterDialogDescription}
+          addFilterLabel={addFilterLabel}
+          addSortLabel={addSortLabel}
+          clearFiltersLabel={clearFiltersLabel}
+          resetSortingLabel={resetSortingLabel}
+          applyFiltersLabel={applyFiltersLabel}
+          globalFilterLabel={globalFilterLabel}
+          globalFilterPlaceholder={globalFilterPlaceholder}
+          onApply={handleFilterSortDialogApply}
+        />
       ) : null}
 
       {showPagination ? (

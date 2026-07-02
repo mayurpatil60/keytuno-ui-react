@@ -13,11 +13,6 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./addons/table-exporters": {
-      "types": "./dist/addons/table-exporters.d.ts",
-      "import": "./dist/addons/table-exporters.js",
-      "default": "./dist/addons/table-exporters.js"
-    },
     "./components/*": {
       "types": "./dist/components/*.d.ts",
       "import": "./dist/components/*.js",
@@ -71,22 +66,8 @@
     "prepack": "pnpm run build"
   },
   "peerDependencies": {
-    "jspdf": "^4.2.1",
-    "jspdf-autotable": "^5.0.8",
     "react": "^18.0.0",
-    "react-dom": "^18.0.0",
-    "xlsx": "^0.18.5"
-  },
-  "peerDependenciesMeta": {
-    "jspdf": {
-      "optional": true
-    },
-    "jspdf-autotable": {
-      "optional": true
-    },
-    "xlsx": {
-      "optional": true
-    }
+    "react-dom": "^18.0.0"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
@@ -111,16 +92,13 @@
     "eslint-plugin-react-hooks": "^5.1.0",
     "globals": "^15.12.0",
     "jsdom": "^25.0.1",
-    "jspdf": "^4.2.1",
-    "jspdf-autotable": "^5.0.8",
     "react-icons": "^5.6.0",
     "size-limit": "^12.1.0",
     "storybook": "^8.6.14",
     "tsup": "8.3.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0",
-    "vitest": "^2.1.9",
-    "xlsx": "^0.18.5"
+    "vitest": "^2.1.9"
   },
   "packageManager": "pnpm@9.15.0",
   "size-limit": [

@@ -1037,6 +1037,13 @@ export function DropdownMenuContent({
     scrollbarGutter: "stable both-edges",
   };
 
+  const contentStackStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    minWidth: 0,
+  };
+
   const portalNode = renderPortal(
     <div
       ref={contentRef}
@@ -1126,7 +1133,7 @@ export function DropdownMenuContent({
         tabIndex={-1}
         style={viewportStyle}
       >
-        {children}
+        <div style={contentStackStyle}>{children}</div>
       </Scrollbar>
     </div>,
   );
@@ -1381,7 +1388,9 @@ export function DropdownMenuItem({
   }, [isSubmenuOpen, submenuOffset, submenuSide]);
 
   const rowStyle: CSSProperties = {
+    width: "100%",
     minWidth: 0,
+    boxSizing: "border-box",
     minHeight: sizeToken.itemHeight,
     border: "none",
     backgroundColor: isHovered
@@ -1394,7 +1403,7 @@ export function DropdownMenuItem({
       : variantToken.itemTextColor,
     cursor: resolvedDisabled ? "not-allowed" : "pointer",
     opacity: resolvedDisabled ? 0.62 : 1,
-    display: "inline-flex",
+    display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     gap: "0.35rem",
@@ -1517,6 +1526,13 @@ export function DropdownMenuItem({
     maxWidth: `calc(100vw - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
     overscrollBehavior: "contain",
     scrollbarGutter: "stable both-edges",
+  };
+
+  const submenuStackStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    minWidth: 0,
   };
 
   return (
@@ -1646,7 +1662,7 @@ export function DropdownMenuItem({
                 tabIndex={-1}
                 style={submenuViewportStyle}
               >
-                {submenu}
+                <div style={submenuStackStyle}>{submenu}</div>
               </Scrollbar>
             </div>,
           )

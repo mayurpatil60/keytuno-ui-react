@@ -14,8 +14,6 @@ pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.0
 pnpm add @keytuno/ui-react
 
 # peer deps: react ^18, react-dom ^18
-# optional heavy peers (only needed if you use table export):
-# pnpm add jspdf jspdf-autotable xlsx
 ```
 
 ---
@@ -37,7 +35,7 @@ Barrel import also works and is fully tree-shakeable when `sideEffects: false`:
 import { Button, Table, Badge } from '@keytuno/ui-react';
 ```
 
-Available subpath roots: `@keytuno/ui-react/components/*`, `@keytuno/ui-react/themes/*`, `@keytuno/ui-react/tokens/*`, `@keytuno/ui-react/adapters/*`, `@keytuno/ui-react/contracts/*`, `@keytuno/ui-react/addons/table-exporters`.
+Available subpath roots: `@keytuno/ui-react/components/*`, `@keytuno/ui-react/themes/*`, `@keytuno/ui-react/tokens/*`, `@keytuno/ui-react/adapters/*`, `@keytuno/ui-react/contracts/*`.
 
 ---
 
@@ -1347,31 +1345,26 @@ const rowActions: RowAction<User>[] = [
 
   // Toolbar controls
   showToolbar?={boolean}
-  showColumnToggle?={boolean}
-  columnsLabel?={string}
-  toggleColumnsLabel?={string}
-  showFiltersLabel?={string}
-  hideFiltersLabel?={string}
+  showViewSwitch?={boolean}
+  switchToCardViewLabel?={string}   // keep icon tooltip short, e.g. 'Cards'
+  onSwitchToCardView?={() => void}
+  showFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Filters'
+  hideFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Close'
   filterDialogTitle?={string}
   filterDialogDescription?={string}
   addFilterLabel?={string}
+  addSortLabel?={string}
   clearFiltersLabel?={string}
+  resetSortingLabel?={string}
   applyFiltersLabel?={string}
   globalFilterLabel?={string}
   globalFilterPlaceholder?={string}
   showRefresh?={boolean}
-  refreshLabel?={string}
-  refreshingLabel?={string}
-  fullscreenLabel?={string}
-  resetScreenLabel?={string}
-  downloadLabel?={string}
-  exportingLabelFormatter?={(format: 'csv'|'xlsx'|'pdf') => string}
-  exportFormatLabel?={string}
+  refreshLabel?={string}            // keep icon tooltip short, e.g. 'Refresh'
+  refreshingLabel?={string}         // keep icon tooltip short, e.g. 'Refreshing'
+  fullscreenLabel?={string}         // keep icon tooltip short, e.g. 'Fullscreen'
+  resetScreenLabel?={string}        // keep icon tooltip short, e.g. 'Reset'
   onRefresh?={() => void | Promise<void>}
-  showExport?={boolean}
-  exportable?={boolean}
-  exportFormats?={('csv'|'xlsx'|'pdf')[]}
-  exportFileName?={string}
 
   // Row actions
   rowActions={rowActions}
@@ -1410,23 +1403,105 @@ const rowActions: RowAction<User>[] = [
 // - Add multiple rules with: contains, starts with, ends with, equals,
 //   not equals, greater than, greater/equal, less than, less/equal.
 // - Each rule has an X reset button (row-level reset/removal).
+// - Dialog supports multi-column sorting with add/remove and Reset Sorting.
 // - Use Clear Filters to reset all filters and Apply Filters to commit.
 // - Includes optional global search field inside the dialog when globalFilter/searchable is enabled.
-// - Storybook reference: Card + Table Full Width Playbook.
+// - Advanced filter dialog UI uses inbuilt Field, Input, Select, Button, and Scrollbar primitives with theme-token styling.
+// - Table viewport uses the inbuilt Scrollbar component (axis='both').
+// - Toolbar and sortable headers use inbuilt Button controls with inbuilt feather icons.
+// - For icon-only toolbar controls, keep tooltip labels one-word and short in stories/playbooks.
+// - Storybook reference: Table + Card Switch Playbook (paired with CardData mixed layouts).
 ```
 
-#### Table export (xlsx / pdf)
+### CardData
 
 ```ts
-// Auto-included CSV export needs no extra deps.
-// For xlsx / pdf — install optional peers then use built-in handlers:
-import { exportTableAsXlsx, exportTableAsPdf } from '@keytuno/ui-react/addons/table-exporters';
+import { CardData } from '@keytuno/ui-react';
+import type {
+  CardDataAction,
+  CardDataActionAlignment,
+  CardDataActionMode,
+  CardDataFieldSchema,
+  CardDataFieldType,
+} from '@keytuno/ui-react';
 
-<Table
-  exportable
-  exportFormats={['csv', 'xlsx', 'pdf']}
-  exportHandlers={{ xlsx: exportTableAsXlsx, pdf: exportTableAsPdf }}
+<CardData<User>
+  data={users}
+  rowKey="id"
+
+  // Rendering model
+  schema?={CardDataFieldSchema<User>[]}
+  variant?={'default'|'compact'|'ghost'}
+  size?={'xs'|'sm'|'md'|'lg'}
+  locale?={string}
+  currency?={string}
+  showFieldLabels?={boolean}
+
+  // Card actions (array or per-row resolver)
+  actions?={CardDataAction<User>[] | ((row: User, rowIndex: number) => CardDataAction<User>[])}
+  actionMode?={'auto'|'inline'|'menu'}
+  actionInlineMaxVisible?={number}    // auto mode threshold (default 5)
+  actionAlignment?={'left'|'right'}
+  actionMenuLabel?={ReactNode}
+  onAction?={(ctx) => void}
+
+  // Optional table/card switch
+  showViewSwitch
+  switchToTableViewLabel="Table"
+  onSwitchToTableView={() => setView('table')}
+
+  // Layout
+  viewportMaxHeight?={number | string}
+  safeAreaAware?={boolean}
+  emptyText?={ReactNode}
 />
+
+type CardDataActionAlignment = 'left' | 'right';
+type CardDataActionMode = 'auto' | 'inline' | 'menu';
+
+type CardDataFieldType =
+  | 'auto'
+  | 'text'
+  | 'link'
+  | 'number'
+  | 'currency'
+  | 'percent'
+  | 'date'
+  | 'phone'
+  | 'status'
+  | 'badge'
+  | 'progress'
+  | 'media';
+
+interface CardDataFieldSchema<TData> {
+  key: keyof TData | string;            // supports dot path (e.g. "contact.phone")
+  label?: ReactNode;
+  showLabel?: boolean;
+  type?: CardDataFieldType;
+  align?: 'left' | 'right';
+  span?: 1 | 2 | 'auto';
+  priority?: number;
+  hideIfEmpty?: boolean;
+  formatter?: (value: unknown, row: TData, rowIndex: number) => ReactNode;
+  currency?: string;
+  locale?: string;
+}
+
+// Behavior notes:
+// - Minimal fast path: pass only `data`; CardData infers schema from the first row.
+// - Auto mixed layout: compact values share left/right columns, long content expands full row.
+// - Empty/null values are hidden by default (`hideIfEmpty: true`) with no layout gaps.
+// - Built-in semantic renderers: status, badge, progress, lazy-loaded media, and clickable links.
+// - Built-in formatters: number, currency, percent, date, phone, and link href normalization.
+// - Layout is list-first and fluid (no fixed card width/height assumptions).
+// - `actionMode='auto'` shows inline icon actions up to `actionInlineMaxVisible` (default 5), then switches to a 3-dot dropdown overflow menu.
+// - Media/image fields render full width by default.
+// - Storybook references:
+//   - Minimal Props (Fast Default)
+//   - Auto Configured Mixed Layout
+//   - Schema-Driven Adaptive Cards
+//   - Action Overflow Menu
+//   - CardData Playground
 ```
 
 ### List

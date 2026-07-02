@@ -1513,6 +1513,41 @@ export const DropdownMenuActions: Story = {
   },
 };
 
+export const VerticalBlockList: Story = {
+  name: "Vertical Block List",
+  render: () => (
+    <Field style={frameStyle}>
+      <FieldLabel>Stacked Dropdown Rows</FieldLabel>
+
+      <FieldContent>
+        <DropdownMenu side="bottom" size="sm" variant="outline">
+          <DropdownMenuTrigger>Open Ordered List</DropdownMenuTrigger>
+
+          <DropdownMenuContent style={{ minWidth: "16rem" }}>
+            <DropdownMenuLabel>Execution Order</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+
+            <DropdownMenuItem icon={<FiPlay size={14} />}>
+              First action
+            </DropdownMenuItem>
+            <DropdownMenuItem icon={<FiLayers size={14} />}>
+              Second action
+            </DropdownMenuItem>
+            <DropdownMenuItem icon={<FiCheckSquare size={14} />}>
+              Third action
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <FieldDescription>
+          All dropdown rows are rendered as vertical block-level items, one
+          below another, including nested menu content.
+        </FieldDescription>
+      </FieldContent>
+    </Field>
+  ),
+};
+
 type DropdownMenuPlaygroundProps = DropdownMenuProps & {
   withAction?: boolean;
 };

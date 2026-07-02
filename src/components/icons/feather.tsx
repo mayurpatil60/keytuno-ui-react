@@ -184,6 +184,16 @@ export function FiMenu(props: FeatherIconProps): JSX.Element {
   );
 }
 
+export function FiMoreVertical(props: FeatherIconProps): JSX.Element {
+  return (
+    <FeatherIcon {...props}>
+      <circle cx="12" cy="5" r="1" />
+      <circle cx="12" cy="12" r="1" />
+      <circle cx="12" cy="19" r="1" />
+    </FeatherIcon>
+  );
+}
+
 export function FiEye(props: FeatherIconProps): JSX.Element {
   return (
     <FeatherIcon {...props}>
@@ -249,6 +259,30 @@ export function FiFilter(props: FeatherIconProps): JSX.Element {
   return (
     <FeatherIcon {...props}>
       <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+    </FeatherIcon>
+  );
+}
+
+export function FiGrid(props: FeatherIconProps): JSX.Element {
+  return (
+    <FeatherIcon {...props}>
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+    </FeatherIcon>
+  );
+}
+
+export function FiList(props: FeatherIconProps): JSX.Element {
+  return (
+    <FeatherIcon {...props}>
+      <line x1="8" y1="6" x2="21" y2="6" />
+      <line x1="8" y1="12" x2="21" y2="12" />
+      <line x1="8" y1="18" x2="21" y2="18" />
+      <circle cx="4" cy="6" r="1" />
+      <circle cx="4" cy="12" r="1" />
+      <circle cx="4" cy="18" r="1" />
     </FeatherIcon>
   );
 }
