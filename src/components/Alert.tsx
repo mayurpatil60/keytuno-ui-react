@@ -86,7 +86,6 @@ export interface AlertProps extends Omit<
   onOpenChange?: (open: boolean) => void;
   onAction?: (context: AlertActionContext) => void;
   variant?: AlertVariant;
-  varient?: AlertVariant;
   side?: AlertSide;
   size?: AlertSize;
   duration?: number;
@@ -364,16 +363,9 @@ function getStackInfo(
   };
 }
 
-function resolveVariant(
-  variant: AlertVariant | undefined,
-  varient: AlertVariant | undefined,
-): AlertVariant {
+function resolveVariant(variant: AlertVariant | undefined): AlertVariant {
   if (variant != null) {
     return variant;
-  }
-
-  if (varient != null) {
-    return varient;
   }
 
   return "primary";
@@ -573,7 +565,6 @@ export function Alert({
   onOpenChange,
   onAction,
   variant,
-  varient,
   side = "top-right",
   size = "md",
   duration = 30_000,
@@ -617,7 +608,7 @@ export function Alert({
 
   const isOpen = isControlled ? open === true : uncontrolledOpen;
   const normalizedDuration = Math.max(duration, 0);
-  const resolvedVariant = resolveVariant(variant, varient);
+  const resolvedVariant = resolveVariant(variant);
   const resolvedViewportInset = resolveViewportInset(viewportInset);
   const sizeToken = sizeTokens[size];
   const variantToken = variantTokens[resolvedVariant];

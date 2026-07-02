@@ -9,6 +9,11 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { FiEdit3, FiEye, FiTrash2 } from "react-icons/fi";
 
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
   Field,
   FieldContent,
   FieldDescription,
@@ -17,8 +22,8 @@ import {
   type RowAction,
   type TableColumnDef,
   type TableProps,
-} from "@keytuno/ui-react";
-import { tableExportHandlers } from "@keytuno/ui-react/addons/table-exporters";
+} from "../src/index";
+import { tableExportHandlers } from "../src/addons/table-exporters";
 
 interface TradeRow {
   id: string;
@@ -38,6 +43,13 @@ type TableSortState = Parameters<
 type TableFilterState = Parameters<
   NonNullable<TableProps<TradeRow>["onFilterChange"]>
 >[0];
+
+type NumericFilterOperator = "gt" | "gte" | "lt" | "lte" | "eq" | "neq";
+
+type ParsedNumericFilterCondition = {
+  operator: NumericFilterOperator;
+  value: number;
+};
 
 const sectors = ["Banking", "IT", "Energy", "Pharma", "Auto"];
 const statuses: TradeRow["status"][] = ["Open", "Paused", "Closed"];
@@ -180,6 +192,21 @@ const tableFrameStyle: CSSProperties = {
   width: "100%",
 };
 
+const cardTableShellStyle: CSSProperties = {
+  width: "100%",
+  maxWidth: "1200px",
+  minWidth: 0,
+  marginInline: "auto",
+  boxSizing: "border-box",
+};
+
+const cardTableContentStyle: CSSProperties = {
+  width: "100%",
+  minWidth: 0,
+  padding: "0.65rem",
+  boxSizing: "border-box",
+};
+
 const meta: Meta<TableProps<TradeRow>> = {
   title: "Data/Table",
   component: Table as unknown as Meta<TableProps<TradeRow>>["component"],
@@ -192,13 +219,6 @@ const meta: Meta<TableProps<TradeRow>> = {
 export default meta;
 
 type Story = StoryObj<TableProps<TradeRow>>;
-
-type NumericFilterOperator = "gt" | "lt" | "eq";
-
-type ParsedNumericFilterCondition = {
-  operator: NumericFilterOperator;
-  value: number;
-};
 
 function splitFilterTerms(filterValue: unknown): string[] {
   if (typeof filterValue !== "string") {
@@ -240,7 +260,7 @@ function parseNumericFilterCondition(
   }
 
   const prefixedMatch = normalizedTerm.match(
-    /^([><=])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/,
+    /^(>=|<=|!=|>|<|=)\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/,
   );
 
   if (prefixedMatch != null) {
@@ -255,8 +275,20 @@ function parseNumericFilterCondition(
       return { operator: "gt", value: numericValue };
     }
 
+    if (operatorToken === ">=") {
+      return { operator: "gte", value: numericValue };
+    }
+
     if (operatorToken === "<") {
       return { operator: "lt", value: numericValue };
+    }
+
+    if (operatorToken === "<=") {
+      return { operator: "lte", value: numericValue };
+    }
+
+    if (operatorToken === "!=") {
+      return { operator: "neq", value: numericValue };
     }
 
     return { operator: "eq", value: numericValue };
@@ -281,6 +313,11 @@ function matchesStringCondition(value: string, term: string): boolean {
 
   if (normalizedTerm === "") {
     return true;
+  }
+
+  if (normalizedTerm.startsWith("!=")) {
+    const expected = normalizedTerm.slice(2).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue !== expected;
   }
 
   if (normalizedTerm.startsWith("=")) {
@@ -314,8 +351,20 @@ function matchesNumericCondition(
     return value > condition.value;
   }
 
+  if (condition.operator === "gte") {
+    return value >= condition.value;
+  }
+
   if (condition.operator === "lt") {
     return value < condition.value;
+  }
+
+  if (condition.operator === "lte") {
+    return value <= condition.value;
+  }
+
+  if (condition.operator === "neq") {
+    return value !== condition.value;
   }
 
   return value === condition.value;
@@ -712,113 +761,173 @@ export const ServerSideTanstackQuery: Story = {
   ),
 };
 
+const tableInteractiveDefaultArgs: Story["args"] = {
+  variant: "striped",
+  compact: true,
+  size: "md",
+  sortable: true,
+  filterable: true,
+  searchable: true,
+  selectable: true,
+  multiSelect: true,
+  columnVisibility: true,
+  showToolbar: true,
+  showColumnToggle: true,
+  showRefresh: true,
+  showExport: true,
+  exportable: true,
+  showPagination: true,
+  paginationVariant: "advance",
+  paginationDefaultPageSize: 10,
+  paginationPageSizeOptions: [10, 20, 50, 100],
+  paginationMaxVisiblePages: 5,
+  paginationShowPageSizeSelector: true,
+  paginationShowSummary: true,
+  paginationShowShowingPage: true,
+  paginationResetPageOnPageSizeChange: true,
+  loading: false,
+  loadingRows: 6,
+  skeleton: true,
+  hoverable: true,
+  bordered: true,
+  rounded: true,
+  stickyHeader: true,
+  fullscreen: true,
+  serverSide: false,
+  globalFilter: true,
+  columnFilters: ["symbol", "sector", "status", "price"],
+  defaultHiddenColumns: ["updatedAt"],
+  exportFormats: ["csv", "xlsx", "pdf"],
+};
+
+const tableInteractiveArgTypes = {
+  variant: {
+    control: "select",
+    options: ["basic", "outline", "ghost", "filled", "minimal", "striped"],
+  },
+  size: {
+    control: "select",
+    options: ["xs", "sm", "md", "lg"],
+  },
+  compact: { control: "boolean" },
+  exportFormats: {
+    control: "check",
+    options: ["csv", "xlsx", "pdf"],
+  },
+  sortable: { control: "boolean" },
+  filterable: { control: "boolean" },
+  searchable: { control: "boolean" },
+  globalFilter: { control: "boolean" },
+  selectable: { control: "boolean" },
+  multiSelect: { control: "boolean" },
+  columnVisibility: { control: "boolean" },
+  showToolbar: { control: "boolean" },
+  showColumnToggle: { control: "boolean" },
+  showRefresh: { control: "boolean" },
+  showExport: { control: "boolean" },
+  exportable: { control: "boolean" },
+  showPagination: { control: "boolean" },
+  paginationVariant: {
+    control: "select",
+    options: ["basic", "advance", "compact"],
+  },
+  paginationDefaultPageSize: {
+    control: { type: "number", min: 1, max: 200, step: 1 },
+  },
+  paginationPageSizeOptions: { control: "object" },
+  paginationMaxVisiblePages: {
+    control: { type: "number", min: 3, max: 15, step: 1 },
+  },
+  paginationShowPageSizeSelector: { control: "boolean" },
+  paginationShowSummary: { control: "boolean" },
+  paginationShowShowingPage: { control: "boolean" },
+  paginationResetPageOnPageSizeChange: { control: "boolean" },
+  loading: { control: "boolean" },
+  loadingRows: { control: { type: "number", min: 1, max: 20, step: 1 } },
+  skeleton: { control: "boolean" },
+  hoverable: { control: "boolean" },
+  bordered: { control: "boolean" },
+  rounded: { control: "boolean" },
+  stickyHeader: { control: "boolean" },
+  fullscreen: { control: "boolean" },
+  onAction: { action: "action" },
+  onPageChange: { action: "page-change" },
+  onPageSizeChange: { action: "page-size-change" },
+  onSortChange: { action: "sort-change" },
+  onFilterChange: { action: "filter-change" },
+  onSelectionChange: { action: "selection-change" },
+  onRefresh: { action: "refresh" },
+  serverSide: { table: { disable: true } },
+  totalRows: { table: { disable: true } },
+  pageIndex: { table: { disable: true } },
+  rowActions: { table: { disable: true } },
+  data: { table: { disable: true } },
+  columns: { table: { disable: true } },
+  rowKey: { table: { disable: true } },
+  style: { table: { disable: true } },
+  className: { table: { disable: true } },
+} satisfies NonNullable<Story["argTypes"]>;
+
+export const CardTableFullWidthPlaybook: Story = {
+  name: "Card + Table Full Width Playbook",
+  args: {
+    ...tableInteractiveDefaultArgs,
+    compact: true,
+    size: "sm",
+    stickyHeader: false,
+    fullscreen: false,
+    rounded: false,
+    filterDialogTitle: "Advanced filters",
+    filterDialogDescription:
+      "Use one modal to build global and per-column rules with starts-with, ends-with, equals, and numeric operators.",
+    addFilterLabel: "Add rule",
+    clearFiltersLabel: "Clear filters",
+    applyFiltersLabel: "Apply filters",
+  },
+  argTypes: tableInteractiveArgTypes,
+  render: (args) => {
+    const {
+      data: _data,
+      columns: _columns,
+      rowActions: _rowActions,
+      ...restArgs
+    } = args;
+
+    return (
+      <div style={stackStyle}>
+        <div style={cardTableShellStyle}>
+          <Card size="sm" spacing="sm" style={{ width: "100%" }}>
+            <CardHeader>
+              <CardTitle>Trade Monitor</CardTitle>
+              <CardDescription>
+                Table uses exact card content width, compact spacing, responsive
+                wrapping, and dialog-driven advanced filters.
+              </CardDescription>
+            </CardHeader>
+
+            <CardContent style={cardTableContentStyle}>
+              <Table
+                key={`card-playbook-${JSON.stringify(restArgs)}`}
+                {...restArgs}
+                data={mockRows}
+                columns={baseColumns}
+                rowActions={tableRowActions}
+                exportHandlers={tableExportHandlers}
+                onRefresh={args.onRefresh ?? (() => {})}
+                style={{ width: "100%", maxWidth: "100%" }}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  },
+};
+
 export const TablePlayground: Story = {
   name: "Table Playground",
-  args: {
-    variant: "striped",
-    compact: true,
-    size: "md",
-    sortable: true,
-    filterable: true,
-    searchable: true,
-    selectable: true,
-    multiSelect: true,
-    columnVisibility: true,
-    showToolbar: true,
-    showColumnToggle: true,
-    showRefresh: true,
-    showExport: true,
-    exportable: true,
-    showPagination: true,
-    paginationVariant: "advance",
-    paginationDefaultPageSize: 10,
-    paginationPageSizeOptions: [10, 20, 50, 100],
-    paginationMaxVisiblePages: 5,
-    paginationShowPageSizeSelector: true,
-    paginationShowSummary: true,
-    paginationShowShowingPage: true,
-    paginationResetPageOnPageSizeChange: true,
-    loading: false,
-    loadingRows: 6,
-    skeleton: true,
-    hoverable: true,
-    bordered: true,
-    rounded: true,
-    stickyHeader: true,
-    fullscreen: true,
-    serverSide: false,
-    globalFilter: true,
-    columnFilters: ["symbol", "sector", "status", "price"],
-    defaultHiddenColumns: ["updatedAt"],
-    exportFormats: ["csv", "xlsx", "pdf"],
-  },
-  argTypes: {
-    variant: {
-      control: "select",
-      options: ["basic", "outline", "ghost", "filled", "minimal", "striped"],
-    },
-    size: {
-      control: "select",
-      options: ["xs", "sm", "md", "lg"],
-    },
-    compact: { control: "boolean" },
-    exportFormats: {
-      control: "check",
-      options: ["csv", "xlsx", "pdf"],
-    },
-    sortable: { control: "boolean" },
-    filterable: { control: "boolean" },
-    searchable: { control: "boolean" },
-    globalFilter: { control: "boolean" },
-    selectable: { control: "boolean" },
-    multiSelect: { control: "boolean" },
-    columnVisibility: { control: "boolean" },
-    showToolbar: { control: "boolean" },
-    showColumnToggle: { control: "boolean" },
-    showRefresh: { control: "boolean" },
-    showExport: { control: "boolean" },
-    exportable: { control: "boolean" },
-    showPagination: { control: "boolean" },
-    paginationVariant: {
-      control: "select",
-      options: ["basic", "advance", "compact"],
-    },
-    paginationDefaultPageSize: {
-      control: { type: "number", min: 1, max: 200, step: 1 },
-    },
-    paginationPageSizeOptions: { control: "object" },
-    paginationMaxVisiblePages: {
-      control: { type: "number", min: 3, max: 15, step: 1 },
-    },
-    paginationShowPageSizeSelector: { control: "boolean" },
-    paginationShowSummary: { control: "boolean" },
-    paginationShowShowingPage: { control: "boolean" },
-    paginationResetPageOnPageSizeChange: { control: "boolean" },
-    loading: { control: "boolean" },
-    loadingRows: { control: { type: "number", min: 1, max: 20, step: 1 } },
-    skeleton: { control: "boolean" },
-    hoverable: { control: "boolean" },
-    bordered: { control: "boolean" },
-    rounded: { control: "boolean" },
-    stickyHeader: { control: "boolean" },
-    fullscreen: { control: "boolean" },
-    onAction: { action: "action" },
-    onPageChange: { action: "page-change" },
-    onPageSizeChange: { action: "page-size-change" },
-    onSortChange: { action: "sort-change" },
-    onFilterChange: { action: "filter-change" },
-    onSelectionChange: { action: "selection-change" },
-    onRefresh: { action: "refresh" },
-    serverSide: { table: { disable: true } },
-    totalRows: { table: { disable: true } },
-    pageIndex: { table: { disable: true } },
-    rowActions: { table: { disable: true } },
-    data: { table: { disable: true } },
-    columns: { table: { disable: true } },
-    rowKey: { table: { disable: true } },
-    style: { table: { disable: true } },
-    className: { table: { disable: true } },
-  },
+  args: tableInteractiveDefaultArgs,
+  argTypes: tableInteractiveArgTypes,
   render: (args) => {
     const {
       data: _data,

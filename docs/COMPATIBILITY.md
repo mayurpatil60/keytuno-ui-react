@@ -44,9 +44,11 @@ pnpm build-storybook
 
 1. Most stateful components expose direct change callbacks and `onAction(context)`.
 2. Event-style `onAction(event)` remains intentional for `Button`, `Badge`, `Avatar`, and item-level actions in `Breadcrumb`, `Navbar`, and `Sidebar`.
-3. Backward-compatible aliases exist for legacy API spelling:
-	- `varient` (legacy) -> prefer `variant`
-	- `Seperator` (legacy) -> prefer `Separator`
+3. Legacy compatibility naming notes:
+	- Use `variant` as the only spelling in active docs and stories.
+	- Canonical file/component naming is `Separator` (`src/components/Separator.tsx`, `Separator`).
+	- Use `Separator` as the only spelling in code, exports, docs, and stories.
+4. Navbar variant update: `soft` was removed from `Navbar`; use `light` or `brand-light` for soft enterprise styling, and use `default` or `outline` for legacy compatibility styles.
 
 ## Testing Compatibility Notes
 
@@ -58,6 +60,8 @@ pnpm build-storybook
 	- label text
 	- scoped `data-testid`
 	- avoid positional/index-only selectors
+5. In this library repository's Storybook files, import from local source exports (`../src/index`) rather than `@keytuno/ui-react` to avoid local module-resolution red diagnostics.
+6. Keep story typings as `Meta<typeof Component>` and `StoryObj<typeof meta>` to preserve typed `render(args)` signatures and avoid implicit-any issues.
 
 ## Vite and Storybook Upgrade Guidance
 
@@ -79,3 +83,4 @@ Minimum matrix before declaring compatibility changes complete:
 1. Name: Mayur Patil
 2. Email: mayurpatil60@gmail.com
 3. GitHub: https://github.com/mayurpatil60
+

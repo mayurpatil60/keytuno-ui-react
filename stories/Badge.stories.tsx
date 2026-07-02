@@ -1,14 +1,14 @@
-import type { CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
-import { Badge } from '@keytuno/ui-react';
+import { Badge } from "../src/index";
 
 const meta: Meta<typeof Badge> = {
-  title: 'Feedback/Badge',
+  title: "Feedback/Badge",
   component: Badge,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -17,20 +17,20 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const rowStyle: CSSProperties = {
-  display: 'flex',
-  gap: '0.75rem',
-  flexWrap: 'wrap',
+  display: "flex",
+  gap: "0.75rem",
+  flexWrap: "wrap",
 };
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(860px, 92vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(860px, 92vw)",
 };
 
 export const BadgeVariants: Story = {
-  name: 'Badge Variants',
+  name: "Badge Variants",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Variants</h3>
@@ -47,7 +47,7 @@ export const BadgeVariants: Story = {
 };
 
 export const BadgeSizes: Story = {
-  name: 'Badge Sizes',
+  name: "Badge Sizes",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Sizes</h3>
@@ -62,12 +62,12 @@ export const BadgeSizes: Story = {
 };
 
 export const BadgeActions: Story = {
-  name: 'Badge Actions',
+  name: "Badge Actions",
   parameters: {
     docs: {
       description: {
         story:
-          'Actionable badges are keyboard-accessible and can trigger action callbacks on click, Enter, or Space.',
+          "Actionable badges are keyboard-accessible and can trigger action callbacks on click, Enter, or Space.",
       },
     },
   },
@@ -81,7 +81,11 @@ export const BadgeActions: Story = {
         <Badge variant="outline" onAction={() => undefined}>
           Review
         </Badge>
-        <Badge variant="link" onAction={() => undefined} aria-label="Open details">
+        <Badge
+          variant="link"
+          onAction={() => undefined}
+          aria-label="Open details"
+        >
           Details
         </Badge>
       </div>
@@ -90,32 +94,38 @@ export const BadgeActions: Story = {
 };
 
 export const BadgePlayground: Story = {
-  name: 'Badge Playground',
+  name: "Badge Playground",
   args: {
-    children: 'Badge',
-    variant: 'primary',
-    size: 'md',
+    children: "Badge",
+    variant: "primary",
+    size: "md",
     withAction: false,
   },
   argTypes: {
-    children: { control: 'text' },
+    children: { control: "text" },
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onClick: { action: 'click' },
-    varient: { table: { disable: true } },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onClick: { action: "click" },
     style: { table: { disable: true } },
     className: { table: { disable: true } },
   },
   render: (args) => {
-    const label = typeof args.children === 'string' ? args.children : 'Badge';
+    const label = typeof args.children === "string" ? args.children : "Badge";
     const withAction = args.withAction ?? false;
 
     return (

@@ -139,11 +139,3 @@ export function Separator({
     />
   );
 }
-
-export type SeperatorSize = SeparatorSize;
-export type SeperatorOrientation = SeparatorOrientation;
-export type SeperatorProps = SeparatorProps;
-export type SeperatorActionSource = SeparatorActionSource;
-export type SeperatorActionContext = SeparatorActionContext;
-
-export const Seperator = Separator;

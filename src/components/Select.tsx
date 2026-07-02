@@ -12,6 +12,7 @@
 } from "react";
 
 import { Button } from "./Button";
+import { Scrollbar } from "./Scrollbar";
 
 export type SelectSize = "xs" | "sm" | "md" | "lg";
 export type SelectValue = string | string[] | null;
@@ -621,8 +622,10 @@ export function Select({
     display: "flex",
     flexDirection: "column",
     gap: "0.3rem",
+  };
+
+  const listViewportStyle: CSSProperties = {
     maxHeight: "14.5rem",
-    overflowY: "auto",
     paddingInlineEnd: "0.1rem",
   };
 
@@ -821,113 +824,122 @@ export function Select({
               {emptyText}
             </div>
           ) : (
-            <div style={listStyle}>
-              {filteredGroups.map((group, groupIndex) => (
-                <div
-                  key={`select-group-${group.label ?? "plain"}-${groupIndex}`}
-                  role={
-                    group.label != null && group.label.trim() !== ""
-                      ? "group"
-                      : undefined
-                  }
-                  aria-labelledby={
-                    group.label != null && group.label.trim() !== ""
-                      ? `${listboxId}-group-${groupIndex}-label`
-                      : undefined
-                  }
-                  style={{
-                    ...groupStyle,
-                    borderTop:
-                      groupIndex > 0 && group.label != null
-                        ? "1px solid var(--ktn-border-muted)"
-                        : undefined,
-                    paddingBlockStart: groupIndex > 0 ? "0.35rem" : 0,
-                  }}
-                >
-                  {group.label != null && group.label.trim() !== "" ? (
-                    <div
-                      id={`${listboxId}-group-${groupIndex}-label`}
-                      style={groupLabelStyle}
-                    >
-                      {group.label}
-                    </div>
-                  ) : null}
-
-                  {group.options.map((option, optionIndex) => {
-                    const selected = selectedSet.has(option.value);
-                    const optionId = `${listboxId}-option-${groupIndex}-${optionIndex}`;
-
-                    return (
-                      <Button
-                        key={option.value}
-                        id={optionId}
-                        type="button"
-                        variant="ghost"
-                        size="xs"
-                        disabled={disabled || option.disabled}
-                        aria-selected={selected}
-                        aria-disabled={
-                          disabled || option.disabled ? true : undefined
-                        }
-                        role="option"
-                        style={{
-                          ...optionStyle,
-                          backgroundColor: selected
-                            ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.12))"
-                            : "transparent",
-                          color: option.disabled
-                            ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
-                            : "var(--ktn-text-primary)",
-                          cursor:
-                            disabled || option.disabled
-                              ? "not-allowed"
-                              : "pointer",
-                          opacity: option.disabled ? 0.6 : 1,
-                        }}
-                        onMouseDown={(event) => {
-                          event.preventDefault();
-                        }}
-                        onClick={() => {
-                          handleOptionSelect(option);
-                        }}
+            <Scrollbar
+              axis="y"
+              role="presentation"
+              tabIndex={-1}
+              style={listViewportStyle}
+            >
+              <div style={listStyle}>
+                {filteredGroups.map((group, groupIndex) => (
+                  <div
+                    key={`select-group-${group.label ?? "plain"}-${groupIndex}`}
+                    role={
+                      group.label != null && group.label.trim() !== ""
+                        ? "group"
+                        : undefined
+                    }
+                    aria-labelledby={
+                      group.label != null && group.label.trim() !== ""
+                        ? `${listboxId}-group-${groupIndex}-label`
+                        : undefined
+                    }
+                    style={{
+                      ...groupStyle,
+                      borderTop:
+                        groupIndex > 0 && group.label != null
+                          ? "1px solid var(--ktn-border-muted)"
+                          : undefined,
+                      paddingBlockStart: groupIndex > 0 ? "0.35rem" : 0,
+                    }}
+                  >
+                    {group.label != null && group.label.trim() !== "" ? (
+                      <div
+                        id={`${listboxId}-group-${groupIndex}-label`}
+                        style={groupLabelStyle}
                       >
-                        {renderItem != null ? (
-                          renderItem(option, { selected })
-                        ) : (
-                          <span style={optionTextWrapStyle}>
-                            <span style={optionLabelStyle}>{option.label}</span>
-                            {option.description != null ? (
-                              <span style={optionDescriptionStyle}>
-                                {option.description}
-                              </span>
-                            ) : null}
-                          </span>
-                        )}
+                        {group.label}
+                      </div>
+                    ) : null}
 
-                        {selected ? (
-                          <span aria-hidden style={checkMarkStyle}>
-                            <svg
-                              width="12"
-                              height="12"
-                              viewBox="0 0 16 16"
-                              fill="none"
-                            >
-                              <path
-                                d="M3.5 8.2l2.8 2.8 6.2-6.2"
-                                stroke="currentColor"
-                                strokeWidth="1.8"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </span>
-                        ) : null}
-                      </Button>
-                    );
-                  })}
-                </div>
-              ))}
-            </div>
+                    {group.options.map((option, optionIndex) => {
+                      const selected = selectedSet.has(option.value);
+                      const optionId = `${listboxId}-option-${groupIndex}-${optionIndex}`;
+
+                      return (
+                        <Button
+                          key={option.value}
+                          id={optionId}
+                          type="button"
+                          variant="ghost"
+                          size="xs"
+                          disabled={disabled || option.disabled}
+                          aria-selected={selected}
+                          aria-disabled={
+                            disabled || option.disabled ? true : undefined
+                          }
+                          role="option"
+                          style={{
+                            ...optionStyle,
+                            backgroundColor: selected
+                              ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.12))"
+                              : "transparent",
+                            color: option.disabled
+                              ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
+                              : "var(--ktn-text-primary)",
+                            cursor:
+                              disabled || option.disabled
+                                ? "not-allowed"
+                                : "pointer",
+                            opacity: option.disabled ? 0.6 : 1,
+                          }}
+                          onMouseDown={(event) => {
+                            event.preventDefault();
+                          }}
+                          onClick={() => {
+                            handleOptionSelect(option);
+                          }}
+                        >
+                          {renderItem != null ? (
+                            renderItem(option, { selected })
+                          ) : (
+                            <span style={optionTextWrapStyle}>
+                              <span style={optionLabelStyle}>
+                                {option.label}
+                              </span>
+                              {option.description != null ? (
+                                <span style={optionDescriptionStyle}>
+                                  {option.description}
+                                </span>
+                              ) : null}
+                            </span>
+                          )}
+
+                          {selected ? (
+                            <span aria-hidden style={checkMarkStyle}>
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                              >
+                                <path
+                                  d="M3.5 8.2l2.8 2.8 6.2-6.2"
+                                  stroke="currentColor"
+                                  strokeWidth="1.8"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                            </span>
+                          ) : null}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </Scrollbar>
           )}
         </div>
       ) : null}

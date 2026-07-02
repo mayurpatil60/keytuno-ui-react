@@ -1,6 +1,6 @@
-import type { CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
-import { FiAtSign, FiSearch, FiSend } from 'react-icons/fi';
+import type { CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
+import { FiAtSign, FiSearch, FiSend } from "react-icons/fi";
 
 import {
   Field,
@@ -14,14 +14,14 @@ import {
   InputGroupButton,
   InputGroupInput,
   InputGroupTextarea,
-} from '@keytuno/ui-react';
+} from "../src/index";
 
 const meta: Meta<typeof InputGroup> = {
-  title: 'Forms/InputGroup',
+  title: "Forms/InputGroup",
   component: InputGroup,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -30,25 +30,25 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(860px, 92vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(860px, 92vw)",
 };
 
 const frameStyle: CSSProperties = {
-  width: 'min(560px, 92vw)',
+  width: "min(560px, 92vw)",
 };
 
 const addonTextStyle: CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '0.35rem',
-  whiteSpace: 'nowrap',
+  display: "inline-flex",
+  alignItems: "center",
+  gap: "0.35rem",
+  whiteSpace: "nowrap",
 };
 
 export const InlineStart: Story = {
-  name: 'Inline Start',
+  name: "Inline Start",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Inline Start</h3>
@@ -68,7 +68,9 @@ export const InlineStart: Story = {
             </InputGroupAddon>
           </InputGroup>
 
-          <FieldDescription>Default alignment places addon at inline start.</FieldDescription>
+          <FieldDescription>
+            Default alignment places addon at inline start.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -76,7 +78,7 @@ export const InlineStart: Story = {
 };
 
 export const InlineEnd: Story = {
-  name: 'Inline End',
+  name: "Inline End",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Inline End</h3>
@@ -87,7 +89,10 @@ export const InlineEnd: Story = {
 
           <FieldContent>
             <InputGroup variant="outline" align="inline-end">
-              <InputGroupInput id="input-group-inline-end-url" placeholder="https://example.com" />
+              <InputGroupInput
+                id="input-group-inline-end-url"
+                placeholder="https://example.com"
+              />
               <InputGroupAddon>
                 <InputGroupButton type="button" variant="secondary">
                   Visit
@@ -95,7 +100,9 @@ export const InlineEnd: Story = {
               </InputGroupAddon>
             </InputGroup>
 
-            <FieldDescription>Buttons and addons can be aligned at inline end.</FieldDescription>
+            <FieldDescription>
+              Buttons and addons can be aligned at inline end.
+            </FieldDescription>
           </FieldContent>
         </Field>
 
@@ -124,7 +131,7 @@ export const InlineEnd: Story = {
 };
 
 export const BlockLayout: Story = {
-  name: 'Block Layout',
+  name: "Block Layout",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Block Layout</h3>
@@ -150,7 +157,9 @@ export const BlockLayout: Story = {
             </InputGroupAddon>
           </InputGroup>
 
-          <FieldDescription>Use block-end for textarea footers and actions.</FieldDescription>
+          <FieldDescription>
+            Use block-end for textarea footers and actions.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -166,8 +175,11 @@ export const States: Story = {
         <FieldLabel htmlFor="input-group-required">Required Value</FieldLabel>
 
         <FieldContent>
-          <InputGroup required varient="primary" align="inline-end">
-            <InputGroupInput id="input-group-required" placeholder="Enter ticker symbol" />
+          <InputGroup required variant="primary" align="inline-end">
+            <InputGroupInput
+              id="input-group-required"
+              placeholder="Enter ticker symbol"
+            />
             <InputGroupAddon>
               <InputGroupButton type="button">Check</InputGroupButton>
             </InputGroupAddon>
@@ -192,7 +204,9 @@ export const States: Story = {
             </InputGroupAddon>
           </InputGroup>
 
-          <FieldDescription>The full group can be locked using disabled state.</FieldDescription>
+          <FieldDescription>
+            The full group can be locked using disabled state.
+          </FieldDescription>
         </FieldContent>
       </Field>
     </div>
@@ -200,49 +214,62 @@ export const States: Story = {
 };
 
 export const InputGroupPlayground: Story = {
-  name: 'InputGroup Playground',
+  name: "InputGroup Playground",
   args: {
-    varient: 'primary',
-    size: 'md',
-    align: 'inline-start',
+    variant: "primary",
+    size: "md",
+    align: "inline-start",
     disabled: false,
     required: false,
     withAction: false,
   },
   argTypes: {
-    variant: { table: { disable: true } },
-    varient: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+    variant: {
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
     align: {
-      control: 'inline-radio',
-      options: ['inline-start', 'inline-end', 'block-start', 'block-end'],
+      control: "inline-radio",
+      options: ["inline-start", "inline-end", "block-start", "block-end"],
     },
-    disabled: { control: 'boolean' },
-    required: { control: 'boolean' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
+    disabled: { control: "boolean" },
+    required: { control: "boolean" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
   render: (args) => {
     const withAction = args.withAction ?? false;
-    const useTextarea = args.align === 'block-start' || args.align === 'block-end';
+    const useTextarea =
+      args.align === "block-start" || args.align === "block-end";
 
     return (
-      <Field disabled={args.disabled} required={args.required} style={frameStyle}>
-        <FieldLabel htmlFor="input-group-playground">Group Playground</FieldLabel>
+      <Field
+        disabled={args.disabled}
+        required={args.required}
+        style={frameStyle}
+      >
+        <FieldLabel htmlFor="input-group-playground">
+          Group Playground
+        </FieldLabel>
 
         <FieldContent>
           <InputGroup
-            key={`${args.varient}-${args.size}-${args.align}-${args.disabled}-${args.required}`}
-            varient={args.varient}
+            key={`${args.variant}-${args.size}-${args.align}-${args.disabled}-${args.required}`}
+            variant={args.variant}
             size={args.size}
             align={args.align}
             disabled={args.disabled}
@@ -256,7 +283,11 @@ export const InputGroupPlayground: Story = {
                 defaultValue="Preview content"
               />
             ) : (
-              <InputGroupInput id="input-group-playground" placeholder="Type a value" type="text" />
+              <InputGroupInput
+                id="input-group-playground"
+                placeholder="Type a value"
+                type="text"
+              />
             )}
 
             <InputGroupAddon>

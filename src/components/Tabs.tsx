@@ -49,7 +49,6 @@ export interface TabsProps extends Omit<
   onValueChange?: (value: string) => void;
   onAction?: (context: TabsActionContext) => void;
   variant?: TabsVariant;
-  varient?: TabsVariant;
   orientation?: TabsOrientation;
   size?: TabsSize;
   side?: TabsSide;
@@ -111,16 +110,9 @@ const sizeTokens: Record<TabsSize, TabsSizeTokens> = {
   },
 };
 
-function resolveVariant(
-  variant: TabsVariant | undefined,
-  varient: TabsVariant | undefined,
-): TabsVariant {
+function resolveVariant(variant: TabsVariant | undefined): TabsVariant {
   if (variant != null) {
     return variant;
-  }
-
-  if (varient != null) {
-    return varient;
   }
 
   return "line";
@@ -248,7 +240,6 @@ export function Tabs({
   onValueChange,
   onAction,
   variant,
-  varient,
   orientation = "horizontal",
   size = "md",
   side = "top",
@@ -274,7 +265,7 @@ export function Tabs({
     }
   }, [disabled, isControlled, items]);
 
-  const resolvedVariant = resolveVariant(variant, varient);
+  const resolvedVariant = resolveVariant(variant);
   const tokens = sizeTokens[size];
 
   const activeValue = resolveActiveValue(

@@ -10,6 +10,7 @@ import {
 } from "react";
 
 import { Button } from "./Button";
+import { Scrollbar } from "./Scrollbar";
 import {
   FiCalendar,
   FiChevronDown,
@@ -63,7 +64,6 @@ export interface DatePickerProps extends Omit<
 > {
   mode?: DatePickerMode;
   variant?: DatePickerVariant;
-  varient?: DatePickerVariant;
   size?: DatePickerSize;
   disabled?: boolean;
   required?: boolean;
@@ -602,7 +602,6 @@ function formatDisplayValue(
 export function DatePicker({
   mode = "date",
   variant,
-  varient,
   size = "md",
   disabled = false,
   required = false,
@@ -635,7 +634,7 @@ export function DatePicker({
   "aria-describedby": ariaDescribedBy,
   ...props
 }: DatePickerProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? "outline";
+  const resolvedVariant = variant ?? "outline";
   const isControlled = value !== undefined;
 
   const [isOpen, setIsOpen] = useState(false);
@@ -1355,8 +1354,10 @@ export function DatePicker({
     display: "flex",
     flexDirection: "column",
     gap: "0.35rem",
+  };
+
+  const timeListViewportStyle: CSSProperties = {
     maxHeight: "15rem",
-    overflowY: "auto",
     paddingInlineEnd: "0.2rem",
   };
 
@@ -1830,51 +1831,60 @@ export function DatePicker({
                 </div>
               </div>
 
-              <div style={timeListStyle}>
-                {timeOptions.map((timeValue) => {
-                  const selected = selectedTime === timeValue;
-                  const time12Hour = formatTime12Hour(timeValue);
+              <Scrollbar
+                axis="y"
+                role="presentation"
+                tabIndex={-1}
+                style={timeListViewportStyle}
+              >
+                <div style={timeListStyle}>
+                  {timeOptions.map((timeValue) => {
+                    const selected = selectedTime === timeValue;
+                    const time12Hour = formatTime12Hour(timeValue);
 
-                  return (
-                    <Button
-                      key={`time-${timeValue}`}
-                      type="button"
-                      variant="ghost"
-                      size="xs"
-                      disabled={disabled}
-                      onMouseDown={(event) => {
-                        event.preventDefault();
-                      }}
-                      onClick={() => {
-                        handleTimeSelect(timeValue);
-                      }}
-                      aria-label={
-                        timeOptionAriaFormatter != null
-                          ? timeOptionAriaFormatter(time12Hour, timeValue)
-                          : `Select ${time12Hour} (${timeValue})`
-                      }
-                      aria-pressed={selected}
-                      style={{
-                        ...timeButtonStyle,
-                        backgroundColor: selected
-                          ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.16))"
-                          : "transparent",
-                        borderColor: selected
-                          ? "var(--ktn-action-primary-bg)"
-                          : "transparent",
-                        color: selected
-                          ? "var(--ktn-text-primary)"
-                          : "var(--ktn-text-secondary, var(--ktn-text-primary))",
-                      }}
-                    >
-                      <span style={timeTextRowStyle}>
-                        <span style={timeTextPrimaryStyle}>{time12Hour}</span>
-                        <span style={timeTextSecondaryStyle}>{timeValue}</span>
-                      </span>
-                    </Button>
-                  );
-                })}
-              </div>
+                    return (
+                      <Button
+                        key={`time-${timeValue}`}
+                        type="button"
+                        variant="ghost"
+                        size="xs"
+                        disabled={disabled}
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                        }}
+                        onClick={() => {
+                          handleTimeSelect(timeValue);
+                        }}
+                        aria-label={
+                          timeOptionAriaFormatter != null
+                            ? timeOptionAriaFormatter(time12Hour, timeValue)
+                            : `Select ${time12Hour} (${timeValue})`
+                        }
+                        aria-pressed={selected}
+                        style={{
+                          ...timeButtonStyle,
+                          backgroundColor: selected
+                            ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.16))"
+                            : "transparent",
+                          borderColor: selected
+                            ? "var(--ktn-action-primary-bg)"
+                            : "transparent",
+                          color: selected
+                            ? "var(--ktn-text-primary)"
+                            : "var(--ktn-text-secondary, var(--ktn-text-primary))",
+                        }}
+                      >
+                        <span style={timeTextRowStyle}>
+                          <span style={timeTextPrimaryStyle}>{time12Hour}</span>
+                          <span style={timeTextSecondaryStyle}>
+                            {timeValue}
+                          </span>
+                        </span>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </Scrollbar>
             </>
           )}
         </div>

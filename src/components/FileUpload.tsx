@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import { FiUploadCloud } from "./icons/feather";
+import { FiUploadCloud, FiX } from "./icons/feather";
 
 import { Button, type ButtonProps } from "./Button";
 import {
@@ -25,8 +25,20 @@ import { FileList, type FileListItem } from "./FileList";
 import type { FilePreviewType } from "./FilePreview";
 import { Tooltip } from "./Tooltip";
 
-export type FileUploadVariant = "compact" | "dropzone";
+export type FileUploadVariant = "compact" | "dropzone" | "profile";
 export type FileUploadSize = "xs" | "sm" | "md" | "lg";
+export type FileUploadSide = "left" | "center" | "right";
+
+export interface FileUploadProfileConfig {
+  hint?: ReactNode;
+  imageAlt?: string;
+  accept?: string;
+  uploadActionLabel?: string;
+  removeActionLabel?: string;
+  placeholderIcon?: ReactNode;
+  uploadHoverIcon?: ReactNode;
+  removeHoverIcon?: ReactNode;
+}
 
 export interface FileUploadFile {
   id: string;
@@ -46,10 +58,12 @@ export interface FileUploadProps extends Omit<
   "children" | "onChange"
 > {
   variant?: FileUploadVariant;
-  varient?: FileUploadVariant;
   size?: FileUploadSize;
+  side?: FileUploadSide;
   disabled?: boolean;
   required?: boolean;
+  invalid?: boolean;
+  errorMessage?: ReactNode;
   multiple?: boolean;
   accept?: string;
   placeholder?: ReactNode;
@@ -60,13 +74,14 @@ export interface FileUploadProps extends Omit<
   dialogDescription?: ReactNode;
   fileListEmptyText?: ReactNode;
   onFilesChange?: (files: FileUploadFile[]) => void;
+  profileConfig?: FileUploadProfileConfig;
   browseButtonProps?: Omit<
     ButtonProps,
     "children" | "onClick" | "disabled" | "size" | "type"
   >;
   dialogProps?: Pick<
     DialogProps,
-    "size" | "variant" | "varient" | "closeOnEscape" | "closeOnOverlayClick"
+    "size" | "variant" | "closeOnEscape" | "closeOnOverlayClick"
   >;
 }
 
@@ -83,6 +98,10 @@ type FileUploadSizeTokens = {
   dropzoneTitleFontSize: string;
   dropzoneHintFontSize: string;
   dropzoneIconSize: number;
+  profileDiameter: string;
+  profileIconSize: number;
+  profileHintFontSize: string;
+  profileContentMaxWidth: string;
   cardGap: string;
 };
 
@@ -125,6 +144,10 @@ const sizeTokens: Record<FileUploadSize, FileUploadSizeTokens> = {
     dropzoneTitleFontSize: "0.7rem",
     dropzoneHintFontSize: "0.62rem",
     dropzoneIconSize: 12,
+    profileDiameter: "3.5rem",
+    profileIconSize: 15,
+    profileHintFontSize: "0.64rem",
+    profileContentMaxWidth: "12rem",
     cardGap: "0.36rem",
   },
   sm: {
@@ -140,6 +163,10 @@ const sizeTokens: Record<FileUploadSize, FileUploadSizeTokens> = {
     dropzoneTitleFontSize: "0.76rem",
     dropzoneHintFontSize: "0.66rem",
     dropzoneIconSize: 13,
+    profileDiameter: "4.25rem",
+    profileIconSize: 17,
+    profileHintFontSize: "0.7rem",
+    profileContentMaxWidth: "13.5rem",
     cardGap: "0.4rem",
   },
   md: {
@@ -155,6 +182,10 @@ const sizeTokens: Record<FileUploadSize, FileUploadSizeTokens> = {
     dropzoneTitleFontSize: "0.82rem",
     dropzoneHintFontSize: "0.7rem",
     dropzoneIconSize: 14,
+    profileDiameter: "5rem",
+    profileIconSize: 19,
+    profileHintFontSize: "0.76rem",
+    profileContentMaxWidth: "15.5rem",
     cardGap: "0.46rem",
   },
   lg: {
@@ -170,11 +201,36 @@ const sizeTokens: Record<FileUploadSize, FileUploadSizeTokens> = {
     dropzoneTitleFontSize: "0.88rem",
     dropzoneHintFontSize: "0.76rem",
     dropzoneIconSize: 15,
+    profileDiameter: "5.8rem",
+    profileIconSize: 21,
+    profileHintFontSize: "0.82rem",
+    profileContentMaxWidth: "17rem",
     cardGap: "0.52rem",
   },
 };
 
 const baseClasses = "flex w-full min-w-0 flex-col";
+const defaultProfileAccept = "image/jpeg,image/png,image/webp";
+
+function ProfilePlaceholderIcon({ size }: { size: number }): JSX.Element {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      focusable="false"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4.5 20c0-4.2 3-6.6 7.5-6.6s7.5 2.4 7.5 6.6" />
+    </svg>
+  );
+}
 
 function getLowerFileExtension(fileNameOrUrl: string): string {
   const normalized = fileNameOrUrl.toLowerCase();
@@ -275,10 +331,12 @@ function revokeItemObjectUrl(item: FileUploadFile): void {
 
 export function FileUpload({
   variant,
-  varient,
   size = "md",
+  side = "center",
   disabled = false,
   required = false,
+  invalid = false,
+  errorMessage,
   multiple = false,
   accept,
   placeholder,
@@ -289,20 +347,25 @@ export function FileUpload({
   dialogDescription = "Click filename or thumbnail to open preview. Use the trash action to remove files.",
   fileListEmptyText = "No files uploaded yet.",
   onFilesChange,
+  profileConfig,
   browseButtonProps,
   dialogProps,
   className = "",
   style,
   ...props
 }: FileUploadProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? "compact";
+  const resolvedVariant = variant ?? "compact";
   const isCompact = resolvedVariant === "compact";
+  const isProfile = resolvedVariant === "profile";
   const sizeToken = sizeTokens[size];
   const inputId = useId();
+  const errorId = `${inputId}-error`;
 
   const [files, setFiles] = useState<FileUploadFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isProfileHovered, setIsProfileHovered] = useState(false);
+  const [isProfileFocused, setIsProfileFocused] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const filesRef = useRef<FileUploadFile[]>([]);
@@ -316,13 +379,22 @@ export function FileUpload({
   const {
     size: dialogSize = "lg",
     variant: dialogVariant,
-    varient: dialogLegacyVariant,
     closeOnEscape = true,
     closeOnOverlayClick = true,
   } = dialogProps ?? {};
 
-  const resolvedDialogVariant =
-    dialogVariant ?? dialogLegacyVariant ?? "outline";
+  const {
+    hint: profileHint,
+    imageAlt: profileImageAlt = "Uploaded profile photo",
+    accept: profileAccept,
+    uploadActionLabel: profileUploadActionLabel = "Upload profile photo",
+    removeActionLabel: profileRemoveActionLabel = "Remove profile photo",
+    placeholderIcon: profilePlaceholderIcon,
+    uploadHoverIcon: profileUploadHoverIcon,
+    removeHoverIcon: profileRemoveHoverIcon,
+  } = profileConfig ?? {};
+
+  const resolvedDialogVariant = dialogVariant ?? "outline";
 
   const compactPlaceholder =
     placeholder ??
@@ -330,6 +402,14 @@ export function FileUpload({
 
   const resolvedDropzoneHint =
     dropzoneHint ?? "Drag and drop files here, or use Browse to pick files.";
+
+  const normalizedAccept = typeof accept === "string" ? accept.trim() : "";
+  const resolvedAccept =
+    normalizedAccept !== ""
+      ? accept
+      : isProfile
+        ? profileAccept?.trim() || defaultProfileAccept
+        : undefined;
 
   useEffect(() => {
     filesRef.current = files;
@@ -460,13 +540,16 @@ export function FileUpload({
       return;
     }
 
-    const acceptedFiles = multiple ? selectedFiles : [selectedFiles[0] as File];
+    const shouldKeepSingleFile = isProfile || !multiple;
+    const acceptedFiles = shouldKeepSingleFile
+      ? [selectedFiles[0] as File]
+      : selectedFiles;
     const nextUploadFiles = createUploadFiles(acceptedFiles);
 
-    if (multiple) {
-      updateFiles((currentFiles) => [...currentFiles, ...nextUploadFiles]);
-    } else {
+    if (shouldKeepSingleFile) {
       updateFiles(() => nextUploadFiles, true);
+    } else {
+      updateFiles((currentFiles) => [...currentFiles, ...nextUploadFiles]);
     }
 
     hydrateImageDimensions(nextUploadFiles);
@@ -527,6 +610,24 @@ export function FileUpload({
     );
   }
 
+  function handleProfileAction(): void {
+    if (disabled) {
+      return;
+    }
+
+    const profileFile = files[0];
+
+    if (profileFile != null) {
+      removeFile(profileFile.id);
+      return;
+    }
+
+    openFilePicker();
+  }
+
+  const profileAlignItems: CSSProperties["alignItems"] =
+    side === "left" ? "flex-start" : side === "right" ? "flex-end" : "center";
+
   const fileListItems: FileListItem[] = files.map((file) => ({
     id: file.id,
     name: file.name,
@@ -545,7 +646,8 @@ export function FileUpload({
     minWidth: 0,
     display: "flex",
     flexDirection: "column",
-    gap: isCompact ? "0.45rem" : sizeToken.cardGap,
+    gap: isCompact ? "0.45rem" : isProfile ? 0 : sizeToken.cardGap,
+    alignItems: isProfile ? profileAlignItems : "stretch",
     boxSizing: "border-box",
     ...style,
   };
@@ -556,7 +658,9 @@ export function FileUpload({
     minHeight: sizeToken.compactMinHeight,
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "var(--ktn-border-muted)",
+    borderColor: invalid
+      ? "var(--ktn-action-danger-bg, #dc2626)"
+      : "var(--ktn-border-muted)",
     borderRadius: sizeToken.compactRadius,
     backgroundColor: "var(--ktn-bg-surface, #ffffff)",
     padding: sizeToken.compactPadding,
@@ -564,6 +668,7 @@ export function FileUpload({
     alignItems: "center",
     gap: sizeToken.compactGap,
     boxSizing: "border-box",
+    boxShadow: invalid ? "0 0 0 2px rgba(220, 38, 38, 0.14)" : undefined,
     opacity: disabled ? 0.62 : 1,
   };
 
@@ -627,19 +732,106 @@ export function FileUpload({
     minWidth: 0,
     borderWidth: "1px",
     borderStyle: "dashed",
-    borderColor: isDragging
-      ? "var(--ktn-action-primary-bg, #2563eb)"
-      : "var(--ktn-border-muted)",
+    borderColor: invalid
+      ? "var(--ktn-action-danger-bg, #dc2626)"
+      : isDragging
+        ? "var(--ktn-action-primary-bg, #2563eb)"
+        : "var(--ktn-border-muted)",
     borderRadius: sizeToken.dropzoneRadius,
     padding: sizeToken.dropzonePadding,
     display: "flex",
     flexDirection: "column",
     gap: sizeToken.cardGap,
     boxSizing: "border-box",
+    boxShadow: invalid ? "0 0 0 2px rgba(220, 38, 38, 0.14)" : undefined,
     backgroundColor: isDragging
       ? "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, transparent)"
       : "color-mix(in srgb, var(--ktn-bg-muted, #f3f4f6) 44%, transparent)",
     opacity: disabled ? 0.62 : 1,
+  };
+
+  const profileButtonStyle: CSSProperties = {
+    width: sizeToken.profileDiameter,
+    height: sizeToken.profileDiameter,
+    borderRadius: "999px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: invalid
+      ? "var(--ktn-action-danger-bg, #dc2626)"
+      : "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))",
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    overflow: "hidden",
+    cursor: disabled ? "not-allowed" : "pointer",
+    padding: 0,
+    margin: 0,
+    boxSizing: "border-box",
+    transition: "border-color 140ms ease, box-shadow 140ms ease",
+    boxShadow: isProfileFocused
+      ? invalid
+        ? "0 0 0 2px rgba(220, 38, 38, 0.24)"
+        : "0 0 0 2px rgba(37, 99, 235, 0.22)"
+      : undefined,
+    opacity: disabled ? 0.62 : 1,
+  };
+
+  const profileImageStyle: CSSProperties = {
+    width: "100%",
+    height: "100%",
+    display: "block",
+    objectFit: "cover",
+  };
+
+  const profileFallbackStyle: CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    lineHeight: 0,
+  };
+
+  const profileOverlayStyle: CSSProperties = {
+    position: "absolute",
+    inset: 0,
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #e5e7eb) 82%, rgba(75, 85, 99, 0.2))",
+    color: "var(--ktn-text-primary)",
+    lineHeight: 0,
+  };
+
+  const profileRailStyle: CSSProperties = {
+    width: `min(100%, ${sizeToken.profileContentMaxWidth})`,
+    minWidth: 0,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: profileAlignItems,
+    gap: "0.44rem",
+    boxSizing: "border-box",
+  };
+
+  const profileHintStyle: CSSProperties = {
+    width: "100%",
+    margin: 0,
+    color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    fontSize: sizeToken.profileHintFontSize,
+    lineHeight: 1.35,
+    textAlign: side,
+  };
+
+  const errorMessageStyle: CSSProperties = {
+    width: "100%",
+    margin: 0,
+    fontWeight: 500,
+    fontSize: "0.78rem",
+    lineHeight: 1.35,
+    color: "var(--ktn-action-danger-bg, #dc2626)",
+    textAlign: isProfile ? side : "left",
   };
 
   const dropzoneHeaderStyle: CSSProperties = {
@@ -682,6 +874,13 @@ export function FileUpload({
 
   const firstFile = files[0];
   const hiddenFilesCount = files.length > 1 ? files.length - 1 : 0;
+  const hasErrorMessage = invalid && errorMessage != null;
+
+  const errorMessageNode = hasErrorMessage ? (
+    <p id={errorId} role="alert" aria-live="polite" style={errorMessageStyle}>
+      {errorMessage}
+    </p>
+  ) : null;
 
   const compactSummaryNode =
     files.length === 0 ? (
@@ -768,11 +967,13 @@ export function FileUpload({
       id={`${inputId}-input`}
       ref={inputRef}
       type="file"
-      multiple={multiple}
-      accept={accept}
+      multiple={isProfile ? false : multiple}
+      accept={resolvedAccept}
       disabled={disabled}
       required={required && files.length === 0}
       aria-required={required || undefined}
+      aria-invalid={invalid || undefined}
+      aria-describedby={hasErrorMessage ? errorId : undefined}
       style={{ display: "none" }}
       onChange={handleInputChange}
     />
@@ -799,7 +1000,79 @@ export function FileUpload({
           </Button>
         </div>
 
+        {errorMessageNode}
         {compactDialogNode}
+        {hiddenInputNode}
+      </div>
+    );
+  }
+
+  if (isProfile) {
+    const profileFile = files[0];
+    const hasProfileFile = profileFile != null;
+    const showProfileOverlay =
+      !disabled && (isProfileHovered || isProfileFocused);
+    const profileButtonIcon = hasProfileFile
+      ? (profileRemoveHoverIcon ?? <FiX size={sizeToken.profileIconSize} />)
+      : (profileUploadHoverIcon ?? (
+          <FiUploadCloud size={sizeToken.profileIconSize} />
+        ));
+    const profileDefaultIcon = profilePlaceholderIcon ?? (
+      <ProfilePlaceholderIcon size={sizeToken.profileIconSize} />
+    );
+    const profileButtonLabel = hasProfileFile
+      ? disabled
+        ? profileImageAlt
+        : profileRemoveActionLabel
+      : profileUploadActionLabel;
+
+    return (
+      <div className={composedClassName} style={rootStyle} {...props}>
+        <div style={profileRailStyle}>
+          <button
+            type="button"
+            style={profileButtonStyle}
+            disabled={disabled}
+            onClick={handleProfileAction}
+            onMouseEnter={() => {
+              setIsProfileHovered(true);
+            }}
+            onMouseLeave={() => {
+              setIsProfileHovered(false);
+            }}
+            onFocus={() => {
+              setIsProfileFocused(true);
+            }}
+            onBlur={() => {
+              setIsProfileFocused(false);
+            }}
+            aria-label={profileButtonLabel}
+          >
+            {hasProfileFile ? (
+              <img
+                src={profileFile.src}
+                alt={profileImageAlt}
+                style={profileImageStyle}
+              />
+            ) : (
+              <span aria-hidden style={profileFallbackStyle}>
+                {profileDefaultIcon}
+              </span>
+            )}
+
+            {showProfileOverlay ? (
+              <span aria-hidden style={profileOverlayStyle}>
+                {profileButtonIcon}
+              </span>
+            ) : null}
+          </button>
+
+          {profileHint != null ? (
+            <p style={profileHintStyle}>{profileHint}</p>
+          ) : null}
+          {errorMessageNode}
+        </div>
+
         {hiddenInputNode}
       </div>
     );
@@ -861,6 +1134,7 @@ export function FileUpload({
         ) : null}
       </div>
 
+      {errorMessageNode}
       {hiddenInputNode}
     </div>
   );

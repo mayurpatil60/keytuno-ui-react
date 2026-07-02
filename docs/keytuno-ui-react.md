@@ -41,6 +41,27 @@ Available subpath roots: `@keytuno/ui-react/components/*`, `@keytuno/ui-react/th
 
 ---
 
+## Story authoring in this repo
+
+When editing stories inside the `keytuno-ui-react` repository itself, prefer local source imports so VS Code and TypeScript resolve symbols without package-install indirection:
+
+```ts
+import { Alert } from '../src/index';
+```
+
+Use standard Storybook typing for stable `args` inference and typed `render(args)` signatures:
+
+```ts
+const meta: Meta<typeof Alert> = { ... };
+export default meta;
+
+type Story = StoryObj<typeof meta>;
+```
+
+This avoids common red diagnostics such as unresolved `@keytuno/ui-react` imports in story files and implicit-any callback parameters.
+
+---
+
 ## Theming setup
 
 The library uses **CSS custom properties** (`--ktn-*`). Apply a theme by writing variables onto a root element:
@@ -102,7 +123,8 @@ const myTheme: ThemeContract = {
 - Some lightweight components use event-style `onAction(event)` by design: `Button`, `Badge`, `Avatar`, and item-level actions in `Breadcrumb`, `Navbar`, and `Sidebar`.
 - Components never import CSS files — all styles are inline or CSS vars. No stylesheet setup required.
 - `sideEffects: false` in package.json — all tree-shaking safe.
-- `Seperator` (typo alias) and `varient` props (typo aliases) exist for backward compatibility — prefer the correctly spelled versions (`Separator`, `variant`) in all new code.
+- Canonical file/component naming uses `Separator` (`src/components/Separator.tsx`, `Separator`).
+- Use `Separator` consistently in all code, exports, docs, and stories.
 - Most component roots accept native HTML attributes (including `aria-*` and `data-*`), which enables custom accessibility wiring and test selectors.
 
 ---
@@ -584,7 +606,7 @@ import { ColorPicker } from '@keytuno/ui-react';
 <ColorPicker
   size?={'xs'|'sm'|'md'|'lg'}
   variant?={'compact'|'detailed'}
-  varient?={'compact'|'detailed'}    // backwards-compatible alias; prefer variant
+  variant?={'compact'|'detailed'}    // backwards-compatible alias; prefer variant
   value?={string | null}             // controlled HEX value (for example '#2563eb')
   defaultValue?={string | null}      // uncontrolled initial HEX value
   swatches?={string[]}               // optional curated palette
@@ -815,6 +837,7 @@ interface NavbarItem {
   href?: string;
   disabled?: boolean;
   active?: boolean;
+  ariaLabel?: string;
   items?: NavbarItem[];
   onAction?: (event?: MouseEvent) => void;
 }
@@ -826,24 +849,17 @@ interface NavbarItem {
   brandLogo?={ReactNode}            // logo/icon on the left side of brand block
   brandName?={ReactNode}            // company name/title on top row
   brandTagline?={ReactNode}         // optional text below company name
+  showHamburger?={boolean}          // render optional hamburger button before brand/logo
+  hamburgerAriaLabel?={string}
+  hamburgerIcon?={ReactNode}
+  hamburgerDisabled?={boolean}
+  onHamburgerAction?={(event: MouseEvent<HTMLButtonElement>) => void}
   items?={NavbarItem[]}
   actions?={ReactNode}
   size?={'xs'|'sm'|'md'|'lg'}
-  variant?={'default'|'outline'|'soft'}
+  variant?={'light'|'dark'|'brand-light'|'brand-dark'|'default'|'outline'}
   sticky?={boolean}
-  responsive?={boolean}
-  mobileBreakpoint?={number}
-  mobileMenuSide?={'left'|'right'}
-  mobileTitle?={ReactNode}
-  showMobileToggle?={boolean}
-  mobileToggleLabel?={string}
-  mobileCloseLabel?={string}
   desktopNavigationLabel?={string}  // aria-label for desktop nav region
-  mobileNavigationLabel?={string}   // aria-label for mobile nav region
-  mobileOpen?={boolean}
-  defaultMobileOpen?={boolean}
-  onMobileOpenChange?={(open: boolean) => void}
-  closeMobileOnSelect?={boolean}
   activeItemId?={string}
   defaultActiveItemId?={string}
   onActiveItemChange?={(itemId: string) => void}
@@ -852,16 +868,36 @@ interface NavbarItem {
 />
 
 // Layout behavior:
+// - Optional hamburger renders before brand/logo and is fully callback-driven (no hardcoded open/close behavior)
 // - Brand shows on the left (logo + text stack where tagline appears below name)
 // - Menu/actions area is right-aligned on desktop
 // - Set showBrand={false} when you want only right-aligned controls
 // - Set defaultBrandName when you need fallback brand text (no project name is hardcoded)
+// Action behavior:
+// - Use onHamburgerAction to run any app logic (open/close sidebar, dialog, drawer, etc.)
+// - onAction emits source='hamburger-action' for hamburger clicks, and item/submenu sources for navigation
+// Variant guide:
+// - light: neutral enterprise header
+// - dark: high-contrast dark header
+// - brand-light: softer branded enterprise header
+// - brand-dark: stronger branded dark header
+// - default and outline: legacy compatibility variants
+// - soft: removed from Navbar
 ```
 
 ### Sidebar
 
 ```ts
 import { Sidebar } from '@keytuno/ui-react';
+import type {
+  SidebarActionContext,
+  SidebarActionSource,
+  SidebarItem,
+  SidebarItemActionEvent,
+  SidebarSection,
+  SidebarSize,
+  SidebarVariant,
+} from '@keytuno/ui-react';
 
 interface SidebarItem {
   id: string;
@@ -871,7 +907,11 @@ interface SidebarItem {
   href?: string;
   disabled?: boolean;
   active?: boolean;
+  expanded?: boolean;
+  defaultExpanded?: boolean;
   items?: SidebarItem[];
+  ariaLabel?: string;
+  onAction?: (event: SidebarItemActionEvent) => void;
 }
 
 interface SidebarSection {
@@ -880,39 +920,83 @@ interface SidebarSection {
   items: SidebarItem[];
 }
 
+type SidebarActionSource =
+  | 'item-select'
+  | 'submenu-toggle'
+  | 'collapse-toggle'
+  | 'escape-close';
+
+interface SidebarActionContext {
+  source: SidebarActionSource;
+  itemId?: string;
+  itemLabel?: string;
+  collapsed: boolean;
+  nextCollapsed?: boolean;
+  open: boolean;
+  nextOpen?: boolean;
+  size: SidebarSize;
+  variant: SidebarVariant;
+  event?: unknown;
+}
+
 <Sidebar
+  // data
   sections?={SidebarSection[]}
-  header?={ReactNode}
-  footer?={ReactNode}
+
+  // look
   size?={'xs'|'sm'|'md'|'lg'}
-  variant?={'default'|'outline'|'soft'}
+  variant?={'default'|'dark'|'light'|'brand-dark'|'brand-light'}
+  brandLogo?={ReactNode}
+  brandName?={ReactNode}
+  brandTagline?={ReactNode}
+  footer?={ReactNode}
+
+  // open and collapse state
+  open?={boolean}
+  defaultOpen?={boolean}
+  onOpenChange?={(open: boolean) => void}
   collapsed?={boolean}
   defaultCollapsed?={boolean}
   onCollapsedChange?={(collapsed: boolean) => void}
-  mobileOpen?={boolean}
-  defaultMobileOpen?={boolean}
-  onMobileOpenChange?={(open: boolean) => void}
-  responsive?={boolean}
-  collapseBreakpoint?={number}
-  iconOnly?={boolean}
-  showCollapseToggle?={boolean}
-  showMobileToggle?={boolean}
-  mobileOpenLabel?={string}
-  mobileCloseLabel?={string}
-  panelAriaLabel?={string}
-  navigationAriaLabel?={string}
-  collapseExpandLabel?={string}
-  collapseCollapseLabel?={string}
-  collapseLockedLabel?={string}
-  closeMobileOnSelect?={boolean}
+
+  // behavior
+  closeOnEscape?={boolean}
+  showItemIcons?={boolean}
+
+  // selection
   activeItemId?={string}
   defaultActiveItemId?={string}
   onActiveItemChange?={(itemId: string) => void}
   onItemSelect?={(item: SidebarItem) => void}
-  showSectionSeparators?={boolean}
-  sectionSeparatorSize?={'xs'|'sm'|'md'|'lg'}
+
+  // accessibility
+  panelAriaLabel?={string}
+  navigationAriaLabel?={string}
+  emptyText?={ReactNode}
+
+  // analytics
   onAction?={(ctx: SidebarActionContext) => void}
+
+  // plus native div props (className, style, onKeyDown, data-*, aria-*)
 />
+
+// Notes:
+// - Defaults:
+//   size='md', defaultCollapsed=false, defaultOpen=true, closeOnEscape=true,
+//   showItemIcons=true, panelAriaLabel='Sidebar', navigationAriaLabel='Sidebar navigation',
+//   emptyText='No navigation items.'
+// - Sidebar panel is full height (100vh) and square-edged (no rounded corners).
+// - The middle navigation area uses the inbuilt themed Scrollbar.
+// - Collapse toggle is fixed at the bottom and is rendered only when showItemIcons=true.
+// - Sidebar has no internal mobile toggle/backdrop button; control open state from parent
+//   (for example via Navbar hamburger in app layout).
+// - onOpenChange is emitted when Sidebar requests a close (for example Escape + closeOnEscape).
+// - For mobile drawers, pass showItemIcons=false and control open from the parent layout.
+// - For backdrop overlays on both desktop and mobile, keep Sidebar fixed-positioned,
+//   drive open state from parent, and close via an external backdrop click handler.
+// - Use showItemIcons=false for text-only overlay navigation (no icon mode / no collapse toggle).
+// - Storybook reference: Sidebar Backdrop Overlay Playbook.
+// - If open=false, Sidebar returns null (not rendered).
 ```
 
 ### Card
@@ -1012,6 +1096,46 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 </Dialog>
 ```
 
+Dialog scroll behavior notes:
+
+- When `scrollable` is enabled, `DialogContent` keeps header and footer visible and applies the inbuilt `Scrollbar` only to the middle content section.
+- `maxContentHeight` defaults to `min(86vh, 40rem)` and is also clamped by viewport height (`calc(100vh - 2.5rem)`) so the full dialog remains visible.
+- Header-to-body, body-to-footer, and scrollbar-to-content spacing are intentionally separated for clearer visual grouping.
+
+Dialog playbook pattern (middle-only scrollbar + sticky footer):
+
+```tsx
+<Dialog trigger="Open review" variant="outline" size="md">
+  <DialogContent scrollable maxContentHeight="min(85vh, 32rem)">
+    <DialogHeader>
+      <DialogTitle>Quarterly Rebalance Approval</DialogTitle>
+      <DialogDescription>
+        Header and footer stay visible while only the middle section scrolls.
+      </DialogDescription>
+    </DialogHeader>
+
+    {/* long content */}
+
+    <DialogFooter sticky>
+      <Button variant="outline">Review Later</Button>
+      <Button variant="primary">Approve Rebalance</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+Scrollable playground pattern (for tuning in Storybook):
+
+```tsx
+const [maxContentHeight, setMaxContentHeight] = useState("min(85vh, 32rem)");
+const [stickyFooter, setStickyFooter] = useState(true);
+
+<DialogContent scrollable maxContentHeight={maxContentHeight}>
+  {/* long content */}
+  <DialogFooter sticky={stickyFooter}>...</DialogFooter>
+</DialogContent>
+```
+
 ### Sheet
 
 ```ts
@@ -1036,6 +1160,46 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFo
     <SheetFooter sticky?={boolean}>…</SheetFooter>
   </SheetContent>
 </Sheet>
+```
+
+Sheet scroll behavior notes:
+
+- When `scrollable` is enabled, `SheetContent` keeps header and footer visible and applies the inbuilt `Scrollbar` only to the middle content section.
+- `maxContentHeight` defaults to `min(86vh, 40rem)`; for top and bottom sheets it is also clamped by viewport height (`calc(100vh - 2.5rem)`) so the sheet remains fully visible.
+- Header-to-body, body-to-footer, and scrollbar-to-content spacing are intentionally separated for clearer visual grouping.
+
+Sheet playbook pattern (middle-only scrollbar + sticky footer):
+
+```tsx
+<Sheet trigger="Open review" side="top" showCloseButton>
+  <SheetContent scrollable maxContentHeight="min(85vh, 32rem)">
+    <SheetHeader>
+      <SheetTitle>Portfolio Rebalance Review</SheetTitle>
+      <SheetDescription>
+        Header and footer remain visible while the middle section scrolls.
+      </SheetDescription>
+    </SheetHeader>
+
+    {/* long content */}
+
+    <SheetFooter sticky>
+      <Button variant="outline">Review Later</Button>
+      <Button variant="primary">Confirm Rebalance</Button>
+    </SheetFooter>
+  </SheetContent>
+</Sheet>
+```
+
+Scrollable playground pattern (for tuning in Storybook):
+
+```tsx
+const [maxContentHeight, setMaxContentHeight] = useState("min(85vh, 32rem)");
+const [stickyFooter, setStickyFooter] = useState(true);
+
+<SheetContent scrollable maxContentHeight={maxContentHeight}>
+  {/* long content */}
+  <SheetFooter sticky={stickyFooter}>...</SheetFooter>
+</SheetContent>
 ```
 
 ### Alert (toast / notification)
@@ -1169,7 +1333,7 @@ const rowActions: RowAction<User>[] = [
   searchable?={boolean}             // global text search input
   searchPlaceholder?={string}
   searchAriaLabel?={string}
-  filterable?={boolean}             // per-column filter dropdowns
+  filterable?={boolean}             // toolbar filter icon opens advanced filter dialog
   columnFilters?={string[]}         // limit filterable columns by id
   globalFilter?={boolean}
   selectable?={boolean}
@@ -1188,6 +1352,13 @@ const rowActions: RowAction<User>[] = [
   toggleColumnsLabel?={string}
   showFiltersLabel?={string}
   hideFiltersLabel?={string}
+  filterDialogTitle?={string}
+  filterDialogDescription?={string}
+  addFilterLabel?={string}
+  clearFiltersLabel?={string}
+  applyFiltersLabel?={string}
+  globalFilterLabel?={string}
+  globalFilterPlaceholder?={string}
   showRefresh?={boolean}
   refreshLabel?={string}
   refreshingLabel?={string}
@@ -1233,6 +1404,15 @@ const rowActions: RowAction<User>[] = [
   onAction?={(ctx: TableActionContext<User>) => void}
   emptyText?={ReactNode}
 />
+
+// Advanced filter dialog behavior:
+// - Click toolbar filter icon to open a Dialog-based filter builder.
+// - Add multiple rules with: contains, starts with, ends with, equals,
+//   not equals, greater than, greater/equal, less than, less/equal.
+// - Each rule has an X reset button (row-level reset/removal).
+// - Use Clear Filters to reset all filters and Apply Filters to commit.
+// - Includes optional global search field inside the dialog when globalFilter/searchable is enabled.
+// - Storybook reference: Card + Table Full Width Playbook.
 ```
 
 #### Table export (xlsx / pdf)
@@ -1359,6 +1539,8 @@ interface FileListItem {
 ```ts
 import { FileUpload } from '@keytuno/ui-react';
 
+type FileUploadSide = 'left' | 'center' | 'right';
+
 interface FileUploadFile {
   id: string;
   file: File;                       // native File object
@@ -1372,9 +1554,24 @@ interface FileUploadFile {
   height?: number;
 }
 
+interface FileUploadProfileConfig {
+  hint?: ReactNode;                 // optional content below round upload
+  imageAlt?: string;
+  accept?: string;                  // defaults to image/jpeg,image/png,image/webp
+  uploadActionLabel?: string;
+  removeActionLabel?: string;
+  placeholderIcon?: ReactNode;
+  uploadHoverIcon?: ReactNode;
+  removeHoverIcon?: ReactNode;
+}
+
 <FileUpload
-  variant?={'compact'|'dropzone'}
+  variant?={'compact'|'dropzone'|'profile'}
   size?={'xs'|'sm'|'md'|'lg'}
+  side?={'left'|'center'|'right'}   // default: 'center' (primarily for profile variant)
+  required?={boolean}
+  invalid?={boolean}
+  errorMessage?={ReactNode}
   multiple?={boolean}
   accept?={string}                  // MIME type or extension filter, e.g. 'image/*,.pdf'
   disabled?={boolean}
@@ -1385,8 +1582,53 @@ interface FileUploadFile {
   dialogTitle?={ReactNode}
   dialogDescription?={ReactNode}
   fileListEmptyText?={ReactNode}
+  profileConfig?={FileUploadProfileConfig}
   onFilesChange?={(files: FileUploadFile[]) => void}
 />
+```
+
+```tsx
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldLabel,
+  FileUpload,
+} from '@keytuno/ui-react';
+
+// Compact with Field wrapper
+<Field required>
+  <FieldLabel required>Attachments</FieldLabel>
+  <FieldContent>
+    <FileUpload variant="compact" required />
+    <FieldDescription>Upload one or more supporting files.</FieldDescription>
+  </FieldContent>
+</Field>
+
+// Dropzone with Field wrapper
+<Field>
+  <FieldLabel>Documents</FieldLabel>
+  <FieldContent>
+    <FileUpload variant="dropzone" multiple />
+  </FieldContent>
+</Field>
+
+// Profile variant with optional hint, side alignment, required + error state
+<Field required invalid>
+  <FieldLabel required>Profile Photo</FieldLabel>
+  <FieldContent>
+    <FileUpload
+      variant="profile"
+      side="center"
+      required
+      invalid
+      errorMessage="Profile photo is required."
+      profileConfig={{
+        hint: 'JPG, PNG or WEBP - Max 5 MB',
+      }}
+    />
+  </FieldContent>
+</Field>
 ```
 
 ---
@@ -1450,3 +1692,4 @@ function ThemeProvider({ mode, children }) {
   return <div style={vars as React.CSSProperties}>{children}</div>;
 }
 ```
+

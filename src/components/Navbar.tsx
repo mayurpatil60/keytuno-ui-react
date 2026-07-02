@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useId,
   useState,
   type CSSProperties,
   type HTMLAttributes,
@@ -9,27 +8,25 @@ import {
 } from "react";
 
 import { Badge } from "./Badge";
-import { Button } from "./Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./DropdownMenu";
-import { Separator } from "./Separator";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "./Sheet";
 import { FiChevronDown, FiMenu } from "./icons/feather";
 
-export type NavbarVariant = "default" | "outline" | "soft";
+type NavbarLegacyVariant = "default" | "outline";
+type NavbarModernVariant = "dark" | "light" | "brand-dark" | "brand-light";
+export type NavbarVariant = NavbarLegacyVariant | NavbarModernVariant;
 export type NavbarSize = "xs" | "sm" | "md" | "lg";
-export type NavbarMobileMenuSide = "left" | "right";
 export type NavbarActionSource =
   | "item-select"
   | "submenu-select"
-  | "mobile-toggle"
-  | "escape-close";
+  | "hamburger-action";
 
 export type NavbarItemActionEvent = ReactMouseEvent<HTMLElement> | undefined;
+export type NavbarHamburgerActionEvent = ReactMouseEvent<HTMLButtonElement>;
 
 export interface NavbarItem {
   id: string;
@@ -49,9 +46,6 @@ export interface NavbarActionContext {
   itemId?: string;
   itemLabel?: string;
   parentItemId?: string;
-  mobileOpen: boolean;
-  nextMobileOpen?: boolean;
-  isMobileViewport: boolean;
   size: NavbarSize;
   variant: NavbarVariant;
   event?: unknown;
@@ -67,25 +61,17 @@ export interface NavbarProps extends Omit<
   brandLogo?: ReactNode;
   brandName?: ReactNode;
   brandTagline?: ReactNode;
+  showHamburger?: boolean;
+  hamburgerAriaLabel?: string;
+  hamburgerIcon?: ReactNode;
+  hamburgerDisabled?: boolean;
+  onHamburgerAction?: (event: NavbarHamburgerActionEvent) => void;
   items?: NavbarItem[];
   actions?: ReactNode;
   size?: NavbarSize;
   variant?: NavbarVariant;
-  varient?: NavbarVariant;
   sticky?: boolean;
-  responsive?: boolean;
-  mobileBreakpoint?: number;
-  mobileMenuSide?: NavbarMobileMenuSide;
-  mobileTitle?: ReactNode;
-  showMobileToggle?: boolean;
-  mobileToggleLabel?: string;
-  mobileCloseLabel?: string;
   desktopNavigationLabel?: string;
-  mobileNavigationLabel?: string;
-  mobileOpen?: boolean;
-  defaultMobileOpen?: boolean;
-  onMobileOpenChange?: (open: boolean) => void;
-  closeMobileOnSelect?: boolean;
   activeItemId?: string;
   defaultActiveItemId?: string;
   onActiveItemChange?: (itemId: string) => void;
@@ -107,7 +93,6 @@ type NavbarSizeTokens = {
   brandTaglineFontSize: string;
   brandLogoSize: string;
   iconSize: number;
-  mobileSheetWidth: string;
 };
 
 type NavbarVariantTokens = {
@@ -141,7 +126,6 @@ const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
     brandTaglineFontSize: "0.64rem",
     brandLogoSize: "1.6rem",
     iconSize: 13,
-    mobileSheetWidth: "min(92vw, 19rem)",
   },
   sm: {
     minHeight: "3rem",
@@ -156,7 +140,6 @@ const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
     brandTaglineFontSize: "0.68rem",
     brandLogoSize: "1.78rem",
     iconSize: 14,
-    mobileSheetWidth: "min(92vw, 20rem)",
   },
   md: {
     minHeight: "3.35rem",
@@ -171,7 +154,6 @@ const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
     brandTaglineFontSize: "0.72rem",
     brandLogoSize: "1.94rem",
     iconSize: 15,
-    mobileSheetWidth: "min(92vw, 21.5rem)",
   },
   lg: {
     minHeight: "3.7rem",
@@ -186,21 +168,68 @@ const sizeTokens: Record<NavbarSize, NavbarSizeTokens> = {
     brandTaglineFontSize: "0.76rem",
     brandLogoSize: "2.08rem",
     iconSize: 16,
-    mobileSheetWidth: "min(92vw, 22.5rem)",
   },
 };
 
 const variantTokens: Record<NavbarVariant, NavbarVariantTokens> = {
   default: {
-    panelBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    panelBackgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 96%, var(--ktn-bg-default, #f8fafc) 4%)",
     panelBorderColor: "var(--ktn-border-muted)",
-    panelShadow: "0 12px 30px rgba(15, 23, 42, 0.1)",
+    panelShadow: "0 10px 24px rgba(15, 23, 42, 0.1)",
     textColor: "var(--ktn-text-primary)",
     mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     itemActiveBackgroundColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 16%, transparent)",
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 14%, transparent)",
     itemActiveTextColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 88%, black)",
+  },
+  light: {
+    panelBackgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 96%, var(--ktn-bg-default, #f8fafc) 4%)",
+    panelBorderColor: "var(--ktn-border-muted)",
+    panelShadow: "0 10px 24px rgba(15, 23, 42, 0.1)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 14%, transparent)",
+    itemActiveTextColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 88%, black)",
+  },
+  dark: {
+    panelBackgroundColor: "color-mix(in srgb, #0f172a 88%, #111827 12%)",
+    panelBorderColor: "color-mix(in srgb, #94a3b8 26%, #0f172a 74%)",
+    panelShadow: "0 16px 34px rgba(2, 6, 23, 0.55)",
+    textColor: "#f8fafc",
+    mutedTextColor: "color-mix(in srgb, #e2e8f0 72%, #94a3b8 28%)",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 42%, transparent)",
+    itemActiveTextColor: "#ffffff",
+  },
+  "brand-dark": {
+    panelBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 28%, #0f172a 72%)",
+    panelBorderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 44%, #0f172a 56%)",
+    panelShadow: "0 18px 38px rgba(2, 6, 23, 0.58)",
+    textColor: "#eff6ff",
+    mutedTextColor: "color-mix(in srgb, #dbeafe 75%, #93c5fd 25%)",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 56%, #ffffff 0%)",
+    itemActiveTextColor: "#ffffff",
+  },
+  "brand-light": {
+    panelBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 9%, var(--ktn-bg-surface, #ffffff) 91%)",
+    panelBorderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 24%, var(--ktn-border-muted, #e2e8f0) 76%)",
+    panelShadow: "0 12px 28px rgba(15, 23, 42, 0.09)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 18%, transparent)",
+    itemActiveTextColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 82%, black)",
   },
   outline: {
     panelBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
@@ -213,30 +242,19 @@ const variantTokens: Record<NavbarVariant, NavbarVariantTokens> = {
     itemActiveTextColor:
       "color-mix(in srgb, var(--ktn-action-primary-bg) 88%, black)",
   },
-  soft: {
-    panelBackgroundColor:
-      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 90%, var(--ktn-bg-muted, #f1f5f9))",
-    panelBorderColor: "var(--ktn-border-muted)",
-    panelShadow: "0 10px 26px rgba(15, 23, 42, 0.08)",
-    textColor: "var(--ktn-text-primary)",
-    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    itemActiveBackgroundColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 16%, transparent)",
-    itemActiveTextColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
-  },
 };
 
-function resolveVariant(
-  variant: NavbarVariant | undefined,
-  varient: NavbarVariant | undefined,
-): NavbarVariant {
+function resolveVariant(variant: NavbarVariant | undefined): NavbarVariant {
   if (variant != null) {
     return variant;
   }
 
-  if (varient != null) {
-    return varient;
+  return "default";
+}
+
+function resolveSubmenuVariant(variant: NavbarVariant): "default" | "outline" {
+  if (variant === "outline" || variant === "dark" || variant === "brand-dark") {
+    return "outline";
   }
 
   return "default";
@@ -402,25 +420,17 @@ export function Navbar({
   brandLogo,
   brandName,
   brandTagline,
+  showHamburger = false,
+  hamburgerAriaLabel = "Toggle navigation action",
+  hamburgerIcon,
+  hamburgerDisabled = false,
+  onHamburgerAction,
   items = [],
   actions,
   size = "md",
   variant,
-  varient,
   sticky = false,
-  responsive = true,
-  mobileBreakpoint = 960,
-  mobileMenuSide = "left",
-  mobileTitle = "Navigation",
-  showMobileToggle = true,
-  mobileToggleLabel = "Menu",
-  mobileCloseLabel = "Close",
   desktopNavigationLabel = "Navbar",
-  mobileNavigationLabel = "Mobile navigation",
-  mobileOpen,
-  defaultMobileOpen = false,
-  onMobileOpenChange,
-  closeMobileOnSelect = true,
   activeItemId,
   defaultActiveItemId,
   onActiveItemChange,
@@ -432,46 +442,11 @@ export function Navbar({
   onKeyDown,
   ...props
 }: NavbarProps): JSX.Element {
-  const generatedId = useId();
-  const isMobileOpenControlled = mobileOpen !== undefined;
   const isActiveControlled = activeItemId !== undefined;
-
-  const [uncontrolledMobileOpen, setUncontrolledMobileOpen] =
-    useState<boolean>(defaultMobileOpen);
-
-  const [isMobileViewport, setIsMobileViewport] = useState<boolean>(() => {
-    if (!responsive || typeof window === "undefined") {
-      return false;
-    }
-
-    return window.innerWidth <= mobileBreakpoint;
-  });
 
   const [uncontrolledActiveItemId, setUncontrolledActiveItemId] = useState<
     string | null
   >(() => resolveInitialActiveItemId(items, defaultActiveItemId));
-
-  useEffect(() => {
-    if (!responsive) {
-      setIsMobileViewport(false);
-      return;
-    }
-
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    function handleResize(): void {
-      setIsMobileViewport(window.innerWidth <= mobileBreakpoint);
-    }
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [mobileBreakpoint, responsive]);
 
   useEffect(() => {
     if (isActiveControlled) {
@@ -491,13 +466,7 @@ export function Navbar({
     });
   }, [defaultActiveItemId, isActiveControlled, items]);
 
-  useEffect(() => {
-    if (!isMobileViewport && !isMobileOpenControlled) {
-      setUncontrolledMobileOpen(false);
-    }
-  }, [isMobileOpenControlled, isMobileViewport]);
-
-  const resolvedVariant = resolveVariant(variant, varient);
+  const resolvedVariant = resolveVariant(variant);
   const tokens = sizeTokens[size];
   const colors = variantTokens[resolvedVariant];
   const hasCustomBrand = hasRenderableContent(brand);
@@ -516,21 +485,16 @@ export function Navbar({
     hasBrandLogo || hasResolvedBrandName || hasBrandTagline;
   const shouldRenderBrand =
     showBrand && (hasCustomBrand || shouldRenderStructuredBrand);
-  const resolvedMobileOpen = isMobileOpenControlled
-    ? (mobileOpen ?? false)
-    : uncontrolledMobileOpen;
   const resolvedActiveItemId = isActiveControlled
     ? (activeItemId ?? null)
     : uncontrolledActiveItemId;
-  const showMobileSheet = responsive && isMobileViewport && showMobileToggle;
-  const mobileNavigationId = `${generatedId}-mobile-navigation`;
+  const shouldRenderHamburger = showHamburger;
 
   function emitAction(
     source: NavbarActionSource,
     options?: {
       item?: NavbarItem;
       parentItem?: NavbarItem;
-      nextMobileOpen?: boolean;
       event?: unknown;
     },
   ): void {
@@ -540,28 +504,9 @@ export function Navbar({
       itemLabel:
         options?.item != null ? toLabelText(options.item.label) : undefined,
       parentItemId: options?.parentItem?.id,
-      mobileOpen: resolvedMobileOpen,
-      nextMobileOpen: options?.nextMobileOpen,
-      isMobileViewport,
       size,
       variant: resolvedVariant,
       event: options?.event,
-    });
-  }
-
-  function setMobileOpenState(
-    nextOpen: boolean,
-    source: NavbarActionSource,
-    event?: unknown,
-  ): void {
-    if (!isMobileOpenControlled) {
-      setUncontrolledMobileOpen(nextOpen);
-    }
-
-    onMobileOpenChange?.(nextOpen);
-    emitAction(source, {
-      nextMobileOpen: nextOpen,
-      event,
     });
   }
 
@@ -590,10 +535,6 @@ export function Navbar({
       parentItem: options?.parentItem,
       event: options?.event,
     });
-
-    if (showMobileSheet && closeMobileOnSelect) {
-      setMobileOpenState(false, "mobile-toggle", options?.event);
-    }
   }
 
   function buildItemStyle(
@@ -712,7 +653,7 @@ export function Navbar({
         <DropdownMenu
           key={item.id}
           size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
-          variant={resolvedVariant === "outline" ? "outline" : "soft"}
+          variant={resolveSubmenuVariant(resolvedVariant)}
         >
           <DropdownMenuTrigger asChild>
             <button
@@ -793,105 +734,6 @@ export function Navbar({
     );
   }
 
-  function renderMobileItems(
-    mobileItems: NavbarItem[],
-    depth = 0,
-    parentItem?: NavbarItem,
-  ): JSX.Element {
-    return (
-      <ul
-        style={{
-          listStyle: "none",
-          margin: 0,
-          padding: 0,
-          display: "flex",
-          flexDirection: "column",
-          gap: "0.16rem",
-        }}
-      >
-        {mobileItems.map((item) => {
-          const itemHasChildren = hasChildren(item);
-          const itemDisabled = item.disabled === true;
-          const itemIsActive =
-            resolvedActiveItemId != null && item.id === resolvedActiveItemId;
-          const childIsActive =
-            itemHasChildren &&
-            (item.items ?? []).some((child) =>
-              itemContainsActive(child, resolvedActiveItemId),
-            );
-          const itemHighlighted = itemIsActive || childIsActive;
-          const itemStyle = buildItemStyle(
-            itemHighlighted,
-            itemDisabled,
-            true,
-            depth,
-          );
-          const labelText =
-            item.ariaLabel ?? toLabelText(item.label) ?? item.id;
-
-          return (
-            <li key={item.id}>
-              {item.href != null ? (
-                <a
-                  href={item.href}
-                  aria-label={labelText}
-                  aria-current={itemIsActive ? "page" : undefined}
-                  aria-disabled={itemDisabled}
-                  onClick={(event) => {
-                    if (itemDisabled) {
-                      event.preventDefault();
-                      return;
-                    }
-
-                    setItemActive(item, {
-                      source:
-                        parentItem != null ? "submenu-select" : "item-select",
-                      parentItem,
-                      event,
-                    });
-                  }}
-                  style={itemStyle}
-                >
-                  {renderItemContent(item, itemHighlighted, false)}
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  aria-label={labelText}
-                  disabled={itemDisabled}
-                  onClick={(event) => {
-                    setItemActive(item, {
-                      source:
-                        parentItem != null ? "submenu-select" : "item-select",
-                      parentItem,
-                      event,
-                    });
-                  }}
-                  style={itemStyle}
-                >
-                  {renderItemContent(item, itemHighlighted, false)}
-                </button>
-              )}
-
-              {itemHasChildren ? (
-                <div
-                  style={{
-                    marginTop: "0.14rem",
-                    marginInlineStart: "0.2rem",
-                    paddingInlineStart: "0.2rem",
-                    borderInlineStart: `1px solid ${colors.panelBorderColor}`,
-                  }}
-                >
-                  {renderMobileItems(item.items ?? [], depth + 1, item)}
-                </div>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-    );
-  }
-
   const composedClassName = `${baseClasses} ${className}`.trim();
 
   const rootStyle: CSSProperties = {
@@ -905,7 +747,6 @@ export function Navbar({
           position: "relative",
         }),
     border: `1px solid ${colors.panelBorderColor}`,
-    borderRadius: "var(--ktn-radius-lg, 0.75rem)",
     backgroundColor: colors.panelBackgroundColor,
     color: colors.textColor,
     boxShadow: colors.panelShadow,
@@ -921,6 +762,33 @@ export function Navbar({
     gap: "0.7rem",
     paddingInline: tokens.paddingInline,
     paddingBlock: tokens.paddingBlock,
+  };
+
+  const leadingClusterStyle: CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.46rem",
+    minWidth: 0,
+    flexShrink: 1,
+  };
+
+  const hamburgerButtonStyle: CSSProperties = {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: tokens.itemHeight,
+    minWidth: tokens.itemHeight,
+    height: tokens.itemHeight,
+    padding: 0,
+    border: "none",
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    backgroundColor: "transparent",
+    color: colors.textColor,
+    transition: "color 140ms ease, opacity 140ms ease",
+    lineHeight: 0,
+    flexShrink: 0,
+    cursor: hamburgerDisabled ? "not-allowed" : "pointer",
+    opacity: hamburgerDisabled ? 0.56 : 1,
   };
 
   const brandStyle: CSSProperties = {
@@ -1010,14 +878,6 @@ export function Navbar({
     event: Parameters<NonNullable<NavbarProps["onKeyDown"]>>[0],
   ): void {
     onKeyDown?.(event);
-
-    if (event.defaultPrevented) {
-      return;
-    }
-
-    if (event.key === "Escape" && showMobileSheet && resolvedMobileOpen) {
-      setMobileOpenState(false, "escape-close", event);
-    }
   }
 
   return (
@@ -1028,148 +888,85 @@ export function Navbar({
       {...props}
     >
       <div style={barStyle}>
-        {shouldRenderBrand ? (
-          <div style={brandStyle}>
-            {hasCustomBrand ? (
-              brand
-            ) : (
-              <>
-                {hasBrandLogo ? (
-                  <span style={brandLogoStyle}>{brandLogo}</span>
-                ) : null}
+        {shouldRenderHamburger || shouldRenderBrand ? (
+          <div style={leadingClusterStyle}>
+            {shouldRenderHamburger ? (
+              <button
+                type="button"
+                aria-label={hamburgerAriaLabel}
+                title={hamburgerAriaLabel}
+                disabled={hamburgerDisabled}
+                onClick={(event) => {
+                  onHamburgerAction?.(event);
+                  emitAction("hamburger-action", {
+                    event,
+                  });
+                }}
+                style={hamburgerButtonStyle}
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    lineHeight: 0,
+                  }}
+                >
+                  {hamburgerIcon ?? <FiMenu size={tokens.iconSize} />}
+                </span>
+              </button>
+            ) : null}
 
-                {hasResolvedBrandName || hasBrandTagline ? (
-                  <span style={brandTextWrapStyle}>
-                    {hasResolvedBrandName ? (
-                      <span style={brandNameStyle}>{resolvedBrandName}</span>
+            {shouldRenderBrand ? (
+              <div style={brandStyle}>
+                {hasCustomBrand ? (
+                  brand
+                ) : (
+                  <>
+                    {hasBrandLogo ? (
+                      <span style={brandLogoStyle}>{brandLogo}</span>
                     ) : null}
 
-                    {hasBrandTagline ? (
-                      <span style={brandTaglineStyle}>{brandTagline}</span>
+                    {hasResolvedBrandName || hasBrandTagline ? (
+                      <span style={brandTextWrapStyle}>
+                        {hasResolvedBrandName ? (
+                          <span style={brandNameStyle}>
+                            {resolvedBrandName}
+                          </span>
+                        ) : null}
+
+                        {hasBrandTagline ? (
+                          <span style={brandTaglineStyle}>{brandTagline}</span>
+                        ) : null}
+                      </span>
                     ) : null}
-                  </span>
-                ) : null}
-              </>
-            )}
+                  </>
+                )}
+              </div>
+            ) : null}
           </div>
         ) : null}
 
-        {!showMobileSheet ? (
-          <div style={desktopRightClusterStyle}>
-            <nav aria-label={desktopNavigationLabel} style={desktopNavStyle}>
-              {items.length > 0 ? (
-                items.map((item) => renderDesktopItem(item))
-              ) : (
-                <span
-                  style={{
-                    color: colors.mutedTextColor,
-                    fontSize: tokens.itemFontSize,
-                  }}
-                >
-                  {emptyText}
-                </span>
-              )}
-            </nav>
-
-            {actions != null ? <div style={actionsStyle}>{actions}</div> : null}
-          </div>
-        ) : (
-          <div style={{ marginInlineStart: "auto" }}>
-            <Button
-              variant="outline"
-              size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
-              onAction={(event) => {
-                setMobileOpenState(!resolvedMobileOpen, "mobile-toggle", event);
-              }}
-              aria-controls={mobileNavigationId}
-              aria-expanded={resolvedMobileOpen}
-            >
-              <FiMenu size={tokens.iconSize} aria-hidden />
-              {resolvedMobileOpen ? mobileCloseLabel : mobileToggleLabel}
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {showMobileSheet ? (
-        <Sheet
-          open={resolvedMobileOpen}
-          side={mobileMenuSide}
-          onOpenChange={(nextOpen) => {
-            setMobileOpenState(nextOpen, "mobile-toggle");
-          }}
-          onAction={(context) => {
-            if (context.source === "escape" && context.open === false) {
-              emitAction("escape-close", {
-                nextMobileOpen: false,
-                event: context.event,
-              });
-            }
-          }}
-        >
-          <SheetContent
-            side={mobileMenuSide}
-            scrollable
-            maxContentHeight="100vh"
-            style={{
-              width: tokens.mobileSheetWidth,
-              maxWidth: tokens.mobileSheetWidth,
-              gap: "0.8rem",
-            }}
-          >
-            <SheetHeader>
-              <SheetTitle>{mobileTitle}</SheetTitle>
-            </SheetHeader>
-
-            <nav
-              id={mobileNavigationId}
-              aria-label={mobileNavigationLabel}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.42rem",
-                minHeight: 0,
-              }}
-            >
-              {items.length > 0 ? (
-                renderMobileItems(items)
-              ) : (
-                <span
-                  style={{
-                    color: colors.mutedTextColor,
-                    fontSize: tokens.itemFontSize,
-                  }}
-                >
-                  {emptyText}
-                </span>
-              )}
-            </nav>
-
-            {actions != null ? (
-              <div
+        <div style={desktopRightClusterStyle}>
+          <nav aria-label={desktopNavigationLabel} style={desktopNavStyle}>
+            {items.length > 0 ? (
+              items.map((item) => renderDesktopItem(item))
+            ) : (
+              <span
                 style={{
-                  marginTop: "0.35rem",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.55rem",
+                  color: colors.mutedTextColor,
+                  fontSize: tokens.itemFontSize,
                 }}
               >
-                <Separator size="sm" />
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                  }}
-                >
-                  {actions}
-                </div>
-              </div>
-            ) : null}
-          </SheetContent>
-        </Sheet>
-      ) : null}
+                {emptyText}
+              </span>
+            )}
+          </nav>
+
+          {actions != null ? <div style={actionsStyle}>{actions}</div> : null}
+        </div>
+      </div>
     </header>
   );
 }

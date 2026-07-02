@@ -5,10 +5,10 @@ import {
   type HTMLAttributes,
   type ReactNode,
   type UIEvent,
-} from 'react';
+} from "react";
 
-export type ScrollbarAxis = 'x' | 'y' | 'both';
-export type ScrollbarActionSource = 'scroll' | 'focus' | 'blur';
+export type ScrollbarAxis = "x" | "y" | "both";
+export type ScrollbarActionSource = "scroll" | "focus" | "blur";
 
 export interface ScrollbarActionContext {
   source: ScrollbarActionSource;
@@ -22,17 +22,20 @@ export interface ScrollbarActionContext {
   event?: unknown;
 }
 
-export interface ScrollbarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface ScrollbarProps extends Omit<
+  HTMLAttributes<HTMLDivElement>,
+  "children"
+> {
   children?: ReactNode;
   axis?: ScrollbarAxis;
   onAction?: (context: ScrollbarActionContext) => void;
 }
 
-const STYLE_ID = 'ktn-themed-scrollbar-styles';
-const BASE_CLASS = 'ktn-themed-scrollbar';
+const STYLE_ID = "ktn-themed-scrollbar-styles";
+const BASE_CLASS = "ktn-themed-scrollbar";
 
 function ensureScrollbarStyles(): void {
-  if (typeof document === 'undefined') {
+  if (typeof document === "undefined") {
     return;
   }
 
@@ -40,7 +43,7 @@ function ensureScrollbarStyles(): void {
     return;
   }
 
-  const styleElement = document.createElement('style');
+  const styleElement = document.createElement("style");
   styleElement.id = STYLE_ID;
   styleElement.textContent = `
 .${BASE_CLASS} {
@@ -80,17 +83,17 @@ function ensureScrollbarStyles(): void {
 
 export function Scrollbar({
   children,
-  axis = 'y',
+  axis = "y",
   onAction,
-  className = '',
+  className = "",
   style,
   onScroll,
   onFocus,
   onBlur,
   role,
   tabIndex,
-  ['aria-label']: ariaLabel,
-  ['aria-labelledby']: ariaLabelledBy,
+  ["aria-label"]: ariaLabel,
+  ["aria-labelledby"]: ariaLabelledBy,
   ...props
 }: ScrollbarProps): JSX.Element {
   useEffect(() => {
@@ -98,19 +101,19 @@ export function Scrollbar({
   }, []);
 
   const overflowStyle: CSSProperties =
-    axis === 'both'
+    axis === "both"
       ? {
-          overflowX: 'auto',
-          overflowY: 'auto',
+          overflowX: "auto",
+          overflowY: "auto",
         }
-      : axis === 'x'
+      : axis === "x"
         ? {
-            overflowX: 'auto',
-            overflowY: 'hidden',
+            overflowX: "auto",
+            overflowY: "hidden",
           }
         : {
-            overflowX: 'hidden',
-            overflowY: 'auto',
+            overflowX: "hidden",
+            overflowY: "auto",
           };
 
   const composedClassName = `${BASE_CLASS} ${className}`.trim();
@@ -119,8 +122,14 @@ export function Scrollbar({
     ...style,
   };
 
-  const resolvedAriaLabel =
-    ariaLabel ?? (ariaLabelledBy == null ? 'Scrollable content' : undefined);
+  const resolvedRole = role ?? "region";
+  const isPresentationalRole =
+    resolvedRole === "presentation" || resolvedRole === "none";
+  const resolvedTabIndex = tabIndex ?? (isPresentationalRole ? undefined : 0);
+  const resolvedAriaLabel = isPresentationalRole
+    ? undefined
+    : (ariaLabel ??
+      (ariaLabelledBy == null ? "Scrollable content" : undefined));
 
   function emitAction(
     source: ScrollbarActionSource,
@@ -144,7 +153,7 @@ export function Scrollbar({
     onScroll?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('scroll', event, event.currentTarget);
+      emitAction("scroll", event, event.currentTarget);
     }
   }
 
@@ -152,7 +161,7 @@ export function Scrollbar({
     onFocus?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('focus', event, event.currentTarget);
+      emitAction("focus", event, event.currentTarget);
     }
   }
 
@@ -160,7 +169,7 @@ export function Scrollbar({
     onBlur?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('blur', event, event.currentTarget);
+      emitAction("blur", event, event.currentTarget);
     }
   }
 
@@ -168,8 +177,8 @@ export function Scrollbar({
     <div
       className={composedClassName}
       style={composedStyle}
-      role={role ?? 'region'}
-      tabIndex={tabIndex ?? 0}
+      role={resolvedRole}
+      tabIndex={resolvedTabIndex}
       aria-label={resolvedAriaLabel}
       aria-labelledby={ariaLabelledBy}
       onScroll={handleScroll}

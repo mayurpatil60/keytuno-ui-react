@@ -72,9 +72,9 @@ export { Navbar } from "./components/Navbar";
 export type {
   NavbarActionContext,
   NavbarActionSource,
+  NavbarHamburgerActionEvent,
   NavbarItem,
   NavbarItemActionEvent,
-  NavbarMobileMenuSide,
   NavbarProps,
   NavbarSize,
   NavbarVariant,
@@ -86,7 +86,6 @@ export type {
   SidebarItem,
   SidebarItemActionEvent,
   SidebarProps,
-  SidebarSectionSeparatorContext,
   SidebarSection,
   SidebarSize,
   SidebarVariant,
@@ -233,18 +232,13 @@ export type {
   SkeletonProps,
   SkeletonRadius,
 } from "./components/Skeleton";
-export { Separator, Seperator } from "./components/Separator";
+export { Separator } from "./components/Separator";
 export type {
   SeparatorActionContext,
   SeparatorActionSource,
   SeparatorOrientation,
   SeparatorProps,
   SeparatorSize,
-  SeperatorActionContext,
-  SeperatorActionSource,
-  SeperatorOrientation,
-  SeperatorProps,
-  SeperatorSize,
 } from "./components/Separator";
 export { Radio } from "./components/Radio";
 export type {
@@ -437,8 +431,10 @@ export type {
 export { FileUpload } from "./components/FileUpload";
 export type {
   FileUploadFile,
+  FileUploadProfileConfig,
   FileUploadProps,
   FileUploadSize,
+  FileUploadSide,
   FileUploadVariant,
 } from "./components/FileUpload";
 

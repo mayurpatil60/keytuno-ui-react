@@ -42,7 +42,6 @@ export interface ColorPickerProps extends Omit<
 > {
   size?: ColorPickerSize;
   variant?: ColorPickerVariant;
-  varient?: ColorPickerVariant;
   disabled?: boolean;
   required?: boolean;
   invalid?: boolean;
@@ -176,7 +175,6 @@ function toDisplayHex(value: string | null): string {
 export function ColorPicker({
   size = "md",
   variant,
-  varient,
   disabled = false,
   required = false,
   invalid = false,
@@ -204,7 +202,7 @@ export function ColorPicker({
   ["aria-describedby"]: ariaDescribedBy,
   ...props
 }: ColorPickerProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? "detailed";
+  const resolvedVariant = variant ?? "detailed";
   const tokens = sizeTokens[size];
   const normalizedSwatches = useMemo(
     () => normalizeSwatches(swatches),

@@ -81,6 +81,29 @@ const customItems: SelectOption[] = [
   },
 ];
 
+const LARGE_GROUP_COUNT = 8;
+const LARGE_OPTIONS_PER_GROUP = 40;
+
+const largeDataGroups: SelectGroup[] = Array.from(
+  { length: LARGE_GROUP_COUNT },
+  (_, groupIndex) => ({
+    label: `Universe ${groupIndex + 1}`,
+    options: Array.from(
+      { length: LARGE_OPTIONS_PER_GROUP },
+      (_, optionIndex) => {
+        const sequence = groupIndex * LARGE_OPTIONS_PER_GROUP + optionIndex + 1;
+
+        return {
+          value: `instrument-${sequence}`,
+          label: `Instrument ${String(sequence).padStart(3, "0")}`,
+          description: `Bucket ${groupIndex + 1}`,
+          keywords: [`group-${groupIndex + 1}`, `instrument-${sequence}`],
+        };
+      },
+    ),
+  }),
+);
+
 function MultipleDemo(): JSX.Element {
   const [value, setValue] = useState<SelectValue>(["nextjs", "react"]);
 
@@ -307,6 +330,34 @@ export const Disabled: Story = {
           />
           <FieldDescription>
             Selection is disabled for this account tier.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
+export const LargeDataScrollbar: Story = {
+  name: "Large Data Scrollbar",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Large Data Scrollbar</h3>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Large Instrument Universe</FieldLabel>
+
+        <FieldContent>
+          <Select
+            groups={largeDataGroups}
+            showClear
+            placeholder="Search 320 instruments"
+            searchPlaceholder="Search by instrument or bucket"
+            style={{ width: "100%" }}
+          />
+
+          <FieldDescription>
+            Dedicated scrollbar stress story with 320 grouped options. Open the
+            panel and scroll to validate themed scrollbar behavior.
           </FieldDescription>
         </FieldContent>
       </Field>

@@ -1,6 +1,6 @@
 import { defineConfig } from "tsup";
 
-export default defineConfig({
+export default defineConfig((ctx) => ({
   // One output file per source file — mirrors what tsc produced, preserving
   // subpath exports and consumer-side tree-shaking.
   entry: [
@@ -21,7 +21,7 @@ export default defineConfig({
   // as-is so the dist layout remains identical to src and subpath exports work.
   bundle: false,
   outDir: "dist",
-  clean: true,
+  clean: !ctx.watch,
   platform: "browser",
   target: "es2021",
   tsconfig: "tsconfig.release.json",
@@ -29,4 +29,4 @@ export default defineConfig({
   esbuildOptions(options) {
     options.pure = ["console.log", "console.debug", "console.info"];
   },
-});
+}));

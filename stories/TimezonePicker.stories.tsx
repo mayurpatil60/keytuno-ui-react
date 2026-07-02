@@ -313,7 +313,6 @@ export const TimezonePickerPlayground: Story = {
       control: "inline-radio",
       options: ["compact", "detailed"],
     },
-    varient: { table: { disable: true } },
     disabled: { control: "boolean" },
     required: { control: "boolean" },
     invalid: { control: "boolean" },
@@ -396,7 +395,6 @@ export const CompactTimezonePlayground: Story = {
       control: "inline-radio",
       options: ["compact", "detailed"],
     },
-    varient: { table: { disable: true } },
     disabled: { control: "boolean" },
     required: { control: "boolean" },
     invalid: { control: "boolean" },
@@ -455,3 +453,4 @@ export const CompactTimezonePlayground: Story = {
     </Field>
   ),
 };
+

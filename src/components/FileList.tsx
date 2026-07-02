@@ -406,7 +406,6 @@ export function FileList({
 
   const {
     variant: compactChipVariant,
-    varient: compactChipLegacyVariant,
     size: compactChipSize,
     className: compactChipClassName,
     style: compactChipCustomStyle,
@@ -553,11 +552,7 @@ export function FileList({
         <Badge
           {...compactChipRestProps}
           size={compactChipSize ?? badgeSize}
-          variant={
-            compactChipVariant ??
-            compactChipLegacyVariant ??
-            (itemDisabled ? "ghost" : "secondary")
-          }
+          variant={compactChipVariant ?? (itemDisabled ? "ghost" : "secondary")}
           className={compactChipClassName}
           style={compactChipContainerStyle}
         >

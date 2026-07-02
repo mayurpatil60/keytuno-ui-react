@@ -44,7 +44,6 @@ export interface TimezonePickerProps extends Omit<
 > {
   size?: TimezonePickerSize;
   variant?: TimezonePickerVariant;
-  varient?: TimezonePickerVariant;
   disabled?: boolean;
   required?: boolean;
   invalid?: boolean;
@@ -245,7 +244,6 @@ function toSingleSelectValue(value: SelectValue | undefined): string | null {
 export function TimezonePicker({
   size = "md",
   variant,
-  varient,
   disabled = false,
   required = false,
   invalid = false,
@@ -273,7 +271,7 @@ export function TimezonePicker({
   ["aria-describedby"]: ariaDescribedBy,
   ...props
 }: TimezonePickerProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? "detailed";
+  const resolvedVariant = variant ?? "detailed";
 
   const resolvedSystemTimezone =
     normalizeTimezoneValue(systemTimezone) ?? detectSystemTimezone();

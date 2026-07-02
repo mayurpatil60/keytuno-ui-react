@@ -216,6 +216,33 @@ export const Disabled: Story = {
   ),
 };
 
+export const LargeDataScrollbar: Story = {
+  name: "Large Data Scrollbar",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Large Data Scrollbar</h3>
+
+      <Field style={fieldStyle}>
+        <FieldLabel>Time Slots (96 items)</FieldLabel>
+
+        <FieldContent>
+          <DatePicker
+            mode="time"
+            defaultValue="10:30"
+            style={{ width: "100%" }}
+          />
+
+          <FieldDescription>
+            Time mode renders a long openable list (24 hours in 15-minute
+            slots). Use this dedicated story to verify themed scrollbar behavior
+            in the time panel.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
 export const DatePickerActions: Story = {
   name: "DatePicker Actions",
   args: {
@@ -297,7 +324,6 @@ export const DatePickerPlayground: Story = {
         "link",
       ],
     },
-    varient: { table: { disable: true } },
     size: {
       control: "select",
       options: ["xs", "sm", "md", "lg"],
@@ -385,7 +411,6 @@ export const RangePickerPlayground: Story = {
         "link",
       ],
     },
-    varient: { table: { disable: true } },
     size: {
       control: "select",
       options: ["xs", "sm", "md", "lg"],
@@ -473,7 +498,6 @@ export const TimePickerPlayground: Story = {
         "link",
       ],
     },
-    varient: { table: { disable: true } },
     size: {
       control: "select",
       options: ["xs", "sm", "md", "lg"],

@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   Button,
@@ -10,14 +10,14 @@ import {
   DialogHeader,
   DialogTitle,
   type DialogActionContext,
-} from '@keytuno/ui-react';
+} from "../src/index";
 
 const meta: Meta<typeof Dialog> = {
-  title: 'Overlay/Dialog',
+  title: "Overlay/Dialog",
   component: Dialog,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -26,28 +26,34 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(860px, 92vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(860px, 92vw)",
 };
 
 const mutedTextStyle: CSSProperties = {
   margin: 0,
-  fontSize: '0.8125rem',
-  color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+  fontSize: "0.8125rem",
+  color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
 };
 
 const longParagraphs = [
-  'The strategy summary includes confirmed entries, pending executions, and risk boundaries based on your selected profile.',
-  'Before placing an order, verify lot size, order type, and stop-loss value to avoid accidental high-risk exposure.',
-  'Adjust your alert thresholds to receive updates whenever implied volatility or open interest shifts significantly.',
-  'For overnight positions, ensure margin availability and review broker-level square-off timings.',
-  'You can export all positions with mark-to-market values from this dialog once review is complete.',
-  'Use tags and notes to group trades by setup quality, confidence level, and session type.',
-  'A sticky footer keeps quick actions visible even when the content panel is long and scrollable.',
-  'This demo intentionally includes extra text to verify scrolling and spacing behavior in the modal body.',
+  "The strategy summary includes confirmed entries, pending executions, and risk boundaries based on your selected profile.",
+  "Before placing an order, verify lot size, order type, and stop-loss value to avoid accidental high-risk exposure.",
+  "Adjust your alert thresholds to receive updates whenever implied volatility or open interest shifts significantly.",
+  "For overnight positions, ensure margin availability and review broker-level square-off timings.",
+  "You can export all positions with mark-to-market values from this dialog once review is complete.",
+  "Use tags and notes to group trades by setup quality, confidence level, and session type.",
+  "A sticky footer keeps quick actions visible even when the content panel is long and scrollable.",
+  "This demo intentionally includes extra text to verify scrolling and spacing behavior in the modal body.",
 ];
+
+const largeDataRows = Array.from({ length: 180 }, (_, index) => ({
+  id: index + 1,
+  title: `Portfolio Row ${String(index + 1).padStart(3, "0")}`,
+  status: index % 3 === 0 ? "Queued" : index % 3 === 1 ? "Pending" : "Ready",
+}));
 
 function renderStandardContent(): JSX.Element {
   return (
@@ -55,12 +61,14 @@ function renderStandardContent(): JSX.Element {
       <DialogHeader>
         <DialogTitle>Deploy Portfolio Changes</DialogTitle>
         <DialogDescription>
-          Review the selected changes before applying them to your active portfolio.
+          Review the selected changes before applying them to your active
+          portfolio.
         </DialogDescription>
       </DialogHeader>
 
       <p style={mutedTextStyle}>
-        This action updates allocation targets and may rebalance existing holdings.
+        This action updates allocation targets and may rebalance existing
+        holdings.
       </p>
 
       <DialogFooter>
@@ -88,7 +96,7 @@ export const Basic: Story = {
 };
 
 export const NoCloseButton: Story = {
-  name: 'No Close Button',
+  name: "No Close Button",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>No Close Button</h3>
@@ -103,7 +111,8 @@ export const NoCloseButton: Story = {
           </DialogHeader>
 
           <p style={mutedTextStyle}>
-            Close this dialog by clicking outside, pressing Escape, or using footer actions.
+            Close this dialog by clicking outside, pressing Escape, or using
+            footer actions.
           </p>
 
           <DialogFooter>
@@ -121,7 +130,7 @@ export const NoCloseButton: Story = {
 };
 
 export const StickyFooter: Story = {
-  name: 'Sticky Footer',
+  name: "Sticky Footer",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Sticky Footer</h3>
@@ -156,7 +165,7 @@ export const StickyFooter: Story = {
 };
 
 export const ScrollableContent: Story = {
-  name: 'Scrollable Content',
+  name: "Scrollable Content",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Scrollable Content</h3>
@@ -187,37 +196,121 @@ export const ScrollableContent: Story = {
   ),
 };
 
+export const MiddleScrollbarPlaybook: Story = {
+  name: "Middle Scrollbar Playbook",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Middle Scrollbar Playbook</h3>
+
+      <Dialog
+        trigger="Open middle scrollbar playbook"
+        variant="outline"
+        size="md"
+      >
+        <DialogContent scrollable maxContentHeight="min(85vh, 32rem)">
+          <DialogHeader>
+            <DialogTitle>Quarterly Rebalance Approval</DialogTitle>
+            <DialogDescription>
+              Header and footer stay visible while only the middle content
+              section scrolls.
+            </DialogDescription>
+          </DialogHeader>
+
+          {longParagraphs
+            .concat(longParagraphs, longParagraphs)
+            .map((text, index) => (
+              <p key={`playbook-line-${index}`} style={mutedTextStyle}>
+                {text}
+              </p>
+            ))}
+
+          <DialogFooter sticky>
+            <Button size="sm" variant="outline">
+              Review Later
+            </Button>
+            <Button size="sm" variant="primary">
+              Approve Rebalance
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  ),
+};
+
+export const LargeDataScrollbar: Story = {
+  name: "Large Data Scrollbar",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Large Data Scrollbar</h3>
+
+      <Dialog trigger="Open large data dialog" variant="secondary" size="lg">
+        <DialogContent scrollable maxContentHeight="min(86vh, 34rem)">
+          <DialogHeader>
+            <DialogTitle>Bulk Portfolio Review</DialogTitle>
+            <DialogDescription>
+              Dedicated long-data story for dialog scrollbar validation with 180
+              rows.
+            </DialogDescription>
+          </DialogHeader>
+
+          {largeDataRows.map((row) => (
+            <p key={`large-row-${row.id}`} style={mutedTextStyle}>
+              {`${row.title} - Status: ${row.status}`}
+            </p>
+          ))}
+
+          <DialogFooter sticky>
+            <Button size="sm" variant="outline">
+              Close
+            </Button>
+            <Button size="sm" variant="primary">
+              Proceed
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  ),
+};
+
 export const DialogPlayground: Story = {
-  name: 'Dialog Playground',
+  name: "Dialog Playground",
   args: {
-    variant: 'primary',
-    size: 'md',
+    variant: "primary",
+    size: "md",
     disabled: false,
     closeOnOverlayClick: true,
     closeOnEscape: true,
     defaultOpen: false,
-    trigger: 'Open Playground Dialog',
+    trigger: "Open Playground Dialog",
     withAction: false,
   },
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
-    varient: { table: { disable: true } },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    closeOnOverlayClick: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-    defaultOpen: { control: 'boolean' },
-    trigger: { control: 'text' },
-    withAction: { control: 'boolean' },
+    disabled: { control: "boolean" },
+    closeOnOverlayClick: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
+    defaultOpen: { control: "boolean" },
+    trigger: { control: "text" },
+    withAction: { control: "boolean" },
     open: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
@@ -246,20 +339,21 @@ export const DialogPlayground: Story = {
 };
 
 export const DialogActions: Story = {
-  name: 'Dialog Actions',
+  name: "Dialog Actions",
   args: {
     onAction: undefined,
     onOpenChange: undefined,
   },
   argTypes: {
     onAction: {
-      action: 'action',
+      action: "action",
       description:
-        'Fires when open state changes from trigger, overlay click, escape key, or close button.',
+        "Fires when open state changes from trigger, overlay click, escape key, or close button.",
     },
     onOpenChange: {
-      action: 'open-change',
-      description: 'Fires with the next open state whenever the dialog toggles.',
+      action: "open-change",
+      description:
+        "Fires with the next open state whenever the dialog toggles.",
     },
   },
   render: (args) => {
@@ -287,13 +381,14 @@ export const DialogActions: Story = {
             <DialogHeader>
               <DialogTitle>Inspect Dialog Action Sources</DialogTitle>
               <DialogDescription>
-                Open and close this dialog from different controls to see emitted action context.
+                Open and close this dialog from different controls to see
+                emitted action context.
               </DialogDescription>
             </DialogHeader>
 
             <p style={mutedTextStyle}>
-              Try close button, overlay click, and Escape key to compare action sources in the
-              Storybook actions panel.
+              Try close button, overlay click, and Escape key to compare action
+              sources in the Storybook actions panel.
             </p>
 
             <DialogFooter>
@@ -312,35 +407,41 @@ export const DialogActions: Story = {
 };
 
 export const DialogScrollablePlayground: Story = {
-  name: 'Scrollable Playground',
+  name: "Scrollable Playground",
   args: {
-    variant: 'secondary',
-    size: 'md',
+    variant: "secondary",
+    size: "md",
     disabled: false,
     closeOnOverlayClick: true,
     closeOnEscape: true,
-    trigger: 'Open Scrollable Playground',
+    trigger: "Open Scrollable Playground",
     withAction: false,
   },
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
-    varient: { table: { disable: true } },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    closeOnOverlayClick: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-    trigger: { control: 'text' },
-    withAction: { control: 'boolean' },
+    disabled: { control: "boolean" },
+    closeOnOverlayClick: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
+    trigger: { control: "text" },
+    withAction: { control: "boolean" },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
@@ -366,12 +467,16 @@ export const DialogScrollablePlayground: Story = {
           <DialogHeader>
             <DialogTitle>Scrollable Playground Content</DialogTitle>
             <DialogDescription>
-              This playground keeps dialog props configurable while content remains scrollable.
+              This playground keeps dialog props configurable while content
+              remains scrollable.
             </DialogDescription>
           </DialogHeader>
 
           {longParagraphs.concat(longParagraphs).map((text, index) => (
-            <p key={`scrollable-playground-line-${index}`} style={mutedTextStyle}>
+            <p
+              key={`scrollable-playground-line-${index}`}
+              style={mutedTextStyle}
+            >
               {text}
             </p>
           ))}
@@ -391,35 +496,41 @@ export const DialogScrollablePlayground: Story = {
 };
 
 export const DialogFooterPlayground: Story = {
-  name: 'Sticky Footer Playground',
+  name: "Sticky Footer Playground",
   args: {
-    variant: 'outline',
-    size: 'md',
+    variant: "outline",
+    size: "md",
     disabled: false,
     closeOnOverlayClick: true,
     closeOnEscape: true,
-    trigger: 'Open Sticky Footer Playground',
+    trigger: "Open Sticky Footer Playground",
     withAction: false,
   },
   argTypes: {
     variant: {
-      control: 'select',
-      options: ['primary', 'secondary', 'destructive', 'outline', 'ghost', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "secondary",
+        "destructive",
+        "outline",
+        "ghost",
+        "link",
+      ],
     },
-    varient: { table: { disable: true } },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
-    disabled: { control: 'boolean' },
-    closeOnOverlayClick: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-    trigger: { control: 'text' },
-    withAction: { control: 'boolean' },
+    disabled: { control: "boolean" },
+    closeOnOverlayClick: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
+    trigger: { control: "text" },
+    withAction: { control: "boolean" },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
@@ -450,7 +561,10 @@ export const DialogFooterPlayground: Story = {
           </DialogHeader>
 
           {longParagraphs.concat(longParagraphs).map((text, index) => (
-            <p key={`sticky-footer-playground-line-${index}`} style={mutedTextStyle}>
+            <p
+              key={`sticky-footer-playground-line-${index}`}
+              style={mutedTextStyle}
+            >
               {text}
             </p>
           ))}

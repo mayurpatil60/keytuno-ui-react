@@ -138,6 +138,7 @@ const customChipTriggerStyle: CSSProperties = {
 
 const DEEP_NESTED_LEVEL_COUNT = 10;
 const SIDE_DEBUG_SCROLL_ITEM_COUNT = 18;
+const LARGE_DATA_MENU_ITEM_COUNT = 160;
 
 const sideDebugViewportStyle: CSSProperties = {
   position: "relative",
@@ -1398,6 +1399,53 @@ export const SideDebug: Story = {
           />
         ))}
       </div>
+    </div>
+  ),
+};
+
+export const LargeDataScrollbar: Story = {
+  name: "Large Data Scrollbar",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Large Data Scrollbar</h3>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Large Dataset Menu</FieldLabel>
+
+        <FieldContent>
+          <DropdownMenu side="bottom" size="sm" variant="outline">
+            <DropdownMenuTrigger>{`Open ${LARGE_DATA_MENU_ITEM_COUNT} Items`}</DropdownMenuTrigger>
+
+            <DropdownMenuContent>
+              <DropdownMenuLabel>Instrument Universe</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+
+              {Array.from(
+                { length: LARGE_DATA_MENU_ITEM_COUNT },
+                (_, index) => (
+                  <DropdownMenuItem
+                    key={`large-data-item-${index + 1}`}
+                    icon={
+                      index % 2 === 0 ? (
+                        <FiLayers size={14} />
+                      ) : (
+                        <FiFileText size={14} />
+                      )
+                    }
+                  >
+                    {`Instrument ${String(index + 1).padStart(3, "0")}`}
+                  </DropdownMenuItem>
+                ),
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <FieldDescription>
+            Dedicated long-list story for dropdown scrolling with 160 items.
+            Open and scroll to validate themed scrollbar behavior.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
     </div>
   ),
 };

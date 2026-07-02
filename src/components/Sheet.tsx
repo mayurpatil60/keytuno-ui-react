@@ -311,7 +311,7 @@ export function SheetContent({
   showCloseButton,
   closeButtonLabel,
   scrollable = false,
-  maxContentHeight = "min(85vh, 32rem)",
+  maxContentHeight = "min(86vh, 40rem)",
   className = "",
   style,
   ...props
@@ -330,6 +330,9 @@ export function SheetContent({
   const resolvedSide = side ?? contextSide;
   const resolvedShowCloseButton = showCloseButton ?? contextShowCloseButton;
   const resolvedCloseButtonLabel = closeButtonLabel ?? contextCloseButtonLabel;
+  const isVerticalSheet = resolvedSide === "top" || resolvedSide === "bottom";
+  const resolvedMaxContentHeight = `min(${maxContentHeight}, calc(100vh - 2.5rem))`;
+  const sectionSpacing = scrollable ? "calc(0.6rem + 0.18rem)" : "0.6rem";
 
   const headerChildren: ReactNode[] = [];
   const bodyChildren: ReactNode[] = [];
@@ -348,6 +351,11 @@ export function SheetContent({
 
     bodyChildren.push(child);
   });
+
+  const hasHeaderBodySeparation =
+    headerChildren.length > 0 && bodyChildren.length > 0;
+  const hasFooterBodySeparation =
+    footerChildren.length > 0 && bodyChildren.length > 0;
 
   const shellStyle: CSSProperties = {
     position: "fixed",
@@ -371,7 +379,7 @@ export function SheetContent({
     color: "var(--ktn-text-primary)",
     display: "flex",
     flexDirection: "column",
-    gap: "0.6rem",
+    gap: sectionSpacing,
     padding: "0.95rem",
     fontSize: "0.875rem",
     lineHeight: 1.5,
@@ -384,17 +392,26 @@ export function SheetContent({
     ["--ktn-sheet-close-space" as string]: resolvedShowCloseButton
       ? "calc(1.82rem + 0.5rem)"
       : "0px",
+    ["--ktn-sheet-header-divider" as string]: hasHeaderBodySeparation
+      ? "1px solid var(--ktn-border-muted)"
+      : "none",
+    ["--ktn-sheet-header-divider-space" as string]: hasHeaderBodySeparation
+      ? "0.5rem"
+      : "0px",
+    ["--ktn-sheet-footer-divider" as string]: hasFooterBodySeparation
+      ? "1px solid var(--ktn-border-muted)"
+      : "none",
+    ["--ktn-sheet-footer-divider-space" as string]: hasFooterBodySeparation
+      ? "0.5rem"
+      : "0px",
     ...getSheetPanelStyle(resolvedSide),
     ...getSheetPanelRadiusStyle(resolvedSide),
-    ...(resolvedSide === "top" || resolvedSide === "bottom"
+    ...(scrollable
       ? {
-          ...(scrollable
-            ? { overflow: "hidden", maxHeight: maxContentHeight }
-            : {}),
+          overflow: "hidden",
+          ...(isVerticalSheet ? { maxHeight: resolvedMaxContentHeight } : {}),
         }
-      : {
-          ...(scrollable ? { overflow: "hidden" } : {}),
-        }),
+      : {}),
     ...style,
   };
 
@@ -412,6 +429,7 @@ export function SheetContent({
     display: "flex",
     flexDirection: "column",
     gap: "0.6rem",
+    flexShrink: 0,
     minWidth: 0,
     width: "100%",
   };
@@ -422,9 +440,24 @@ export function SheetContent({
       ? {
           flex: 1,
           minHeight: 0,
-          paddingInlineEnd: "0.2rem",
+          paddingBlock: "0.1rem",
         }
       : {}),
+  };
+
+  const bodyScrollbarStyle: CSSProperties = {
+    ...bodySectionStyle,
+    boxSizing: "border-box",
+    paddingInlineStart: "0.1rem",
+    paddingInlineEnd: "0.4rem",
+  };
+
+  const bodyContentStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.6rem",
+    minWidth: 0,
+    width: "100%",
   };
 
   const composedClassName = className.trim() === "" ? undefined : className;
@@ -481,11 +514,13 @@ export function SheetContent({
 
         {bodyChildren.length > 0 ? (
           scrollable ? (
-            <Scrollbar axis="y" style={bodySectionStyle}>
-              {bodyChildren}
+            <Scrollbar axis="y" style={bodyScrollbarStyle}>
+              <div style={bodyContentStyle}>{bodyChildren}</div>
             </Scrollbar>
           ) : (
-            <div style={bodySectionStyle}>{bodyChildren}</div>
+            <div style={bodySectionStyle}>
+              <div style={bodyContentStyle}>{bodyChildren}</div>
+            </div>
           )
         ) : null}
 
@@ -511,6 +546,8 @@ export function SheetHeader({
     gap: "0.25rem",
     margin: 0,
     paddingInlineEnd: "var(--ktn-sheet-close-space, 0px)",
+    paddingBlockEnd: "var(--ktn-sheet-header-divider-space, 0px)",
+    borderBottom: "var(--ktn-sheet-header-divider, none)",
     ...style,
   };
 
@@ -603,11 +640,11 @@ export function SheetFooter({
     boxSizing: "border-box",
     gap: "0.5rem",
     marginTop: "0.15rem",
+    paddingBlockStart: "var(--ktn-sheet-footer-divider-space, 0px)",
+    borderTop: "var(--ktn-sheet-footer-divider, none)",
     ...(sticky
       ? {
           backgroundColor: "var(--ktn-bg-surface, #ffffff)",
-          paddingBlockStart: "0.65rem",
-          borderTop: "1px solid var(--ktn-border-muted)",
         }
       : {}),
     ...style,

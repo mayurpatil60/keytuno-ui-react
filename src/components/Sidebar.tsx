@@ -10,22 +10,26 @@ import {
 
 import { Badge } from "./Badge";
 import { Button } from "./Button";
+import { Scrollbar } from "./Scrollbar";
 import { Separator } from "./Separator";
 import {
   FiChevronDown,
   FiChevronRight,
   FiChevronsLeft,
   FiChevronsRight,
-  FiMenu,
 } from "./icons/feather";
 
-export type SidebarVariant = "default" | "outline" | "soft";
+export type SidebarVariant =
+  | "default"
+  | "dark"
+  | "light"
+  | "brand-dark"
+  | "brand-light";
 export type SidebarSize = "xs" | "sm" | "md" | "lg";
 export type SidebarActionSource =
   | "item-select"
   | "submenu-toggle"
   | "collapse-toggle"
-  | "mobile-toggle"
   | "escape-close";
 
 export type SidebarItemActionEvent = ReactMouseEvent<HTMLElement>;
@@ -38,8 +42,8 @@ export interface SidebarItem {
   href?: string;
   disabled?: boolean;
   active?: boolean;
-  defaultExpanded?: boolean;
   expanded?: boolean;
+  defaultExpanded?: boolean;
   items?: SidebarItem[];
   ariaLabel?: string;
   onAction?: (event: SidebarItemActionEvent) => void;
@@ -57,19 +61,11 @@ export interface SidebarActionContext {
   itemLabel?: string;
   collapsed: boolean;
   nextCollapsed?: boolean;
-  mobileOpen: boolean;
-  nextMobileOpen?: boolean;
-  isMobileViewport: boolean;
+  open: boolean;
+  nextOpen?: boolean;
   size: SidebarSize;
   variant: SidebarVariant;
   event?: unknown;
-}
-
-export interface SidebarSectionSeparatorContext {
-  index: number;
-  sectionId?: string;
-  collapsed: boolean;
-  mobileViewport: boolean;
 }
 
 export interface SidebarProps extends Omit<
@@ -77,59 +73,42 @@ export interface SidebarProps extends Omit<
   "children" | "onChange"
 > {
   sections?: SidebarSection[];
-  header?: ReactNode;
-  footer?: ReactNode;
   size?: SidebarSize;
   variant?: SidebarVariant;
-  varient?: SidebarVariant;
+  brandLogo?: ReactNode;
+  brandName?: ReactNode;
+  brandTagline?: ReactNode;
+  footer?: ReactNode;
   collapsed?: boolean;
   defaultCollapsed?: boolean;
   onCollapsedChange?: (collapsed: boolean) => void;
-  mobileOpen?: boolean;
-  defaultMobileOpen?: boolean;
-  onMobileOpenChange?: (open: boolean) => void;
-  responsive?: boolean;
-  collapseBreakpoint?: number;
-  iconOnly?: boolean;
-  showCollapseToggle?: boolean;
-  showMobileToggle?: boolean;
-  mobileOpenLabel?: string;
-  mobileCloseLabel?: string;
-  panelAriaLabel?: string;
-  navigationAriaLabel?: string;
-  collapseExpandLabel?: string;
-  collapseCollapseLabel?: string;
-  collapseLockedLabel?: string;
-  closeMobileOnSelect?: boolean;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  closeOnEscape?: boolean;
+  showItemIcons?: boolean;
   activeItemId?: string;
   defaultActiveItemId?: string;
   onActiveItemChange?: (itemId: string) => void;
   onItemSelect?: (item: SidebarItem) => void;
-  sectionSpacing?: CSSProperties["rowGap"];
-  sectionPaddingTop?: CSSProperties["paddingTop"];
-  sectionPaddingBottom?: CSSProperties["paddingBottom"];
-  showSectionSeparators?: boolean;
-  sectionSeparatorInset?: CSSProperties["paddingInline"];
-  sectionSeparatorSize?: "xs" | "sm" | "md" | "lg";
-  sectionSeparatorStyle?: CSSProperties;
-  renderSectionSeparator?: (
-    context: SidebarSectionSeparatorContext,
-  ) => ReactNode;
   onAction?: (context: SidebarActionContext) => void;
+  panelAriaLabel?: string;
+  navigationAriaLabel?: string;
   emptyText?: ReactNode;
 }
 
 type SidebarSizeTokens = {
   expandedWidth: string;
   collapsedWidth: string;
-  mobileWidth: string;
   panelPadding: string;
   sectionGap: string;
   itemHeight: string;
   itemPaddingInline: string;
   itemFontSize: string;
   iconSize: number;
-  sectionTitleFontSize: string;
+  titleFontSize: string;
+  brandNameFontSize: string;
+  brandTaglineFontSize: string;
 };
 
 type SidebarVariantTokens = {
@@ -142,115 +121,154 @@ type SidebarVariantTokens = {
   itemActiveBackgroundColor: string;
   itemActiveTextColor: string;
   indicatorColor: string;
+  collapseBorderColor: string;
 };
 
 const baseClasses = "relative inline-flex min-w-0 max-w-full";
 
 const sizeTokens: Record<SidebarSize, SidebarSizeTokens> = {
   xs: {
-    expandedWidth: "14rem",
-    collapsedWidth: "3.6rem",
-    mobileWidth: "min(92vw, 15rem)",
-    panelPadding: "0.48rem",
-    sectionGap: "0.38rem",
-    itemHeight: "1.82rem",
-    itemPaddingInline: "0.5rem",
+    expandedWidth: "14.5rem",
+    collapsedWidth: "3.75rem",
+    panelPadding: "0.55rem",
+    sectionGap: "0.42rem",
+    itemHeight: "1.9rem",
+    itemPaddingInline: "0.52rem",
     itemFontSize: "0.74rem",
     iconSize: 13,
-    sectionTitleFontSize: "0.62rem",
+    titleFontSize: "0.62rem",
+    brandNameFontSize: "0.8rem",
+    brandTaglineFontSize: "0.66rem",
   },
   sm: {
-    expandedWidth: "15.5rem",
-    collapsedWidth: "4rem",
-    mobileWidth: "min(92vw, 16.5rem)",
-    panelPadding: "0.55rem",
-    sectionGap: "0.45rem",
-    itemHeight: "2rem",
-    itemPaddingInline: "0.56rem",
-    itemFontSize: "0.79rem",
+    expandedWidth: "16rem",
+    collapsedWidth: "4.05rem",
+    panelPadding: "0.62rem",
+    sectionGap: "0.48rem",
+    itemHeight: "2.05rem",
+    itemPaddingInline: "0.58rem",
+    itemFontSize: "0.8rem",
     iconSize: 14,
-    sectionTitleFontSize: "0.66rem",
+    titleFontSize: "0.67rem",
+    brandNameFontSize: "0.86rem",
+    brandTaglineFontSize: "0.7rem",
   },
   md: {
-    expandedWidth: "17rem",
-    collapsedWidth: "4.2rem",
-    mobileWidth: "min(92vw, 18rem)",
-    panelPadding: "0.62rem",
-    sectionGap: "0.52rem",
+    expandedWidth: "17.5rem",
+    collapsedWidth: "4.3rem",
+    panelPadding: "0.68rem",
+    sectionGap: "0.56rem",
     itemHeight: "2.25rem",
-    itemPaddingInline: "0.64rem",
+    itemPaddingInline: "0.66rem",
     itemFontSize: "0.86rem",
     iconSize: 15,
-    sectionTitleFontSize: "0.7rem",
+    titleFontSize: "0.71rem",
+    brandNameFontSize: "0.92rem",
+    brandTaglineFontSize: "0.74rem",
   },
   lg: {
-    expandedWidth: "19rem",
-    collapsedWidth: "4.4rem",
-    mobileWidth: "min(92vw, 20rem)",
-    panelPadding: "0.72rem",
-    sectionGap: "0.6rem",
-    itemHeight: "2.45rem",
-    itemPaddingInline: "0.72rem",
+    expandedWidth: "19.25rem",
+    collapsedWidth: "4.55rem",
+    panelPadding: "0.76rem",
+    sectionGap: "0.62rem",
+    itemHeight: "2.46rem",
+    itemPaddingInline: "0.74rem",
     itemFontSize: "0.92rem",
     iconSize: 16,
-    sectionTitleFontSize: "0.74rem",
+    titleFontSize: "0.75rem",
+    brandNameFontSize: "0.98rem",
+    brandTaglineFontSize: "0.78rem",
   },
 };
 
 const variantTokens: Record<SidebarVariant, SidebarVariantTokens> = {
   default: {
-    panelBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
-    panelBorderColor: "var(--ktn-border-muted)",
-    panelShadow: "0 12px 28px rgba(15, 23, 42, 0.12)",
-    textColor: "var(--ktn-text-primary)",
-    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    itemHoverBackgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.14))",
-    itemActiveBackgroundColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 16%, transparent)",
-    itemActiveTextColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
-    indicatorColor: "var(--ktn-action-primary-bg)",
-  },
-  outline: {
-    panelBackgroundColor: "var(--ktn-bg-surface, #ffffff)",
-    panelBorderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
-    panelShadow: "0 10px 24px rgba(15, 23, 42, 0.1)",
-    textColor: "var(--ktn-text-primary)",
-    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    itemHoverBackgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.12))",
-    itemActiveBackgroundColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 13%, transparent)",
-    itemActiveTextColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 88%, black)",
-    indicatorColor: "var(--ktn-action-primary-bg)",
-  },
-  soft: {
     panelBackgroundColor:
-      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 90%, var(--ktn-bg-muted, #f1f5f9))",
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 95%, var(--ktn-bg-default, #f8fafc) 5%)",
     panelBorderColor: "var(--ktn-border-muted)",
-    panelShadow: "0 10px 24px rgba(15, 23, 42, 0.1)",
+    panelShadow: "0 14px 30px rgba(15, 23, 42, 0.12)",
     textColor: "var(--ktn-text-primary)",
     mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     itemHoverBackgroundColor:
-      "color-mix(in srgb, var(--ktn-bg-muted, rgba(100, 116, 139, 0.14)) 88%, transparent)",
+      "color-mix(in srgb, var(--ktn-bg-muted, #e2e8f0) 75%, transparent)",
     itemActiveBackgroundColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 16%, transparent)",
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 16%, transparent)",
     itemActiveTextColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
-    indicatorColor: "var(--ktn-action-primary-bg)",
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 82%, black)",
+    indicatorColor: "var(--ktn-action-primary-bg, #2563eb)",
+    collapseBorderColor: "var(--ktn-border-muted)",
+  },
+  light: {
+    panelBackgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 96%, #dbeafe 4%)",
+    panelBorderColor:
+      "color-mix(in srgb, var(--ktn-border-muted, #e2e8f0) 88%, #bfdbfe 12%)",
+    panelShadow: "0 14px 30px rgba(15, 23, 42, 0.11)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    itemHoverBackgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #e2e8f0) 72%, transparent)",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 16%, transparent)",
+    itemActiveTextColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 82%, black)",
+    indicatorColor: "var(--ktn-action-primary-bg, #2563eb)",
+    collapseBorderColor:
+      "color-mix(in srgb, var(--ktn-border-muted, #e2e8f0) 84%, #bfdbfe 16%)",
+  },
+  dark: {
+    panelBackgroundColor: "color-mix(in srgb, #0f172a 88%, #111827 12%)",
+    panelBorderColor: "color-mix(in srgb, #94a3b8 26%, #0f172a 74%)",
+    panelShadow: "0 20px 42px rgba(2, 6, 23, 0.58)",
+    textColor: "#f8fafc",
+    mutedTextColor: "color-mix(in srgb, #e2e8f0 76%, #94a3b8 24%)",
+    itemHoverBackgroundColor: "color-mix(in srgb, #334155 38%, transparent)",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 42%, transparent)",
+    itemActiveTextColor: "#ffffff",
+    indicatorColor: "#93c5fd",
+    collapseBorderColor: "color-mix(in srgb, #94a3b8 22%, #0f172a 78%)",
+  },
+  "brand-dark": {
+    panelBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 27%, #0f172a 73%)",
+    panelBorderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 40%, #0f172a 60%)",
+    panelShadow: "0 22px 44px rgba(2, 6, 23, 0.6)",
+    textColor: "#eff6ff",
+    mutedTextColor: "color-mix(in srgb, #dbeafe 78%, #93c5fd 22%)",
+    itemHoverBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 26%, transparent)",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 52%, transparent)",
+    itemActiveTextColor: "#ffffff",
+    indicatorColor: "#bfdbfe",
+    collapseBorderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 32%, #0f172a 68%)",
+  },
+  "brand-light": {
+    panelBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, var(--ktn-bg-surface, #ffffff) 90%)",
+    panelBorderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 24%, var(--ktn-border-muted, #e2e8f0) 76%)",
+    panelShadow: "0 16px 34px rgba(15, 23, 42, 0.11)",
+    textColor: "var(--ktn-text-primary)",
+    mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    itemHoverBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 9%, transparent)",
+    itemActiveBackgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 18%, transparent)",
+    itemActiveTextColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 85%, black)",
+    indicatorColor: "var(--ktn-action-primary-bg, #2563eb)",
+    collapseBorderColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 20%, var(--ktn-border-muted, #e2e8f0) 80%)",
   },
 };
 
-function resolveVariant(
-  variant: SidebarVariant | undefined,
-  varient: SidebarVariant | undefined,
-): SidebarVariant {
+function resolveVariant(variant: SidebarVariant | undefined): SidebarVariant {
   if (variant != null) {
     return variant;
-  }
-
-  if (varient != null) {
-    return varient;
   }
 
   return "default";
@@ -459,92 +477,83 @@ function itemContainsActive(
 }
 
 function resolveBadge(item: SidebarItem, size: SidebarSize): ReactNode {
-  const badge = item.badge;
-
-  if (badge == null) {
+  if (item.badge == null) {
     return null;
   }
 
-  if (typeof badge === "string" || typeof badge === "number") {
-    const badgeSize = size === "lg" ? "sm" : "xs";
-
+  if (typeof item.badge === "string" || typeof item.badge === "number") {
     return (
-      <Badge size={badgeSize} variant="secondary">
-        {badge}
+      <Badge size={size === "lg" ? "sm" : "xs"} variant="secondary">
+        {item.badge}
       </Badge>
     );
   }
 
-  return badge;
+  return item.badge;
+}
+
+function resolveControlButtonSize(size: SidebarSize): "xs" | "sm" | "md" {
+  if (size === "xs") {
+    return "xs";
+  }
+
+  if (size === "lg") {
+    return "md";
+  }
+
+  return "sm";
+}
+
+function resolveDefaultBrandBadgeVariant(
+  variant: SidebarVariant,
+): "primary" | "secondary" {
+  if (variant === "dark" || variant === "brand-dark") {
+    return "secondary";
+  }
+
+  return "primary";
 }
 
 export function Sidebar({
   sections = [],
-  header,
-  footer,
   size = "md",
   variant,
-  varient,
+  brandLogo,
+  brandName = "Keytuno",
+  brandTagline = "Workspace",
+  footer,
   collapsed,
   defaultCollapsed = false,
   onCollapsedChange,
-  mobileOpen,
-  defaultMobileOpen = false,
-  onMobileOpenChange,
-  responsive = true,
-  collapseBreakpoint = 992,
-  iconOnly = false,
-  showCollapseToggle = true,
-  showMobileToggle = true,
-  mobileOpenLabel = "Open menu",
-  mobileCloseLabel = "Hide menu",
-  panelAriaLabel = "Sidebar",
-  navigationAriaLabel = "Sidebar navigation",
-  collapseExpandLabel = "Expand sidebar",
-  collapseCollapseLabel = "Collapse sidebar",
-  collapseLockedLabel = "Icon-only mode is controlled by prop",
-  closeMobileOnSelect = true,
+  open,
+  defaultOpen = true,
+  onOpenChange,
+  closeOnEscape = true,
+  showItemIcons = true,
   activeItemId,
   defaultActiveItemId,
   onActiveItemChange,
   onItemSelect,
-  sectionSpacing,
-  sectionPaddingTop,
-  sectionPaddingBottom,
-  showSectionSeparators = false,
-  sectionSeparatorInset = "0.45rem",
-  sectionSeparatorSize = "sm",
-  sectionSeparatorStyle,
-  renderSectionSeparator,
   onAction,
+  panelAriaLabel = "Sidebar",
+  navigationAriaLabel = "Sidebar navigation",
   emptyText = "No navigation items.",
   className = "",
   style,
   onKeyDown,
   ...props
-}: SidebarProps): JSX.Element {
+}: SidebarProps): JSX.Element | null {
   const isCollapsedControlled = collapsed !== undefined;
-  const isMobileOpenControlled = mobileOpen !== undefined;
+  const isOpenControlled = open !== undefined;
   const isActiveControlled = activeItemId !== undefined;
 
   const [uncontrolledCollapsed, setUncontrolledCollapsed] =
     useState<boolean>(defaultCollapsed);
-
-  const [uncontrolledMobileOpen, setUncontrolledMobileOpen] =
-    useState<boolean>(defaultMobileOpen);
-
-  const [isMobileViewport, setIsMobileViewport] = useState<boolean>(() => {
-    if (!responsive || typeof window === "undefined") {
-      return false;
-    }
-
-    return window.innerWidth <= collapseBreakpoint;
-  });
-
+  const [uncontrolledOpen, setUncontrolledOpen] =
+    useState<boolean>(defaultOpen);
   const [uncontrolledActiveItemId, setUncontrolledActiveItemId] = useState<
     string | null
   >(() => resolveInitialActiveItemId(sections, defaultActiveItemId));
-
   const [expandedById, setExpandedById] = useState<Record<string, boolean>>(
     () =>
       mergeExpandedState(
@@ -553,28 +562,6 @@ export function Sidebar({
         resolveInitialActiveItemId(sections, defaultActiveItemId),
       ),
   );
-
-  useEffect(() => {
-    if (!responsive) {
-      setIsMobileViewport(false);
-      return;
-    }
-
-    if (typeof window === "undefined") {
-      return;
-    }
-
-    function handleResize(): void {
-      setIsMobileViewport(window.innerWidth <= collapseBreakpoint);
-    }
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [collapseBreakpoint, responsive]);
 
   useEffect(() => {
     if (isActiveControlled) {
@@ -594,32 +581,16 @@ export function Sidebar({
     });
   }, [defaultActiveItemId, isActiveControlled, sections]);
 
-  useEffect(() => {
-    if (!isMobileViewport && !isMobileOpenControlled) {
-      setUncontrolledMobileOpen(false);
-    }
-  }, [isMobileOpenControlled, isMobileViewport]);
-
-  const resolvedVariant = resolveVariant(variant, varient);
+  const resolvedVariant = resolveVariant(variant);
   const tokens = sizeTokens[size];
   const colors = variantTokens[resolvedVariant];
-
   const resolvedCollapsed = isCollapsedControlled
     ? (collapsed ?? false)
     : uncontrolledCollapsed;
-
-  const resolvedMobileOpen = isMobileOpenControlled
-    ? (mobileOpen ?? false)
-    : uncontrolledMobileOpen;
-
+  const resolvedOpen = isOpenControlled ? (open ?? true) : uncontrolledOpen;
   const resolvedActiveItemId = isActiveControlled
     ? (activeItemId ?? null)
     : uncontrolledActiveItemId;
-
-  const collapseToggleLocked = iconOnly === true;
-  const resolvedIconOnly = iconOnly || resolvedCollapsed;
-  const shouldRenderPanel =
-    !isMobileViewport || !showMobileToggle || resolvedMobileOpen;
 
   useEffect(() => {
     setExpandedById((current) =>
@@ -632,7 +603,7 @@ export function Sidebar({
     options?: {
       item?: SidebarItem;
       nextCollapsed?: boolean;
-      nextMobileOpen?: boolean;
+      nextOpen?: boolean;
       event?: unknown;
     },
   ): void {
@@ -641,14 +612,29 @@ export function Sidebar({
       itemId: options?.item?.id,
       itemLabel:
         options?.item != null ? toLabelText(options.item.label) : undefined,
-      collapsed: resolvedIconOnly,
+      collapsed: resolvedCollapsed,
       nextCollapsed: options?.nextCollapsed,
-      mobileOpen: resolvedMobileOpen,
-      nextMobileOpen: options?.nextMobileOpen,
-      isMobileViewport,
+      open: resolvedOpen,
+      nextOpen: options?.nextOpen,
       size,
       variant: resolvedVariant,
       event: options?.event,
+    });
+  }
+
+  function setOpenState(
+    nextOpen: boolean,
+    source: SidebarActionSource,
+    event?: unknown,
+  ): void {
+    if (!isOpenControlled) {
+      setUncontrolledOpen(nextOpen);
+    }
+
+    onOpenChange?.(nextOpen);
+    emitAction(source, {
+      nextOpen,
+      event,
     });
   }
 
@@ -660,22 +646,6 @@ export function Sidebar({
     onCollapsedChange?.(nextCollapsed);
     emitAction("collapse-toggle", {
       nextCollapsed,
-      event,
-    });
-  }
-
-  function setMobileOpenState(
-    nextOpen: boolean,
-    source: SidebarActionSource,
-    event?: unknown,
-  ): void {
-    if (!isMobileOpenControlled) {
-      setUncontrolledMobileOpen(nextOpen);
-    }
-
-    onMobileOpenChange?.(nextOpen);
-    emitAction(source, {
-      nextMobileOpen: nextOpen,
       event,
     });
   }
@@ -698,10 +668,6 @@ export function Sidebar({
       item,
       event,
     });
-
-    if (closeMobileOnSelect && isMobileViewport) {
-      setMobileOpenState(false, "mobile-toggle", event);
-    }
   }
 
   function toggleSubmenu(item: SidebarItem, event: unknown): void {
@@ -731,8 +697,8 @@ export function Sidebar({
       return;
     }
 
-    if (event.key === "Escape" && isMobileViewport && resolvedMobileOpen) {
-      setMobileOpenState(false, "escape-close", event);
+    if (event.key === "Escape" && closeOnEscape && resolvedOpen) {
+      setOpenState(false, "escape-close", event);
     }
   }
 
@@ -765,16 +731,17 @@ export function Sidebar({
               itemContainsActive(child, resolvedActiveItemId),
             );
           const itemHighlighted = itemIsActive || itemHasActiveChild;
-          const indentation = Math.max(depth - 1, 0) * 0.8;
+          const indentation = Math.max(depth - 1, 0) * 0.9;
           const badgeNode = resolveBadge(item, size);
           const labelText =
             item.ariaLabel ?? toLabelText(item.label) ?? item.id;
+          const shouldRenderItemIcon = showItemIcons || resolvedCollapsed;
 
           const rowStyle: CSSProperties = {
             position: "relative",
             display: "inline-flex",
             alignItems: "center",
-            justifyContent: resolvedIconOnly ? "center" : "flex-start",
+            justifyContent: resolvedCollapsed ? "center" : "flex-start",
             width: "100%",
             minHeight: tokens.itemHeight,
             border: "none",
@@ -788,11 +755,11 @@ export function Sidebar({
             fontSize: tokens.itemFontSize,
             lineHeight: 1.25,
             textDecoration: "none",
-            paddingInlineStart: resolvedIconOnly
-              ? "0.36rem"
+            paddingInlineStart: resolvedCollapsed
+              ? "0.4rem"
               : `calc(${tokens.itemPaddingInline} + ${indentation}rem)`,
-            paddingInlineEnd: resolvedIconOnly
-              ? "0.36rem"
+            paddingInlineEnd: resolvedCollapsed
+              ? "0.4rem"
               : tokens.itemPaddingInline,
             transition:
               "background-color 140ms ease, color 140ms ease, opacity 140ms ease",
@@ -802,11 +769,11 @@ export function Sidebar({
           };
 
           const iconStyle: CSSProperties = {
-            display: "inline-flex",
+            display: shouldRenderItemIcon ? "inline-flex" : "none",
             alignItems: "center",
             justifyContent: "center",
-            width: `${tokens.iconSize + 4}px`,
-            minWidth: `${tokens.iconSize + 4}px`,
+            width: `${tokens.iconSize + 6}px`,
+            minWidth: `${tokens.iconSize + 6}px`,
             color: itemHighlighted
               ? colors.itemActiveTextColor
               : colors.mutedTextColor,
@@ -814,7 +781,7 @@ export function Sidebar({
           };
 
           const labelStyle: CSSProperties = {
-            display: resolvedIconOnly ? "none" : "inline-flex",
+            display: resolvedCollapsed ? "none" : "inline-flex",
             alignItems: "center",
             minWidth: 0,
             flex: 1,
@@ -824,17 +791,17 @@ export function Sidebar({
           };
 
           const tailStyle: CSSProperties = {
-            display: resolvedIconOnly ? "none" : "inline-flex",
+            display: resolvedCollapsed ? "none" : "inline-flex",
             alignItems: "center",
-            gap: "0.32rem",
-            marginInlineStart: "0.35rem",
+            gap: "0.34rem",
+            marginInlineStart: "0.36rem",
             color: colors.mutedTextColor,
             flexShrink: 0,
           };
 
           const baseRowProps = {
             "aria-label": labelText,
-            title: resolvedIconOnly ? labelText : undefined,
+            title: resolvedCollapsed ? labelText : undefined,
             style: rowStyle,
           };
 
@@ -858,10 +825,7 @@ export function Sidebar({
                       justifyContent: "center",
                       width: `${tokens.iconSize + 6}px`,
                       height: `${tokens.iconSize + 6}px`,
-                      borderRadius: "var(--ktn-radius-sm, 0.375rem)",
-                      backgroundColor: "transparent",
                       color: colors.mutedTextColor,
-                      padding: 0,
                     }}
                   >
                     {itemExpanded ? (
@@ -873,7 +837,7 @@ export function Sidebar({
                 ) : null}
               </span>
 
-              {itemHighlighted && !resolvedIconOnly ? (
+              {itemHighlighted && !resolvedCollapsed ? (
                 <span
                   aria-hidden
                   style={{
@@ -890,11 +854,11 @@ export function Sidebar({
           );
 
           const nestedContent =
-            itemHasChildren && itemExpanded && !resolvedIconOnly ? (
+            itemHasChildren && itemExpanded && !resolvedCollapsed ? (
               <div
                 style={{
                   marginTop: "0.16rem",
-                  paddingInlineStart: "0.42rem",
+                  paddingInlineStart: "0.45rem",
                   borderInlineStart: `1px solid ${colors.panelBorderColor}`,
                 }}
               >
@@ -922,6 +886,21 @@ export function Sidebar({
                     }
 
                     setItemActive(item, event);
+                  }}
+                  onMouseEnter={(event) => {
+                    if (itemDisabled || itemHighlighted) {
+                      return;
+                    }
+
+                    event.currentTarget.style.backgroundColor =
+                      colors.itemHoverBackgroundColor;
+                  }}
+                  onMouseLeave={(event) => {
+                    if (itemDisabled || itemHighlighted) {
+                      return;
+                    }
+
+                    event.currentTarget.style.backgroundColor = "transparent";
                   }}
                   aria-disabled={itemDisabled}
                   aria-current={itemIsActive ? "page" : undefined}
@@ -954,6 +933,21 @@ export function Sidebar({
 
                   setItemActive(item, event);
                 }}
+                onMouseEnter={(event) => {
+                  if (itemDisabled || itemHighlighted) {
+                    return;
+                  }
+
+                  event.currentTarget.style.backgroundColor =
+                    colors.itemHoverBackgroundColor;
+                }}
+                onMouseLeave={(event) => {
+                  if (itemDisabled || itemHighlighted) {
+                    return;
+                  }
+
+                  event.currentTarget.style.backgroundColor = "transparent";
+                }}
                 disabled={itemDisabled}
                 aria-pressed={itemIsActive}
                 aria-expanded={itemHasChildren ? itemExpanded : undefined}
@@ -970,142 +964,147 @@ export function Sidebar({
     );
   }
 
-  const composedClassName = `${baseClasses} ${className}`.trim();
+  if (!resolvedOpen) {
+    return null;
+  }
+
+  const controlButtonSize = resolveControlButtonSize(size);
+  const resolvedPanelWidth = resolvedCollapsed
+    ? tokens.collapsedWidth
+    : tokens.expandedWidth;
+  const allowCollapseToggle = showItemIcons;
 
   const panelStyle: CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    gap: tokens.sectionGap,
-    width: resolvedIconOnly
-      ? tokens.collapsedWidth
-      : isMobileViewport
-        ? tokens.mobileWidth
-        : tokens.expandedWidth,
-    minWidth: resolvedIconOnly
-      ? tokens.collapsedWidth
-      : isMobileViewport
-        ? tokens.mobileWidth
-        : tokens.expandedWidth,
-    maxWidth: resolvedIconOnly
-      ? tokens.collapsedWidth
-      : isMobileViewport
-        ? tokens.mobileWidth
-        : tokens.expandedWidth,
+    width: resolvedPanelWidth,
+    minWidth: resolvedPanelWidth,
+    maxWidth: resolvedPanelWidth,
+    height: "100vh",
+    minHeight: "100vh",
+    maxHeight: "100vh",
     border: `1px solid ${colors.panelBorderColor}`,
-    borderRadius: "var(--ktn-radius-lg, 0.75rem)",
+    borderRadius: 0,
     backgroundColor: colors.panelBackgroundColor,
     color: colors.textColor,
-    padding: tokens.panelPadding,
     boxShadow: colors.panelShadow,
+    padding: tokens.panelPadding,
+    gap: tokens.sectionGap,
+    overflow: "hidden",
+    flexShrink: 0,
     transition: "width 180ms ease, min-width 180ms ease, max-width 180ms ease",
   };
 
-  const rootStyle: CSSProperties = {
-    position: "relative",
-    display: "inline-flex",
-    flexDirection: "column",
-    gap: isMobileViewport ? "0.5rem" : 0,
-    ...style,
-  };
+  const composedClassName = `${baseClasses} ${className}`.trim();
 
   return (
     <div
       className={composedClassName}
-      style={rootStyle}
+      style={style}
       onKeyDown={handleRootKeyDown}
       {...props}
     >
-      {isMobileViewport && showMobileToggle ? (
-        <div style={{ display: "inline-flex", alignItems: "center" }}>
-          <Button
-            variant="outline"
-            size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
-            onAction={(event) => {
-              setMobileOpenState(!resolvedMobileOpen, "mobile-toggle", event);
-            }}
-            iconOnly={false}
-          >
-            <FiMenu size={tokens.iconSize} aria-hidden />
-            {resolvedMobileOpen ? mobileCloseLabel : mobileOpenLabel}
-          </Button>
-        </div>
-      ) : null}
-
-      {shouldRenderPanel ? (
-        <aside style={panelStyle} aria-label={panelAriaLabel}>
-          <div
+      <aside style={panelStyle} aria-label={panelAriaLabel}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: resolvedCollapsed ? "center" : "flex-start",
+            gap: "0.56rem",
+            minHeight: tokens.itemHeight,
+          }}
+        >
+          <span
             style={{
-              display: "flex",
+              display: "inline-flex",
               alignItems: "center",
-              justifyContent: resolvedIconOnly ? "center" : "space-between",
-              gap: "0.5rem",
+              justifyContent: "center",
+              flexShrink: 0,
             }}
           >
-            {!resolvedIconOnly ? (
-              <div
+            {brandLogo ?? (
+              <Badge
+                variant={resolveDefaultBrandBadgeVariant(resolvedVariant)}
+                size="sm"
+              >
+                KT
+              </Badge>
+            )}
+          </span>
+
+          {!resolvedCollapsed ? (
+            <span
+              style={{
+                minWidth: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.02rem",
+              }}
+            >
+              <strong
                 style={{
-                  minWidth: 0,
-                  flex: 1,
+                  fontSize: tokens.brandNameFontSize,
+                  lineHeight: 1.12,
                   color: colors.textColor,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
-                {header}
-              </div>
-            ) : null}
+                {brandName}
+              </strong>
 
-            {showCollapseToggle ? (
-              <Button
-                variant="ghost"
-                size={size === "lg" ? "md" : size === "xs" ? "xs" : "sm"}
-                iconOnly
-                iconOnlyTone
-                tooltip={
-                  collapseToggleLocked
-                    ? collapseLockedLabel
-                    : resolvedIconOnly
-                      ? collapseExpandLabel
-                      : collapseCollapseLabel
-                }
-                disabled={collapseToggleLocked}
-                onAction={(event) => {
-                  if (collapseToggleLocked) {
-                    return;
-                  }
-
-                  setCollapsedState(!resolvedCollapsed, event);
+              <span
+                style={{
+                  fontSize: tokens.brandTaglineFontSize,
+                  lineHeight: 1.12,
+                  color: colors.mutedTextColor,
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
                 }}
               >
-                {resolvedIconOnly ? (
-                  <FiChevronsRight size={tokens.iconSize} aria-hidden />
-                ) : (
-                  <FiChevronsLeft size={tokens.iconSize} aria-hidden />
-                )}
-              </Button>
-            ) : null}
-          </div>
+                {brandTagline}
+              </span>
+            </span>
+          ) : null}
+        </div>
 
+        <Separator size={size === "xs" ? "xs" : "sm"} />
+
+        <Scrollbar
+          axis="y"
+          role="presentation"
+          style={{
+            flex: 1,
+            minHeight: 0,
+            marginInlineEnd: `calc(${tokens.panelPadding} * -1)`,
+            paddingInlineEnd: 0,
+          }}
+        >
           <nav
             aria-label={navigationAriaLabel}
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: sectionSpacing ?? tokens.sectionGap,
+              gap: tokens.sectionGap,
               minHeight: 0,
+              paddingInlineEnd: tokens.panelPadding,
             }}
           >
             {sections.length === 0 ? (
               <div
                 style={{
-                  minHeight: "4rem",
+                  minHeight: "4.2rem",
                   display: "inline-flex",
                   alignItems: "center",
-                  justifyContent: resolvedIconOnly ? "center" : "flex-start",
-                  paddingInline: resolvedIconOnly ? 0 : "0.45rem",
+                  justifyContent: resolvedCollapsed ? "center" : "flex-start",
+                  paddingInline: resolvedCollapsed ? "0.3rem" : "0.45rem",
                   fontSize: tokens.itemFontSize,
                   color: colors.mutedTextColor,
                 }}
               >
-                {!resolvedIconOnly ? emptyText : null}
+                {!resolvedCollapsed ? emptyText : null}
               </div>
             ) : (
               sections.map((section, sectionIndex) => (
@@ -1115,37 +1114,18 @@ export function Sidebar({
                     display: "flex",
                     flexDirection: "column",
                     gap: "0.24rem",
-                    paddingTop:
-                      sectionPaddingTop ??
-                      (sectionIndex === 0 ? "0.18rem" : "0.48rem"),
-                    paddingBottom: sectionPaddingBottom,
                   }}
                 >
-                  {showSectionSeparators && sectionIndex > 0 ? (
-                    <div
-                      style={{
-                        paddingInline: sectionSeparatorInset,
-                        marginBottom: "0.2rem",
-                      }}
-                    >
-                      {renderSectionSeparator?.({
-                        index: sectionIndex,
-                        sectionId: section.id,
-                        collapsed: resolvedIconOnly,
-                        mobileViewport: isMobileViewport,
-                      }) ?? (
-                        <Separator
-                          size={sectionSeparatorSize}
-                          style={sectionSeparatorStyle}
-                        />
-                      )}
+                  {sectionIndex > 0 ? (
+                    <div style={{ paddingBlock: "0.22rem" }}>
+                      <Separator size={size === "xs" ? "xs" : "sm"} />
                     </div>
                   ) : null}
 
-                  {!resolvedIconOnly && section.title != null ? (
+                  {!resolvedCollapsed && section.title != null ? (
                     <div
                       style={{
-                        fontSize: tokens.sectionTitleFontSize,
+                        fontSize: tokens.titleFontSize,
                         color: colors.mutedTextColor,
                         textTransform: "uppercase",
                         letterSpacing: "0.04em",
@@ -1163,21 +1143,47 @@ export function Sidebar({
               ))
             )}
           </nav>
+        </Scrollbar>
 
-          {!resolvedIconOnly && footer != null ? (
-            <div
-              style={{
-                marginTop: "auto",
-                paddingTop: "0.45rem",
-                borderTop: `1px solid ${colors.panelBorderColor}`,
-                color: colors.mutedTextColor,
+        {footer != null && !resolvedCollapsed ? (
+          <div
+            style={{
+              borderTop: `1px solid ${colors.panelBorderColor}`,
+              paddingTop: "0.46rem",
+            }}
+          >
+            {footer}
+          </div>
+        ) : null}
+
+        {allowCollapseToggle ? (
+          <div
+            style={{
+              marginTop: "auto",
+              borderTop: `1px solid ${colors.collapseBorderColor}`,
+              paddingTop: "0.46rem",
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Button
+              variant="ghost"
+              size={controlButtonSize}
+              iconOnly
+              iconOnlyTone
+              onAction={(event) => {
+                setCollapsedState(!resolvedCollapsed, event);
               }}
             >
-              {footer}
-            </div>
-          ) : null}
-        </aside>
-      ) : null}
+              {resolvedCollapsed ? (
+                <FiChevronsRight size={tokens.iconSize} aria-hidden />
+              ) : (
+                <FiChevronsLeft size={tokens.iconSize} aria-hidden />
+              )}
+            </Button>
+          </div>
+        ) : null}
+      </aside>
     </div>
   );
 }

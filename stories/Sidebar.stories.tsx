@@ -1,37 +1,41 @@
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import {
   FiBarChart2,
   FiBell,
   FiBook,
+  FiBox,
   FiBriefcase,
+  FiCalendar,
+  FiCreditCard,
+  FiDatabase,
+  FiFileText,
+  FiGlobe,
   FiGrid,
   FiHelpCircle,
   FiLayers,
-  FiList,
-  FiMoreHorizontal,
+  FiMoon,
   FiSettings,
+  FiShield,
   FiShoppingCart,
-  FiUser,
   FiUsers,
 } from "react-icons/fi";
 
 import {
-  Avatar,
   Badge,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Separator,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Navbar,
   Sidebar,
   type SidebarActionContext,
   type SidebarItem,
   type SidebarProps,
-  type SidebarSectionSeparatorContext,
   type SidebarSection,
 } from "../src/index";
 
@@ -48,50 +52,60 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-const fallbackOnAction = action("action");
-const fallbackOnItemSelect = action("item-select");
+type DesktopSidebarMode = "expanded" | "icons";
 
-const canvasStyle: CSSProperties = {
-  width: "min(1120px, 96vw)",
+const MOBILE_BREAKPOINT = 960;
+
+const sidebarCanvasStyle: CSSProperties = {
+  width: "min(1260px, 98vw)",
   maxWidth: "100%",
-  minHeight: "34rem",
-  overflow: "visible",
-  border: "1px solid var(--ktn-border-muted)",
-  borderRadius: "1rem",
-  padding: "0.85rem",
   display: "flex",
-  gap: "0.85rem",
-  alignItems: "stretch",
-  background:
-    "linear-gradient(145deg, color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 90%, #dbeafe 10%), var(--ktn-bg-default, #f8fafc))",
+  gap: "0.95rem",
+  alignItems: "flex-start",
+  overflow: "visible",
 };
 
-const previewPaneStyle: CSSProperties = {
-  flex: "1 1 18rem",
+const sidebarPreviewStyle: CSSProperties = {
+  flex: "1 1 22rem",
   minWidth: 0,
+  minHeight: "100vh",
   border: "1px solid var(--ktn-border-muted)",
-  borderRadius: "0.85rem",
-  backgroundColor: "var(--ktn-bg-surface, #ffffff)",
-  padding: "0.9rem",
+  borderRadius: "0.95rem",
+  padding: "1rem",
   display: "flex",
   flexDirection: "column",
-  gap: "0.8rem",
+  gap: "0.9rem",
+  background:
+    "radial-gradient(110% 110% at 100% 0%, color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 16%, transparent), transparent 60%), linear-gradient(145deg, var(--ktn-bg-surface, #ffffff), color-mix(in srgb, var(--ktn-bg-default, #f8fafc) 86%, #dbeafe 14%))",
 };
 
-const metricGridStyle: CSSProperties = {
+const statsGridStyle: CSSProperties = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
-  gap: "0.55rem",
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gap: "0.62rem",
 };
 
-const metricCardStyle: CSSProperties = {
+const statCardStyle: CSSProperties = {
   border: "1px solid var(--ktn-border-muted)",
-  borderRadius: "0.7rem",
+  borderRadius: "0.72rem",
   padding: "0.65rem",
   display: "flex",
   flexDirection: "column",
   gap: "0.2rem",
   backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+};
+
+const pageShellStyle: CSSProperties = {
+  width: "100vw",
+  maxWidth: "100vw",
+  minHeight: "100vh",
+  height: "100vh",
+  border: "1px solid var(--ktn-border-muted)",
+  borderRadius: 0,
+  overflow: "hidden",
+  display: "flex",
+  flexDirection: "row",
+  backgroundColor: "var(--ktn-bg-default, #f1f4f8)",
 };
 
 const actionArgTypes = {
@@ -101,53 +115,25 @@ const actionArgTypes = {
   },
   variant: {
     control: "select",
-    options: ["default", "outline", "soft"],
+    options: ["default", "light", "dark", "brand-light", "brand-dark"],
   },
   defaultCollapsed: {
     control: "boolean",
   },
-  responsive: {
+  defaultOpen: {
     control: "boolean",
   },
-  collapseBreakpoint: {
-    control: "number",
-  },
-  iconOnly: {
+  closeOnEscape: {
     control: "boolean",
   },
-  showCollapseToggle: {
+  showItemIcons: {
     control: "boolean",
   },
-  showMobileToggle: {
-    control: "boolean",
-  },
-  defaultMobileOpen: {
-    control: "boolean",
-  },
-  closeMobileOnSelect: {
-    control: "boolean",
-  },
-  sectionSpacing: {
+  brandName: {
     control: "text",
   },
-  sectionPaddingTop: {
+  brandTagline: {
     control: "text",
-  },
-  sectionPaddingBottom: {
-    control: "text",
-  },
-  showSectionSeparators: {
-    control: "boolean",
-  },
-  sectionSeparatorInset: {
-    control: "text",
-  },
-  sectionSeparatorSize: {
-    control: "select",
-    options: ["xs", "sm", "md", "lg"],
-  },
-  sectionSeparatorStyle: {
-    control: "object",
   },
   onAction: {
     action: "action",
@@ -155,25 +141,10 @@ const actionArgTypes = {
   onItemSelect: {
     action: "item-select",
   },
-  sections: {
-    table: { disable: true },
-  },
-  header: {
-    table: { disable: true },
-  },
-  footer: {
-    table: { disable: true },
-  },
-  className: {
-    table: { disable: true },
-  },
-  style: {
-    table: { disable: true },
-  },
   collapsed: {
     control: "boolean",
   },
-  mobileOpen: {
+  open: {
     control: "boolean",
   },
   activeItemId: {
@@ -182,296 +153,295 @@ const actionArgTypes = {
   onCollapsedChange: {
     action: "collapsed-change",
   },
-  onMobileOpenChange: {
-    action: "mobile-open-change",
+  onOpenChange: {
+    action: "open-change",
   },
   onActiveItemChange: {
     action: "active-item-change",
   },
-  renderSectionSeparator: {
+  sections: {
+    table: { disable: true },
+  },
+  footer: {
+    table: { disable: true },
+  },
+  brandLogo: {
+    table: { disable: true },
+  },
+  className: {
+    table: { disable: true },
+  },
+  style: {
     table: { disable: true },
   },
 } satisfies NonNullable<Story["argTypes"]>;
 
-const navigationSections: SidebarSection[] = [
-  {
-    id: "overview",
-    title: "Overview",
-    items: [
-      {
-        id: "dashboard",
-        label: "Dashboard",
-        icon: <FiGrid size={15} />,
-        href: "#",
-        active: true,
-      },
-      {
-        id: "orders",
-        label: "Orders",
-        icon: <FiShoppingCart size={15} />,
-        defaultExpanded: true,
-        items: [
-          {
-            id: "orders-all",
-            label: "All Orders",
-            href: "#",
-          },
-          {
-            id: "orders-pending",
-            label: "Pending",
-            badge: 12,
-            href: "#",
-          },
-          {
-            id: "orders-complete",
-            label: "Completed",
-            href: "#",
-          },
-        ],
-      },
-      {
-        id: "alerts",
-        label: "Alerts",
-        icon: <FiBell size={15} />,
-        badge: "3",
-        href: "#",
-      },
-      {
-        id: "workspace",
-        label: "Workspace",
-        icon: <FiLayers size={15} />,
-        href: "#",
-      },
-    ],
-  },
-  {
-    id: "management",
-    title: "Management",
-    items: [
-      {
-        id: "clients",
-        label: "Clients",
-        icon: <FiBriefcase size={15} />,
-        href: "#",
-      },
-      {
-        id: "team",
-        label: "Team",
-        icon: <FiUsers size={15} />,
-        items: [
-          {
-            id: "team-members",
-            label: "Members",
-            href: "#",
-          },
-          {
-            id: "team-permissions",
-            label: "Permissions",
-            href: "#",
-          },
-        ],
-      },
-      {
-        id: "reports",
-        label: "Reports",
-        icon: <FiBarChart2 size={15} />,
-        href: "#",
-      },
-    ],
-  },
-  {
-    id: "preferences",
-    title: "Preferences",
-    items: [
-      {
-        id: "settings",
-        label: "Settings",
-        icon: <FiSettings size={15} />,
-        href: "#",
-      },
-      {
-        id: "docs",
-        label: "Documentation",
-        icon: <FiBook size={15} />,
-        href: "#",
-      },
-      {
-        id: "support",
-        label: "Support",
-        icon: <FiHelpCircle size={15} />,
-        href: "#",
-        disabled: true,
-      },
-    ],
-  },
-];
+const fallbackOnAction = action("action");
+const fallbackOnItemSelect = action("item-select");
+const fallbackHamburgerAction = action("hamburger-action");
 
-function SidebarHeader(): JSX.Element {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: "0.55rem" }}>
-      <Badge variant="primary" size="sm">
-        KT
-      </Badge>
+function iconOrUndefined(
+  includeIcons: boolean,
+  icon: JSX.Element,
+): JSX.Element | undefined {
+  return includeIcons ? icon : undefined;
+}
 
-      <div style={{ minWidth: 0, display: "flex", flexDirection: "column" }}>
-        <strong
-          style={{
-            fontSize: "0.86rem",
-            lineHeight: 1.15,
-            color: "var(--ktn-text-primary)",
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
-          Keytuno Admin
-        </strong>
+function buildSections(includeIcons: boolean): SidebarSection[] {
+  const iconSize = 15;
 
-        <span
-          style={{
-            fontSize: "0.72rem",
-            lineHeight: 1.1,
-            color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-            whiteSpace: "normal",
-            overflowWrap: "anywhere",
-          }}
-        >
-          Navigation workspace
-        </span>
-      </div>
-    </div>
-  );
+  return [
+    {
+      id: "overview",
+      title: "Overview",
+      items: [
+        {
+          id: "dashboard",
+          label: "Dashboard",
+          icon: iconOrUndefined(includeIcons, <FiGrid size={iconSize} />),
+          active: true,
+          href: "#",
+        },
+        {
+          id: "activity",
+          label: "Activity Center",
+          icon: iconOrUndefined(includeIcons, <FiLayers size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "alerts",
+          label: "Alerts",
+          icon: iconOrUndefined(includeIcons, <FiBell size={iconSize} />),
+          badge: "5",
+          href: "#",
+        },
+        {
+          id: "calendar",
+          label: "Calendar",
+          icon: iconOrUndefined(includeIcons, <FiCalendar size={iconSize} />),
+          href: "#",
+        },
+      ],
+    },
+    {
+      id: "operations",
+      title: "Operations",
+      items: [
+        {
+          id: "orders",
+          label: "Orders",
+          icon: iconOrUndefined(
+            includeIcons,
+            <FiShoppingCart size={iconSize} />,
+          ),
+          defaultExpanded: true,
+          items: [
+            {
+              id: "orders-all",
+              label: "All Orders",
+              href: "#",
+            },
+            {
+              id: "orders-pending",
+              label: "Pending Approval",
+              badge: 12,
+              href: "#",
+            },
+            {
+              id: "orders-packed",
+              label: "Packed",
+              href: "#",
+            },
+            {
+              id: "orders-shipped",
+              label: "Shipped",
+              href: "#",
+            },
+          ],
+        },
+        {
+          id: "inventory",
+          label: "Inventory",
+          icon: iconOrUndefined(includeIcons, <FiBox size={iconSize} />),
+          items: [
+            {
+              id: "inventory-stock",
+              label: "Stock Levels",
+              href: "#",
+            },
+            {
+              id: "inventory-reorder",
+              label: "Reorder Queue",
+              href: "#",
+            },
+            {
+              id: "inventory-batches",
+              label: "Batch Tracking",
+              href: "#",
+            },
+          ],
+        },
+        {
+          id: "procurement",
+          label: "Procurement",
+          icon: iconOrUndefined(includeIcons, <FiBriefcase size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "fulfillment",
+          label: "Fulfillment",
+          icon: iconOrUndefined(includeIcons, <FiDatabase size={iconSize} />),
+          href: "#",
+        },
+      ],
+    },
+    {
+      id: "people",
+      title: "People",
+      items: [
+        {
+          id: "team",
+          label: "Team",
+          icon: iconOrUndefined(includeIcons, <FiUsers size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "roles",
+          label: "Roles & Permissions",
+          icon: iconOrUndefined(includeIcons, <FiShield size={iconSize} />),
+          items: [
+            {
+              id: "roles-access",
+              label: "Access Policies",
+              href: "#",
+            },
+            {
+              id: "roles-audit",
+              label: "Approval Matrix",
+              href: "#",
+            },
+          ],
+        },
+        {
+          id: "partners",
+          label: "Partners",
+          icon: iconOrUndefined(includeIcons, <FiGlobe size={iconSize} />),
+          href: "#",
+        },
+      ],
+    },
+    {
+      id: "finance",
+      title: "Finance",
+      items: [
+        {
+          id: "billing",
+          label: "Billing",
+          icon: iconOrUndefined(includeIcons, <FiCreditCard size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "invoices",
+          label: "Invoices",
+          icon: iconOrUndefined(includeIcons, <FiFileText size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "reports",
+          label: "Reports",
+          icon: iconOrUndefined(includeIcons, <FiBarChart2 size={iconSize} />),
+          href: "#",
+        },
+      ],
+    },
+    {
+      id: "support",
+      title: "Support",
+      items: [
+        {
+          id: "docs",
+          label: "Documentation",
+          icon: iconOrUndefined(includeIcons, <FiBook size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "settings",
+          label: "Settings",
+          icon: iconOrUndefined(includeIcons, <FiSettings size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "help-desk",
+          label: "Help Desk",
+          icon: iconOrUndefined(includeIcons, <FiHelpCircle size={iconSize} />),
+          href: "#",
+          disabled: true,
+        },
+      ],
+    },
+  ];
+}
+
+function buildLargeSections(includeIcons: boolean): SidebarSection[] {
+  const sections = buildSections(includeIcons);
+
+  return [
+    ...sections,
+    {
+      id: "archive",
+      title: "Archive",
+      items: Array.from({ length: 12 }, (_, index) => ({
+        id: `archive-${index + 1}`,
+        label: `Archive Workspace ${index + 1}`,
+        icon: iconOrUndefined(includeIcons, <FiBox size={15} />),
+        href: "#",
+      })),
+    },
+  ];
 }
 
 function SidebarFooter(): JSX.Element {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-      <DropdownMenu size="sm" variant="soft">
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            style={{ width: "100%", justifyContent: "space-between" }}
-          >
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "0.45rem",
-                minWidth: 0,
-              }}
-            >
-              <Avatar size="xs" text="Mayur" />
-              <span
-                style={{
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                My Profile
-              </span>
-            </span>
-
-            <FiMoreHorizontal size={14} aria-hidden />
-          </Button>
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent side="top" align="start">
-          <DropdownMenuItem icon={<FiUser size={14} />}>
-            Account
-          </DropdownMenuItem>
-          <DropdownMenuItem icon={<FiList size={14} />}>
-            Activity
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem destructive>Sign out</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+      <Button variant="ghost" size="sm" style={{ width: "100%" }}>
+        Team profile
+      </Button>
+      <Button variant="outline" size="sm" style={{ width: "100%" }}>
+        Sign out
+      </Button>
     </div>
   );
 }
 
-function DashboardPreview({ lastAction }: { lastAction: string }): JSX.Element {
-  return (
-    <div style={previewPaneStyle}>
-      <div>
-        <h3 style={{ margin: 0, fontSize: "1rem" }}>Operations Dashboard</h3>
-        <p
-          style={{
-            margin: "0.25rem 0 0",
-            color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-            fontSize: "0.82rem",
-          }}
-        >
-          Sidebar supports direct menu and nested submenu items, plus your
-          existing components in header/footer.
-        </p>
-      </div>
+function SidebarPlaybookCanvas({
+  args,
+  useLargeData = false,
+  includeIcons = true,
+}: {
+  args: SidebarProps;
+  useLargeData?: boolean;
+  includeIcons?: boolean;
+}): JSX.Element {
+  const sections = useMemo(() => {
+    if (args.sections != null) {
+      return args.sections;
+    }
 
-      <div style={metricGridStyle}>
-        <div style={metricCardStyle}>
-          <span
-            style={{ color: "var(--ktn-text-secondary)", fontSize: "0.72rem" }}
-          >
-            Open Orders
-          </span>
-          <strong style={{ fontSize: "1rem" }}>127</strong>
-        </div>
+    return useLargeData
+      ? buildLargeSections(includeIcons)
+      : buildSections(includeIcons);
+  }, [args.sections, includeIcons, useLargeData]);
 
-        <div style={metricCardStyle}>
-          <span
-            style={{ color: "var(--ktn-text-secondary)", fontSize: "0.72rem" }}
-          >
-            Team Online
-          </span>
-          <strong style={{ fontSize: "1rem" }}>19</strong>
-        </div>
-
-        <div style={metricCardStyle}>
-          <span
-            style={{ color: "var(--ktn-text-secondary)", fontSize: "0.72rem" }}
-          >
-            Active Alerts
-          </span>
-          <strong style={{ fontSize: "1rem" }}>3</strong>
-        </div>
-      </div>
-
-      <div
-        style={{
-          marginTop: "auto",
-          border: "1px solid var(--ktn-border-muted)",
-          borderRadius: "0.7rem",
-          padding: "0.6rem",
-          fontSize: "0.78rem",
-          color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-          backgroundColor: "var(--ktn-bg-surface, #ffffff)",
-        }}
-      >
-        Last sidebar action: {lastAction}
-      </div>
-    </div>
-  );
-}
-
-function renderSidebar(
-  args: SidebarProps,
-  options?: {
-    collapseBreakpoint?: number;
-    separatorStyle?: "default" | "dashed";
-  },
-): JSX.Element {
-  const [lastAction, setLastAction] = useState("No action yet");
   const [storyCollapsed, setStoryCollapsed] = useState<boolean>(
     args.collapsed ?? args.defaultCollapsed ?? false,
   );
-  const [storyMobileOpen, setStoryMobileOpen] = useState<boolean>(
-    args.mobileOpen ?? args.defaultMobileOpen ?? false,
+  const [storyOpen, setStoryOpen] = useState<boolean>(
+    args.open ?? args.defaultOpen ?? true,
   );
   const [storyActiveItemId, setStoryActiveItemId] = useState<
     string | undefined
   >(args.activeItemId ?? args.defaultActiveItemId);
+  const [lastAction, setLastAction] = useState("No action yet");
 
   useEffect(() => {
     if (args.collapsed !== undefined) {
@@ -483,13 +453,13 @@ function renderSidebar(
   }, [args.collapsed, args.defaultCollapsed]);
 
   useEffect(() => {
-    if (args.mobileOpen !== undefined) {
-      setStoryMobileOpen(args.mobileOpen);
+    if (args.open !== undefined) {
+      setStoryOpen(args.open);
       return;
     }
 
-    setStoryMobileOpen(args.defaultMobileOpen ?? false);
-  }, [args.mobileOpen, args.defaultMobileOpen]);
+    setStoryOpen(args.defaultOpen ?? true);
+  }, [args.open, args.defaultOpen]);
 
   useEffect(() => {
     if (args.activeItemId !== undefined) {
@@ -513,31 +483,25 @@ function renderSidebar(
     });
 
   const onCollapsedChange = args.onCollapsedChange;
-  const onMobileOpenChange = args.onMobileOpenChange;
+  const onOpenChange = args.onOpenChange;
   const onActiveItemChange = args.onActiveItemChange;
 
   return (
-    <div style={canvasStyle}>
+    <div style={sidebarCanvasStyle}>
       <Sidebar
         {...args}
-        sections={navigationSections}
-        header={<SidebarHeader />}
+        sections={sections}
         footer={<SidebarFooter />}
-        onAction={(context) => {
-          const label = context.itemLabel ?? context.itemId ?? "n/a";
-          setLastAction(`${context.source}: ${label}`);
-          onAction(context);
-        }}
         collapsed={storyCollapsed}
-        mobileOpen={storyMobileOpen}
+        open={storyOpen}
         activeItemId={storyActiveItemId}
         onCollapsedChange={(nextCollapsed) => {
           setStoryCollapsed(nextCollapsed);
           onCollapsedChange?.(nextCollapsed);
         }}
-        onMobileOpenChange={(nextOpen) => {
-          setStoryMobileOpen(nextOpen);
-          onMobileOpenChange?.(nextOpen);
+        onOpenChange={(nextOpen) => {
+          setStoryOpen(nextOpen);
+          onOpenChange?.(nextOpen);
         }}
         onActiveItemChange={(itemId) => {
           setStoryActiveItemId(itemId);
@@ -546,54 +510,749 @@ function renderSidebar(
         onItemSelect={(item) => {
           onItemSelect(item);
         }}
-        collapseBreakpoint={
-          options?.collapseBreakpoint ?? args.collapseBreakpoint
-        }
-        renderSectionSeparator={
-          options?.separatorStyle === "dashed"
-            ? (context: SidebarSectionSeparatorContext) => (
-                <Separator
-                  size={args.sectionSeparatorSize ?? "sm"}
-                  style={{
-                    backgroundColor: "transparent",
-                    borderTop: "1px dashed var(--ktn-border-muted)",
-                    height: 0,
-                    minHeight: 0,
-                    opacity: context.collapsed ? 0.5 : 1,
-                    ...(args.sectionSeparatorStyle ?? {}),
-                  }}
-                />
-              )
-            : args.renderSectionSeparator
-        }
+        onAction={(context) => {
+          const label = context.itemLabel ?? context.itemId ?? "n/a";
+          setLastAction(`${context.source}: ${label}`);
+          onAction(context);
+        }}
       />
 
-      <DashboardPreview lastAction={lastAction} />
+      <div style={sidebarPreviewStyle}>
+        <div>
+          <h3 style={{ margin: 0, fontSize: "1.02rem" }}>
+            Sidebar Menu and Submenu Playbook
+          </h3>
+          <p
+            style={{
+              margin: "0.34rem 0 0",
+              fontSize: "0.84rem",
+              color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+            }}
+          >
+            Built with Sidebar + Badge + Button + Scrollbar. Collapse/expand and
+            submenu interactions are emitted via onAction.
+          </p>
+        </div>
+
+        <div style={statsGridStyle}>
+          <div style={statCardStyle}>
+            <span
+              style={{
+                color: "var(--ktn-text-secondary)",
+                fontSize: "0.72rem",
+              }}
+            >
+              Active section
+            </span>
+            <strong style={{ fontSize: "1.01rem" }}>{storyActiveItemId}</strong>
+          </div>
+
+          <div style={statCardStyle}>
+            <span
+              style={{
+                color: "var(--ktn-text-secondary)",
+                fontSize: "0.72rem",
+              }}
+            >
+              Collapsed
+            </span>
+            <strong style={{ fontSize: "1.01rem" }}>
+              {storyCollapsed ? "Yes" : "No"}
+            </strong>
+          </div>
+
+          <div style={statCardStyle}>
+            <span
+              style={{
+                color: "var(--ktn-text-secondary)",
+                fontSize: "0.72rem",
+              }}
+            >
+              Open
+            </span>
+            <strong style={{ fontSize: "1.01rem" }}>
+              {storyOpen ? "Visible" : "Hidden"}
+            </strong>
+          </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: "auto",
+            border: "1px solid var(--ktn-border-muted)",
+            borderRadius: "0.72rem",
+            padding: "0.62rem",
+            fontSize: "0.78rem",
+            color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+            backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+          }}
+        >
+          Last sidebar action: {lastAction}
+        </div>
+      </div>
     </div>
   );
 }
 
-export const SidebarMenuAndSubmenu: Story = {
-  name: "Sidebar Menu and Submenu",
-  render: () =>
-    renderSidebar({
-      size: "md",
-      variant: "default",
-      defaultCollapsed: false,
-      iconOnly: false,
-      responsive: true,
-      collapseBreakpoint: 992,
-      showCollapseToggle: true,
-      showMobileToggle: true,
-      defaultMobileOpen: false,
-      closeMobileOnSelect: true,
-      sectionSpacing: "0.6rem",
-      sectionPaddingTop: "0.2rem",
-      sectionPaddingBottom: "0rem",
-      showSectionSeparators: true,
-      sectionSeparatorInset: "0.45rem",
-      sectionSeparatorSize: "sm",
-    }),
+function useMobileViewport(breakpoint: number): boolean {
+  const [isMobile, setIsMobile] = useState<boolean>(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    return window.innerWidth <= breakpoint;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    function handleResize(): void {
+      setIsMobile(window.innerWidth <= breakpoint);
+    }
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [breakpoint]);
+
+  return isMobile;
+}
+
+function PagePlaybook(): JSX.Element {
+  const isMobile = useMobileViewport(MOBILE_BREAKPOINT);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [desktopMode, setDesktopMode] =
+    useState<DesktopSidebarMode>("expanded");
+  const [activeItemId, setActiveItemId] = useState<string | undefined>(
+    "dashboard",
+  );
+  const [lastAction, setLastAction] = useState("Ready");
+
+  useEffect(() => {
+    if (!isMobile) {
+      setMobileOpen(false);
+    }
+  }, [isMobile]);
+
+  const sections = useMemo(() => buildSections(!isMobile), [isMobile]);
+
+  const sidebarCollapsed = !isMobile && desktopMode === "icons";
+
+  function cycleDesktopMode(): void {
+    setDesktopMode((current) =>
+      current === "expanded" ? "icons" : "expanded",
+    );
+  }
+
+  function handleSidebarAction(context: SidebarActionContext): void {
+    const label = context.itemLabel ?? context.itemId ?? "n/a";
+    setLastAction(`${context.source}: ${label}`);
+    fallbackOnAction(context);
+
+    if (isMobile && context.source === "item-select") {
+      setMobileOpen(false);
+    }
+  }
+
+  const navbarActions = (
+    <div
+      style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+    >
+      <Button
+        variant="ghost"
+        size="sm"
+        iconOnly
+        aria-label="Theme"
+        tooltip="Theme"
+      >
+        <FiMoon size={14} aria-hidden />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        iconOnly
+        aria-label="Notifications"
+        tooltip="Notifications"
+      >
+        <FiBell size={14} aria-hidden />
+      </Button>
+    </div>
+  );
+
+  return (
+    <div style={pageShellStyle}>
+      {!isMobile ? (
+        <Sidebar
+          sections={sections}
+          size="md"
+          variant="brand-light"
+          brandName="Keytuno"
+          brandTagline="Navigation"
+          showItemIcons
+          open
+          collapsed={sidebarCollapsed}
+          activeItemId={activeItemId}
+          onActiveItemChange={(itemId) => {
+            setActiveItemId(itemId);
+          }}
+          onCollapsedChange={(nextCollapsed) => {
+            setDesktopMode(nextCollapsed ? "icons" : "expanded");
+          }}
+          onAction={handleSidebarAction}
+          style={{
+            position: "relative",
+            zIndex: 2,
+          }}
+        />
+      ) : null}
+
+      <div
+        style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+          minWidth: 0,
+          minHeight: "100vh",
+          backgroundColor: "var(--ktn-bg-default, #f1f4f8)",
+        }}
+      >
+        <Navbar
+          size="md"
+          variant="light"
+          showHamburger
+          showBrand
+          items={[]}
+          emptyText={null}
+          brandLogo={
+            <Badge variant="primary" size="sm">
+              KT
+            </Badge>
+          }
+          brandName="Keytuno"
+          brandTagline="Operations Platform"
+          actions={navbarActions}
+          onHamburgerAction={(event) => {
+            fallbackHamburgerAction(event);
+
+            if (isMobile) {
+              setMobileOpen((current) => !current);
+              return;
+            }
+
+            cycleDesktopMode();
+          }}
+        />
+
+        <main
+          style={{
+            flex: 1,
+            minHeight: 0,
+            minWidth: 0,
+            padding: "1rem 1.05rem",
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.82rem",
+            backgroundColor: "var(--ktn-bg-default, #f1f4f8)",
+          }}
+        >
+          <div
+            style={{
+              border: "1px solid var(--ktn-border-muted)",
+              borderRadius: "0.72rem",
+              backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+              padding: "0.9rem",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "0.6rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <h3 style={{ margin: 0, fontSize: "1rem" }}>
+                Navbar Sidebar Page Playbook
+              </h3>
+              <p
+                style={{
+                  margin: "0.26rem 0 0",
+                  fontSize: "0.82rem",
+                  color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+                }}
+              >
+                Desktop: full and icon modes. Mobile: left slide-in sidebar with
+                outside-click close.
+              </p>
+            </div>
+
+            <Badge variant="secondary" size="sm">
+              {isMobile
+                ? mobileOpen
+                  ? "Mobile: open"
+                  : "Mobile: hidden"
+                : desktopMode === "icons"
+                  ? "Desktop: icons"
+                  : "Desktop: full"}
+            </Badge>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "0.72rem",
+            }}
+          >
+            <Card size="sm" spacing="sm">
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+                <CardDescription>
+                  Showcase buttons in the right page area.
+                </CardDescription>
+              </CardHeader>
+              <CardContent
+                style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}
+              >
+                <Button size="sm">Create Order</Button>
+                <Button size="sm" variant="outline">
+                  Export
+                </Button>
+                <Button size="sm" variant="ghost">
+                  Assign Team
+                </Button>
+              </CardContent>
+              <CardFooter
+                style={{
+                  color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+                }}
+              >
+                Actions remain visible while sidebar changes state.
+              </CardFooter>
+            </Card>
+
+            <Card size="sm" spacing="sm">
+              <CardHeader>
+                <CardTitle>Live Snapshot</CardTitle>
+                <CardDescription>
+                  Operational cards for visual verification.
+                </CardDescription>
+              </CardHeader>
+              <CardContent
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+                  gap: "0.56rem",
+                }}
+              >
+                {["Pending", "Warnings", "Online", "SLA"].map(
+                  (label, index) => (
+                    <div
+                      key={label}
+                      style={{
+                        border: "1px solid var(--ktn-border-muted)",
+                        borderRadius: "0.58rem",
+                        padding: "0.54rem",
+                        backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "0.72rem",
+                          color:
+                            "var(--ktn-text-secondary, var(--ktn-text-primary))",
+                        }}
+                      >
+                        {label}
+                      </div>
+                      <strong style={{ fontSize: "0.95rem" }}>
+                        {index === 0
+                          ? "128"
+                          : index === 1
+                            ? "6"
+                            : index === 2
+                              ? "23"
+                              : "98%"}
+                      </strong>
+                    </div>
+                  ),
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card size="sm" spacing="sm">
+            <CardHeader>
+              <CardTitle>Last Sidebar Action</CardTitle>
+            </CardHeader>
+            <CardContent
+              style={{
+                fontSize: "0.84rem",
+                color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+              }}
+            >
+              {lastAction}
+            </CardContent>
+          </Card>
+        </main>
+      </div>
+
+      {isMobile ? (
+        <>
+          {mobileOpen ? (
+            <button
+              type="button"
+              aria-label="Close sidebar overlay"
+              onClick={() => {
+                setMobileOpen(false);
+              }}
+              style={{
+                position: "fixed",
+                inset: 0,
+                zIndex: 30,
+                border: "none",
+                backgroundColor: "rgba(2, 6, 23, 0.46)",
+                cursor: "pointer",
+              }}
+            />
+          ) : null}
+
+          <Sidebar
+            sections={sections}
+            size="md"
+            variant="light"
+            brandName="Keytuno"
+            brandTagline="Navigation"
+            showItemIcons={false}
+            open
+            collapsed={false}
+            activeItemId={activeItemId}
+            onActiveItemChange={(itemId) => {
+              setActiveItemId(itemId);
+            }}
+            onOpenChange={(nextOpen) => {
+              setMobileOpen(nextOpen);
+            }}
+            onAction={handleSidebarAction}
+            style={{
+              position: "fixed",
+              insetBlockStart: 0,
+              insetBlockEnd: 0,
+              insetInlineStart: 0,
+              transform: mobileOpen
+                ? "translateX(0)"
+                : "translateX(calc(-100% - 1.5rem))",
+              transition: "transform 220ms ease",
+              pointerEvents: mobileOpen ? "auto" : "none",
+              zIndex: 40,
+            }}
+          />
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+function BackdropOverlayPlaybook(): JSX.Element {
+  const isMobile = useMobileViewport(MOBILE_BREAKPOINT);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activeItemId, setActiveItemId] = useState<string | undefined>(
+    "dashboard",
+  );
+  const [lastAction, setLastAction] = useState("Ready");
+
+  const sections = useMemo(() => buildSections(false), []);
+
+  const navbarActions = (
+    <div
+      style={{ display: "inline-flex", alignItems: "center", gap: "0.4rem" }}
+    >
+      <Button
+        variant="ghost"
+        size="sm"
+        iconOnly
+        aria-label="Theme"
+        tooltip="Theme"
+      >
+        <FiMoon size={14} aria-hidden />
+      </Button>
+
+      <Button
+        variant="ghost"
+        size="sm"
+        iconOnly
+        aria-label="Notifications"
+        tooltip="Notifications"
+      >
+        <FiBell size={14} aria-hidden />
+      </Button>
+    </div>
+  );
+
+  function handleSidebarAction(context: SidebarActionContext): void {
+    const label = context.itemLabel ?? context.itemId ?? "n/a";
+    setLastAction(`${context.source}: ${label}`);
+    fallbackOnAction(context);
+
+    if (context.source === "item-select") {
+      setDrawerOpen(false);
+    }
+  }
+
+  return (
+    <div
+      style={{
+        width: "100vw",
+        maxWidth: "100vw",
+        minHeight: "100vh",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "var(--ktn-bg-default, #f1f4f8)",
+        border: "1px solid var(--ktn-border-muted)",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <Navbar
+        size="md"
+        variant="light"
+        showHamburger
+        showBrand
+        items={[]}
+        emptyText={null}
+        brandLogo={
+          <Badge variant="primary" size="sm">
+            KT
+          </Badge>
+        }
+        brandName="Keytuno"
+        brandTagline="Overlay Navigation"
+        actions={navbarActions}
+        onHamburgerAction={(event) => {
+          fallbackHamburgerAction(event);
+          setDrawerOpen((current) => !current);
+        }}
+      />
+
+      <main
+        style={{
+          flex: 1,
+          minHeight: 0,
+          minWidth: 0,
+          padding: "1rem 1.05rem",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.82rem",
+          backgroundColor: "var(--ktn-bg-default, #f1f4f8)",
+        }}
+      >
+        <div
+          style={{
+            border: "1px solid var(--ktn-border-muted)",
+            borderRadius: "0.72rem",
+            backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+            padding: "0.9rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "0.6rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <h3 style={{ margin: 0, fontSize: "1rem" }}>
+              Sidebar Backdrop Overlay Playbook
+            </h3>
+            <p
+              style={{
+                margin: "0.26rem 0 0",
+                fontSize: "0.82rem",
+                color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+              }}
+            >
+              Both web and mobile use backdrop + overlay sidebar. Page content
+              stays fixed and does not shift.
+            </p>
+          </div>
+
+          <Badge variant="secondary" size="sm">
+            {isMobile
+              ? drawerOpen
+                ? "Mobile: open"
+                : "Mobile: hidden"
+              : drawerOpen
+                ? "Desktop: open"
+                : "Desktop: hidden"}
+          </Badge>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+            gap: "0.72rem",
+          }}
+        >
+          <Card size="sm" spacing="sm">
+            <CardHeader>
+              <CardTitle>Overlay Behavior</CardTitle>
+              <CardDescription>
+                Click hamburger to open. Click backdrop to close.
+              </CardDescription>
+            </CardHeader>
+            <CardContent style={{ display: "flex", gap: "0.5rem" }}>
+              <Button size="sm" onAction={() => setDrawerOpen(true)}>
+                Open Sidebar
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onAction={() => setDrawerOpen(false)}
+              >
+                Close Sidebar
+              </Button>
+            </CardContent>
+            <CardFooter
+              style={{
+                color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+              }}
+            >
+              Sidebar is text-only in this playbook (no icons, no icon mode).
+            </CardFooter>
+          </Card>
+
+          <Card size="sm" spacing="sm">
+            <CardHeader>
+              <CardTitle>Current State</CardTitle>
+            </CardHeader>
+            <CardContent
+              style={{
+                fontSize: "0.84rem",
+                color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.34rem",
+              }}
+            >
+              <span>Viewport: {isMobile ? "Mobile" : "Desktop"}</span>
+              <span>Drawer: {drawerOpen ? "Open" : "Hidden"}</span>
+              <span>Last Action: {lastAction}</span>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+
+      {drawerOpen ? (
+        <button
+          type="button"
+          aria-label="Close sidebar overlay"
+          onClick={() => {
+            setDrawerOpen(false);
+          }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 30,
+            border: "none",
+            backgroundColor: "rgba(2, 6, 23, 0.46)",
+            cursor: "pointer",
+          }}
+        />
+      ) : null}
+
+      <Sidebar
+        sections={sections}
+        size={isMobile ? "sm" : "md"}
+        variant={isMobile ? "light" : "brand-light"}
+        brandName="Keytuno"
+        brandTagline="Overlay Sidebar"
+        showItemIcons={false}
+        open
+        collapsed={false}
+        activeItemId={activeItemId}
+        onActiveItemChange={(itemId) => {
+          setActiveItemId(itemId);
+        }}
+        onOpenChange={(nextOpen) => {
+          setDrawerOpen(nextOpen);
+        }}
+        onAction={handleSidebarAction}
+        style={{
+          position: "fixed",
+          insetBlockStart: 0,
+          insetBlockEnd: 0,
+          insetInlineStart: 0,
+          transform: drawerOpen
+            ? "translateX(0)"
+            : "translateX(calc(-100% - 1.5rem))",
+          transition: "transform 220ms ease",
+          pointerEvents: drawerOpen ? "auto" : "none",
+          zIndex: 40,
+        }}
+      />
+    </div>
+  );
+}
+
+export const SidebarMenuAndSubmenuPlaybook: Story = {
+  name: "Sidebar Menu and Submenu Playbook",
+  render: () => (
+    <SidebarPlaybookCanvas
+      args={{
+        size: "md",
+        variant: "default",
+        defaultCollapsed: false,
+        defaultOpen: true,
+        closeOnEscape: true,
+        showItemIcons: true,
+        brandName: "Keytuno",
+        brandTagline: "Navigation",
+      }}
+    />
+  ),
+};
+
+export const SidebarLongListScrollbarPlaybook: Story = {
+  name: "Sidebar Long List Scrollbar Playbook",
+  render: () => (
+    <SidebarPlaybookCanvas
+      args={{
+        size: "md",
+        variant: "brand-light",
+        defaultCollapsed: false,
+        defaultOpen: true,
+        closeOnEscape: true,
+        showItemIcons: true,
+        brandName: "Keytuno",
+        brandTagline: "Large Data",
+      }}
+      useLargeData
+    />
+  ),
+};
+
+export const SidebarVariantPlaybook: Story = {
+  name: "Sidebar Variant Playbook",
+  render: () => (
+    <SidebarPlaybookCanvas
+      args={{
+        size: "md",
+        variant: "brand-dark",
+        defaultCollapsed: false,
+        defaultOpen: true,
+        closeOnEscape: true,
+        showItemIcons: true,
+        brandName: "Keytuno",
+        brandTagline: "Brand Dark",
+      }}
+    />
+  ),
 };
 
 export const SidebarPlayground: Story = {
@@ -602,87 +1261,33 @@ export const SidebarPlayground: Story = {
     size: "md",
     variant: "default",
     defaultCollapsed: false,
-    iconOnly: false,
-    responsive: true,
-    collapseBreakpoint: 992,
-    showCollapseToggle: true,
-    showMobileToggle: true,
-    defaultMobileOpen: false,
-    closeMobileOnSelect: true,
-    sectionSpacing: "0.6rem",
-    sectionPaddingTop: "0.2rem",
-    sectionPaddingBottom: "0rem",
-    showSectionSeparators: true,
-    sectionSeparatorInset: "0.45rem",
-    sectionSeparatorSize: "sm",
-    sectionSeparatorStyle: undefined,
-    renderSectionSeparator: undefined,
+    defaultOpen: true,
+    closeOnEscape: true,
+    showItemIcons: true,
+    brandName: "Keytuno",
+    brandTagline: "Operations",
     onAction: undefined,
     onItemSelect: undefined,
+    onCollapsedChange: undefined,
+    onOpenChange: undefined,
+    onActiveItemChange: undefined,
   },
   argTypes: actionArgTypes,
-  render: (args) => renderSidebar(args),
+  render: (args) => <SidebarPlaybookCanvas args={args} />,
 };
 
-export const ResponsivePlayground: Story = {
-  name: "Responsive Playground",
-  args: {
-    size: "md",
-    variant: "soft",
-    defaultCollapsed: false,
-    iconOnly: false,
-    responsive: true,
-    collapseBreakpoint: 9999,
-    showCollapseToggle: true,
-    showMobileToggle: true,
-    defaultMobileOpen: true,
-    closeMobileOnSelect: true,
-    sectionSpacing: "0.6rem",
-    sectionPaddingTop: "0.2rem",
-    sectionPaddingBottom: "0rem",
-    showSectionSeparators: true,
-    sectionSeparatorInset: "0.45rem",
-    sectionSeparatorSize: "sm",
-    sectionSeparatorStyle: undefined,
-    renderSectionSeparator: undefined,
-    onAction: undefined,
-    onItemSelect: undefined,
+export const NavbarSidebarPagePlaybook: Story = {
+  name: "Navbar Sidebar Page Playbook",
+  parameters: {
+    layout: "fullscreen",
   },
-  argTypes: actionArgTypes,
-  render: (args) =>
-    renderSidebar(args, {
-      collapseBreakpoint: args.collapseBreakpoint,
-    }),
+  render: () => <PagePlaybook />,
 };
 
-export const SeparatorStylePlayground: Story = {
-  name: "Separator Style Playground",
-  args: {
-    size: "md",
-    variant: "outline",
-    defaultCollapsed: false,
-    iconOnly: false,
-    responsive: true,
-    collapseBreakpoint: 1024,
-    showCollapseToggle: true,
-    showMobileToggle: true,
-    defaultMobileOpen: false,
-    closeMobileOnSelect: true,
-    sectionSpacing: "0.72rem",
-    sectionPaddingTop: "0.24rem",
-    sectionPaddingBottom: "0rem",
-    showSectionSeparators: true,
-    sectionSeparatorInset: "0.25rem",
-    sectionSeparatorSize: "sm",
-    sectionSeparatorStyle: {
-      opacity: 0.85,
-    },
-    onAction: undefined,
-    onItemSelect: undefined,
+export const SidebarBackdropOverlayPlaybook: Story = {
+  name: "Sidebar Backdrop Overlay Playbook",
+  parameters: {
+    layout: "fullscreen",
   },
-  argTypes: actionArgTypes,
-  render: (args) =>
-    renderSidebar(args, {
-      separatorStyle: "dashed",
-    }),
+  render: () => <BackdropOverlayPlaybook />,
 };

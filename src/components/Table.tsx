@@ -33,6 +33,7 @@ import {
   FiMinimize2,
   FiRefreshCw,
   FiSearch,
+  FiX,
 } from "./icons/feather";
 
 import { Button, type ButtonProps } from "./Button";
@@ -45,6 +46,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./DropdownMenu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./Dialog";
 import { Input } from "./Input";
 import {
   Pagination,
@@ -72,6 +81,8 @@ export type TableActionSource =
   | "selection"
   | "column-visibility"
   | "column-filters-toggle"
+  | "column-filters-apply"
+  | "column-filters-clear"
   | "refresh"
   | "export"
   | "fullscreen"
@@ -178,6 +189,13 @@ export interface TableProps<TData extends object = object> extends Omit<
   toggleColumnsLabel?: string;
   showFiltersLabel?: string;
   hideFiltersLabel?: string;
+  filterDialogTitle?: string;
+  filterDialogDescription?: string;
+  addFilterLabel?: string;
+  clearFiltersLabel?: string;
+  applyFiltersLabel?: string;
+  globalFilterLabel?: string;
+  globalFilterPlaceholder?: string;
   refreshLabel?: string;
   refreshingLabel?: string;
   fullscreenLabel?: string;
@@ -422,12 +440,261 @@ function splitColumnFilterTerms(filterValue: unknown): string[] {
     .filter((term) => term !== "");
 }
 
-type NumericFilterOperator = "gt" | "lt" | "eq";
+type NumericFilterOperator = "gt" | "gte" | "lt" | "lte" | "eq" | "neq";
+
+type AdvancedFilterOperator =
+  | "contains"
+  | "starts-with"
+  | "ends-with"
+  | "equals"
+  | "not-equals"
+  | "gt"
+  | "gte"
+  | "lt"
+  | "lte";
+
+interface AdvancedFilterRule {
+  id: string;
+  columnId: string;
+  operator: AdvancedFilterOperator;
+  value: string;
+}
+
+type AdvancedFilterOperatorOption = {
+  value: AdvancedFilterOperator;
+  label: string;
+};
+
+const advancedFilterOperatorOptions: AdvancedFilterOperatorOption[] = [
+  { value: "contains", label: "Contains" },
+  { value: "starts-with", label: "Starts with" },
+  { value: "ends-with", label: "Ends with" },
+  { value: "equals", label: "Equals" },
+  { value: "not-equals", label: "Not equals" },
+  { value: "gt", label: "Greater than" },
+  { value: "gte", label: "Greater than or equal" },
+  { value: "lt", label: "Less than" },
+  { value: "lte", label: "Less than or equal" },
+];
+
+const defaultAdvancedFilterOperator: AdvancedFilterOperator = "contains";
 
 type ParsedNumericCondition = {
   operator: NumericFilterOperator;
   value: number;
 };
+
+function createAdvancedFilterRuleId(): string {
+  return `adv-filter-${Date.now().toString(36)}-${Math.random()
+    .toString(36)
+    .slice(2, 9)}`;
+}
+
+function createAdvancedFilterRule(columnId: string): AdvancedFilterRule {
+  return {
+    id: createAdvancedFilterRuleId(),
+    columnId,
+    operator: defaultAdvancedFilterOperator,
+    value: "",
+  };
+}
+
+function toAdvancedFilterToken(
+  operator: AdvancedFilterOperator,
+  rawValue: string,
+): string {
+  const value = rawValue.trim();
+
+  if (value === "") {
+    return "";
+  }
+
+  if (operator === "starts-with") {
+    return `^${value}`;
+  }
+
+  if (operator === "ends-with") {
+    return `${value}$`;
+  }
+
+  if (operator === "equals") {
+    return `=${value}`;
+  }
+
+  if (operator === "not-equals") {
+    return `!=${value}`;
+  }
+
+  if (operator === "gt") {
+    return `>${value}`;
+  }
+
+  if (operator === "gte") {
+    return `>=${value}`;
+  }
+
+  if (operator === "lt") {
+    return `<${value}`;
+  }
+
+  if (operator === "lte") {
+    return `<=${value}`;
+  }
+
+  return `~${value}`;
+}
+
+function parseAdvancedFilterToken(token: string): {
+  operator: AdvancedFilterOperator;
+  value: string;
+} {
+  const normalizedToken = token.trim();
+
+  if (normalizedToken === "") {
+    return {
+      operator: defaultAdvancedFilterOperator,
+      value: "",
+    };
+  }
+
+  if (normalizedToken.startsWith("!=")) {
+    return {
+      operator: "not-equals",
+      value: normalizedToken.slice(2).trim(),
+    };
+  }
+
+  if (normalizedToken.startsWith(">=")) {
+    return {
+      operator: "gte",
+      value: normalizedToken.slice(2).trim(),
+    };
+  }
+
+  if (normalizedToken.startsWith("<=")) {
+    return {
+      operator: "lte",
+      value: normalizedToken.slice(2).trim(),
+    };
+  }
+
+  if (normalizedToken.startsWith(">")) {
+    return {
+      operator: "gt",
+      value: normalizedToken.slice(1).trim(),
+    };
+  }
+
+  if (normalizedToken.startsWith("<")) {
+    return {
+      operator: "lt",
+      value: normalizedToken.slice(1).trim(),
+    };
+  }
+
+  if (normalizedToken.startsWith("=")) {
+    return {
+      operator: "equals",
+      value: normalizedToken.slice(1).trim(),
+    };
+  }
+
+  if (normalizedToken.startsWith("^")) {
+    return {
+      operator: "starts-with",
+      value: normalizedToken.slice(1).trim(),
+    };
+  }
+
+  if (normalizedToken.startsWith("~")) {
+    return {
+      operator: "contains",
+      value: normalizedToken.slice(1).trim(),
+    };
+  }
+
+  if (normalizedToken.endsWith("$")) {
+    return {
+      operator: "ends-with",
+      value: normalizedToken.slice(0, -1).trim(),
+    };
+  }
+
+  return {
+    operator: "contains",
+    value: normalizedToken,
+  };
+}
+
+function extractAdvancedFilterRules(
+  filters: ColumnFiltersState,
+): AdvancedFilterRule[] {
+  const rules: AdvancedFilterRule[] = [];
+
+  filters.forEach((filter) => {
+    if (
+      filter.id === GLOBAL_FILTER_ID ||
+      filter.id === SPECIAL_SELECT_COLUMN_ID ||
+      filter.id === SPECIAL_ACTIONS_COLUMN_ID
+    ) {
+      return;
+    }
+
+    const terms = splitColumnFilterTerms(filter.value);
+
+    terms.forEach((term) => {
+      const parsed = parseAdvancedFilterToken(term);
+
+      rules.push({
+        id: createAdvancedFilterRuleId(),
+        columnId: filter.id,
+        operator: parsed.operator,
+        value: parsed.value,
+      });
+    });
+  });
+
+  return rules;
+}
+
+function buildColumnFiltersFromAdvancedRules(
+  rules: AdvancedFilterRule[],
+): ColumnFiltersState {
+  const groupedByColumn = new Map<string, string[]>();
+
+  rules.forEach((rule) => {
+    const normalizedColumnId = rule.columnId.trim();
+
+    if (
+      normalizedColumnId === "" ||
+      normalizedColumnId === SPECIAL_SELECT_COLUMN_ID ||
+      normalizedColumnId === SPECIAL_ACTIONS_COLUMN_ID ||
+      normalizedColumnId === GLOBAL_FILTER_ID
+    ) {
+      return;
+    }
+
+    const token = toAdvancedFilterToken(rule.operator, rule.value);
+
+    if (token === "") {
+      return;
+    }
+
+    const existingTokens = groupedByColumn.get(normalizedColumnId);
+
+    if (existingTokens == null) {
+      groupedByColumn.set(normalizedColumnId, [token]);
+      return;
+    }
+
+    existingTokens.push(token);
+  });
+
+  return Array.from(groupedByColumn.entries()).map(([columnId, terms]) => ({
+    id: columnId,
+    value: terms.join(","),
+  }));
+}
 
 function parseNumericFilterCondition(
   term: string,
@@ -439,7 +706,7 @@ function parseNumericFilterCondition(
   }
 
   const prefixedMatch = normalizedTerm.match(
-    /^([><=])\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/,
+    /^(>=|<=|!=|>|<|=)\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/,
   );
 
   if (prefixedMatch != null) {
@@ -457,9 +724,30 @@ function parseNumericFilterCondition(
       };
     }
 
+    if (operatorToken === ">=") {
+      return {
+        operator: "gte",
+        value: numericValue,
+      };
+    }
+
     if (operatorToken === "<") {
       return {
         operator: "lt",
+        value: numericValue,
+      };
+    }
+
+    if (operatorToken === "<=") {
+      return {
+        operator: "lte",
+        value: numericValue,
+      };
+    }
+
+    if (operatorToken === "!=") {
+      return {
+        operator: "neq",
         value: numericValue,
       };
     }
@@ -515,6 +803,16 @@ function matchesStringCondition(source: string, term: string): boolean {
     return true;
   }
 
+  if (normalizedTerm.startsWith("!=")) {
+    const expected = normalizedTerm.slice(2).trim().toLowerCase();
+
+    if (expected === "") {
+      return true;
+    }
+
+    return normalizedSource !== expected;
+  }
+
   if (normalizedTerm.startsWith("=")) {
     const expected = normalizedTerm.slice(1).trim().toLowerCase();
 
@@ -566,8 +864,20 @@ function matchesNumericCondition(
     return value > condition.value;
   }
 
+  if (condition.operator === "gte") {
+    return value >= condition.value;
+  }
+
   if (condition.operator === "lt") {
     return value < condition.value;
+  }
+
+  if (condition.operator === "lte") {
+    return value <= condition.value;
+  }
+
+  if (condition.operator === "neq") {
+    return value !== condition.value;
   }
 
   return value === condition.value;
@@ -599,31 +909,6 @@ function matchesAdvancedColumnFilter(
 
     return matchesStringCondition(stringCellValue, term);
   });
-}
-
-function resolveColumnFilterPlaceholder<TData extends object>(
-  column: Column<TData, unknown>,
-  rows: Row<TData>[],
-): string {
-  for (const row of rows) {
-    const rowValue = row.getValue(column.id);
-
-    if (rowValue == null) {
-      continue;
-    }
-
-    if (typeof rowValue === "string" && rowValue.trim() === "") {
-      continue;
-    }
-
-    if (toFiniteNumber(rowValue) != null) {
-      return ">,<,= num (e.g. >10,=25)";
-    }
-
-    break;
-  }
-
-  return "^$~= text (e.g. ^abc,abc$,~abc,=abc)";
 }
 
 function toCompactTableSize(size: TableSize): TableSize {
@@ -814,6 +1099,13 @@ export function Table<TData extends object = object>({
   toggleColumnsLabel = "Toggle Columns",
   showFiltersLabel = "Show filters",
   hideFiltersLabel = "Hide filters",
+  filterDialogTitle = "Advanced column filters",
+  filterDialogDescription = "Build multiple per-column rules with operators, then apply or clear in one place.",
+  addFilterLabel = "Add filter",
+  clearFiltersLabel = "Clear filters",
+  applyFiltersLabel = "Apply filters",
+  globalFilterLabel = "Global search",
+  globalFilterPlaceholder = "Search all columns",
   refreshLabel = "Refresh",
   refreshingLabel = "Refreshing",
   fullscreenLabel = "Fullscreen",
@@ -916,7 +1208,12 @@ export function Table<TData extends object = object>({
   const [exportingFormat, setExportingFormat] =
     useState<TableExportFormat | null>(null);
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-  const [showColumnFilterRow, setShowColumnFilterRow] = useState(false);
+  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [advancedFilterDraftRules, setAdvancedFilterDraftRules] = useState<
+    AdvancedFilterRule[]
+  >([]);
+  const [advancedFilterDraftSearch, setAdvancedFilterDraftSearch] =
+    useState("");
   const isFullscreenMode = fullscreen && isFullscreenActive;
 
   useEffect(() => {
@@ -1415,6 +1712,176 @@ export function Table<TData extends object = object>({
         column.id !== SPECIAL_ACTIONS_COLUMN_ID,
     );
 
+  const filterableColumns = table.getAllLeafColumns().filter((column) => {
+    if (
+      column.id === SPECIAL_SELECT_COLUMN_ID ||
+      column.id === SPECIAL_ACTIONS_COLUMN_ID
+    ) {
+      return false;
+    }
+
+    if (!column.getCanFilter()) {
+      return false;
+    }
+
+    if (columnFilters == null || columnFilters.length === 0) {
+      return true;
+    }
+
+    return filterableColumnSet.has(column.id);
+  });
+
+  const firstFilterableColumnId = filterableColumns[0]?.id ?? "";
+
+  const activeColumnFilterCount = columnFilterState.reduce((count, filter) => {
+    if (filter.id === GLOBAL_FILTER_ID) {
+      return count;
+    }
+
+    return count + splitColumnFilterTerms(filter.value).length;
+  }, 0);
+
+  const hasActiveGlobalSearch =
+    canUseGlobalFilter && globalSearch.trim() !== "";
+  const totalActiveAdvancedFilters =
+    activeColumnFilterCount + (hasActiveGlobalSearch ? 1 : 0);
+
+  function getInitialAdvancedFilterRules(): AdvancedFilterRule[] {
+    const allowedColumnIds = new Set(
+      filterableColumns.map((column) => column.id),
+    );
+
+    const nextRules = extractAdvancedFilterRules(columnFilterState).filter(
+      (rule) => allowedColumnIds.has(rule.columnId),
+    );
+
+    if (nextRules.length > 0) {
+      return nextRules;
+    }
+
+    if (firstFilterableColumnId === "") {
+      return [];
+    }
+
+    return [createAdvancedFilterRule(firstFilterableColumnId)];
+  }
+
+  function handleAdvancedFilterDialogOpen(): void {
+    if (!filterable || filterableColumns.length === 0) {
+      return;
+    }
+
+    setAdvancedFilterDraftRules(getInitialAdvancedFilterRules());
+    setAdvancedFilterDraftSearch(globalSearch);
+    setIsFilterDialogOpen(true);
+
+    onAction?.({
+      source: "column-filters-toggle",
+      showColumnFilters: true,
+    });
+  }
+
+  function handleAdvancedFilterDialogOpenChange(nextOpen: boolean): void {
+    setIsFilterDialogOpen(nextOpen);
+
+    if (!nextOpen) {
+      onAction?.({
+        source: "column-filters-toggle",
+        showColumnFilters: false,
+      });
+    }
+  }
+
+  function handleAdvancedFilterRuleAdd(): void {
+    if (firstFilterableColumnId === "") {
+      return;
+    }
+
+    setAdvancedFilterDraftRules((current) => [
+      ...current,
+      createAdvancedFilterRule(firstFilterableColumnId),
+    ]);
+  }
+
+  function handleAdvancedFilterRuleChange(
+    ruleId: string,
+    changes: Partial<Omit<AdvancedFilterRule, "id">>,
+  ): void {
+    setAdvancedFilterDraftRules((current) =>
+      current.map((rule) =>
+        rule.id === ruleId
+          ? {
+              ...rule,
+              ...changes,
+            }
+          : rule,
+      ),
+    );
+  }
+
+  function handleAdvancedFilterRuleReset(ruleId: string): void {
+    setAdvancedFilterDraftRules((current) => {
+      if (current.length <= 1) {
+        return current.map((rule) =>
+          rule.id === ruleId
+            ? {
+                ...rule,
+                operator: defaultAdvancedFilterOperator,
+                value: "",
+              }
+            : rule,
+        );
+      }
+
+      return current.filter((rule) => rule.id !== ruleId);
+    });
+  }
+
+  function applyAdvancedFiltersFromDialog(): void {
+    const nextColumnFilters = buildColumnFiltersFromAdvancedRules(
+      advancedFilterDraftRules,
+    );
+
+    table.setColumnFilters(nextColumnFilters);
+
+    if (canUseGlobalFilter) {
+      table.setGlobalFilter(advancedFilterDraftSearch);
+    }
+
+    setIsFilterDialogOpen(false);
+
+    onAction?.({
+      source: "column-filters-apply",
+      filters: buildExternalFilterState(
+        nextColumnFilters,
+        canUseGlobalFilter ? advancedFilterDraftSearch : globalSearch,
+      ),
+      search: canUseGlobalFilter ? advancedFilterDraftSearch : undefined,
+    });
+  }
+
+  function clearAdvancedFilters(): void {
+    const fallbackRules =
+      firstFilterableColumnId === ""
+        ? []
+        : [createAdvancedFilterRule(firstFilterableColumnId)];
+
+    setAdvancedFilterDraftRules(fallbackRules);
+    setAdvancedFilterDraftSearch("");
+
+    table.setColumnFilters([]);
+
+    if (canUseGlobalFilter) {
+      table.setGlobalFilter("");
+    }
+
+    onAction?.({
+      source: "column-filters-clear",
+      filters: [],
+      search: "",
+    });
+  }
+
   const resolvedExportFormats = useMemo(() => {
     const requestedFormats =
       exportFormats.length > 0 ? exportFormats : [...DEFAULT_EXPORT_FORMATS];
@@ -1585,9 +2052,8 @@ export function Table<TData extends object = object>({
     minWidth: 0,
     display: "flex",
     flexDirection: "column",
-    gap: "0.55rem",
+    gap: "0.45rem",
     boxSizing: "border-box",
-    color: colorToken.textColor,
     fontSize: sizeToken.tableFontSize,
     position: isFullscreenMode ? "fixed" : undefined,
     inset: isFullscreenMode ? "1rem" : undefined,
@@ -1636,7 +2102,7 @@ export function Table<TData extends object = object>({
     justifyContent: "space-between",
     flexWrap: "wrap",
     gap: sizeToken.toolbarGap,
-    padding: "0.25rem 0.2rem",
+    padding: "0.12rem 0",
   };
 
   const toolbarLeftStyle: CSSProperties = {
@@ -1672,11 +2138,11 @@ export function Table<TData extends object = object>({
 
   const searchWrapStyle: CSSProperties = {
     position: "relative",
-    flex: "1 1 10rem",
+    flex: "1 1 9rem",
     width: "100%",
     boxSizing: "border-box",
     minInlineSize: 0,
-    inlineSize: "min(18rem, 100%)",
+    inlineSize: "clamp(10rem, 28vw, 15rem)",
     maxWidth: "100%",
     minWidth: 0,
   };
@@ -1748,15 +2214,6 @@ export function Table<TData extends object = object>({
     zIndex: stickyHeader ? 4 : undefined,
   };
 
-  const filterCellStyle: CSSProperties = {
-    padding: "0.35rem 0.45rem",
-    backgroundColor: colorToken.rootBackgroundColor,
-    borderBottom:
-      resolvedVariant === "ghost"
-        ? undefined
-        : `1px solid ${colorToken.rowBorderColor}`,
-  };
-
   const tableBodyCellStyle: CSSProperties = {
     padding: sizeToken.cellPadding,
     textAlign: "left",
@@ -1807,7 +2264,66 @@ export function Table<TData extends object = object>({
     paddingBlock: "0.7rem",
   };
 
-  const actionsColumnRightPadding = "1.35rem";
+  const actionsColumnRightPadding = "0.72rem";
+
+  const filterDialogBodyStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.72rem",
+    minWidth: 0,
+  };
+
+  const filterDialogTopRowStyle: CSSProperties = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "0.5rem",
+    flexWrap: "wrap",
+  };
+
+  const filterDialogRulesWrapStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+  };
+
+  const filterDialogRuleRowStyle: CSSProperties = {
+    display: "grid",
+    gridTemplateColumns:
+      "minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(0, 1.8fr) auto",
+    gap: "0.42rem",
+    alignItems: "center",
+    width: "100%",
+    minWidth: 0,
+  };
+
+  const filterDialogSelectStyle: CSSProperties = {
+    width: "100%",
+    minWidth: 0,
+    height: "2.05rem",
+    border: `1px solid ${colorToken.borderColor}`,
+    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: colorToken.textColor,
+    fontSize: "0.83rem",
+    paddingInline: "0.55rem",
+    boxSizing: "border-box",
+  };
+
+  const filterDialogRuleHintStyle: CSSProperties = {
+    margin: 0,
+    fontSize: "0.76rem",
+    color: colorToken.mutedTextColor,
+  };
+
+  const filterDialogFooterStyle: CSSProperties = {
+    display: "flex",
+    width: "100%",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: "0.5rem",
+    flexWrap: "wrap",
+  };
 
   function renderSortIcon(column: Column<TData, unknown>): ReactNode {
     const state = column.getIsSorted();
@@ -1850,9 +2366,12 @@ export function Table<TData extends object = object>({
   }
 
   const headerGroups = table.getHeaderGroups();
-  const leafHeaderGroup =
-    headerGroups.length > 0 ? headerGroups[headerGroups.length - 1] : null;
-  const preFilteredRows = table.getPreFilteredRowModel().rows;
+  const showAdvancedFilterTrigger = filterable && filterableColumns.length > 0;
+  const filterTriggerLabel = isFilterDialogOpen
+    ? hideFiltersLabel
+    : totalActiveAdvancedFilters > 0
+      ? `${showFiltersLabel} (${totalActiveAdvancedFilters} active)`
+      : showFiltersLabel;
 
   return (
     <div
@@ -1890,30 +2409,21 @@ export function Table<TData extends object = object>({
           </div>
 
           <div style={toolbarRightStyle}>
-            {filterable ? (
+            {showAdvancedFilterTrigger ? (
               <Button
                 size={sizeToken.controlSize}
-                variant={showColumnFilterRow ? "primary" : "outline"}
-                iconOnly
-                tooltip={
-                  showColumnFilterRow ? hideFiltersLabel : showFiltersLabel
+                variant={
+                  isFilterDialogOpen || totalActiveAdvancedFilters > 0
+                    ? "primary"
+                    : "outline"
                 }
+                iconOnly
+                tooltip={filterTriggerLabel}
                 tooltipSide="top"
                 tooltipSize="xs"
-                aria-label={
-                  showColumnFilterRow ? hideFiltersLabel : showFiltersLabel
-                }
+                aria-label={filterTriggerLabel}
                 onClick={() => {
-                  setShowColumnFilterRow((current) => {
-                    const next = !current;
-
-                    onAction?.({
-                      source: "column-filters-toggle",
-                      showColumnFilters: next,
-                    });
-
-                    return next;
-                  });
+                  handleAdvancedFilterDialogOpen();
                 }}
               >
                 <FiFilter size={sizeToken.iconSize} />
@@ -2143,58 +2653,6 @@ export function Table<TData extends object = object>({
                   })}
                 </tr>
               ))}
-
-              {filterable && showColumnFilterRow && leafHeaderGroup != null ? (
-                <tr>
-                  {leafHeaderGroup.headers.map((header) => {
-                    const headerId = header.column.id;
-                    const canFilterColumn =
-                      header.column.getCanFilter() &&
-                      headerId !== SPECIAL_SELECT_COLUMN_ID &&
-                      headerId !== SPECIAL_ACTIONS_COLUMN_ID;
-
-                    const resolvedCanFilter =
-                      canFilterColumn &&
-                      (columnFilters == null ||
-                        columnFilters.length === 0 ||
-                        filterableColumnSet.has(headerId));
-
-                    const filterValue = header.column.getFilterValue();
-
-                    return (
-                      <th
-                        key={`filter-${header.id}`}
-                        style={{
-                          ...filterCellStyle,
-                          paddingInlineEnd:
-                            header.column.id === SPECIAL_ACTIONS_COLUMN_ID
-                              ? actionsColumnRightPadding
-                              : undefined,
-                        }}
-                      >
-                        {resolvedCanFilter ? (
-                          <Input
-                            size={sizeToken.controlSize}
-                            value={
-                              typeof filterValue === "string" ? filterValue : ""
-                            }
-                            placeholder={resolveColumnFilterPlaceholder(
-                              header.column,
-                              preFilteredRows,
-                            )}
-                            aria-label={`Filter ${toHeaderLabel(header.column)}`}
-                            onChange={(event) => {
-                              header.column.setFilterValue(
-                                event.currentTarget.value,
-                              );
-                            }}
-                          />
-                        ) : null}
-                      </th>
-                    );
-                  })}
-                </tr>
-              ) : null}
             </thead>
 
             <tbody>
@@ -2316,6 +2774,181 @@ export function Table<TData extends object = object>({
           </table>
         </div>
       </div>
+
+      {showAdvancedFilterTrigger ? (
+        <Dialog
+          open={isFilterDialogOpen}
+          onOpenChange={handleAdvancedFilterDialogOpenChange}
+          variant="outline"
+          size="lg"
+          closeOnEscape
+          closeOnOverlayClick
+        >
+          <DialogContent
+            scrollable
+            maxContentHeight="min(86vh, 38rem)"
+            style={{ width: "min(100%, 56rem)", maxWidth: "56rem" }}
+          >
+            <DialogHeader>
+              <DialogTitle>{filterDialogTitle}</DialogTitle>
+              <DialogDescription>{filterDialogDescription}</DialogDescription>
+            </DialogHeader>
+
+            <div style={filterDialogBodyStyle}>
+              {canUseGlobalFilter ? (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.32rem",
+                  }}
+                >
+                  <label
+                    style={{
+                      fontSize: "0.82rem",
+                      fontWeight: 600,
+                      color: colorToken.textColor,
+                    }}
+                  >
+                    {globalFilterLabel}
+                  </label>
+                  <Input
+                    size={sizeToken.controlSize}
+                    value={advancedFilterDraftSearch}
+                    placeholder={globalFilterPlaceholder}
+                    aria-label={globalFilterLabel}
+                    onChange={(event) => {
+                      setAdvancedFilterDraftSearch(event.currentTarget.value);
+                    }}
+                  />
+
+                  <p style={filterDialogRuleHintStyle}>
+                    Applies across all visible table columns.
+                  </p>
+                </div>
+              ) : null}
+
+              <div style={filterDialogTopRowStyle}>
+                <strong
+                  style={{
+                    fontSize: "0.84rem",
+                    color: colorToken.textColor,
+                  }}
+                >
+                  Column rules
+                </strong>
+
+                <Button
+                  size={sizeToken.controlSize}
+                  variant="outline"
+                  onClick={() => {
+                    handleAdvancedFilterRuleAdd();
+                  }}
+                >
+                  + {addFilterLabel}
+                </Button>
+              </div>
+
+              <div style={filterDialogRulesWrapStyle}>
+                {advancedFilterDraftRules.map((rule, index) => (
+                  <div key={rule.id} style={filterDialogRuleRowStyle}>
+                    <select
+                      value={rule.columnId}
+                      aria-label={`Filter column ${index + 1}`}
+                      style={filterDialogSelectStyle}
+                      onChange={(event) => {
+                        handleAdvancedFilterRuleChange(rule.id, {
+                          columnId: event.currentTarget.value,
+                        });
+                      }}
+                    >
+                      {filterableColumns.map((column) => (
+                        <option key={column.id} value={column.id}>
+                          {toHeaderLabel(column)}
+                        </option>
+                      ))}
+                    </select>
+
+                    <select
+                      value={rule.operator}
+                      aria-label={`Filter operator ${index + 1}`}
+                      style={filterDialogSelectStyle}
+                      onChange={(event) => {
+                        handleAdvancedFilterRuleChange(rule.id, {
+                          operator: event.currentTarget
+                            .value as AdvancedFilterOperator,
+                        });
+                      }}
+                    >
+                      {advancedFilterOperatorOptions.map((operator) => (
+                        <option key={operator.value} value={operator.value}>
+                          {operator.label}
+                        </option>
+                      ))}
+                    </select>
+
+                    <Input
+                      size={sizeToken.controlSize}
+                      value={rule.value}
+                      placeholder="Enter value"
+                      aria-label={`Filter value ${index + 1}`}
+                      onChange={(event) => {
+                        handleAdvancedFilterRuleChange(rule.id, {
+                          value: event.currentTarget.value,
+                        });
+                      }}
+                    />
+
+                    <Button
+                      size={sizeToken.controlSize}
+                      variant="ghost"
+                      iconOnly
+                      iconOnlyTone
+                      tooltip="Reset this filter"
+                      tooltipSide="top"
+                      tooltipSize="xs"
+                      aria-label={`Reset filter ${index + 1}`}
+                      onAction={() => {
+                        handleAdvancedFilterRuleReset(rule.id);
+                      }}
+                    >
+                      <FiX size={sizeToken.iconSize} />
+                    </Button>
+                  </div>
+                ))}
+
+                {advancedFilterDraftRules.length === 0 ? (
+                  <p style={filterDialogRuleHintStyle}>
+                    Add a filter row to start applying per-column rules.
+                  </p>
+                ) : null}
+              </div>
+            </div>
+
+            <DialogFooter style={filterDialogFooterStyle} sticky>
+              <Button
+                size={sizeToken.controlSize}
+                variant="outline"
+                onAction={() => {
+                  clearAdvancedFilters();
+                }}
+              >
+                {clearFiltersLabel}
+              </Button>
+
+              <Button
+                size={sizeToken.controlSize}
+                variant="primary"
+                onAction={() => {
+                  applyAdvancedFiltersFromDialog();
+                }}
+              >
+                {applyFiltersLabel}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      ) : null}
 
       {showPagination ? (
         <Pagination

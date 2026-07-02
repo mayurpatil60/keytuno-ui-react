@@ -1,1 +1,0 @@
-import{darkTheme as m}from"./dark";import{lightTheme as o}from"./light";const r={dark:m,light:o};function T(e,t="default"){return{...r[e],mode:t}}const c=["default"];export{T as resolveTheme,c as themeSubthemeModes};

@@ -52,7 +52,6 @@ export interface DialogProps extends Omit<
   onAction?: (context: DialogActionContext) => void;
   trigger?: ReactNode;
   variant?: DialogVariant;
-  varient?: DialogVariant;
   size?: DialogSize;
   disabled?: boolean;
   closeOnOverlayClick?: boolean;
@@ -283,7 +282,6 @@ export function Dialog({
   onAction,
   trigger,
   variant,
-  varient,
   size = "md",
   disabled = false,
   closeOnOverlayClick = true,
@@ -292,7 +290,7 @@ export function Dialog({
   style,
   ...props
 }: DialogProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? "primary";
+  const resolvedVariant = variant ?? "primary";
   const isControlled = open !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const isOpen = isControlled ? open === true : uncontrolledOpen;
@@ -576,7 +574,7 @@ export function DialogContent({
   children,
   showCloseButton = true,
   scrollable = false,
-  maxContentHeight = "70vh",
+  maxContentHeight = "min(86vh, 40rem)",
   closeButtonLabel = "Close dialog",
   className = "",
   style,
@@ -621,6 +619,11 @@ export function DialogContent({
     bodyChildren.push(child);
   });
 
+  const hasHeaderBodySeparation =
+    headerChildren.length > 0 && bodyChildren.length > 0;
+  const hasFooterBodySeparation =
+    footerChildren.length > 0 && bodyChildren.length > 0;
+
   function closeDialog(event?: unknown): void {
     if (!disabled) {
       setOpen(false, "close-button", event);
@@ -660,11 +663,16 @@ export function DialogContent({
     );
   }
 
+  const resolvedMaxContentHeight = `min(${maxContentHeight}, calc(100vh - 2.5rem))`;
+  const sectionSpacing = scrollable
+    ? `calc(${sizeToken.sectionGap} + 0.18rem)`
+    : sizeToken.sectionGap;
+
   const contentStyle: CSSProperties = {
     position: "relative",
     pointerEvents: "auto",
     width: `min(100%, ${sizeToken.maxWidth})`,
-    maxHeight: scrollable ? maxContentHeight : undefined,
+    maxHeight: scrollable ? resolvedMaxContentHeight : undefined,
     overflow: scrollable ? "hidden" : undefined,
     borderWidth: "1px",
     borderStyle: "solid",
@@ -675,13 +683,25 @@ export function DialogContent({
     color: "var(--ktn-text-primary)",
     display: "flex",
     flexDirection: "column",
-    gap: sizeToken.sectionGap,
+    gap: sectionSpacing,
     padding: sizeToken.sectionPadding,
     fontSize: sizeToken.bodyFontSize,
     lineHeight: 1.5,
     opacity: disabled ? 0.72 : 1,
     ["--ktn-dialog-close-space" as string]: showCloseButton
       ? `calc(${sizeToken.closeButtonSize} + 0.5rem)`
+      : "0px",
+    ["--ktn-dialog-header-divider" as string]: hasHeaderBodySeparation
+      ? "1px solid var(--ktn-border-muted)"
+      : "none",
+    ["--ktn-dialog-header-divider-space" as string]: hasHeaderBodySeparation
+      ? "0.5rem"
+      : "0px",
+    ["--ktn-dialog-footer-divider" as string]: hasFooterBodySeparation
+      ? "1px solid var(--ktn-border-muted)"
+      : "none",
+    ["--ktn-dialog-footer-divider-space" as string]: hasFooterBodySeparation
+      ? "0.5rem"
       : "0px",
     ...style,
   };
@@ -702,6 +722,7 @@ export function DialogContent({
     display: "flex",
     flexDirection: "column",
     gap: sizeToken.sectionGap,
+    flexShrink: 0,
     minWidth: 0,
     width: "100%",
   };
@@ -712,9 +733,24 @@ export function DialogContent({
       ? {
           flex: 1,
           minHeight: 0,
-          paddingInlineEnd: "0.2rem",
+          paddingBlock: "0.1rem",
         }
       : {}),
+  };
+
+  const bodyScrollbarStyle: CSSProperties = {
+    ...bodySectionStyle,
+    boxSizing: "border-box",
+    paddingInlineStart: "0.1rem",
+    paddingInlineEnd: "0.4rem",
+  };
+
+  const bodyContentStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: sizeToken.sectionGap,
+    minWidth: 0,
+    width: "100%",
   };
 
   return (
@@ -744,11 +780,13 @@ export function DialogContent({
 
       {bodyChildren.length > 0 ? (
         scrollable ? (
-          <Scrollbar axis="y" style={bodySectionStyle}>
-            {bodyChildren}
+          <Scrollbar axis="y" style={bodyScrollbarStyle}>
+            <div style={bodyContentStyle}>{bodyChildren}</div>
           </Scrollbar>
         ) : (
-          <div style={bodySectionStyle}>{bodyChildren}</div>
+          <div style={bodySectionStyle}>
+            <div style={bodyContentStyle}>{bodyChildren}</div>
+          </div>
         )
       ) : null}
 
@@ -775,6 +813,8 @@ export function DialogHeader({
     gap: "0.25rem",
     margin: 0,
     paddingInlineEnd: "var(--ktn-dialog-close-space, 0px)",
+    paddingBlockEnd: "var(--ktn-dialog-header-divider-space, 0px)",
+    borderBottom: "var(--ktn-dialog-header-divider, none)",
     ...style,
   };
 
@@ -870,11 +910,11 @@ export function DialogFooter({
     boxSizing: "border-box",
     gap: sizeToken.footerGap,
     marginTop: "0.15rem",
+    paddingBlockStart: "var(--ktn-dialog-footer-divider-space, 0px)",
+    borderTop: "var(--ktn-dialog-footer-divider, none)",
     ...(sticky
       ? {
           backgroundColor: variantToken.backgroundColor,
-          paddingBlockStart: "0.65rem",
-          borderTop: "1px solid var(--ktn-border-muted)",
         }
       : {}),
     ...style,

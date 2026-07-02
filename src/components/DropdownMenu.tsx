@@ -18,6 +18,7 @@ import { createPortal } from "react-dom";
 import { FiCheck, FiChevronRight } from "./icons/feather";
 
 import { Button } from "./Button";
+import { Scrollbar } from "./Scrollbar";
 
 export type DropdownMenuVariant = "default" | "outline" | "soft";
 export type DropdownMenuSize = "xs" | "sm" | "md" | "lg";
@@ -51,7 +52,6 @@ export interface DropdownMenuProps extends Omit<
   onAction?: (context: DropdownMenuActionContext) => void;
   size?: DropdownMenuSize;
   variant?: DropdownMenuVariant;
-  varient?: DropdownMenuVariant;
   side?: DropdownMenuSide;
   itemLayout?: DropdownMenuItemLayout;
   closeOnSelect?: boolean;
@@ -618,14 +618,7 @@ function getPanelStyle(
     flexDirection: itemLayout === "block" ? "column" : undefined,
     alignItems: itemLayout === "block" ? "stretch" : undefined,
     maxWidth: `calc(100vw - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
-    maxHeight: `calc(100vh - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
-    overflowY: visible ? "auto" : "hidden",
-    overflowX: "hidden",
-    overscrollBehavior: "contain",
-    scrollbarGutter: "stable both-edges",
-    scrollbarWidth: "thin",
-    scrollbarColor:
-      "color-mix(in srgb, var(--ktn-text-secondary, #94a3b8) 58%, transparent) transparent",
+    overflow: "hidden",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: variantToken.panelBorderColor,
@@ -647,7 +640,6 @@ export function DropdownMenu({
   onAction,
   size = "md",
   variant,
-  varient,
   side = "auto",
   itemLayout = "block",
   closeOnSelect = true,
@@ -656,7 +648,7 @@ export function DropdownMenu({
   style,
   ...props
 }: DropdownMenuProps): JSX.Element {
-  const resolvedVariant = variant ?? varient ?? "default";
+  const resolvedVariant = variant ?? "default";
   const isControlled = open !== undefined;
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
   const triggerRef = useRef<HTMLDivElement | null>(null);
@@ -1038,6 +1030,13 @@ export function DropdownMenuContent({
     ...style,
   };
 
+  const viewportStyle: CSSProperties = {
+    maxHeight: `calc(100vh - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
+    maxWidth: `calc(100vw - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
+    overscrollBehavior: "contain",
+    scrollbarGutter: "stable both-edges",
+  };
+
   const portalNode = renderPortal(
     <div
       ref={contentRef}
@@ -1121,7 +1120,14 @@ export function DropdownMenuContent({
         focusableItems[previousIndex]?.focus();
       }}
     >
-      {children}
+      <Scrollbar
+        axis="y"
+        role="presentation"
+        tabIndex={-1}
+        style={viewportStyle}
+      >
+        {children}
+      </Scrollbar>
     </div>,
   );
 
@@ -1506,6 +1512,13 @@ export function DropdownMenuItem({
     isSubmenuReady,
   );
 
+  const submenuViewportStyle: CSSProperties = {
+    maxHeight: `calc(100vh - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
+    maxWidth: `calc(100vw - ${FLOATING_VIEWPORT_MARGIN * 2}px)`,
+    overscrollBehavior: "contain",
+    scrollbarGutter: "stable both-edges",
+  };
+
   return (
     <>
       <button
@@ -1627,7 +1640,14 @@ export function DropdownMenuItem({
                 }
               }}
             >
-              {submenu}
+              <Scrollbar
+                axis="y"
+                role="presentation"
+                tabIndex={-1}
+                style={submenuViewportStyle}
+              >
+                {submenu}
+              </Scrollbar>
             </div>,
           )
         : null}

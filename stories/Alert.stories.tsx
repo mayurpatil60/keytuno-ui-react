@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   Alert,
@@ -17,7 +17,7 @@ import {
   type AlertSize,
   type AlertVariant,
   type AlertViewportInset,
-} from '@keytuno/ui-react';
+} from "../src/index";
 
 type PlaygroundArgs = {
   withAction?: boolean;
@@ -26,7 +26,7 @@ type PlaygroundArgs = {
 };
 
 type AlertPlaygroundArgs = PlaygroundArgs & {
-  varient: AlertVariant;
+  variant: AlertVariant;
   side: AlertSide;
   size: AlertSize;
   duration: number;
@@ -36,14 +36,14 @@ type AlertPlaygroundArgs = PlaygroundArgs & {
 };
 
 type AlertStackPlaygroundArgs = PlaygroundArgs & {
-  varient: AlertVariant;
+  variant: AlertVariant;
   side: AlertSide;
   size: AlertSize;
   duration: number;
 };
 
 type AlertSideGuidePlaygroundArgs = PlaygroundArgs & {
-  varient: AlertVariant;
+  variant: AlertVariant;
   size: AlertSize;
   duration: number;
 };
@@ -57,7 +57,7 @@ type AlertVariantPageArgs = PlaygroundArgs & {
 };
 
 type AlertSizePageArgs = PlaygroundArgs & {
-  varient: AlertVariant;
+  variant: AlertVariant;
   side: AlertSide;
   duration: number;
   actionRequired: boolean;
@@ -65,12 +65,12 @@ type AlertSizePageArgs = PlaygroundArgs & {
 };
 
 type AlertSideDebugPlaygroundArgs = PlaygroundArgs & {
-  varient: AlertVariant;
+  variant: AlertVariant;
   size: AlertSize;
   duration: number;
   actionRequired: boolean;
   closeOnEscape: boolean;
-  areaMode: 'full-viewport' | 'custom-area';
+  areaMode: "full-viewport" | "custom-area";
   insetTop: number;
   insetRight: number;
   insetBottom: number;
@@ -78,7 +78,7 @@ type AlertSideDebugPlaygroundArgs = PlaygroundArgs & {
 };
 
 type AlertCustomColorPlaygroundArgs = PlaygroundArgs & {
-  varient: AlertVariant;
+  variant: AlertVariant;
   side: AlertSide;
   size: AlertSize;
   duration: number;
@@ -92,31 +92,31 @@ type AlertCustomColorPlaygroundArgs = PlaygroundArgs & {
 };
 
 const variantOptions: AlertVariant[] = [
-  'primary',
-  'secondary',
-  'destructive',
-  'outline',
-  'link',
-  'compact',
+  "primary",
+  "secondary",
+  "destructive",
+  "outline",
+  "link",
+  "compact",
 ];
 
 const sideOptions: AlertSide[] = [
-  'top-left',
-  'bottom-left',
-  'bottom-right',
-  'top-right',
-  'bottom-center',
-  'top-center',
+  "top-left",
+  "bottom-left",
+  "bottom-right",
+  "top-right",
+  "bottom-center",
+  "top-center",
 ];
 
-const sizeOptions: AlertSize[] = ['xs', 'sm', 'md', 'lg'];
+const sizeOptions: AlertSize[] = ["xs", "sm", "md", "lg"];
 
 const meta: Meta<typeof Alert> = {
-  title: 'Feedback/Alert',
+  title: "Feedback/Alert",
   component: Alert,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -125,104 +125,110 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.9rem',
-  width: 'min(820px, 94vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.9rem",
+  width: "min(820px, 94vw)",
 };
 
 const frameStyle: CSSProperties = {
-  width: 'min(620px, 94vw)',
+  width: "min(620px, 94vw)",
 };
 
 const mutedTextStyle: CSSProperties = {
   margin: 0,
-  fontSize: '0.82rem',
-  color: 'var(--ktn-text-secondary, var(--ktn-text-primary))',
+  fontSize: "0.82rem",
+  color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
 };
 
 const badgeRowStyle: CSSProperties = {
-  display: 'inline-flex',
-  gap: '0.45rem',
-  flexWrap: 'wrap',
+  display: "inline-flex",
+  gap: "0.45rem",
+  flexWrap: "wrap",
 };
 
 const sideGuideGridStyle: CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-  gap: '0.55rem',
+  display: "grid",
+  gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+  gap: "0.55rem",
 };
 
 const sideGuideCardStyle: CSSProperties = {
-  border: '1px dashed var(--ktn-border-muted)',
-  borderRadius: 'var(--ktn-radius-md, 0.5rem)',
-  padding: '0.5rem',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.35rem',
+  border: "1px dashed var(--ktn-border-muted)",
+  borderRadius: "var(--ktn-radius-md, 0.5rem)",
+  padding: "0.5rem",
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.35rem",
 };
 
 const sideHintByValue: Record<AlertSide, string> = {
-  'top-left': 'Anchors at top-left. New alerts animate in-place over older alerts.',
-  'bottom-left': 'Anchors at bottom-left. New alerts animate in-place over older alerts.',
-  'bottom-right': 'Anchors at bottom-right. New alerts animate in-place over older alerts.',
-  'top-right': 'Anchors at top-right. New alerts animate in-place over older alerts.',
-  'bottom-center': 'Anchors at bottom-center. New alerts animate in-place over older alerts.',
-  'top-center': 'Anchors at top-center. New alerts animate in-place over older alerts.',
+  "top-left":
+    "Anchors at top-left. New alerts animate in-place over older alerts.",
+  "bottom-left":
+    "Anchors at bottom-left. New alerts animate in-place over older alerts.",
+  "bottom-right":
+    "Anchors at bottom-right. New alerts animate in-place over older alerts.",
+  "top-right":
+    "Anchors at top-right. New alerts animate in-place over older alerts.",
+  "bottom-center":
+    "Anchors at bottom-center. New alerts animate in-place over older alerts.",
+  "top-center":
+    "Anchors at top-center. New alerts animate in-place over older alerts.",
 };
 
 const sideDebugViewportStyle: CSSProperties = {
-  position: 'relative',
-  width: 'min(1100px, 96vw)',
-  height: '72vh',
-  minHeight: '34rem',
-  border: '1px dashed var(--ktn-border-muted, #94a3b8)',
-  borderRadius: '0.85rem',
+  position: "relative",
+  width: "min(1100px, 96vw)",
+  height: "72vh",
+  minHeight: "34rem",
+  border: "1px dashed var(--ktn-border-muted, #94a3b8)",
+  borderRadius: "0.85rem",
   background:
-    'linear-gradient(145deg, color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, #e2e8f0 12%), var(--ktn-bg-surface, #ffffff))',
-  overflow: 'hidden',
+    "linear-gradient(145deg, color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, #e2e8f0 12%), var(--ktn-bg-surface, #ffffff))",
+  overflow: "hidden",
 };
 
 const sideDebugInfoStyle: CSSProperties = {
-  position: 'absolute',
-  insetInline: '0.75rem',
-  insetBlockStart: '0.6rem',
-  fontSize: '0.74rem',
-  color: 'var(--ktn-text-secondary, #64748b)',
+  position: "absolute",
+  insetInline: "0.75rem",
+  insetBlockStart: "0.6rem",
+  fontSize: "0.74rem",
+  color: "var(--ktn-text-secondary, #64748b)",
   lineHeight: 1.35,
   zIndex: 1,
 };
 
 const sideDebugToolbarStyle: CSSProperties = {
-  position: 'absolute',
-  insetBlockStart: '2.1rem',
-  insetInlineEnd: '0.75rem',
-  display: 'inline-flex',
-  gap: '0.4rem',
-  flexWrap: 'wrap',
+  position: "absolute",
+  insetBlockStart: "2.1rem",
+  insetInlineEnd: "0.75rem",
+  display: "inline-flex",
+  gap: "0.4rem",
+  flexWrap: "wrap",
   zIndex: 2,
 };
 
 const sideDebugAnchorTagStyle: CSSProperties = {
-  marginTop: '0.35rem',
-  fontSize: '0.66rem',
+  marginTop: "0.35rem",
+  fontSize: "0.66rem",
   lineHeight: 1.2,
-  letterSpacing: '0.01em',
-  color: 'var(--ktn-text-secondary, #64748b)',
-  textTransform: 'uppercase',
+  letterSpacing: "0.01em",
+  color: "var(--ktn-text-secondary, #64748b)",
+  textTransform: "uppercase",
 };
 
 const sideDebugAreaLabelStyle: CSSProperties = {
-  position: 'absolute',
-  insetBlockStart: '0.45rem',
-  insetInlineStart: '0.55rem',
-  fontSize: '0.66rem',
+  position: "absolute",
+  insetBlockStart: "0.45rem",
+  insetInlineStart: "0.55rem",
+  fontSize: "0.66rem",
   lineHeight: 1.2,
-  letterSpacing: '0.01em',
-  color: 'var(--ktn-text-secondary, #64748b)',
-  textTransform: 'uppercase',
-  backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-  paddingInline: '0.25rem',
+  letterSpacing: "0.01em",
+  color: "var(--ktn-text-secondary, #64748b)",
+  textTransform: "uppercase",
+  backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+  paddingInline: "0.25rem",
 };
 
 const sideDebugAnchorPositions: Array<{
@@ -231,65 +237,67 @@ const sideDebugAnchorPositions: Array<{
   style: CSSProperties;
 }> = [
   {
-    label: 'Top Left',
-    side: 'top-left',
+    label: "Top Left",
+    side: "top-left",
     style: {
-      position: 'absolute',
-      insetBlockStart: '5.2rem',
-      insetInlineStart: '1rem',
+      position: "absolute",
+      insetBlockStart: "5.2rem",
+      insetInlineStart: "1rem",
     },
   },
   {
-    label: 'Top Center',
-    side: 'top-center',
+    label: "Top Center",
+    side: "top-center",
     style: {
-      position: 'absolute',
-      insetBlockStart: '5.2rem',
-      insetInlineStart: '50%',
-      transform: 'translateX(-50%)',
+      position: "absolute",
+      insetBlockStart: "5.2rem",
+      insetInlineStart: "50%",
+      transform: "translateX(-50%)",
     },
   },
   {
-    label: 'Top Right',
-    side: 'top-right',
+    label: "Top Right",
+    side: "top-right",
     style: {
-      position: 'absolute',
-      insetBlockStart: '5.2rem',
-      insetInlineEnd: '1rem',
+      position: "absolute",
+      insetBlockStart: "5.2rem",
+      insetInlineEnd: "1rem",
     },
   },
   {
-    label: 'Bottom Left',
-    side: 'bottom-left',
+    label: "Bottom Left",
+    side: "bottom-left",
     style: {
-      position: 'absolute',
-      insetBlockEnd: '1rem',
-      insetInlineStart: '1rem',
+      position: "absolute",
+      insetBlockEnd: "1rem",
+      insetInlineStart: "1rem",
     },
   },
   {
-    label: 'Bottom Center',
-    side: 'bottom-center',
+    label: "Bottom Center",
+    side: "bottom-center",
     style: {
-      position: 'absolute',
-      insetBlockEnd: '1rem',
-      insetInlineStart: '50%',
-      transform: 'translateX(-50%)',
+      position: "absolute",
+      insetBlockEnd: "1rem",
+      insetInlineStart: "50%",
+      transform: "translateX(-50%)",
     },
   },
   {
-    label: 'Bottom Right',
-    side: 'bottom-right',
+    label: "Bottom Right",
+    side: "bottom-right",
     style: {
-      position: 'absolute',
-      insetBlockEnd: '1rem',
-      insetInlineEnd: '1rem',
+      position: "absolute",
+      insetBlockEnd: "1rem",
+      insetInlineEnd: "1rem",
     },
   },
 ];
 
 function StackPlaygroundDemo(args: AlertStackPlaygroundArgs): JSX.Element {
-  const [items, setItems] = useState<Array<{ id: number; createdAt: number }>>([]);
+  const [items, setItems] = useState<Array<{ id: number; createdAt: number }>>(
+    [],
+  );
   const nextIdRef = useRef(1);
   const withAction = args.withAction ?? false;
 
@@ -321,7 +329,9 @@ function StackPlaygroundDemo(args: AlertStackPlaygroundArgs): JSX.Element {
       <FieldLabel>Stack Playground</FieldLabel>
 
       <FieldContent>
-        <div style={{ display: 'inline-flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        <div
+          style={{ display: "inline-flex", gap: "0.5rem", flexWrap: "wrap" }}
+        >
           <Button size="sm" variant="primary" onClick={spawnAlert}>
             Add Alert
           </Button>
@@ -335,15 +345,16 @@ function StackPlaygroundDemo(args: AlertStackPlaygroundArgs): JSX.Element {
           </Button>
         </div>
 
-        <p style={{ ...mutedTextStyle, marginTop: '0.5rem' }}>
-          New alerts stack over older ones and each closes after its own duration timer.
+        <p style={{ ...mutedTextStyle, marginTop: "0.5rem" }}>
+          New alerts stack over older ones and each closes after its own
+          duration timer.
         </p>
 
         {items.map((item) => (
           <Alert
             key={`stack-alert-${item.id}`}
             defaultOpen
-            varient={args.varient}
+            variant={args.variant}
             side={args.side}
             size={args.size}
             duration={args.duration}
@@ -363,28 +374,35 @@ function StackPlaygroundDemo(args: AlertStackPlaygroundArgs): JSX.Element {
               }
 
               if (!nextOpen) {
-                setItems((current) => current.filter((entry) => entry.id !== item.id));
+                setItems((current) =>
+                  current.filter((entry) => entry.id !== item.id),
+                );
               }
             }}
           >
             <AlertTitle>Stack Alert #{item.id}</AlertTitle>
             <AlertDescription>
-              Created at {new Date(item.createdAt).toLocaleTimeString()} and auto-dismisses
-              independently.
+              Created at {new Date(item.createdAt).toLocaleTimeString()} and
+              auto-dismisses independently.
             </AlertDescription>
           </Alert>
         ))}
 
         <FieldDescription>
-          Use Add Burst to validate direction-based entry animation and automatic stacking.
+          Use Add Burst to validate direction-based entry animation and
+          automatic stacking.
         </FieldDescription>
       </FieldContent>
     </Field>
   );
 }
 
-function SideGuidePlaygroundDemo(args: AlertSideGuidePlaygroundArgs): JSX.Element {
-  const [items, setItems] = useState<Array<{ id: number; side: AlertSide; createdAt: number }>>([]);
+function SideGuidePlaygroundDemo(
+  args: AlertSideGuidePlaygroundArgs,
+): JSX.Element {
+  const [items, setItems] = useState<
+    Array<{ id: number; side: AlertSide; createdAt: number }>
+  >([]);
   const nextIdRef = useRef(1);
   const withAction = args.withAction ?? false;
 
@@ -392,7 +410,10 @@ function SideGuidePlaygroundDemo(args: AlertSideGuidePlaygroundArgs): JSX.Elemen
     const nextId = nextIdRef.current;
     nextIdRef.current += 1;
 
-    setItems((current) => [{ id: nextId, side, createdAt: Date.now() }, ...current]);
+    setItems((current) => [
+      { id: nextId, side, createdAt: Date.now() },
+      ...current,
+    ]);
   }
 
   function triggerAllSides(): void {
@@ -413,7 +434,8 @@ function SideGuidePlaygroundDemo(args: AlertSideGuidePlaygroundArgs): JSX.Elemen
 
       <FieldContent>
         <p style={mutedTextStyle}>
-          Trigger alerts by side to learn entry direction and stacking behavior for each position.
+          Trigger alerts by side to learn entry direction and stacking behavior
+          for each position.
         </p>
 
         <div style={badgeRowStyle}>
@@ -429,10 +451,16 @@ function SideGuidePlaygroundDemo(args: AlertSideGuidePlaygroundArgs): JSX.Elemen
         <div style={sideGuideGridStyle}>
           {sideOptions.map((side) => (
             <div key={`side-guide-${side}`} style={sideGuideCardStyle}>
-              <strong style={{ fontSize: '0.8rem' }}>{side}</strong>
-              <p style={{ ...mutedTextStyle, fontSize: '0.76rem' }}>{sideHintByValue[side]}</p>
+              <strong style={{ fontSize: "0.8rem" }}>{side}</strong>
+              <p style={{ ...mutedTextStyle, fontSize: "0.76rem" }}>
+                {sideHintByValue[side]}
+              </p>
               <div>
-                <Button size="xs" variant="ghost" onClick={() => triggerSide(side)}>
+                <Button
+                  size="xs"
+                  variant="ghost"
+                  onClick={() => triggerSide(side)}
+                >
                   Trigger {side}
                 </Button>
               </div>
@@ -444,7 +472,7 @@ function SideGuidePlaygroundDemo(args: AlertSideGuidePlaygroundArgs): JSX.Elemen
           <Alert
             key={`side-guide-alert-${item.id}`}
             defaultOpen
-            varient={args.varient}
+            variant={args.variant}
             side={item.side}
             size={args.size}
             duration={args.duration}
@@ -464,19 +492,23 @@ function SideGuidePlaygroundDemo(args: AlertSideGuidePlaygroundArgs): JSX.Elemen
               }
 
               if (!nextOpen) {
-                setItems((current) => current.filter((entry) => entry.id !== item.id));
+                setItems((current) =>
+                  current.filter((entry) => entry.id !== item.id),
+                );
               }
             }}
           >
             <AlertTitle>{item.side}</AlertTitle>
             <AlertDescription>
-              Spawned at {new Date(item.createdAt).toLocaleTimeString()} to show side behavior.
+              Spawned at {new Date(item.createdAt).toLocaleTimeString()} to show
+              side behavior.
             </AlertDescription>
           </Alert>
         ))}
 
         <FieldDescription>
-          Use Trigger All Sides for a quick side-by-side behavior check across all six positions.
+          Use Trigger All Sides for a quick side-by-side behavior check across
+          all six positions.
         </FieldDescription>
       </FieldContent>
     </Field>
@@ -490,7 +522,12 @@ interface SideDebugAnchorProps {
   onTrigger: (side: AlertSide) => void;
 }
 
-function SideDebugAnchor({ label, side, style, onTrigger }: SideDebugAnchorProps): JSX.Element {
+function SideDebugAnchor({
+  label,
+  side,
+  style,
+  onTrigger,
+}: SideDebugAnchorProps): JSX.Element {
   return (
     <div style={style}>
       <Button size="xs" variant="outline" onClick={() => onTrigger(side)}>
@@ -504,7 +541,7 @@ function SideDebugAnchor({ label, side, style, onTrigger }: SideDebugAnchorProps
 function resolveDebugViewportInset(
   args: AlertSideDebugPlaygroundArgs,
 ): AlertViewportInset | undefined {
-  if (args.areaMode !== 'custom-area') {
+  if (args.areaMode !== "custom-area") {
     return undefined;
   }
 
@@ -518,29 +555,34 @@ function resolveDebugViewportInset(
 
 function VariantsPageDemo(args: AlertVariantPageArgs): JSX.Element {
   const withAction = args.withAction ?? false;
-  const [openByVariant, setOpenByVariant] = useState<Record<AlertVariant, boolean>>(
+  const [openByVariant, setOpenByVariant] = useState<
+    Record<AlertVariant, boolean>
+  >(
     () =>
-      Object.fromEntries(variantOptions.map((variant) => [variant, true])) as Record<
-        AlertVariant,
-        boolean
-      >,
+      Object.fromEntries(
+        variantOptions.map((variant) => [variant, true]),
+      ) as Record<AlertVariant, boolean>,
   );
 
   useEffect(() => {
     setOpenByVariant(
-      Object.fromEntries(variantOptions.map((variant) => [variant, true])) as Record<
-        AlertVariant,
-        boolean
-      >,
+      Object.fromEntries(
+        variantOptions.map((variant) => [variant, true]),
+      ) as Record<AlertVariant, boolean>,
     );
-  }, [args.side, args.size, args.duration, args.actionRequired, args.closeOnEscape]);
+  }, [
+    args.side,
+    args.size,
+    args.duration,
+    args.actionRequired,
+    args.closeOnEscape,
+  ]);
 
   function reopenAll(): void {
     setOpenByVariant(
-      Object.fromEntries(variantOptions.map((variant) => [variant, true])) as Record<
-        AlertVariant,
-        boolean
-      >,
+      Object.fromEntries(
+        variantOptions.map((variant) => [variant, true]),
+      ) as Record<AlertVariant, boolean>,
     );
   }
 
@@ -549,7 +591,9 @@ function VariantsPageDemo(args: AlertVariantPageArgs): JSX.Element {
       <FieldLabel>Variants</FieldLabel>
 
       <FieldContent>
-        <p style={mutedTextStyle}>Separate page to compare all variants with same size and side.</p>
+        <p style={mutedTextStyle}>
+          Separate page to compare all variants with same size and side.
+        </p>
 
         <div style={badgeRowStyle}>
           <Badge variant="secondary">side: {args.side}</Badge>
@@ -563,7 +607,7 @@ function VariantsPageDemo(args: AlertVariantPageArgs): JSX.Element {
           <Alert
             key={`variant-page-${variant}-${args.side}-${args.size}-${args.duration}`}
             open={openByVariant[variant]}
-            varient={variant}
+            variant={variant}
             side={args.side}
             size={args.size}
             duration={args.duration}
@@ -594,12 +638,15 @@ function VariantsPageDemo(args: AlertVariantPageArgs): JSX.Element {
             <AlertDescription>
               Compare visual treatment while behavior remains consistent.
             </AlertDescription>
-            {args.actionRequired ? <AlertAction closeOnAction>Resolve</AlertAction> : null}
+            {args.actionRequired ? (
+              <AlertAction closeOnAction>Resolve</AlertAction>
+            ) : null}
           </Alert>
         ))}
 
         <FieldDescription>
-          Use this page to compare primary, secondary, destructive, outline, link, and compact.
+          Use this page to compare primary, secondary, destructive, outline,
+          link, and compact.
         </FieldDescription>
       </FieldContent>
     </Field>
@@ -609,18 +656,34 @@ function VariantsPageDemo(args: AlertVariantPageArgs): JSX.Element {
 function SizesPageDemo(args: AlertSizePageArgs): JSX.Element {
   const withAction = args.withAction ?? false;
   const [openBySize, setOpenBySize] = useState<Record<AlertSize, boolean>>(
-    () => Object.fromEntries(sizeOptions.map((size) => [size, true])) as Record<AlertSize, boolean>,
+    () =>
+      Object.fromEntries(sizeOptions.map((size) => [size, true])) as Record<
+        AlertSize,
+        boolean
+      >,
   );
 
   useEffect(() => {
     setOpenBySize(
-      Object.fromEntries(sizeOptions.map((size) => [size, true])) as Record<AlertSize, boolean>,
+      Object.fromEntries(sizeOptions.map((size) => [size, true])) as Record<
+        AlertSize,
+        boolean
+      >,
     );
-  }, [args.varient, args.side, args.duration, args.actionRequired, args.closeOnEscape]);
+  }, [
+    args.variant,
+    args.side,
+    args.duration,
+    args.actionRequired,
+    args.closeOnEscape,
+  ]);
 
   function reopenAll(): void {
     setOpenBySize(
-      Object.fromEntries(sizeOptions.map((size) => [size, true])) as Record<AlertSize, boolean>,
+      Object.fromEntries(sizeOptions.map((size) => [size, true])) as Record<
+        AlertSize,
+        boolean
+      >,
     );
   }
 
@@ -629,10 +692,12 @@ function SizesPageDemo(args: AlertSizePageArgs): JSX.Element {
       <FieldLabel>Sizes</FieldLabel>
 
       <FieldContent>
-        <p style={mutedTextStyle}>Separate page to compare xs, sm, md, and lg sizes.</p>
+        <p style={mutedTextStyle}>
+          Separate page to compare xs, sm, md, and lg sizes.
+        </p>
 
         <div style={badgeRowStyle}>
-          <Badge variant="secondary">varient: {args.varient}</Badge>
+          <Badge variant="secondary">variant: {args.variant}</Badge>
           <Badge variant="outline">side: {args.side}</Badge>
           <Button size="xs" variant="outline" onClick={reopenAll}>
             Reopen All Sizes
@@ -641,9 +706,9 @@ function SizesPageDemo(args: AlertSizePageArgs): JSX.Element {
 
         {sizeOptions.map((size) => (
           <Alert
-            key={`size-page-${size}-${args.varient}-${args.side}-${args.duration}`}
+            key={`size-page-${size}-${args.variant}-${args.side}-${args.duration}`}
             open={openBySize[size]}
-            varient={args.varient}
+            variant={args.variant}
             side={args.side}
             size={size}
             duration={args.duration}
@@ -672,31 +737,42 @@ function SizesPageDemo(args: AlertSizePageArgs): JSX.Element {
           >
             <AlertTitle>{`Size: ${size}`}</AlertTitle>
             <AlertDescription>
-              Compare typography, spacing, and close-action affordance across sizes.
+              Compare typography, spacing, and close-action affordance across
+              sizes.
             </AlertDescription>
-            {args.actionRequired ? <AlertAction closeOnAction>Resolve</AlertAction> : null}
+            {args.actionRequired ? (
+              <AlertAction closeOnAction>Resolve</AlertAction>
+            ) : null}
           </Alert>
         ))}
 
         <FieldDescription>
-          Use this page to validate scale and readability between xs, sm, md, and lg.
+          Use this page to validate scale and readability between xs, sm, md,
+          and lg.
         </FieldDescription>
       </FieldContent>
     </Field>
   );
 }
 
-function SideDebugPlaygroundDemo(args: AlertSideDebugPlaygroundArgs): JSX.Element {
+function SideDebugPlaygroundDemo(
+  args: AlertSideDebugPlaygroundArgs,
+): JSX.Element {
   const withAction = args.withAction ?? false;
   const viewportInset = resolveDebugViewportInset(args);
-  const [items, setItems] = useState<Array<{ id: number; side: AlertSide; createdAt: number }>>([]);
+  const [items, setItems] = useState<
+    Array<{ id: number; side: AlertSide; createdAt: number }>
+  >([]);
   const nextIdRef = useRef(1);
 
   function triggerSide(side: AlertSide): void {
     const nextId = nextIdRef.current;
     nextIdRef.current += 1;
 
-    setItems((current) => [{ id: nextId, side, createdAt: Date.now() }, ...current]);
+    setItems((current) => [
+      { id: nextId, side, createdAt: Date.now() },
+      ...current,
+    ]);
   }
 
   function triggerAllSides(): void {
@@ -715,23 +791,25 @@ function SideDebugPlaygroundDemo(args: AlertSideDebugPlaygroundArgs): JSX.Elemen
     viewportInset == null
       ? undefined
       : {
-          position: 'absolute',
+          position: "absolute",
           top: `${viewportInset.top ?? 14}px`,
           right: `${viewportInset.right ?? 14}px`,
           bottom: `${viewportInset.bottom ?? 14}px`,
           left: `${viewportInset.left ?? 14}px`,
-          border: '1px dashed color-mix(in srgb, var(--ktn-action-primary-bg) 55%, #94a3b8)',
-          borderRadius: '0.7rem',
-          pointerEvents: 'none',
+          border:
+            "1px dashed color-mix(in srgb, var(--ktn-action-primary-bg) 55%, #94a3b8)",
+          borderRadius: "0.7rem",
+          pointerEvents: "none",
           zIndex: 1,
         };
 
   return (
-    <div style={{ padding: '1rem', display: 'flex', justifyContent: 'center' }}>
+    <div style={{ padding: "1rem", display: "flex", justifyContent: "center" }}>
       <div style={sideDebugViewportStyle}>
         <div style={sideDebugInfoStyle}>
-          Side debug mirrors DropdownMenu style: trigger each side and inspect entry direction,
-          overlay order, and placement. Switch area mode to test full viewport vs custom bounds.
+          Side debug mirrors DropdownMenu style: trigger each side and inspect
+          entry direction, overlay order, and placement. Switch area mode to
+          test full viewport vs custom bounds.
         </div>
 
         <div style={sideDebugToolbarStyle}>
@@ -763,7 +841,7 @@ function SideDebugPlaygroundDemo(args: AlertSideDebugPlaygroundArgs): JSX.Elemen
           <Alert
             key={`side-debug-alert-${item.id}`}
             defaultOpen
-            varient={args.varient}
+            variant={args.variant}
             side={item.side}
             size={args.size}
             duration={args.duration}
@@ -776,7 +854,9 @@ function SideDebugPlaygroundDemo(args: AlertSideDebugPlaygroundArgs): JSX.Elemen
               }
 
               if (!nextOpen) {
-                setItems((current) => current.filter((entry) => entry.id !== item.id));
+                setItems((current) =>
+                  current.filter((entry) => entry.id !== item.id),
+                );
               }
             }}
             onAction={
@@ -793,9 +873,12 @@ function SideDebugPlaygroundDemo(args: AlertSideDebugPlaygroundArgs): JSX.Elemen
           >
             <AlertTitle>{`Side: ${item.side}`}</AlertTitle>
             <AlertDescription>
-              Created at {new Date(item.createdAt).toLocaleTimeString()} for side-debug testing.
+              Created at {new Date(item.createdAt).toLocaleTimeString()} for
+              side-debug testing.
             </AlertDescription>
-            {args.actionRequired ? <AlertAction closeOnAction>Resolve</AlertAction> : null}
+            {args.actionRequired ? (
+              <AlertAction closeOnAction>Resolve</AlertAction>
+            ) : null}
           </Alert>
         ))}
       </div>
@@ -816,14 +899,19 @@ export const Basic: Story = {
 
           <FieldContent>
             <p style={mutedTextStyle}>
-              Alert includes close button by default and supports title, description, and action.
+              Alert includes close button by default and supports title,
+              description, and action.
             </p>
 
             <div style={badgeRowStyle}>
-              <Badge variant="secondary">varient: primary</Badge>
+              <Badge variant="secondary">variant: primary</Badge>
               <Badge variant="outline">side: top-right</Badge>
               <Badge variant="outline">size: md</Badge>
-              <Button size="xs" variant="outline" onClick={() => setIsOpen(true)}>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={() => setIsOpen(true)}
+              >
                 Show Alert
               </Button>
             </div>
@@ -832,19 +920,21 @@ export const Basic: Story = {
               open={isOpen}
               onOpenChange={setIsOpen}
               side="top-right"
-              varient="primary"
+              variant="primary"
               size="md"
               duration={30000}
             >
               <AlertTitle>Order Update</AlertTitle>
               <AlertDescription>
-                Your limit order was placed successfully and is waiting for execution.
+                Your limit order was placed successfully and is waiting for
+                execution.
               </AlertDescription>
               <AlertAction closeOnAction>Acknowledge</AlertAction>
             </Alert>
 
             <FieldDescription>
-              This alert uses composable primitives: AlertTitle, AlertDescription, and AlertAction.
+              This alert uses composable primitives: AlertTitle,
+              AlertDescription, and AlertAction.
             </FieldDescription>
           </FieldContent>
         </Field>
@@ -854,56 +944,55 @@ export const Basic: Story = {
 };
 
 export const Variants: Story = {
-  name: 'Variants',
+  name: "Variants",
   args: {
-    side: 'top-right',
-    size: 'md',
+    side: "top-right",
+    size: "md",
     duration: 30000,
     actionRequired: false,
     closeOnEscape: true,
     withAction: false,
   } as AlertVariantPageArgs,
   argTypes: {
-    side: { control: 'select', options: sideOptions },
-    size: { control: 'select', options: sizeOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    actionRequired: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-    withAction: { control: 'boolean' },
-    varient: { table: { disable: true } },
-    variant: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    side: { control: "select", options: sideOptions },
+    size: { control: "select", options: sizeOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    actionRequired: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
-  render: (rawArgs) => <VariantsPageDemo {...(rawArgs as AlertVariantPageArgs)} />,
+  render: (rawArgs) => (
+    <VariantsPageDemo {...(rawArgs as AlertVariantPageArgs)} />
+  ),
 };
 
 export const Sizes: Story = {
-  name: 'Sizes',
+  name: "Sizes",
   args: {
-    varient: 'primary',
-    side: 'top-right',
+    variant: "primary",
+    side: "top-right",
     duration: 30000,
     actionRequired: false,
     closeOnEscape: true,
     withAction: false,
   } as AlertSizePageArgs,
   argTypes: {
-    varient: { control: 'select', options: variantOptions },
-    side: { control: 'select', options: sideOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    actionRequired: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-    withAction: { control: 'boolean' },
-    variant: { table: { disable: true } },
+    variant: { control: "select", options: variantOptions },
+    side: { control: "select", options: sideOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    actionRequired: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
+    withAction: { control: "boolean" },
     size: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
     children: { table: { disable: true } },
@@ -914,11 +1003,11 @@ export const Sizes: Story = {
 };
 
 export const AlertPlayground: Story = {
-  name: 'Alert Playground',
+  name: "Alert Playground",
   args: {
-    varient: 'primary',
-    side: 'top-right',
-    size: 'md',
+    variant: "primary",
+    side: "top-right",
+    size: "md",
     duration: 30000,
     actionRequired: false,
     closeOnEscape: true,
@@ -926,17 +1015,16 @@ export const AlertPlayground: Story = {
     withAction: false,
   } as AlertPlaygroundArgs,
   argTypes: {
-    varient: { control: 'select', options: variantOptions },
-    variant: { table: { disable: true } },
-    side: { control: 'select', options: sideOptions },
-    size: { control: 'select', options: sizeOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    actionRequired: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-    defaultOpen: { control: 'boolean' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    variant: { control: "select", options: variantOptions },
+    side: { control: "select", options: sideOptions },
+    size: { control: "select", options: sizeOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    actionRequired: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
+    defaultOpen: { control: "boolean" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     open: { table: { disable: true } },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
@@ -965,9 +1053,11 @@ export const AlertPlayground: Story = {
 
         <FieldContent>
           <div style={badgeRowStyle}>
-            <Badge variant="secondary">Duration: {Math.round(args.duration / 1000)}s</Badge>
-            <Badge variant={args.actionRequired ? 'primary' : 'outline'}>
-              {args.actionRequired ? 'Action Required' : 'Auto Dismiss'}
+            <Badge variant="secondary">
+              Duration: {Math.round(args.duration / 1000)}s
+            </Badge>
+            <Badge variant={args.actionRequired ? "primary" : "outline"}>
+              {args.actionRequired ? "Action Required" : "Auto Dismiss"}
             </Badge>
             <Button size="xs" variant="outline" onClick={() => setIsOpen(true)}>
               Show Alert
@@ -975,10 +1065,10 @@ export const AlertPlayground: Story = {
           </div>
 
           <Alert
-            key={`${args.varient}-${args.side}-${args.size}-${args.duration}-${args.actionRequired}-${args.closeOnEscape}-${withAction}`}
+            key={`${args.variant}-${args.side}-${args.size}-${args.duration}-${args.actionRequired}-${args.closeOnEscape}-${withAction}`}
             open={isOpen}
             side={args.side}
-            varient={args.varient}
+            variant={args.variant}
             size={args.size}
             duration={args.duration}
             actionRequired={args.actionRequired}
@@ -990,7 +1080,9 @@ export const AlertPlayground: Story = {
             <AlertDescription>
               Configure variant, side, size, and timer behavior from controls.
             </AlertDescription>
-            {args.actionRequired ? <AlertAction closeOnAction>Resolve</AlertAction> : null}
+            {args.actionRequired ? (
+              <AlertAction closeOnAction>Resolve</AlertAction>
+            ) : null}
           </Alert>
 
           <FieldDescription>
@@ -1003,48 +1095,48 @@ export const AlertPlayground: Story = {
 };
 
 export const AlertStackPlayground: Story = {
-  name: 'Alert Stack Playground',
+  name: "Alert Stack Playground",
   args: {
-    varient: 'secondary',
-    side: 'top-right',
-    size: 'md',
+    variant: "secondary",
+    side: "top-right",
+    size: "md",
     duration: 30000,
     withAction: false,
   } as AlertStackPlaygroundArgs,
   argTypes: {
-    varient: { control: 'select', options: variantOptions },
-    variant: { table: { disable: true } },
-    side: { control: 'select', options: sideOptions },
-    size: { control: 'select', options: sizeOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    variant: { control: "select", options: variantOptions },
+    side: { control: "select", options: sideOptions },
+    size: { control: "select", options: sizeOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
-  render: (rawArgs) => <StackPlaygroundDemo {...(rawArgs as AlertStackPlaygroundArgs)} />,
+  render: (rawArgs) => (
+    <StackPlaygroundDemo {...(rawArgs as AlertStackPlaygroundArgs)} />
+  ),
 };
 
 export const DirectionSide: Story = {
-  name: 'Direction Side',
+  name: "Direction Side",
   args: {
-    varient: 'primary',
-    size: 'md',
+    variant: "primary",
+    size: "md",
     duration: 30000,
     withAction: false,
   } as AlertSideGuidePlaygroundArgs,
   argTypes: {
-    varient: { control: 'select', options: variantOptions },
-    variant: { table: { disable: true } },
-    size: { control: 'select', options: sizeOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    variant: { control: "select", options: variantOptions },
+    size: { control: "select", options: sizeOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     side: { table: { disable: true } },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
@@ -1052,21 +1144,23 @@ export const DirectionSide: Story = {
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
-  render: (rawArgs) => <SideGuidePlaygroundDemo {...(rawArgs as AlertSideGuidePlaygroundArgs)} />,
+  render: (rawArgs) => (
+    <SideGuidePlaygroundDemo {...(rawArgs as AlertSideGuidePlaygroundArgs)} />
+  ),
 };
 
 export const SideDebug: Story = {
-  name: 'Side Debug',
+  name: "Side Debug",
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
   },
   args: {
-    varient: 'primary',
-    size: 'md',
+    variant: "primary",
+    size: "md",
     duration: 30000,
     actionRequired: false,
     closeOnEscape: true,
-    areaMode: 'full-viewport',
+    areaMode: "full-viewport",
     insetTop: 72,
     insetRight: 80,
     insetBottom: 96,
@@ -1074,55 +1168,55 @@ export const SideDebug: Story = {
     withAction: false,
   } as AlertSideDebugPlaygroundArgs,
   argTypes: {
-    varient: { control: 'select', options: variantOptions },
-    variant: { table: { disable: true } },
-    size: { control: 'select', options: sizeOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    actionRequired: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
+    variant: { control: "select", options: variantOptions },
+    size: { control: "select", options: sizeOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    actionRequired: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
     areaMode: {
-      control: 'inline-radio',
-      options: ['full-viewport', 'custom-area'],
+      control: "inline-radio",
+      options: ["full-viewport", "custom-area"],
     },
-    insetTop: { control: { type: 'number', min: 0, step: 4 } },
-    insetRight: { control: { type: 'number', min: 0, step: 4 } },
-    insetBottom: { control: { type: 'number', min: 0, step: 4 } },
-    insetLeft: { control: { type: 'number', min: 0, step: 4 } },
-    withAction: { control: 'boolean' },
+    insetTop: { control: { type: "number", min: 0, step: 4 } },
+    insetRight: { control: { type: "number", min: 0, step: 4 } },
+    insetBottom: { control: { type: "number", min: 0, step: 4 } },
+    insetLeft: { control: { type: "number", min: 0, step: 4 } },
+    withAction: { control: "boolean" },
     side: { table: { disable: true } },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     open: { table: { disable: true } },
     defaultOpen: { table: { disable: true } },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
     style: { table: { disable: true } },
   },
-  render: (rawArgs) => <SideDebugPlaygroundDemo {...(rawArgs as AlertSideDebugPlaygroundArgs)} />,
+  render: (rawArgs) => (
+    <SideDebugPlaygroundDemo {...(rawArgs as AlertSideDebugPlaygroundArgs)} />
+  ),
 };
 
 export const AlertActionRequiredPlayground: Story = {
-  name: 'Action Required Playground',
+  name: "Action Required Playground",
   args: {
-    varient: 'destructive',
-    side: 'bottom-right',
-    size: 'md',
+    variant: "destructive",
+    side: "bottom-right",
+    size: "md",
     duration: 30000,
     closeOnEscape: true,
     defaultOpen: true,
     withAction: false,
   } as AlertPlaygroundArgs,
   argTypes: {
-    varient: { control: 'select', options: variantOptions },
-    variant: { table: { disable: true } },
-    side: { control: 'select', options: sideOptions },
-    size: { control: 'select', options: sizeOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    closeOnEscape: { control: 'boolean' },
-    defaultOpen: { control: 'boolean' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    variant: { control: "select", options: variantOptions },
+    side: { control: "select", options: sideOptions },
+    size: { control: "select", options: sizeOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    closeOnEscape: { control: "boolean" },
+    defaultOpen: { control: "boolean" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     open: { table: { disable: true } },
     actionRequired: { table: { disable: true } },
     children: { table: { disable: true } },
@@ -1159,9 +1253,9 @@ export const AlertActionRequiredPlayground: Story = {
           </div>
 
           <Alert
-            key={`action-required-${args.varient}-${args.side}-${args.size}-${withAction}`}
+            key={`action-required-${args.variant}-${args.side}-${args.size}-${withAction}`}
             open={isOpen}
-            varient={args.varient}
+            variant={args.variant}
             side={args.side}
             size={args.size}
             duration={args.duration}
@@ -1178,7 +1272,8 @@ export const AlertActionRequiredPlayground: Story = {
           </Alert>
 
           <FieldDescription>
-            Actionable alert remains on screen until the user completes an action or closes it.
+            Actionable alert remains on screen until the user completes an
+            action or closes it.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -1187,37 +1282,36 @@ export const AlertActionRequiredPlayground: Story = {
 };
 
 export const AlertCustomColorPlayground: Story = {
-  name: 'Custom Color Playground',
+  name: "Custom Color Playground",
   args: {
-    varient: 'outline',
-    side: 'top-center',
-    size: 'md',
+    variant: "outline",
+    side: "top-center",
+    size: "md",
     duration: 30000,
     defaultOpen: true,
     closeOnEscape: true,
-    backgroundColor: '#fff7ed',
-    borderColor: '#fb923c',
-    titleColor: '#9a3412',
-    descriptionColor: '#7c2d12',
-    actionColor: '#c2410c',
+    backgroundColor: "#fff7ed",
+    borderColor: "#fb923c",
+    titleColor: "#9a3412",
+    descriptionColor: "#7c2d12",
+    actionColor: "#c2410c",
     withAction: false,
   } as AlertCustomColorPlaygroundArgs,
   argTypes: {
-    varient: { control: 'select', options: variantOptions },
-    variant: { table: { disable: true } },
-    side: { control: 'select', options: sideOptions },
-    size: { control: 'select', options: sizeOptions },
-    duration: { control: { type: 'number', min: 0, step: 500 } },
-    defaultOpen: { control: 'boolean' },
-    closeOnEscape: { control: 'boolean' },
-    backgroundColor: { control: 'color' },
-    borderColor: { control: 'color' },
-    titleColor: { control: 'color' },
-    descriptionColor: { control: 'color' },
-    actionColor: { control: 'color' },
-    withAction: { control: 'boolean' },
-    onAction: { action: 'action' },
-    onOpenChange: { action: 'open-change' },
+    variant: { control: "select", options: variantOptions },
+    side: { control: "select", options: sideOptions },
+    size: { control: "select", options: sizeOptions },
+    duration: { control: { type: "number", min: 0, step: 500 } },
+    defaultOpen: { control: "boolean" },
+    closeOnEscape: { control: "boolean" },
+    backgroundColor: { control: "color" },
+    borderColor: { control: "color" },
+    titleColor: { control: "color" },
+    descriptionColor: { control: "color" },
+    actionColor: { control: "color" },
+    withAction: { control: "boolean" },
+    onAction: { action: "action" },
+    onOpenChange: { action: "open-change" },
     open: { table: { disable: true } },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
@@ -1253,9 +1347,9 @@ export const AlertCustomColorPlayground: Story = {
           </div>
 
           <Alert
-            key={`custom-${args.varient}-${args.side}-${args.size}-${args.backgroundColor}-${args.borderColor}-${args.titleColor}-${args.descriptionColor}-${args.actionColor}-${withAction}`}
+            key={`custom-${args.variant}-${args.side}-${args.size}-${args.backgroundColor}-${args.borderColor}-${args.titleColor}-${args.descriptionColor}-${args.actionColor}-${withAction}`}
             open={isOpen}
-            varient={args.varient}
+            variant={args.variant}
             side={args.side}
             size={args.size}
             duration={args.duration}
@@ -1272,13 +1366,15 @@ export const AlertCustomColorPlayground: Story = {
           >
             <AlertTitle>Custom Color Alert</AlertTitle>
             <AlertDescription>
-              Configure brand-specific colors while keeping the alert structure and behavior.
+              Configure brand-specific colors while keeping the alert structure
+              and behavior.
             </AlertDescription>
             <AlertAction>Review</AlertAction>
           </Alert>
 
           <FieldDescription>
-            Use customColors to override background, border, text, and action tones.
+            Use customColors to override background, border, text, and action
+            tones.
           </FieldDescription>
         </FieldContent>
       </Field>

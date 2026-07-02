@@ -42,7 +42,6 @@ export interface ToastProps extends Omit<
   onOpenChange?: (open: boolean) => void;
   onAction?: (context: ToastActionContext) => void;
   variant?: ToastVariant;
-  varient?: ToastVariant;
   size?: ToastSize;
   duration?: number;
   bottomOffset?: number;
@@ -146,16 +145,9 @@ const badgeBaseStyle: CSSProperties = {
   pointerEvents: "auto",
 };
 
-function resolveVariant(
-  variant: ToastVariant | undefined,
-  varient: ToastVariant | undefined,
-): ToastVariant {
+function resolveVariant(variant: ToastVariant | undefined): ToastVariant {
   if (variant != null) {
     return variant;
-  }
-
-  if (varient != null) {
-    return varient;
   }
 
   return "default";
@@ -183,7 +175,6 @@ export function Toast({
   onOpenChange,
   onAction,
   variant,
-  varient,
   size = "sm",
   duration = 1000,
   bottomOffset = 20,
@@ -207,7 +198,7 @@ export function Toast({
   const previousOpenRef = useRef(resolvedOpen);
   const transitionSourceRef = useRef<ToastActionSource | null>(null);
 
-  const resolvedVariant = resolveVariant(variant, varient);
+  const resolvedVariant = resolveVariant(variant);
   const resolvedSize = size;
   const normalizedDuration = Math.max(Math.round(duration), 0);
   const normalizedBottomOffset = Number.isFinite(bottomOffset)

@@ -1,4 +1,0 @@
-function e(n){const t=n.semantic.colors,r=n.primitives.spacing,s=n.primitives.radius,a=n.primitives.shadow;return{"--ktn-bg-default":t.backgroundDefault,"--ktn-bg-surface":t.backgroundSurface,"--ktn-bg-muted":t.backgroundMuted,"--ktn-text-primary":t.textPrimary,"--ktn-text-secondary":t.textSecondary,"--ktn-border-muted":t.borderMuted,"--ktn-action-primary-bg":t.actionPrimaryBackground,"--ktn-action-primary-fg":t.actionPrimaryForeground,"--ktn-space-xs":r.xs,"--ktn-space-sm":r.sm,"--ktn-space-md":r.md,"--ktn-space-lg":r.lg,"--ktn-space-xl":r.xl,"--ktn-radius-sm":s.sm,"--ktn-radius-md":s.md,"--ktn-radius-lg":s.lg,"--ktn-radius-pill":s.pill,"--ktn-shadow-sm":a.sm,"--ktn-shadow-md":a.md}}function o(n,t){const r=Object.entries(t).map(([s,a])=>`  ${s}: ${a};`).join(`
-`);return`${n} {
-${r}
-}`}export{o as selectorToCssBlock,e as themeToCssVariables};
