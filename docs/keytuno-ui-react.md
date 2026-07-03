@@ -1395,6 +1395,8 @@ import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
   defaultSearchValue?={string}
   searchPlaceholder?={string}
   searchAriaLabel?={string}
+  searchInputMinWidth?={CSSProperties['minWidth']} // default '20px'
+  searchInputMaxWidth?={CSSProperties['maxWidth']} // default '100%'
   onSearchChange?={(value: string) => void}
 
   // AdvanceFilter (Sheet)
@@ -1441,7 +1443,8 @@ import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 
 DataToolbar behavior notes:
 
-- One responsive row only: filter/switch/refresh/fullscreen icon actions on the left, global search on the right.
+- One responsive row only: global search on the left, then filter/switch/refresh/fullscreen icon actions.
+- Search is compact-first for small widths (`searchInputMinWidth='20px'`) so icon actions remain visible in one row.
 - Reuses inbuilt primitives (`AdvanceFilter`, `Button`, `Input`) and inherits theme tokens.
 - Designed for composed data shells: top `DataToolbar`, middle `Table` or `AdaptiveCard`, bottom `Pagination`.
 - In composed shells, set `showToolbar={false}` on `Table`/`AdaptiveCard` to avoid duplicate controls.
@@ -1564,7 +1567,7 @@ const rowActions: RowAction<User>[] = [
 // - Advanced filter UI uses inbuilt Field, Input, Select, Button, and Scrollbar primitives with theme-token styling.
 // - Table viewport uses the inbuilt Scrollbar component (axis='both').
 // - Toolbar and sortable headers use inbuilt Button controls with inbuilt feather icons.
-// - Toolbar parity mode keeps one row with full-width search and icon controls ordered as filter, view switch, refresh, and fullscreen.
+// - Toolbar parity mode keeps one row with search first, then icon controls ordered as filter, view switch, refresh, and fullscreen.
 // - For icon-only toolbar controls, keep tooltip labels one-word and short in stories/playbooks.
 // - In shared table/card playbooks, if page-size state is shared via `onPageSizeChange` and `paginationDefaultPageSize`, Table picks up adaptive-card page-size updates.
 // - Storybook reference: Toolbar Composed Switch (shared toolbar + table/adaptive-card state).

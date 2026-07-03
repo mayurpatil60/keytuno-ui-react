@@ -634,7 +634,7 @@ Accessibility tokens/signals found in story code:
 | showAdvanceFilter | argTypes, args | boolean | true | - | Shows filter trigger and sheet. |
 | showFullscreen | argTypes, args | boolean | true | - | Shows fullscreen toggle icon action. |
 | showRefresh | argTypes, args | boolean | true | - | Shows refresh icon action. |
-| showSearch | argTypes, args | boolean | true | - | Shows right-side global search input. |
+| showSearch | argTypes, args | boolean | true | - | Shows left-side global search input that can shrink in compact one-row layouts. |
 | showSwitch | argTypes, args | boolean | true | - | Shows view-switch icon action. |
 | size | argTypes, args | select | sm | lg, md, sm, xs | Control density for toolbar actions/input. |
 | switchLabel | argTypes, args | text | Cards | - | One-word tooltip/aria-label for switch icon. |
@@ -658,10 +658,11 @@ Accessibility tokens/signals found in story code:
 
 #### Implementation Guidance for Future Projects
 
-1. Keep one toolbar row only: left-side icon actions and right-side search field.
-2. Use one-word icon labels for compact tooltips and clearer a11y naming.
-3. Reuse the same toolbar state across composed `Table` and `AdaptiveCard` views.
-4. Set `showToolbar={false}` on middle data components when composing with `DataToolbar`.
+1. Keep one toolbar row only: search field on the left, then filter/switch/refresh/fullscreen icon actions.
+2. Keep search compact by default for narrow screens (`searchInputMinWidth` defaults to `20px`).
+3. Use one-word icon labels for compact tooltips and clearer a11y naming.
+4. Reuse the same toolbar state across composed `Table` and `AdaptiveCard` views.
+5. Set `showToolbar={false}` on middle data components when composing with `DataToolbar`.
 
 ### 2.10 Checkbox
 
