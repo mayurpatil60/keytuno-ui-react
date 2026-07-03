@@ -1,0 +1,39 @@
+import { SVGProps } from 'react';
+
+type FeatherIconProps = SVGProps<SVGSVGElement> & {
+    size?: number | string;
+};
+declare function FiX(props: FeatherIconProps): JSX.Element;
+declare function FiCalendar(props: FeatherIconProps): JSX.Element;
+declare function FiChevronDown(props: FeatherIconProps): JSX.Element;
+declare function FiChevronUp(props: FeatherIconProps): JSX.Element;
+declare function FiChevronLeft(props: FeatherIconProps): JSX.Element;
+declare function FiChevronRight(props: FeatherIconProps): JSX.Element;
+declare function FiChevronsLeft(props: FeatherIconProps): JSX.Element;
+declare function FiChevronsRight(props: FeatherIconProps): JSX.Element;
+declare function FiClock(props: FeatherIconProps): JSX.Element;
+declare function FiCheck(props: FeatherIconProps): JSX.Element;
+declare function FiFile(props: FeatherIconProps): JSX.Element;
+declare function FiFileText(props: FeatherIconProps): JSX.Element;
+declare function FiFilm(props: FeatherIconProps): JSX.Element;
+declare function FiImage(props: FeatherIconProps): JSX.Element;
+declare function FiMusic(props: FeatherIconProps): JSX.Element;
+declare function FiMenu(props: FeatherIconProps): JSX.Element;
+declare function FiMoreVertical(props: FeatherIconProps): JSX.Element;
+declare function FiEye(props: FeatherIconProps): JSX.Element;
+declare function FiEdit3(props: FeatherIconProps): JSX.Element;
+declare function FiTrash2(props: FeatherIconProps): JSX.Element;
+declare function FiExternalLink(props: FeatherIconProps): JSX.Element;
+declare function FiLink2(props: FeatherIconProps): JSX.Element;
+declare function FiUploadCloud(props: FeatherIconProps): JSX.Element;
+declare function FiFilter(props: FeatherIconProps): JSX.Element;
+declare function FiGrid(props: FeatherIconProps): JSX.Element;
+declare function FiList(props: FeatherIconProps): JSX.Element;
+declare function FiColumns(props: FeatherIconProps): JSX.Element;
+declare function FiDownload(props: FeatherIconProps): JSX.Element;
+declare function FiMaximize2(props: FeatherIconProps): JSX.Element;
+declare function FiMinimize2(props: FeatherIconProps): JSX.Element;
+declare function FiRefreshCw(props: FeatherIconProps): JSX.Element;
+declare function FiSearch(props: FeatherIconProps): JSX.Element;
+
+export { type FeatherIconProps, FiCalendar, FiCheck, FiChevronDown, FiChevronLeft, FiChevronRight, FiChevronUp, FiChevronsLeft, FiChevronsRight, FiClock, FiColumns, FiDownload, FiEdit3, FiExternalLink, FiEye, FiFile, FiFileText, FiFilm, FiFilter, FiGrid, FiImage, FiLink2, FiList, FiMaximize2, FiMenu, FiMinimize2, FiMoreVertical, FiMusic, FiRefreshCw, FiSearch, FiTrash2, FiUploadCloud, FiX };

@@ -1,0 +1,1 @@
+function n(o,r={}){return{backgroundDefault:o.white,backgroundSurface:o.slate50,backgroundMuted:o.slate100,textPrimary:o.slate900,textSecondary:o.slate600,borderMuted:o.slate300,actionPrimaryBackground:o.teal700,actionPrimaryForeground:o.white,...r}}export{n as createSemanticColors};
