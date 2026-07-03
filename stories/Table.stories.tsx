@@ -10,6 +10,7 @@ import { FiEdit3, FiEye, FiTrash2 } from "../src/components/icons/feather";
 
 import {
   Card,
+  CardData,
   CardContent,
   CardDescription,
   CardHeader,
@@ -19,6 +20,8 @@ import {
   FieldDescription,
   FieldLabel,
   Table,
+  type CardDataAction,
+  type CardDataFieldSchema,
   type RowAction,
   type TableColumnDef,
   type TableProps,
@@ -164,6 +167,67 @@ const tableRowActions: RowAction<TradeRow>[] = [
     iconOnlyTone: true,
     tooltip: "Delete",
     onClick: () => {},
+  },
+];
+
+const parityCardSchema: CardDataFieldSchema<TradeRow>[] = [
+  {
+    key: "symbol",
+    label: "Symbol",
+    priority: 0,
+  },
+  {
+    key: "sector",
+    label: "Sector",
+    priority: 1,
+  },
+  {
+    key: "status",
+    label: "Status",
+    type: "status",
+    priority: 2,
+  },
+  {
+    key: "trader",
+    label: "Trader",
+    priority: 3,
+  },
+  {
+    key: "price",
+    label: "Price",
+    type: "currency",
+    currency: "INR",
+    maximumFractionDigits: 2,
+    align: "right",
+    priority: 4,
+  },
+  {
+    key: "updatedAt",
+    label: "Updated",
+    type: "date",
+    dateOptions: { year: "numeric", month: "short", day: "numeric" },
+    priority: 5,
+  },
+];
+
+const parityCardActions: CardDataAction<TradeRow>[] = [
+  {
+    id: "view",
+    label: "View",
+    icon: <FiEye size={13} />,
+    variant: "secondary",
+  },
+  {
+    id: "edit",
+    label: "Edit",
+    icon: <FiEdit3 size={13} />,
+    variant: "outline",
+  },
+  {
+    id: "remove",
+    label: "Delete",
+    icon: <FiTrash2 size={13} />,
+    variant: "destructive",
   },
 ];
 
@@ -873,12 +937,57 @@ export const CardTableFullWidthPlaybook: Story = {
   },
   argTypes: tableInteractiveArgTypes,
   render: (args) => {
+    const [view, setView] = useState<"table" | "cards">("table");
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(
+      args.paginationDefaultPageSize ?? DEFAULT_PAGE_SIZE,
+    );
+    const [sorting, setSorting] = useState<TableSortState>([]);
+    const [filters, setFilters] = useState<TableFilterState>([]);
+
     const {
       data: _data,
       columns: _columns,
       rowActions: _rowActions,
+      onPageChange: _onPageChange,
+      onPageSizeChange: _onPageSizeChange,
+      onSortChange: _onSortChange,
+      onFilterChange: _onFilterChange,
+      serverSide: _serverSide,
+      totalRows: _totalRows,
+      pageIndex: _pageIndex,
       ...restArgs
     } = args;
+
+    const filteredRows = applyServerFilters(mockRows, filters);
+    const sortedRows = applyServerSorting(filteredRows, sorting);
+    const pageRows = paginateRows(sortedRows, page, pageSize);
+    const parityFilterColumns = args.columnFilters ?? [
+      "symbol",
+      "sector",
+      "status",
+      "price",
+    ];
+
+    const sharedTableArgs = {
+      ...restArgs,
+      serverSide: true as const,
+      totalRows: sortedRows.length,
+      pageIndex: page,
+      paginationDefaultPageSize: pageSize,
+      onPageChange: setPage,
+      onPageSizeChange: setPageSize,
+      onSortChange: (next: TableSortState) => {
+        queueMicrotask(() => {
+          setSorting(next);
+        });
+      },
+      onFilterChange: (next: TableFilterState) => {
+        queueMicrotask(() => {
+          setFilters(next);
+        });
+      },
+    };
 
     return (
       <div style={stackStyle}>
@@ -887,21 +996,90 @@ export const CardTableFullWidthPlaybook: Story = {
             <CardHeader>
               <CardTitle>Trade Monitor</CardTitle>
               <CardDescription>
-                Table uses exact card content width, compact spacing, responsive
-                wrapping, and dialog-driven advanced filters.
+                Table and CardData stay in sync with the same advanced filters,
+                pagination, and sorting while switching views.
               </CardDescription>
             </CardHeader>
 
             <CardContent style={cardTableContentStyle}>
-              <Table
-                key={`card-playbook-${JSON.stringify(restArgs)}`}
-                {...restArgs}
-                data={mockRows}
-                columns={baseColumns}
-                rowActions={tableRowActions}
-                onRefresh={args.onRefresh ?? (() => {})}
-                style={{ width: "100%", maxWidth: "100%" }}
-              />
+              {view === "table" ? (
+                <Table
+                  key={`card-playbook-table-${JSON.stringify(restArgs)}`}
+                  {...sharedTableArgs}
+                  data={pageRows}
+                  columns={baseColumns}
+                  rowActions={tableRowActions}
+                  columnFilters={parityFilterColumns}
+                  showViewSwitch
+                  switchToCardViewLabel={args.switchToCardViewLabel ?? "Cards"}
+                  onSwitchToCardView={() => {
+                    setView("cards");
+                  }}
+                  onRefresh={args.onRefresh ?? (() => {})}
+                  style={{ width: "100%", maxWidth: "100%" }}
+                />
+              ) : (
+                <CardData<TradeRow>
+                  data={pageRows}
+                  rowKey="id"
+                  schema={parityCardSchema}
+                  variant="compact"
+                  size={args.size ?? "sm"}
+                  showFieldLabels={false}
+                  actions={parityCardActions}
+                  sortable={args.sortable}
+                  filterable={args.filterable}
+                  columnFilters={parityFilterColumns}
+                  searchable={args.searchable}
+                  globalFilter={args.globalFilter}
+                  searchPlaceholder={args.searchPlaceholder}
+                  showToolbar={args.showToolbar}
+                  showFiltersLabel={args.showFiltersLabel}
+                  hideFiltersLabel={args.hideFiltersLabel}
+                  filterDialogTitle={args.filterDialogTitle}
+                  filterDialogDescription={args.filterDialogDescription}
+                  addFilterLabel={args.addFilterLabel}
+                  addSortLabel={args.addSortLabel}
+                  clearFiltersLabel={args.clearFiltersLabel}
+                  resetSortingLabel={args.resetSortingLabel}
+                  applyFiltersLabel={args.applyFiltersLabel}
+                  globalFilterLabel={args.globalFilterLabel}
+                  globalFilterPlaceholder={args.globalFilterPlaceholder}
+                  serverSide
+                  totalRows={sortedRows.length}
+                  pageIndex={page}
+                  paginationDefaultPageSize={pageSize}
+                  onPageChange={setPage}
+                  onPageSizeChange={setPageSize}
+                  showPagination={args.showPagination}
+                  paginationVariant={args.paginationVariant}
+                  paginationPageSizeOptions={args.paginationPageSizeOptions}
+                  paginationMaxVisiblePages={args.paginationMaxVisiblePages}
+                  paginationShowPageSizeSelector={
+                    args.paginationShowPageSizeSelector
+                  }
+                  paginationShowSummary={args.paginationShowSummary}
+                  paginationShowShowingPage={args.paginationShowShowingPage}
+                  paginationResetPageOnPageSizeChange={
+                    args.paginationResetPageOnPageSizeChange
+                  }
+                  onSortChange={(next) => {
+                    queueMicrotask(() => {
+                      setSorting(next);
+                    });
+                  }}
+                  onFilterChange={(next) => {
+                    queueMicrotask(() => {
+                      setFilters(next);
+                    });
+                  }}
+                  showViewSwitch
+                  switchToTableViewLabel="Table"
+                  onSwitchToTableView={() => {
+                    setView("table");
+                  }}
+                />
+              )}
             </CardContent>
           </Card>
         </div>

@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 import {
@@ -25,6 +25,7 @@ import {
   type CardDataProps,
   type RowAction,
   type TableColumnDef,
+  type TableProps,
 } from "../src/index";
 
 type TradeStatus = "Open" | "Paused" | "Closed";
@@ -106,6 +107,13 @@ interface AutoConfiguredCardRow {
   detailsLink?: string;
   image?: string;
 }
+
+type SharedSortState = Parameters<
+  NonNullable<TableProps<TradeCardRow>["onSortChange"]>
+>[0];
+type SharedFilterState = Parameters<
+  NonNullable<TableProps<TradeCardRow>["onFilterChange"]>
+>[0];
 
 const sectors = ["Banking", "IT", "Energy", "Pharma", "Auto"];
 const statuses: TradeStatus[] = ["Open", "Paused", "Closed"];
@@ -335,6 +343,291 @@ const autoConfiguredCards: AutoConfiguredCardRow[] = [
     detailsLink: "https://www.apple.com/investor/",
   },
 ];
+
+function getRowValueByPath(row: object, keyPath: string): unknown {
+  const path = keyPath.trim();
+
+  if (path === "") {
+    return undefined;
+  }
+
+  const segments = path.split(".");
+  let current: unknown = row;
+
+  for (const segment of segments) {
+    if (
+      typeof current !== "object" ||
+      current == null ||
+      !(segment in current)
+    ) {
+      return undefined;
+    }
+
+    current = (current as Record<string, unknown>)[segment];
+  }
+
+  return current;
+}
+
+function splitFilterTerms(filterValue: unknown): string[] {
+  if (typeof filterValue !== "string") {
+    return [];
+  }
+
+  return filterValue
+    .split(",")
+    .map((term) => term.trim())
+    .filter((term) => term !== "");
+}
+
+type NumericFilterOperator = "gt" | "gte" | "lt" | "lte" | "eq" | "neq";
+
+type ParsedNumericFilterCondition = {
+  operator: NumericFilterOperator;
+  value: number;
+};
+
+function toFiniteNumber(value: unknown): number | null {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === "string") {
+    const normalizedValue = value.trim();
+
+    if (!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalizedValue)) {
+      return null;
+    }
+
+    const parsedValue = Number.parseFloat(normalizedValue);
+    return Number.isFinite(parsedValue) ? parsedValue : null;
+  }
+
+  return null;
+}
+
+function parseNumericFilterCondition(
+  term: string,
+): ParsedNumericFilterCondition | null {
+  const normalizedTerm = term.trim();
+
+  if (normalizedTerm === "") {
+    return null;
+  }
+
+  const prefixedMatch = normalizedTerm.match(
+    /^(>=|<=|!=|>|<|=)\s*(-?(?:\d+(?:\.\d+)?|\.\d+))$/,
+  );
+
+  if (prefixedMatch != null) {
+    const [, operatorToken, valueToken] = prefixedMatch;
+    const numericValue = Number.parseFloat(valueToken);
+
+    if (!Number.isFinite(numericValue)) {
+      return null;
+    }
+
+    if (operatorToken === ">") {
+      return { operator: "gt", value: numericValue };
+    }
+
+    if (operatorToken === ">=") {
+      return { operator: "gte", value: numericValue };
+    }
+
+    if (operatorToken === "<") {
+      return { operator: "lt", value: numericValue };
+    }
+
+    if (operatorToken === "<=") {
+      return { operator: "lte", value: numericValue };
+    }
+
+    if (operatorToken === "!=") {
+      return { operator: "neq", value: numericValue };
+    }
+
+    return { operator: "eq", value: numericValue };
+  }
+
+  if (!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalizedTerm)) {
+    return null;
+  }
+
+  const numericValue = Number.parseFloat(normalizedTerm);
+
+  if (!Number.isFinite(numericValue)) {
+    return null;
+  }
+
+  return { operator: "eq", value: numericValue };
+}
+
+function matchesStringCondition(value: string, term: string): boolean {
+  const normalizedValue = value.toLowerCase();
+  const normalizedTerm = term.trim();
+
+  if (normalizedTerm === "") {
+    return true;
+  }
+
+  if (normalizedTerm.startsWith("!=")) {
+    const expected = normalizedTerm.slice(2).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue !== expected;
+  }
+
+  if (normalizedTerm.startsWith("=")) {
+    const expected = normalizedTerm.slice(1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue === expected;
+  }
+
+  if (normalizedTerm.startsWith("^")) {
+    const expected = normalizedTerm.slice(1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue.startsWith(expected);
+  }
+
+  if (normalizedTerm.startsWith("~")) {
+    const expected = normalizedTerm.slice(1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue.includes(expected);
+  }
+
+  if (normalizedTerm.endsWith("$")) {
+    const expected = normalizedTerm.slice(0, -1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue.endsWith(expected);
+  }
+
+  return normalizedValue.includes(normalizedTerm.toLowerCase());
+}
+
+function matchesNumericCondition(
+  value: number,
+  condition: ParsedNumericFilterCondition,
+): boolean {
+  if (condition.operator === "gt") {
+    return value > condition.value;
+  }
+
+  if (condition.operator === "gte") {
+    return value >= condition.value;
+  }
+
+  if (condition.operator === "lt") {
+    return value < condition.value;
+  }
+
+  if (condition.operator === "lte") {
+    return value <= condition.value;
+  }
+
+  if (condition.operator === "neq") {
+    return value !== condition.value;
+  }
+
+  return value === condition.value;
+}
+
+function matchesAdvancedColumnFilter(
+  rowValue: unknown,
+  filterValue: unknown,
+): boolean {
+  const terms = splitFilterTerms(filterValue);
+
+  if (terms.length === 0) {
+    return true;
+  }
+
+  const numericValue = toFiniteNumber(rowValue);
+  const stringValue = String(rowValue ?? "");
+
+  return terms.some((term) => {
+    const numericCondition = parseNumericFilterCondition(term);
+
+    if (numericCondition != null) {
+      if (numericValue == null) {
+        return false;
+      }
+
+      return matchesNumericCondition(numericValue, numericCondition);
+    }
+
+    return matchesStringCondition(stringValue, term);
+  });
+}
+
+function applySharedFilters(
+  rows: TradeCardRow[],
+  filters: SharedFilterState,
+): TradeCardRow[] {
+  const globalSearch = String(
+    filters.find((filter) => filter.id === "__global")?.value ?? "",
+  )
+    .trim()
+    .toLowerCase();
+
+  const scopedFilters = filters.filter((filter) => filter.id !== "__global");
+
+  return rows.filter((row) => {
+    if (globalSearch !== "") {
+      const searchableText = JSON.stringify(row).toLowerCase();
+
+      if (!searchableText.includes(globalSearch)) {
+        return false;
+      }
+    }
+
+    return scopedFilters.every((filter) => {
+      const rowValue = getRowValueByPath(row, filter.id);
+      return matchesAdvancedColumnFilter(rowValue, filter.value);
+    });
+  });
+}
+
+function applySharedSorting(
+  rows: TradeCardRow[],
+  sorting: SharedSortState,
+): TradeCardRow[] {
+  if (sorting.length === 0) {
+    return rows;
+  }
+
+  const [{ id, desc }] = sorting;
+
+  return [...rows].sort((leftRow, rightRow) => {
+    const left = getRowValueByPath(leftRow, id);
+    const right = getRowValueByPath(rightRow, id);
+
+    if (typeof left === "number" && typeof right === "number") {
+      return desc ? right - left : left - right;
+    }
+
+    const leftText = String(left ?? "").toLowerCase();
+    const rightText = String(right ?? "").toLowerCase();
+
+    if (leftText === rightText) {
+      return 0;
+    }
+
+    return desc
+      ? leftText < rightText
+        ? 1
+        : -1
+      : leftText < rightText
+        ? -1
+        : 1;
+  });
+}
+
+function paginateRows(
+  rows: TradeCardRow[],
+  page: number,
+  pageSize: number,
+): TradeCardRow[] {
+  const safePageSize = Math.max(1, pageSize);
+  const safePage = Math.max(1, page);
+  const startIndex = (safePage - 1) * safePageSize;
+
+  return rows.slice(startIndex, startIndex + safePageSize);
+}
 
 const autoConfiguredSchema: CardDataFieldSchema<AutoConfiguredCardRow>[] = [
   {
@@ -670,6 +963,46 @@ const adaptiveSchema: CardDataFieldSchema<TradeCardRow>[] = [
   },
 ];
 
+const switchParitySchema: CardDataFieldSchema<TradeCardRow>[] = [
+  {
+    key: "symbol",
+    label: "Symbol",
+    priority: 0,
+  },
+  {
+    key: "sector",
+    label: "Sector",
+    priority: 1,
+  },
+  {
+    key: "status",
+    label: "Status",
+    type: "status",
+    priority: 2,
+  },
+  {
+    key: "trader",
+    label: "Trader",
+    priority: 3,
+  },
+  {
+    key: "price",
+    label: "Price",
+    type: "currency",
+    currency: "INR",
+    maximumFractionDigits: 2,
+    align: "right",
+    priority: 4,
+  },
+  {
+    key: "updatedAt",
+    label: "Updated",
+    type: "date",
+    dateOptions: { year: "numeric", month: "short", day: "numeric" },
+    priority: 5,
+  },
+];
+
 const dashboardTopRowStyle: CSSProperties = {
   width: "100%",
   minWidth: 0,
@@ -914,8 +1247,100 @@ export const ActionOverflowMenu: Story = {
   ),
 };
 
+export const ResponsiveColumnsTopActions: Story = {
+  name: "Responsive Columns + Top Actions",
+  render: () => (
+    <div style={sectionStyle}>
+      <CardData<AutoConfiguredCardRow>
+        data={autoConfiguredCards}
+        rowKey="id"
+        schema={autoConfiguredSchema}
+        variant="compact"
+        size="sm"
+        showFieldLabels={false}
+        locale="en-IN"
+        currency="INR"
+        columns={{ mobile: 1, tablet: 2, web: 3 }}
+        actionPlacement="top"
+        actionAlignment="right"
+        actions={(row) => resolveAutoActions(row)}
+        actionMode="auto"
+        actionInlineMaxVisible={5}
+      />
+    </div>
+  ),
+};
+
+export const VirtualizedAdvancedFilterCards: Story = {
+  name: "Virtualized + Advanced Filter Cards",
+  render: () => (
+    <div style={sectionStyle}>
+      <CardData<TradeCardRow>
+        data={trades}
+        rowKey="id"
+        schema={adaptiveSchema}
+        variant="default"
+        size="sm"
+        showFieldLabels={false}
+        locale="en-IN"
+        currency="INR"
+        actions={cardActions}
+        sortable
+        filterable
+        columnFilters={["symbol", "sector", "status", "trader", "price"]}
+        searchable
+        globalFilter
+        showToolbar
+        showPagination={false}
+        virtualized
+        virtualizedMaxHeight="34rem"
+        columns={{ mobile: 1, tablet: 2, web: 3 }}
+        actionMode="auto"
+        actionAlignment="right"
+      />
+    </div>
+  ),
+};
+
 function CardTableSwitchDemo(): JSX.Element {
   const [view, setView] = useState<"table" | "cards">("table");
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [sorting, setSorting] = useState<SharedSortState>([]);
+  const [filters, setFilters] = useState<SharedFilterState>([]);
+
+  const sharedResult = useMemo(() => {
+    const filteredRows = applySharedFilters(trades, filters);
+    const sortedRows = applySharedSorting(filteredRows, sorting);
+    const pageRows = paginateRows(sortedRows, page, pageSize);
+
+    return {
+      rows: pageRows,
+      totalRows: sortedRows.length,
+    };
+  }, [filters, page, pageSize, sorting]);
+
+  const parityFilterColumns = [
+    "symbol",
+    "sector",
+    "status",
+    "trader",
+    "price",
+    "updatedAt",
+  ];
+
+  function deferSetSorting(next: SharedSortState): void {
+    queueMicrotask(() => {
+      setSorting(next);
+    });
+  }
+
+  function deferSetFilters(next: SharedFilterState): void {
+    queueMicrotask(() => {
+      setFilters(next);
+    });
+  }
 
   return (
     <div style={sectionStyle}>
@@ -923,25 +1348,38 @@ function CardTableSwitchDemo(): JSX.Element {
         <CardHeader>
           <CardTitle>Trade Monitor</CardTitle>
           <CardDescription>
-            Keep one data source and switch between Table and CardData without
-            changing behavior.
+            Table and CardData share the same advanced filters, sorting, and
+            pagination state while switching views.
           </CardDescription>
         </CardHeader>
 
         <CardContent style={{ width: "100%", minWidth: 0, padding: "0.65rem" }}>
           {view === "table" ? (
             <Table<TradeCardRow>
-              data={trades}
+              data={sharedResult.rows}
               columns={tableColumns}
               rowKey="id"
               variant="outline"
               size="sm"
+              serverSide
+              totalRows={sharedResult.totalRows}
+              pageIndex={page}
+              paginationDefaultPageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+              onSortChange={deferSetSorting}
+              onFilterChange={deferSetFilters}
               searchable
               filterable
+              columnFilters={parityFilterColumns}
               globalFilter
               sortable
               showToolbar
+              showRefresh
+              fullscreen
+              onRefresh={() => {}}
               rowActions={tableRowActions}
+              showPagination
               showViewSwitch
               switchToCardViewLabel="Cards"
               onSwitchToCardView={() => {
@@ -950,18 +1388,35 @@ function CardTableSwitchDemo(): JSX.Element {
             />
           ) : (
             <CardData<TradeCardRow>
-              data={trades}
+              data={sharedResult.rows}
               rowKey="id"
-              schema={adaptiveSchema}
+              schema={switchParitySchema}
               size="sm"
               variant="compact"
               showFieldLabels={false}
               locale="en-IN"
               currency="INR"
               actions={cardActions}
+              serverSide
+              totalRows={sharedResult.totalRows}
+              pageIndex={page}
+              paginationDefaultPageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+              sortable
+              filterable
+              columnFilters={parityFilterColumns}
+              searchable
+              globalFilter
+              onSortChange={deferSetSorting}
+              onFilterChange={deferSetFilters}
               actionMode="auto"
               actionAlignment="right"
-              viewportMaxHeight="34rem"
+              showToolbar
+              showRefresh
+              fullscreen
+              onRefresh={() => {}}
+              showPagination
               showViewSwitch
               switchToTableViewLabel="Table"
               onSwitchToTableView={() => {
@@ -986,9 +1441,28 @@ export const CardDataPlayground: Story = {
     variant: "default",
     size: "sm",
     showFieldLabels: false,
+    sortable: true,
+    filterable: true,
+    searchable: true,
+    globalFilter: true,
+    showToolbar: true,
     actionMode: "auto",
     actionInlineMaxVisible: 5,
     actionAlignment: "right",
+    actionPlacement: "bottom",
+    columns: { mobile: 1, tablet: 2, web: 3 },
+    showPagination: true,
+    paginationVariant: "advance",
+    paginationDefaultPageSize: 10,
+    paginationPageSizeOptions: [10, 20, 50],
+    paginationMaxVisiblePages: 5,
+    paginationShowPageSizeSelector: true,
+    paginationShowSummary: true,
+    paginationShowShowingPage: true,
+    paginationResetPageOnPageSizeChange: true,
+    virtualized: false,
+    virtualizedMaxHeight: "34rem",
+    virtualizedOverscan: 6,
     viewportMaxHeight: "34rem",
     safeAreaAware: true,
   },
@@ -1002,6 +1476,13 @@ export const CardDataPlayground: Story = {
       options: ["xs", "sm", "md", "lg"],
     },
     showFieldLabels: { control: "boolean" },
+    sortable: { control: "boolean" },
+    filterable: { control: "boolean" },
+    searchable: { control: "boolean" },
+    globalFilter: { control: "boolean" },
+    showToolbar: { control: "boolean" },
+    searchPlaceholder: { control: "text" },
+    columnFilters: { control: "object" },
     actionMode: {
       control: "select",
       options: ["auto", "inline", "menu"],
@@ -1012,6 +1493,36 @@ export const CardDataPlayground: Story = {
     actionAlignment: {
       control: "select",
       options: ["left", "right"],
+    },
+    actionPlacement: {
+      control: "select",
+      options: ["top", "bottom"],
+    },
+    columns: { control: "object" },
+    columnBreakpoints: { control: "object" },
+    showPagination: { control: "boolean" },
+    paginationVariant: {
+      control: "select",
+      options: ["basic", "advance", "compact"],
+    },
+    paginationDefaultPageSize: {
+      control: { type: "number", min: 1, max: 100, step: 1 },
+    },
+    paginationPageSizeOptions: { control: "object" },
+    paginationMaxVisiblePages: {
+      control: { type: "number", min: 3, max: 15, step: 1 },
+    },
+    paginationShowPageSizeSelector: { control: "boolean" },
+    paginationShowSummary: { control: "boolean" },
+    paginationShowShowingPage: { control: "boolean" },
+    paginationResetPageOnPageSizeChange: { control: "boolean" },
+    virtualized: { control: "boolean" },
+    virtualizedMaxHeight: { control: "text" },
+    virtualizedEstimateSize: {
+      control: { type: "number", min: 80, max: 420, step: 1 },
+    },
+    virtualizedOverscan: {
+      control: { type: "number", min: 1, max: 30, step: 1 },
     },
     viewportMaxHeight: { control: "text" },
     safeAreaAware: { control: "boolean" },

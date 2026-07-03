@@ -1409,8 +1409,10 @@ const rowActions: RowAction<User>[] = [
 // - Advanced filter dialog UI uses inbuilt Field, Input, Select, Button, and Scrollbar primitives with theme-token styling.
 // - Table viewport uses the inbuilt Scrollbar component (axis='both').
 // - Toolbar and sortable headers use inbuilt Button controls with inbuilt feather icons.
+// - Toolbar parity mode keeps one row with full-width search and icon controls ordered as filter, view switch, refresh, and fullscreen.
 // - For icon-only toolbar controls, keep tooltip labels one-word and short in stories/playbooks.
-// - Storybook reference: Table + Card Switch Playbook (paired with CardData mixed layouts).
+// - In shared table/card playbooks, if page-size state is shared via `onPageSizeChange` and `paginationDefaultPageSize`, Table picks up card auto-adjusted page-size updates.
+// - Storybook reference: Card + Table Full Width Playbook (shared table/card filter, sort, and pagination state).
 ```
 
 ### CardData
@@ -1420,7 +1422,11 @@ import { CardData } from '@keytuno/ui-react';
 import type {
   CardDataAction,
   CardDataActionAlignment,
+  CardDataActionPlacement,
+  CardDataActionSource,
   CardDataActionMode,
+  CardDataColumnBreakpoints,
+  CardDataColumns,
   CardDataFieldSchema,
   CardDataFieldType,
 } from '@keytuno/ui-react';
@@ -1437,11 +1443,44 @@ import type {
   currency?={string}
   showFieldLabels?={boolean}
 
+  // Table-parity data engine
+  sortable?={boolean}
+  filterable?={boolean}
+  columnFilters?={string[]}
+  globalFilter?={boolean}
+  searchable?={boolean}
+  searchPlaceholder?={string}
+  searchAriaLabel?={string}
+  showToolbar?={boolean}
+
+  // Toolbar parity controls
+  showRefresh?={boolean}
+  onRefresh?={() => void | Promise<void>}
+  refreshLabel?={string}            // keep icon tooltip short, e.g. 'Refresh'
+  refreshingLabel?={string}         // keep icon tooltip short, e.g. 'Refreshing'
+  fullscreen?={boolean}
+  fullscreenLabel?={string}         // keep icon tooltip short, e.g. 'Fullscreen'
+  resetScreenLabel?={string}        // keep icon tooltip short, e.g. 'Reset'
+
+  // Advanced filter dialog labels (same model as Table)
+  showFiltersLabel?={string}
+  hideFiltersLabel?={string}
+  filterDialogTitle?={string}
+  filterDialogDescription?={string}
+  addFilterLabel?={string}
+  addSortLabel?={string}
+  clearFiltersLabel?={string}
+  resetSortingLabel?={string}
+  applyFiltersLabel?={string}
+  globalFilterLabel?={string}
+  globalFilterPlaceholder?={string}
+
   // Card actions (array or per-row resolver)
   actions?={CardDataAction<User>[] | ((row: User, rowIndex: number) => CardDataAction<User>[])}
   actionMode?={'auto'|'inline'|'menu'}
   actionInlineMaxVisible?={number}    // auto mode threshold (default 5)
   actionAlignment?={'left'|'right'}
+  actionPlacement?={'top'|'bottom'}   // use with actionAlignment='right' for top-right/bottom-right
   actionMenuLabel?={ReactNode}
   onAction?={(ctx) => void}
 
@@ -1450,14 +1489,68 @@ import type {
   switchToTableViewLabel="Table"
   onSwitchToTableView={() => setView('table')}
 
-  // Layout
+  // Responsive layout
+  columns?={number | CardDataColumns}
+  columnBreakpoints?={CardDataColumnBreakpoints}
+
+  // Optional TanStack virtualized card rows
+  virtualized?={boolean}
+  virtualizedMaxHeight?={number | string}
+  virtualizedEstimateSize?={number}
+  virtualizedOverscan?={number}
+
+  // Pagination model (same surface as Table)
+  serverSide?={boolean}
+  totalRows?={number}
+  pageIndex?={number}
+  onPageChange?={(page) => void}
+  onPageSizeChange?={(size) => void}
+  showPagination?={boolean}
+  paginationVariant?={'basic'|'advance'|'compact'}
+  paginationDefaultPageSize?={number}
+  paginationPageSizeOptions?={number[]}
+  paginationMaxVisiblePages?={number}
+  paginationShowPageSizeSelector?={boolean}
+  paginationShowSummary?={boolean}
+  paginationShowShowingPage?={boolean}
+  paginationResetPageOnPageSizeChange?={boolean}
+  onSortChange?={(sorting) => void}
+  onFilterChange?={(filters) => void}
+
+  // Viewport and state
   viewportMaxHeight?={number | string}
   safeAreaAware?={boolean}
   emptyText?={ReactNode}
 />
 
 type CardDataActionAlignment = 'left' | 'right';
+type CardDataActionPlacement = 'top' | 'bottom';
 type CardDataActionMode = 'auto' | 'inline' | 'menu';
+type CardDataActionSource =
+  | 'item-action'
+  | 'view-switch'
+  | 'refresh'
+  | 'fullscreen'
+  | 'search'
+  | 'sort'
+  | 'sort-reset'
+  | 'filter'
+  | 'column-filters-toggle'
+  | 'column-filters-apply'
+  | 'column-filters-clear'
+  | 'pagination'
+  | 'page-size';
+
+interface CardDataColumns {
+  mobile?: number;   // default 1
+  tablet?: number;   // default 2
+  web?: number;      // default 3
+}
+
+interface CardDataColumnBreakpoints {
+  tablet?: number;   // default 768
+  web?: number;      // default 1024
+}
 
 type CardDataFieldType =
   | 'auto'
@@ -1489,11 +1582,20 @@ interface CardDataFieldSchema<TData> {
 
 // Behavior notes:
 // - Minimal fast path: pass only `data`; CardData infers schema from the first row.
+// - CardData uses the same advanced filter dialog contract and token grammar as Table.
+// - When Table and CardData share `serverSide`, `pageIndex`, `onPageChange`, `onSortChange`, and `onFilterChange`, both views stay perfectly synchronized.
+// - Toolbar parity mode keeps one-row layout with full-width search and icon controls (filter, view switch, refresh, fullscreen) in both CardData and Table switch stories.
+// - Default responsive card columns: mobile=1, tablet=2, web=3.
+// - Override responsive count with `columns` and viewport cutoffs with `columnBreakpoints`.
+// - Optional TanStack virtualization (`virtualized`) supports large card datasets with configurable estimate/overscan.
+// - Pagination auto-adjust can increase page size to nearby row-aligned counts so card grids avoid blank slots when more rows exist.
+// - If you share `onPageSizeChange` state between CardData and Table (switch playbooks), auto-adjusted card page size is propagated to Table too.
+// - Place actions at card top or bottom via `actionPlacement`; set `actionAlignment='right'` for top-right/bottom-right behavior.
 // - Auto mixed layout: compact values share left/right columns, long content expands full row.
 // - Empty/null values are hidden by default (`hideIfEmpty: true`) with no layout gaps.
 // - Built-in semantic renderers: status, badge, progress, lazy-loaded media, and clickable links.
 // - Built-in formatters: number, currency, percent, date, phone, and link href normalization.
-// - Layout is list-first and fluid (no fixed card width/height assumptions).
+// - Layout is fluid and responsive (cards use configured mobile/tablet/web columns with no fixed card width assumptions).
 // - `actionMode='auto'` shows inline icon actions up to `actionInlineMaxVisible` (default 5), then switches to a 3-dot dropdown overflow menu.
 // - Media/image fields render full width by default.
 // - Storybook references:
@@ -1501,6 +1603,9 @@ interface CardDataFieldSchema<TData> {
 //   - Auto Configured Mixed Layout
 //   - Schema-Driven Adaptive Cards
 //   - Action Overflow Menu
+//   - Responsive Columns + Top Actions
+//   - Virtualized + Advanced Filter Cards
+//   - Table + Card Switch Playbook
 //   - CardData Playground
 ```
 

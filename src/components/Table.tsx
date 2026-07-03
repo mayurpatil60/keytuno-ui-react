@@ -886,6 +886,20 @@ export function Table<TData extends object = object>({
   }, [pageIndex]);
 
   useEffect(() => {
+    setPaginationState((current) => {
+      if (current.pageSize === normalizedDefaultPageSize) {
+        return current;
+      }
+
+      return {
+        ...current,
+        pageIndex: 0,
+        pageSize: normalizedDefaultPageSize,
+      };
+    });
+  }, [normalizedDefaultPageSize]);
+
+  useEffect(() => {
     if (!fullscreen || !isFullscreenActive) {
       return;
     }
@@ -1618,7 +1632,7 @@ export function Table<TData extends object = object>({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     gap: sizeToken.toolbarGap,
     padding: "0.12rem 0",
   };
@@ -1626,29 +1640,30 @@ export function Table<TData extends object = object>({
   const toolbarLeftStyle: CSSProperties = {
     display: "flex",
     alignItems: "center",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     gap: sizeToken.toolbarGap,
     minWidth: 0,
     maxWidth: "100%",
+    flex: "1 1 auto",
   };
 
   const toolbarRightStyle: CSSProperties = {
     display: "flex",
     alignItems: "center",
-    flexWrap: "wrap",
+    flexWrap: "nowrap",
     gap: "0.4rem",
     marginInlineStart: "auto",
-    minWidth: 0,
+    minWidth: "fit-content",
     maxWidth: "100%",
   };
 
   const searchWrapStyle: CSSProperties = {
     position: "relative",
-    flex: "1 1 9rem",
-    width: "100%",
+    flex: "1 1 auto",
+    width: "auto",
     boxSizing: "border-box",
     minInlineSize: 0,
-    inlineSize: "clamp(10rem, 28vw, 15rem)",
+    inlineSize: "auto",
     maxWidth: "100%",
     minWidth: 0,
   };
@@ -1890,40 +1905,6 @@ export function Table<TData extends object = object>({
               </Button>
             ) : null}
 
-            {fullscreen ? (
-              <Button
-                size={sizeToken.controlSize}
-                variant={isFullscreenActive ? "primary" : "outline"}
-                iconOnly
-                tooltip={
-                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
-                }
-                tooltipSide="top"
-                tooltipSize="xs"
-                aria-label={
-                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
-                }
-                onClick={() => {
-                  setIsFullscreenActive((current) => {
-                    const next = !current;
-
-                    onAction?.({
-                      source: "fullscreen",
-                      fullscreen: next,
-                    });
-
-                    return next;
-                  });
-                }}
-              >
-                {isFullscreenActive ? (
-                  <FiMinimize2 size={sizeToken.iconSize} />
-                ) : (
-                  <FiMaximize2 size={sizeToken.iconSize} />
-                )}
-              </Button>
-            ) : null}
-
             {canShowViewSwitch ? (
               <Button
                 size={sizeToken.controlSize}
@@ -1967,6 +1948,40 @@ export function Table<TData extends object = object>({
                 }}
               >
                 <FiRefreshCw size={sizeToken.iconSize} />
+              </Button>
+            ) : null}
+
+            {fullscreen ? (
+              <Button
+                size={sizeToken.controlSize}
+                variant={isFullscreenActive ? "primary" : "outline"}
+                iconOnly
+                tooltip={
+                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
+                }
+                tooltipSide="top"
+                tooltipSize="xs"
+                aria-label={
+                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
+                }
+                onClick={() => {
+                  setIsFullscreenActive((current) => {
+                    const next = !current;
+
+                    onAction?.({
+                      source: "fullscreen",
+                      fullscreen: next,
+                    });
+
+                    return next;
+                  });
+                }}
+              >
+                {isFullscreenActive ? (
+                  <FiMinimize2 size={sizeToken.iconSize} />
+                ) : (
+                  <FiMaximize2 size={sizeToken.iconSize} />
+                )}
               </Button>
             ) : null}
           </div>
