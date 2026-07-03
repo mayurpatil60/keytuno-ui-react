@@ -7,12 +7,19 @@ import {
 
 export type SeparatorSize = "xs" | "sm" | "md" | "lg";
 export type SeparatorOrientation = "horizontal" | "vertical";
+export type SeparatorVariant =
+  | "default"
+  | "light"
+  | "dark"
+  | "brand-light"
+  | "brand-dark";
 export type SeparatorActionSource = "click" | "focus" | "blur";
 
 export interface SeparatorActionContext {
   source: SeparatorActionSource;
   orientation: SeparatorOrientation;
   size: SeparatorSize;
+  variant: SeparatorVariant;
   decorative: boolean;
   event?: unknown;
 }
@@ -20,6 +27,7 @@ export interface SeparatorActionContext {
 export interface SeparatorProps extends HTMLAttributes<HTMLDivElement> {
   size?: SeparatorSize;
   orientation?: SeparatorOrientation;
+  variant?: SeparatorVariant;
   decorative?: boolean;
   onAction?: (context: SeparatorActionContext) => void;
 }
@@ -56,9 +64,22 @@ const sizeTokens: Record<SeparatorSize, SeparatorSizeTokens> = {
 
 const baseClasses = "shrink-0";
 
+const variantColors: Record<SeparatorVariant, string> = {
+  default:
+    "var(--ktn-separator-color, color-mix(in srgb, var(--ktn-border-muted, #d4dce6) 88%, var(--ktn-bg-default, #ffffff) 12%))",
+  light:
+    "color-mix(in srgb, var(--ktn-border-muted, #d4dce6) 84%, var(--ktn-bg-default, #ffffff) 16%)",
+  dark: "color-mix(in srgb, #e2e8f0 18%, #1e293b 82%)",
+  "brand-light":
+    "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 24%, var(--ktn-border-muted, #d4dce6) 76%)",
+  "brand-dark":
+    "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 28%, #152650 72%)",
+};
+
 export function Separator({
   size = "md",
   orientation = "horizontal",
+  variant = "default",
   decorative = true,
   onAction,
   className = "",
@@ -69,8 +90,7 @@ export function Separator({
   ...props
 }: SeparatorProps): JSX.Element {
   const tokens = sizeTokens[size];
-  const separatorColor =
-    "var(--ktn-separator-color, color-mix(in srgb, var(--ktn-border-muted, #d4dce6) 88%, var(--ktn-bg-default, #ffffff) 12%))";
+  const separatorColor = variantColors[variant];
 
   const separatorStyle: CSSProperties = {
     borderRadius: "999px",
@@ -98,6 +118,7 @@ export function Separator({
       source,
       orientation,
       size,
+      variant,
       decorative,
       event,
     });

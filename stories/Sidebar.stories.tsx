@@ -16,6 +16,7 @@ import {
   FiHelpCircle,
   FiLayers,
   FiMoon,
+  FiLogOut,
   FiSettings,
   FiShield,
   FiShoppingCart,
@@ -379,6 +380,24 @@ function buildSections(includeIcons: boolean): SidebarSection[] {
         },
       ],
     },
+    {
+      id: "account",
+      title: "Account",
+      items: [
+        {
+          id: "team-profile",
+          label: "Team Profile",
+          icon: iconOrUndefined(includeIcons, <FiUsers size={iconSize} />),
+          href: "#",
+        },
+        {
+          id: "sign-out",
+          label: "Sign Out",
+          icon: iconOrUndefined(includeIcons, <FiLogOut size={iconSize} />),
+          href: "#",
+        },
+      ],
+    },
   ];
 }
 
@@ -398,19 +417,6 @@ function buildLargeSections(includeIcons: boolean): SidebarSection[] {
       })),
     },
   ];
-}
-
-function SidebarFooter(): JSX.Element {
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
-      <Button variant="ghost" size="sm" style={{ width: "100%" }}>
-        Team profile
-      </Button>
-      <Button variant="outline" size="sm" style={{ width: "100%" }}>
-        Sign out
-      </Button>
-    </div>
-  );
 }
 
 function SidebarPlaybookCanvas({
@@ -491,7 +497,6 @@ function SidebarPlaybookCanvas({
       <Sidebar
         {...args}
         sections={sections}
-        footer={<SidebarFooter />}
         collapsed={storyCollapsed}
         open={storyOpen}
         activeItemId={storyActiveItemId}

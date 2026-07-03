@@ -25,7 +25,7 @@ export { Textarea, TextareaActionContext, TextareaActionSource, TextareaProps, T
 export { Tooltip, TooltipActionContext, TooltipActionSource, TooltipProps, TooltipSide, TooltipSize } from './components/Tooltip.js';
 export { Alert, AlertAction, AlertActionContext, AlertActionProps, AlertActionSource, AlertCustomColors, AlertDescription, AlertDescriptionProps, AlertProps, AlertSide, AlertSize, AlertTitle, AlertTitleProps, AlertVariant, AlertViewportInset } from './components/Alert.js';
 export { Skeleton, SkeletonActionContext, SkeletonActionSource, SkeletonProps, SkeletonRadius } from './components/Skeleton.js';
-export { Separator, SeparatorActionContext, SeparatorActionSource, SeparatorOrientation, SeparatorProps, SeparatorSize } from './components/Separator.js';
+export { Separator, SeparatorActionContext, SeparatorActionSource, SeparatorOrientation, SeparatorProps, SeparatorSize, SeparatorVariant } from './components/Separator.js';
 export { Radio, RadioActionContext, RadioActionSource, RadioAlign, RadioOption, RadioOrientation, RadioProps, RadioSize } from './components/Radio.js';
 export { InputGroup, InputGroupActionContext, InputGroupActionSource, InputGroupAddon, InputGroupAddonProps, InputGroupAlign, InputGroupButton, InputGroupButtonProps, InputGroupInput, InputGroupInputProps, InputGroupProps, InputGroupSize, InputGroupTextarea, InputGroupTextareaProps, InputGroupVariant } from './components/InputGroup.js';
 export { Select, SelectActionContext, SelectActionSource, SelectGroup, SelectOption, SelectProps, SelectSize, SelectValue } from './components/Select.js';

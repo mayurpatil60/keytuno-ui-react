@@ -239,6 +239,7 @@ export type {
   SeparatorOrientation,
   SeparatorProps,
   SeparatorSize,
+  SeparatorVariant,
 } from "./components/Separator";
 export { Radio } from "./components/Radio";
 export type {

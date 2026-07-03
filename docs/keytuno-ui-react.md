@@ -352,12 +352,13 @@ import { Separator } from '@keytuno/ui-react';
 <Separator
   orientation?={'horizontal'|'vertical'}
   size?={'xs'|'sm'|'md'|'lg'}
+  variant?={'default'|'light'|'dark'|'brand-light'|'brand-dark'}
   decorative?={boolean}
 />
 
 // Theme behavior:
-// - Separator color resolves from semantic theme tokens.
-// - It automatically adapts in light and dark modes (no manual color override required).
+// - Use variant to tune divider contrast by surface theme.
+// - Sidebar uses matching separator variants internally for each sidebar variant.
 ```
 
 ### Tooltip
@@ -991,6 +992,7 @@ interface SidebarActionContext {
 //   emptyText='No navigation items.'
 // - Sidebar panel is full height (100vh) and square-edged (no rounded corners).
 // - The middle navigation area uses the inbuilt themed Scrollbar.
+// - Section and header dividers use matching Separator variant tones (default/light/dark/brand-light/brand-dark).
 // - Collapse toggle is fixed at the bottom and is rendered only when showItemIcons=true.
 // - Sidebar has no internal mobile toggle/backdrop button; control open state from parent
 //   (for example via Navbar hamburger in app layout).

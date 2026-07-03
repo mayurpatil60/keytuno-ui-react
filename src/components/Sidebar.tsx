@@ -117,6 +117,7 @@ type SidebarVariantTokens = {
   panelShadow: string;
   textColor: string;
   mutedTextColor: string;
+  itemIconColor: string;
   itemHoverBackgroundColor: string;
   itemActiveBackgroundColor: string;
   itemActiveTextColor: string;
@@ -189,6 +190,7 @@ const variantTokens: Record<SidebarVariant, SidebarVariantTokens> = {
     panelShadow: "0 14px 30px rgba(15, 23, 42, 0.12)",
     textColor: "var(--ktn-text-primary)",
     mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    itemIconColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     itemHoverBackgroundColor:
       "color-mix(in srgb, var(--ktn-bg-muted, #e2e8f0) 75%, transparent)",
     itemActiveBackgroundColor:
@@ -206,6 +208,7 @@ const variantTokens: Record<SidebarVariant, SidebarVariantTokens> = {
     panelShadow: "0 14px 30px rgba(15, 23, 42, 0.11)",
     textColor: "var(--ktn-text-primary)",
     mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    itemIconColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     itemHoverBackgroundColor:
       "color-mix(in srgb, var(--ktn-bg-muted, #e2e8f0) 72%, transparent)",
     itemActiveBackgroundColor:
@@ -222,6 +225,7 @@ const variantTokens: Record<SidebarVariant, SidebarVariantTokens> = {
     panelShadow: "0 20px 42px rgba(2, 6, 23, 0.58)",
     textColor: "#f8fafc",
     mutedTextColor: "color-mix(in srgb, #e2e8f0 76%, #94a3b8 24%)",
+    itemIconColor: "color-mix(in srgb, #f8fafc 92%, #cbd5e1 8%)",
     itemHoverBackgroundColor: "color-mix(in srgb, #334155 38%, transparent)",
     itemActiveBackgroundColor:
       "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 42%, transparent)",
@@ -237,6 +241,7 @@ const variantTokens: Record<SidebarVariant, SidebarVariantTokens> = {
     panelShadow: "0 22px 44px rgba(2, 6, 23, 0.6)",
     textColor: "#eff6ff",
     mutedTextColor: "color-mix(in srgb, #dbeafe 78%, #93c5fd 22%)",
+    itemIconColor: "color-mix(in srgb, #eff6ff 92%, #bfdbfe 8%)",
     itemHoverBackgroundColor:
       "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 26%, transparent)",
     itemActiveBackgroundColor:
@@ -254,6 +259,7 @@ const variantTokens: Record<SidebarVariant, SidebarVariantTokens> = {
     panelShadow: "0 16px 34px rgba(15, 23, 42, 0.11)",
     textColor: "var(--ktn-text-primary)",
     mutedTextColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    itemIconColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     itemHoverBackgroundColor:
       "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 9%, transparent)",
     itemActiveBackgroundColor:
@@ -776,7 +782,7 @@ export function Sidebar({
             minWidth: `${tokens.iconSize + 6}px`,
             color: itemHighlighted
               ? colors.itemActiveTextColor
-              : colors.mutedTextColor,
+              : colors.itemIconColor,
             lineHeight: 0,
           };
 
@@ -795,7 +801,7 @@ export function Sidebar({
             alignItems: "center",
             gap: "0.34rem",
             marginInlineStart: "0.36rem",
-            color: colors.mutedTextColor,
+            color: colors.itemIconColor,
             flexShrink: 0,
           };
 
@@ -825,7 +831,9 @@ export function Sidebar({
                       justifyContent: "center",
                       width: `${tokens.iconSize + 6}px`,
                       height: `${tokens.iconSize + 6}px`,
-                      color: colors.mutedTextColor,
+                      color: itemHighlighted
+                        ? colors.itemActiveTextColor
+                        : colors.itemIconColor,
                     }}
                   >
                     {itemExpanded ? (
@@ -1070,7 +1078,10 @@ export function Sidebar({
           ) : null}
         </div>
 
-        <Separator size={size === "xs" ? "xs" : "sm"} />
+        <Separator
+          size={size === "xs" ? "xs" : "sm"}
+          variant={resolvedVariant}
+        />
 
         <Scrollbar
           axis="y"
@@ -1118,7 +1129,10 @@ export function Sidebar({
                 >
                   {sectionIndex > 0 ? (
                     <div style={{ paddingBlock: "0.22rem" }}>
-                      <Separator size={size === "xs" ? "xs" : "sm"} />
+                      <Separator
+                        size={size === "xs" ? "xs" : "sm"}
+                        variant={resolvedVariant}
+                      />
                     </div>
                   ) : null}
 
@@ -1171,6 +1185,7 @@ export function Sidebar({
               size={controlButtonSize}
               iconOnly
               iconOnlyTone
+              iconColor={colors.itemIconColor}
               onAction={(event) => {
                 setCollapsedState(!resolvedCollapsed, event);
               }}

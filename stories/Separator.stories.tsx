@@ -49,6 +49,63 @@ const menuItemDescriptionStyle: CSSProperties = {
   color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
 };
 
+const variantCardsStyle: CSSProperties = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "0.75rem",
+  width: "100%",
+};
+
+const variantCardStyle: CSSProperties = {
+  border: "1px solid var(--ktn-border-muted)",
+  borderRadius: "0.7rem",
+  padding: "0.7rem",
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.45rem",
+};
+
+const separatorVariantShowcase: Array<{
+  variant: "default" | "light" | "dark" | "brand-light" | "brand-dark";
+  label: string;
+  background: string;
+  textColor: string;
+}> = [
+  {
+    variant: "default",
+    label: "Default",
+    background: "var(--ktn-bg-surface, #ffffff)",
+    textColor: "var(--ktn-text-primary)",
+  },
+  {
+    variant: "light",
+    label: "Light",
+    background:
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 96%, #dbeafe 4%)",
+    textColor: "var(--ktn-text-primary)",
+  },
+  {
+    variant: "dark",
+    label: "Dark",
+    background: "color-mix(in srgb, #0f172a 88%, #111827 12%)",
+    textColor: "#f8fafc",
+  },
+  {
+    variant: "brand-light",
+    label: "Brand Light",
+    background:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 10%, var(--ktn-bg-surface, #ffffff) 90%)",
+    textColor: "var(--ktn-text-primary)",
+  },
+  {
+    variant: "brand-dark",
+    label: "Brand Dark",
+    background:
+      "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 27%, #0f172a 73%)",
+    textColor: "#eff6ff",
+  },
+];
+
 export const Vertical: Story = {
   render: () => (
     <div style={stackStyle}>
@@ -233,17 +290,82 @@ export const List: Story = {
   ),
 };
 
+export const Variants: Story = {
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Variants</h3>
+
+      <Field style={{ width: "min(900px, 95vw)" }}>
+        <FieldLabel>Sidebar-aligned separator variants</FieldLabel>
+
+        <FieldContent>
+          <div style={variantCardsStyle}>
+            {separatorVariantShowcase.map((item) => (
+              <div
+                key={item.variant}
+                style={{
+                  ...variantCardStyle,
+                  backgroundColor: item.background,
+                  color: item.textColor,
+                  borderColor:
+                    item.variant === "dark" || item.variant === "brand-dark"
+                      ? "rgba(148, 163, 184, 0.3)"
+                      : "var(--ktn-border-muted)",
+                }}
+              >
+                <strong style={{ fontSize: "0.84rem", lineHeight: 1.2 }}>
+                  {item.label}
+                </strong>
+
+                <Separator variant={item.variant} size="sm" />
+
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.45rem",
+                    opacity: 0.92,
+                    fontSize: "0.78rem",
+                  }}
+                >
+                  <span>Left</span>
+                  <Separator
+                    variant={item.variant}
+                    orientation="vertical"
+                    size="sm"
+                  />
+                  <span>Right</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <FieldDescription>
+            Use matching separator variants for sidebar themes to keep divider
+            contrast balanced.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
 export const SeparatorPlayground: Story = {
   name: "Separator Playground",
   args: {
     size: "md",
     orientation: "horizontal",
+    variant: "default",
     withAction: false,
   },
   argTypes: {
     size: {
       control: "select",
       options: ["xs", "sm", "md", "lg"],
+    },
+    variant: {
+      control: "select",
+      options: ["default", "light", "dark", "brand-light", "brand-dark"],
     },
     orientation: {
       control: "inline-radio",
@@ -300,6 +422,7 @@ export const SeparatorPlayground: Story = {
                   <Separator
                     orientation="vertical"
                     size={args.size}
+                    variant={args.variant}
                     onAction={withAction ? args.onAction : undefined}
                     style={withAction ? { cursor: "pointer" } : undefined}
                   />
@@ -327,6 +450,7 @@ export const SeparatorPlayground: Story = {
                   <Separator
                     orientation="horizontal"
                     size={args.size}
+                    variant={args.variant}
                     onAction={withAction ? args.onAction : undefined}
                     style={withAction ? { cursor: "pointer" } : undefined}
                   />
