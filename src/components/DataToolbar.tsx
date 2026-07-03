@@ -123,22 +123,22 @@ const sizeTokens: Record<DataToolbarSize, ToolbarSizeTokens> = {
   xs: {
     controlSize: "xs",
     iconSize: 12,
-    gap: "0.35rem",
+    gap: "0.25rem",
   },
   sm: {
     controlSize: "sm",
     iconSize: 13,
-    gap: "0.42rem",
+    gap: "0.3rem",
   },
   md: {
     controlSize: "md",
     iconSize: 14,
-    gap: "0.5rem",
+    gap: "0.36rem",
   },
   lg: {
     controlSize: "lg",
     iconSize: 15,
-    gap: "0.58rem",
+    gap: "0.42rem",
   },
 };
 
@@ -173,8 +173,8 @@ export function DataToolbar({
   onSearchChange,
   searchPlaceholder = "Search",
   searchAriaLabel = "Search",
-  searchInputMinWidth = "9rem",
-  searchInputMaxWidth = "min(34rem, 62vw)",
+  searchInputMinWidth = "20px",
+  searchInputMaxWidth = "100%",
   showAdvanceFilter = false,
   advanceFilterColumns,
   advanceFilterColumnFilters,
@@ -263,15 +263,15 @@ export function DataToolbar({
     flexWrap: "nowrap",
     gap: sizeToken.gap,
     flex: "0 0 auto",
+    flexShrink: 0,
     minWidth: "fit-content",
   };
 
   const searchWrapStyle: CSSProperties = {
     position: "relative",
-    marginInlineStart: "auto",
     display: "flex",
     alignItems: "center",
-    flex: "1 1 16rem",
+    flex: "1 1 20px",
     minWidth: searchInputMinWidth,
     maxWidth: searchInputMaxWidth,
     width: "100%",
@@ -333,6 +333,28 @@ export function DataToolbar({
       aria-label="Data toolbar"
       {...props}
     >
+      {showSearch ? (
+        <div style={searchWrapStyle}>
+          <span style={searchIconStyle}>
+            <FiSearch size={sizeToken.iconSize} />
+          </span>
+
+          <Input
+            size={sizeToken.controlSize}
+            value={resolvedSearchValue}
+            placeholder={searchPlaceholder}
+            aria-label={searchAriaLabel}
+            onChange={(event) => {
+              handleSearchChange(event.currentTarget.value);
+            }}
+            style={{
+              minWidth: 0,
+              paddingInlineStart: "1.95rem",
+            }}
+          />
+        </div>
+      ) : null}
+
       <div style={actionsWrapStyle}>
         {canShowAdvanceFilter ? (
           <AdvanceFilter
@@ -444,25 +466,6 @@ export function DataToolbar({
           </Button>
         ) : null}
       </div>
-
-      {showSearch ? (
-        <div style={searchWrapStyle}>
-          <span style={searchIconStyle}>
-            <FiSearch size={sizeToken.iconSize} />
-          </span>
-
-          <Input
-            size={sizeToken.controlSize}
-            value={resolvedSearchValue}
-            placeholder={searchPlaceholder}
-            aria-label={searchAriaLabel}
-            onChange={(event) => {
-              handleSearchChange(event.currentTarget.value);
-            }}
-            style={{ paddingInlineStart: "1.95rem" }}
-          />
-        </div>
-      ) : null}
     </div>
   );
 }
