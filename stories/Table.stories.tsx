@@ -20,7 +20,6 @@ import {
   FieldDescription,
   FieldLabel,
   Table,
-  useResponsiveTableCardView,
   type CardDataAction,
   type CardDataFieldSchema,
   type RowAction,
@@ -46,6 +45,8 @@ type TableSortState = Parameters<
 type TableFilterState = Parameters<
   NonNullable<TableProps<TradeRow>["onFilterChange"]>
 >[0];
+
+type TableCardViewMode = "table" | "cards";
 
 type NumericFilterOperator = "gt" | "gte" | "lt" | "lte" | "eq" | "neq";
 
@@ -877,6 +878,8 @@ const tableInteractiveArgTypes = {
   multiSelect: { control: "boolean" },
   columnVisibility: { control: "boolean" },
   showToolbar: { control: "boolean" },
+  showViewSwitch: { control: "boolean" },
+  switchToCardViewLabel: { control: "text" },
   showRefresh: { control: "boolean" },
   showPagination: { control: "boolean" },
   paginationVariant: {
@@ -935,11 +938,11 @@ export const CardTableFullWidthPlaybook: Story = {
     addFilterLabel: "Add rule",
     clearFiltersLabel: "Clear filters",
     applyFiltersLabel: "Apply filters",
+    showViewSwitch: true,
   },
   argTypes: tableInteractiveArgTypes,
   render: (args) => {
-    const { view, switchToCardView, switchToTableView } =
-      useResponsiveTableCardView();
+    const [view, setView] = useState<TableCardViewMode>("cards");
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(
       args.paginationDefaultPageSize ?? DEFAULT_PAGE_SIZE,
@@ -970,6 +973,12 @@ export const CardTableFullWidthPlaybook: Story = {
       "status",
       "price",
     ];
+    const resolvedCardVariant =
+      args.variant === "ghost"
+        ? "ghost"
+        : args.compact || args.variant === "minimal"
+          ? "compact"
+          : "default";
 
     const sharedTableArgs = {
       ...restArgs,
@@ -990,6 +999,18 @@ export const CardTableFullWidthPlaybook: Story = {
         });
       },
     };
+
+    function handleSortChange(next: TableSortState): void {
+      queueMicrotask(() => {
+        setSorting(next);
+      });
+    }
+
+    function handleFilterChange(next: TableFilterState): void {
+      queueMicrotask(() => {
+        setFilters(next);
+      });
+    }
 
     return (
       <div style={stackStyle}>
@@ -1012,9 +1033,11 @@ export const CardTableFullWidthPlaybook: Story = {
                   columns={baseColumns}
                   rowActions={tableRowActions}
                   columnFilters={parityFilterColumns}
-                  showViewSwitch
+                  showViewSwitch={args.showViewSwitch}
                   switchToCardViewLabel={args.switchToCardViewLabel ?? "Cards"}
-                  onSwitchToCardView={switchToCardView}
+                  onSwitchToCardView={() => {
+                    setView("cards");
+                  }}
                   onRefresh={args.onRefresh ?? (() => {})}
                   style={{ width: "100%", maxWidth: "100%" }}
                 />
@@ -1023,7 +1046,7 @@ export const CardTableFullWidthPlaybook: Story = {
                   data={pageRows}
                   rowKey="id"
                   schema={parityCardSchema}
-                  variant="compact"
+                  variant={resolvedCardVariant}
                   size={args.size ?? "sm"}
                   showFieldLabels={false}
                   actions={parityCardActions}
@@ -1045,6 +1068,13 @@ export const CardTableFullWidthPlaybook: Story = {
                   applyFiltersLabel={args.applyFiltersLabel}
                   globalFilterLabel={args.globalFilterLabel}
                   globalFilterPlaceholder={args.globalFilterPlaceholder}
+                  showRefresh={args.showRefresh}
+                  onRefresh={args.onRefresh ?? (() => {})}
+                  refreshLabel={args.refreshLabel}
+                  refreshingLabel={args.refreshingLabel}
+                  fullscreen={args.fullscreen}
+                  fullscreenLabel={args.fullscreenLabel}
+                  resetScreenLabel={args.resetScreenLabel}
                   serverSide
                   totalRows={sortedRows.length}
                   pageIndex={page}
@@ -1063,19 +1093,16 @@ export const CardTableFullWidthPlaybook: Story = {
                   paginationResetPageOnPageSizeChange={
                     args.paginationResetPageOnPageSizeChange
                   }
-                  onSortChange={(next) => {
-                    queueMicrotask(() => {
-                      setSorting(next);
-                    });
+                  onSortChange={handleSortChange}
+                  onFilterChange={handleFilterChange}
+                  onAction={(context) => {
+                    args.onAction?.(context as never);
                   }}
-                  onFilterChange={(next) => {
-                    queueMicrotask(() => {
-                      setFilters(next);
-                    });
-                  }}
-                  showViewSwitch
+                  showViewSwitch={args.showViewSwitch}
                   switchToTableViewLabel="Table"
-                  onSwitchToTableView={switchToTableView}
+                  onSwitchToTableView={() => {
+                    setView("table");
+                  }}
                 />
               )}
             </CardContent>

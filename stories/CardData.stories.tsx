@@ -1,4 +1,10 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import type { Meta, StoryObj } from "@storybook/react";
 import {
@@ -20,7 +26,6 @@ import {
   CardHeader,
   CardTitle,
   Table,
-  useResponsiveTableCardView,
   type CardDataAction,
   type CardDataFieldSchema,
   type CardDataProps,
@@ -115,6 +120,8 @@ type SharedSortState = Parameters<
 type SharedFilterState = Parameters<
   NonNullable<TableProps<TradeCardRow>["onFilterChange"]>
 >[0];
+
+type TableCardViewMode = "table" | "cards";
 
 const sectors = ["Banking", "IT", "Energy", "Pharma", "Auto"];
 const statuses: TradeStatus[] = ["Open", "Paused", "Closed"];
@@ -1304,8 +1311,7 @@ export const VirtualizedAdvancedFilterCards: Story = {
 };
 
 function CardTableSwitchDemo(): JSX.Element {
-  const { view, switchToCardView, switchToTableView } =
-    useResponsiveTableCardView();
+  const [view, setView] = useState<TableCardViewMode>("cards");
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -1384,7 +1390,9 @@ function CardTableSwitchDemo(): JSX.Element {
               showPagination
               showViewSwitch
               switchToCardViewLabel="Cards"
-              onSwitchToCardView={switchToCardView}
+              onSwitchToCardView={() => {
+                setView("cards");
+              }}
             />
           ) : (
             <CardData<TradeCardRow>
@@ -1419,7 +1427,9 @@ function CardTableSwitchDemo(): JSX.Element {
               showPagination
               showViewSwitch
               switchToTableViewLabel="Table"
-              onSwitchToTableView={switchToTableView}
+              onSwitchToTableView={() => {
+                setView("table");
+              }}
             />
           )}
         </CardContent>
@@ -1429,8 +1439,245 @@ function CardTableSwitchDemo(): JSX.Element {
 }
 
 export const TableCardSwitchPlaybook: Story = {
-  name: "Table + Card Switch Playbook",
+  name: "Card First + Table Switch Playbook",
   render: () => <CardTableSwitchDemo />,
+};
+
+interface CardTableUnifiedPlaygroundArgs {
+  defaultView: TableCardViewMode;
+  tableVariant: NonNullable<TableProps<TradeCardRow>["variant"]>;
+  tableSize: NonNullable<TableProps<TradeCardRow>["size"]>;
+  cardVariant: NonNullable<CardDataProps<TradeCardRow>["variant"]>;
+  cardSize: NonNullable<CardDataProps<TradeCardRow>["size"]>;
+  sortable: boolean;
+  filterable: boolean;
+  searchable: boolean;
+  globalFilter: boolean;
+  showToolbar: boolean;
+  showRefresh: boolean;
+  fullscreen: boolean;
+  showPagination: boolean;
+  showViewSwitch: boolean;
+  actionMode: NonNullable<CardDataProps<TradeCardRow>["actionMode"]>;
+  actionAlignment: NonNullable<CardDataProps<TradeCardRow>["actionAlignment"]>;
+  actionPlacement: NonNullable<CardDataProps<TradeCardRow>["actionPlacement"]>;
+  onTableAction?: (context: unknown) => void;
+  onCardAction?: (context: unknown) => void;
+  onRefresh?: () => void;
+}
+
+type CardTableUnifiedStory = StoryObj<CardTableUnifiedPlaygroundArgs>;
+
+export const CardTableUnifiedPlayground: CardTableUnifiedStory = {
+  name: "Card + Table Unified Playground",
+  args: {
+    defaultView: "cards",
+    tableVariant: "outline",
+    tableSize: "sm",
+    cardVariant: "compact",
+    cardSize: "sm",
+    sortable: true,
+    filterable: true,
+    searchable: true,
+    globalFilter: true,
+    showToolbar: true,
+    showRefresh: true,
+    fullscreen: true,
+    showPagination: true,
+    showViewSwitch: true,
+    actionMode: "auto",
+    actionAlignment: "right",
+    actionPlacement: "bottom",
+  },
+  argTypes: {
+    defaultView: {
+      control: "inline-radio",
+      options: ["cards", "table"],
+    },
+    tableVariant: {
+      control: "select",
+      options: ["basic", "outline", "ghost", "filled", "minimal", "striped"],
+    },
+    tableSize: {
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
+    },
+    cardVariant: {
+      control: "select",
+      options: ["default", "compact", "ghost"],
+    },
+    cardSize: {
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
+    },
+    sortable: { control: "boolean" },
+    filterable: { control: "boolean" },
+    searchable: { control: "boolean" },
+    globalFilter: { control: "boolean" },
+    showToolbar: { control: "boolean" },
+    showRefresh: { control: "boolean" },
+    fullscreen: { control: "boolean" },
+    showPagination: { control: "boolean" },
+    showViewSwitch: { control: "boolean" },
+    actionMode: {
+      control: "select",
+      options: ["auto", "inline", "menu"],
+    },
+    actionAlignment: {
+      control: "select",
+      options: ["left", "right"],
+    },
+    actionPlacement: {
+      control: "select",
+      options: ["top", "bottom"],
+    },
+    onTableAction: { action: "table-action" },
+    onCardAction: { action: "card-action" },
+    onRefresh: { action: "refresh" },
+  },
+  render: (args) => {
+    const [view, setView] = useState<TableCardViewMode>(args.defaultView);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [sorting, setSorting] = useState<SharedSortState>([]);
+    const [filters, setFilters] = useState<SharedFilterState>([]);
+
+    useEffect(() => {
+      setView(args.defaultView);
+    }, [args.defaultView]);
+
+    const parityFilterColumns = [
+      "symbol",
+      "sector",
+      "status",
+      "trader",
+      "price",
+      "updatedAt",
+    ];
+
+    const sharedResult = useMemo(() => {
+      const filteredRows = applySharedFilters(trades, filters);
+      const sortedRows = applySharedSorting(filteredRows, sorting);
+      const pageRows = paginateRows(sortedRows, page, pageSize);
+
+      return {
+        rows: pageRows,
+        totalRows: sortedRows.length,
+      };
+    }, [filters, page, pageSize, sorting]);
+
+    function deferSetSorting(next: SharedSortState): void {
+      queueMicrotask(() => {
+        setSorting(next);
+      });
+    }
+
+    function deferSetFilters(next: SharedFilterState): void {
+      queueMicrotask(() => {
+        setFilters(next);
+      });
+    }
+
+    return (
+      <div style={sectionStyle}>
+        <Card size="sm" spacing="sm" style={shellStyle}>
+          <CardHeader>
+            <CardTitle>Unified Trade Monitor</CardTitle>
+            <CardDescription>
+              One playground to test card-first switching, shared data state,
+              and both Table/CardData action callbacks.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent
+            style={{ width: "100%", minWidth: 0, padding: "0.65rem" }}
+          >
+            {view === "table" ? (
+              <Table<TradeCardRow>
+                data={sharedResult.rows}
+                columns={tableColumns}
+                rowKey="id"
+                variant={args.tableVariant}
+                size={args.tableSize}
+                serverSide
+                totalRows={sharedResult.totalRows}
+                pageIndex={page}
+                paginationDefaultPageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={setPageSize}
+                onSortChange={deferSetSorting}
+                onFilterChange={deferSetFilters}
+                onAction={(context) => {
+                  args.onTableAction?.(context);
+                }}
+                searchable={args.searchable}
+                filterable={args.filterable}
+                columnFilters={parityFilterColumns}
+                globalFilter={args.globalFilter}
+                sortable={args.sortable}
+                showToolbar={args.showToolbar}
+                showRefresh={args.showRefresh}
+                fullscreen={args.fullscreen}
+                onRefresh={() => {
+                  args.onRefresh?.();
+                }}
+                rowActions={tableRowActions}
+                showPagination={args.showPagination}
+                showViewSwitch={args.showViewSwitch}
+                switchToCardViewLabel="Cards"
+                onSwitchToCardView={() => {
+                  setView("cards");
+                }}
+              />
+            ) : (
+              <CardData<TradeCardRow>
+                data={sharedResult.rows}
+                rowKey="id"
+                schema={switchParitySchema}
+                variant={args.cardVariant}
+                size={args.cardSize}
+                showFieldLabels={false}
+                locale="en-IN"
+                currency="INR"
+                actions={cardActions}
+                serverSide
+                totalRows={sharedResult.totalRows}
+                pageIndex={page}
+                paginationDefaultPageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={setPageSize}
+                sortable={args.sortable}
+                filterable={args.filterable}
+                columnFilters={parityFilterColumns}
+                searchable={args.searchable}
+                globalFilter={args.globalFilter}
+                onSortChange={deferSetSorting}
+                onFilterChange={deferSetFilters}
+                actionMode={args.actionMode}
+                actionAlignment={args.actionAlignment}
+                actionPlacement={args.actionPlacement}
+                showToolbar={args.showToolbar}
+                showRefresh={args.showRefresh}
+                fullscreen={args.fullscreen}
+                onRefresh={() => {
+                  args.onRefresh?.();
+                }}
+                showPagination={args.showPagination}
+                showViewSwitch={args.showViewSwitch}
+                switchToTableViewLabel="Table"
+                onSwitchToTableView={() => {
+                  setView("table");
+                }}
+                onAction={(context) => {
+                  args.onCardAction?.(context);
+                }}
+              />
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    );
+  },
 };
 
 export const CardDataPlayground: Story = {
@@ -1444,6 +1691,14 @@ export const CardDataPlayground: Story = {
     searchable: true,
     globalFilter: true,
     showToolbar: true,
+    showRefresh: false,
+    refreshLabel: "Refresh",
+    refreshingLabel: "Refreshing",
+    fullscreen: false,
+    fullscreenLabel: "Fullscreen",
+    resetScreenLabel: "Reset",
+    showFiltersLabel: "Filters",
+    hideFiltersLabel: "Close",
     actionMode: "auto",
     actionInlineMaxVisible: 5,
     actionAlignment: "right",
@@ -1479,6 +1734,14 @@ export const CardDataPlayground: Story = {
     searchable: { control: "boolean" },
     globalFilter: { control: "boolean" },
     showToolbar: { control: "boolean" },
+    showRefresh: { control: "boolean" },
+    refreshLabel: { control: "text" },
+    refreshingLabel: { control: "text" },
+    fullscreen: { control: "boolean" },
+    fullscreenLabel: { control: "text" },
+    resetScreenLabel: { control: "text" },
+    showFiltersLabel: { control: "text" },
+    hideFiltersLabel: { control: "text" },
     searchPlaceholder: { control: "text" },
     columnFilters: { control: "object" },
     actionMode: {
@@ -1529,6 +1792,11 @@ export const CardDataPlayground: Story = {
     rowKey: { table: { disable: true } },
     data: { table: { disable: true } },
     onAction: { action: "action" },
+    onRefresh: { action: "refresh" },
+    onSortChange: { action: "sort-change" },
+    onFilterChange: { action: "filter-change" },
+    onPageChange: { action: "page-change" },
+    onPageSizeChange: { action: "page-size-change" },
   },
   render: (args) => (
     <div style={sectionStyle}>

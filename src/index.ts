@@ -387,16 +387,6 @@ export type {
   DropdownMenuTriggerProps,
   DropdownMenuVariant,
 } from "./components/DropdownMenu";
-export {
-  defaultTableCardResponsiveBreakpoints,
-  useResponsiveTableCardView,
-} from "./components/useResponsiveTableCardView";
-export type {
-  TableCardResponsiveBreakpoints,
-  TableCardView,
-  UseResponsiveTableCardViewOptions,
-  UseResponsiveTableCardViewResult,
-} from "./components/useResponsiveTableCardView";
 export { Table } from "./components/Table";
 export type {
   RowAction,
@@ -407,6 +397,34 @@ export type {
   TableSize,
   TableVariant,
 } from "./components/Table";
+export { AdvanceFilter } from "./components/AdvanceFilter";
+export type {
+  AdvanceFilterActionContext,
+  AdvanceFilterActionSource,
+  AdvanceFilterApplyReason,
+  AdvanceFilterColumn,
+  AdvanceFilterOperator,
+  AdvanceFilterProps,
+  AdvanceFilterResult,
+  AdvanceSortDirection,
+} from "./components/AdvanceFilter";
+export { AdaptiveCard } from "./components/AdaptiveCard";
+export type {
+  AdaptiveCardAction,
+  AdaptiveCardActionAlignment,
+  AdaptiveCardActionContext,
+  AdaptiveCardActionMode,
+  AdaptiveCardActionPlacement,
+  AdaptiveCardActionSource,
+  AdaptiveCardColumnBreakpoints,
+  AdaptiveCardColumns,
+  AdaptiveCardFieldSchema,
+  AdaptiveCardFieldType,
+  AdaptiveCardInnerColumns,
+  AdaptiveCardProps,
+  AdaptiveCardSize,
+  AdaptiveCardVariant,
+} from "./components/AdaptiveCard";
 export { CardData } from "./components/CardData";
 export type {
   CardDataAction,

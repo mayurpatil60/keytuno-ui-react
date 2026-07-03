@@ -1297,6 +1297,84 @@ import {
 </DropdownMenu>
 ```
 
+### AdvanceFilter
+
+```ts
+import { AdvanceFilter } from '@keytuno/ui-react';
+import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
+
+interface AdvanceFilterColumn {
+  id: string;
+  label: string;
+  canFilter?: boolean;
+  canSort?: boolean;
+}
+
+<AdvanceFilter
+  // open state
+  open?={boolean}
+  defaultOpen?={boolean}
+  onOpenChange?={(open: boolean) => void}
+
+  // filter/sort model
+  columns={AdvanceFilterColumn[]}
+  columnFilters={ColumnFiltersState}
+  sorting={SortingState}
+  globalSearch={string}
+
+  // behavior
+  canUseGlobalFilter?={boolean}
+  enableSorting?={boolean}
+  controlSize?={'xs'|'sm'|'md'|'lg'}
+
+  // trigger (icon-only filter button)
+  showTrigger?={boolean}            // default true
+  triggerDisabled?={boolean}
+  triggerOpenLabel?={string}
+  triggerCloseLabel?={string}
+  triggerAriaLabel?={string}
+  activeFilterCount?={number}       // optional external badge/count state
+
+  // sheet
+  side?={'left'|'right'|'top'|'bottom'}
+  title?={ReactNode}                // default 'Advance Filter'
+  description?={ReactNode}          // default 'Filter columns with multiple rules and operators'
+
+  // section labels
+  filtersSectionLabel?={ReactNode}
+  sortSectionLabel?={ReactNode}
+
+  // button labels
+  addFilterLabel?={string}
+  addSortLabel?={string}
+  clearFiltersLabel?={string}
+  resetSortingLabel?={string}
+  applyFiltersLabel?={string}
+
+  // global search and rule text
+  globalFilterLabel?={ReactNode}
+  globalFilterPlaceholder?={string}
+  ruleValuePlaceholder?={string}
+
+  // callbacks
+  onApply?={(result, reason) => void}
+  onAction?={(context) => void}
+/>
+
+// reason: 'apply' | 'clear-filters' | 'reset-sorting'
+// operator options:
+//   contains | starts with | ends with | equals | not equals
+//   greater than | greater than or equal | less than | less than or equal
+```
+
+AdvanceFilter behavior notes:
+
+- Trigger is an icon-only filter button that opens a responsive Sheet (mobile, tablet, desktop).
+- Sheet layout includes global search, multiple filter rules, multiple sort rules, per-rule clear icon actions, and sticky footer actions.
+- Footer actions: `Clear filters`, `Reset filters` (sorting reset label configurable), and `Apply filters`.
+- Internally uses inbuilt primitives (`Button`, `Sheet`, `Field`, `Input`, `Select`) and token-based styling.
+- Table and CardData advanced filtering continue to use the same filter token model, so behavior is consistent across surfaces.
+
 ### Table
 
 ```ts
@@ -1353,7 +1431,7 @@ const rowActions: RowAction<User>[] = [
   showToolbar?={boolean}
   showViewSwitch?={boolean}
   switchToCardViewLabel?={string}   // keep icon tooltip short, e.g. 'Cards'
-  onSwitchToCardView?={() => void}  // pass switchToCardView from useResponsiveTableCardView
+  onSwitchToCardView?={() => void}  // e.g. setView('cards')
   showFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Filters'
   hideFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Close'
   filterDialogTitle?={string}
@@ -1421,48 +1499,176 @@ const rowActions: RowAction<User>[] = [
 // - Storybook reference: Card + Table Full Width Playbook (shared table/card filter, sort, and pagination state).
 ```
 
-#### Standard Responsive Table/Card Switch
+#### Card-First Table/Card Switch
 
 ```ts
-import {
-  CardData,
-  Table,
-  useResponsiveTableCardView,
-} from '@keytuno/ui-react';
+import { useState } from 'react';
+import { CardData, Table } from '@keytuno/ui-react';
 
-const {
-  view,
-  switchToCardView,
-  switchToTableView,
-  resetToResponsiveDefault,
-} = useResponsiveTableCardView({
-  // defaults: tablet=768, web=1024
-  breakpoints: { tablet: 768, web: 1024 },
-});
+type View = 'table' | 'cards';
 
-// On mobile/tablet, view defaults to cards.
-// On desktop, view defaults to table.
-// User can still switch manually in either direction.
+const [view, setView] = useState<View>('cards');
+
+// Default is cards. User can still switch manually both ways.
 
 {view === 'table' ? (
   <Table
     showViewSwitch
-    onSwitchToCardView={switchToCardView}
+    switchToCardViewLabel="Cards"
+    onSwitchToCardView={() => setView('cards')}
     {...sharedTableProps}
   />
 ) : (
   <CardData
     showViewSwitch
-    onSwitchToTableView={switchToTableView}
+    switchToTableViewLabel="Table"
+    onSwitchToTableView={() => setView('table')}
     {...sharedCardProps}
   />
 )}
+```
 
-// Optional: return to automatic responsive behavior after a manual override.
-resetToResponsiveDefault();
+### AdaptiveCard
+
+```ts
+import { AdaptiveCard } from '@keytuno/ui-react';
+import type {
+  AdaptiveCardAction,
+  AdaptiveCardActionAlignment,
+  AdaptiveCardActionContext,
+  AdaptiveCardActionMode,
+  AdaptiveCardActionPlacement,
+  AdaptiveCardActionSource,
+  AdaptiveCardColumnBreakpoints,
+  AdaptiveCardColumns,
+  AdaptiveCardFieldSchema,
+  AdaptiveCardFieldType,
+  AdaptiveCardInnerColumns,
+} from '@keytuno/ui-react';
+
+<AdaptiveCard<User>
+  data={users}
+  rowKey="id"
+
+  // Rendering model
+  schema?={AdaptiveCardFieldSchema<User>[]}
+  variant?={'default'|'compact'|'ghost'}
+  size?={'xs'|'sm'|'md'|'lg'}
+  locale?={string}
+  currency?={string}
+  showFieldLabels?={boolean}
+
+  // Inside-card layout (field grid)
+  insideColumns?={1|2|3}            // default 2
+
+  // Outside-card layout (cards grid)
+  columns?={number | AdaptiveCardColumns}
+  columnBreakpoints?={AdaptiveCardColumnBreakpoints}
+
+  // Actions
+  actions?={AdaptiveCardAction<User>[] | ((row: User, rowIndex: number) => AdaptiveCardAction<User>[])}
+  actionMode?={'auto'|'inline'|'menu'}
+  actionInlineMaxVisible?={number}
+  actionAlignment?={'left'|'right'}
+  actionPlacement?={'top'|'bottom'}
+  actionMenuLabel?={ReactNode}
+  onAction?={(ctx: AdaptiveCardActionContext<User>) => void}
+
+  // Toolbar
+  searchable?={boolean}
+  searchPlaceholder?={string}
+  searchAriaLabel?={string}
+  showToolbar?={boolean}
+  showRefresh?={boolean}
+  onRefresh?={() => void | Promise<void>}
+  refreshLabel?={string}
+  refreshingLabel?={string}
+
+  // Optional table switch hook-up
+  showViewSwitch?={boolean}
+  switchToTableViewLabel?={string}
+  onSwitchToTableView?={() => void}
+
+  // Virtualization
+  virtualized?={boolean}            // optimized for one-card-per-row mode
+  virtualizedMaxHeight?={number | string}
+  virtualizedEstimateSize?={number}
+  virtualizedOverscan?={number}
+
+  // Pagination + server-side mode
+  serverSide?={boolean}
+  totalRows?={number}
+  pageIndex?={number}
+  onPageChange?={(page: number) => void}
+  onPageSizeChange?={(size: number) => void}
+  showPagination?={boolean}
+  paginationVariant?={'basic'|'advance'|'compact'}
+  paginationDefaultPageSize?={number}
+  paginationPageSizeOptions?={number[]}
+  paginationMaxVisiblePages?={number}
+  paginationShowPageSizeSelector?={boolean}
+  paginationShowSummary?={boolean}
+  paginationShowShowingPage?={boolean}
+  paginationResetPageOnPageSizeChange?={boolean}
+
+  // Viewport/state
+  viewportMaxHeight?={number | string}
+  emptyText?={ReactNode}
+/>
+
+type AdaptiveCardInnerColumns = 1 | 2 | 3;
+
+interface AdaptiveCardColumns {
+  mobile?: number;
+  tablet?: number;
+  web?: number;
+}
+
+interface AdaptiveCardColumnBreakpoints {
+  tablet?: number;   // default 768
+  web?: number;      // default 1024
+}
+
+type AdaptiveCardFieldType =
+  | 'auto'
+  | 'text'
+  | 'link'
+  | 'number'
+  | 'currency'
+  | 'percent'
+  | 'date'
+  | 'phone'
+  | 'status'
+  | 'badge'
+  | 'progress'
+  | 'media';
+
+type AdaptiveCardActionSource =
+  | 'item-action'
+  | 'search'
+  | 'refresh'
+  | 'view-switch'
+  | 'pagination'
+  | 'page-size';
+
+// Behavior notes:
+// - This is the native enterprise card surface for app-owned data (no external Adaptive Cards SDK required).
+// - `insideColumns` controls field layout inside each card (1, 2, or 3 columns).
+// - `columns` + `columnBreakpoints` control the outer responsive grid of cards.
+// - One-card-per-row enterprise mode: set `columns={1}` and optionally enable `virtualized`.
+// - Uses inbuilt primitives (Card, Button, Badge, Progress, DropdownMenu, Input, Pagination, Scrollbar).
+// - Storybook references:
+//   - Enterprise Adaptive Card (One Card Per Row)
+//   - Inside Columns: 1/2/3
+//   - Outside Grid: Mobile 1 / Tablet 2 / Web 4
+//   - Virtualized Adaptive Cards
+//   - Server-Side (TanStack Query)
+//   - AdaptiveCard Playground
 ```
 
 ### CardData
+
+> Decommission note: `CardData` remains available for backward compatibility, but new implementations should prefer `AdaptiveCard`.
 
 ```ts
 import { CardData } from '@keytuno/ui-react';
@@ -1534,7 +1740,7 @@ import type {
   // Optional table/card switch
   showViewSwitch
   switchToTableViewLabel="Table"
-  onSwitchToTableView={() => setView('table')} // pass switchToTableView from useResponsiveTableCardView
+  onSwitchToTableView={() => setView('table')}
 
   // Responsive layout
   columns?={number | CardDataColumns}
