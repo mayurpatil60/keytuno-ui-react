@@ -1353,7 +1353,7 @@ const rowActions: RowAction<User>[] = [
   showToolbar?={boolean}
   showViewSwitch?={boolean}
   switchToCardViewLabel?={string}   // keep icon tooltip short, e.g. 'Cards'
-  onSwitchToCardView?={() => void}
+  onSwitchToCardView?={() => void}  // pass switchToCardView from useResponsiveTableCardView
   showFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Filters'
   hideFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Close'
   filterDialogTitle?={string}
@@ -1419,6 +1419,47 @@ const rowActions: RowAction<User>[] = [
 // - For icon-only toolbar controls, keep tooltip labels one-word and short in stories/playbooks.
 // - In shared table/card playbooks, if page-size state is shared via `onPageSizeChange` and `paginationDefaultPageSize`, Table picks up card auto-adjusted page-size updates.
 // - Storybook reference: Card + Table Full Width Playbook (shared table/card filter, sort, and pagination state).
+```
+
+#### Standard Responsive Table/Card Switch
+
+```ts
+import {
+  CardData,
+  Table,
+  useResponsiveTableCardView,
+} from '@keytuno/ui-react';
+
+const {
+  view,
+  switchToCardView,
+  switchToTableView,
+  resetToResponsiveDefault,
+} = useResponsiveTableCardView({
+  // defaults: tablet=768, web=1024
+  breakpoints: { tablet: 768, web: 1024 },
+});
+
+// On mobile/tablet, view defaults to cards.
+// On desktop, view defaults to table.
+// User can still switch manually in either direction.
+
+{view === 'table' ? (
+  <Table
+    showViewSwitch
+    onSwitchToCardView={switchToCardView}
+    {...sharedTableProps}
+  />
+) : (
+  <CardData
+    showViewSwitch
+    onSwitchToTableView={switchToTableView}
+    {...sharedCardProps}
+  />
+)}
+
+// Optional: return to automatic responsive behavior after a manual override.
+resetToResponsiveDefault();
 ```
 
 ### CardData
@@ -1493,7 +1534,7 @@ import type {
   // Optional table/card switch
   showViewSwitch
   switchToTableViewLabel="Table"
-  onSwitchToTableView={() => setView('table')}
+  onSwitchToTableView={() => setView('table')} // pass switchToTableView from useResponsiveTableCardView
 
   // Responsive layout
   columns?={number | CardDataColumns}

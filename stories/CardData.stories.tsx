@@ -20,6 +20,7 @@ import {
   CardHeader,
   CardTitle,
   Table,
+  useResponsiveTableCardView,
   type CardDataAction,
   type CardDataFieldSchema,
   type CardDataProps,
@@ -1303,7 +1304,8 @@ export const VirtualizedAdvancedFilterCards: Story = {
 };
 
 function CardTableSwitchDemo(): JSX.Element {
-  const [view, setView] = useState<"table" | "cards">("table");
+  const { view, switchToCardView, switchToTableView } =
+    useResponsiveTableCardView();
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -1382,9 +1384,7 @@ function CardTableSwitchDemo(): JSX.Element {
               showPagination
               showViewSwitch
               switchToCardViewLabel="Cards"
-              onSwitchToCardView={() => {
-                setView("cards");
-              }}
+              onSwitchToCardView={switchToCardView}
             />
           ) : (
             <CardData<TradeCardRow>
@@ -1419,9 +1419,7 @@ function CardTableSwitchDemo(): JSX.Element {
               showPagination
               showViewSwitch
               switchToTableViewLabel="Table"
-              onSwitchToTableView={() => {
-                setView("table");
-              }}
+              onSwitchToTableView={switchToTableView}
             />
           )}
         </CardContent>

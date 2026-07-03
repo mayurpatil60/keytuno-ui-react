@@ -20,6 +20,7 @@ import {
   FieldDescription,
   FieldLabel,
   Table,
+  useResponsiveTableCardView,
   type CardDataAction,
   type CardDataFieldSchema,
   type RowAction,
@@ -937,7 +938,8 @@ export const CardTableFullWidthPlaybook: Story = {
   },
   argTypes: tableInteractiveArgTypes,
   render: (args) => {
-    const [view, setView] = useState<"table" | "cards">("table");
+    const { view, switchToCardView, switchToTableView } =
+      useResponsiveTableCardView();
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(
       args.paginationDefaultPageSize ?? DEFAULT_PAGE_SIZE,
@@ -1012,9 +1014,7 @@ export const CardTableFullWidthPlaybook: Story = {
                   columnFilters={parityFilterColumns}
                   showViewSwitch
                   switchToCardViewLabel={args.switchToCardViewLabel ?? "Cards"}
-                  onSwitchToCardView={() => {
-                    setView("cards");
-                  }}
+                  onSwitchToCardView={switchToCardView}
                   onRefresh={args.onRefresh ?? (() => {})}
                   style={{ width: "100%", maxWidth: "100%" }}
                 />
@@ -1075,9 +1075,7 @@ export const CardTableFullWidthPlaybook: Story = {
                   }}
                   showViewSwitch
                   switchToTableViewLabel="Table"
-                  onSwitchToTableView={() => {
-                    setView("table");
-                  }}
+                  onSwitchToTableView={switchToTableView}
                 />
               )}
             </CardContent>

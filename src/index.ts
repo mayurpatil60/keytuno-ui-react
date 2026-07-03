@@ -387,6 +387,16 @@ export type {
   DropdownMenuTriggerProps,
   DropdownMenuVariant,
 } from "./components/DropdownMenu";
+export {
+  defaultTableCardResponsiveBreakpoints,
+  useResponsiveTableCardView,
+} from "./components/useResponsiveTableCardView";
+export type {
+  TableCardResponsiveBreakpoints,
+  TableCardView,
+  UseResponsiveTableCardViewOptions,
+  UseResponsiveTableCardViewResult,
+} from "./components/useResponsiveTableCardView";
 export { Table } from "./components/Table";
 export type {
   RowAction,

@@ -2685,6 +2685,7 @@ Accessibility tokens/signals found in story code:
 14. Table
 15. TableColumnDef
 16. TableProps
+17. useResponsiveTableCardView
 
 #### Props and Controls Matrix
 
@@ -2758,6 +2759,7 @@ Accessibility tokens/signals found in story code:
 2. Keep icon-only controls paired with accessible naming (`aria-label` or equivalent label props).
 3. Preserve callback prop signatures from story controls (`on*` props) for predictable integration.
 4. Cross-check final production props with canonical API docs before release.
+5. Standardize Table/CardData switching with `useResponsiveTableCardView` so mobile/tablet defaults to cards while keeping manual view switching available.
 
 ### 2.38 Tabs
 
