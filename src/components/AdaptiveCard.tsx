@@ -19,8 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./DropdownMenu";
-import { Input } from "./Input";
-import { FiList, FiMoreVertical, FiRefreshCw, FiSearch } from "./icons/feather";
+import { DataToolbar } from "./DataToolbar";
+import { FiMoreVertical } from "./icons/feather";
 import {
   Pagination,
   type PaginationActionContext,
@@ -1536,51 +1536,6 @@ export function AdaptiveCard<TData extends object = object>({
     );
   }
 
-  const toolbarStyle: CSSProperties = {
-    width: "100%",
-    minWidth: 0,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: "0.6rem",
-    flexWrap: "wrap",
-    boxSizing: "border-box",
-  };
-
-  const toolbarLeftStyle: CSSProperties = {
-    flex: "1 1 16rem",
-    minWidth: 0,
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-  };
-
-  const toolbarRightStyle: CSSProperties = {
-    flex: "0 0 auto",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.42rem",
-  };
-
-  const searchWrapStyle: CSSProperties = {
-    width: "100%",
-    minWidth: 0,
-    position: "relative",
-    display: "flex",
-    alignItems: "center",
-    boxSizing: "border-box",
-  };
-
-  const searchIconStyle: CSSProperties = {
-    position: "absolute",
-    left: "0.7rem",
-    color: variantToken.mutedColor,
-    pointerEvents: "none",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-  };
-
   const cardsGridStyle: CSSProperties = {
     width: "100%",
     minWidth: 0,
@@ -1634,82 +1589,42 @@ export function AdaptiveCard<TData extends object = object>({
       {...props}
     >
       {shouldShowToolbar ? (
-        <div style={toolbarStyle}>
-          <div style={toolbarLeftStyle}>
-            {searchable ? (
-              <div style={searchWrapStyle}>
-                <span style={searchIconStyle}>
-                  <FiSearch size={sizeToken.iconSize} />
-                </span>
+        <DataToolbar
+          size={sizeToken.actionButtonSize}
+          showSearch={searchable}
+          searchValue={searchQuery}
+          searchPlaceholder={searchPlaceholder}
+          searchAriaLabel={searchAriaLabel}
+          onSearchChange={handleSearchChange}
+          showSwitch={canShowViewSwitch}
+          switchMode="table"
+          switchLabel={switchToTableViewLabel}
+          onSwitch={() => {
+            emitAction({
+              source: "view-switch",
+              actionId: "table-view",
+              page: currentPage,
+              pageSize,
+              search: normalizedSearch === "" ? undefined : normalizedSearch,
+            });
 
-                <Input
-                  size={sizeToken.actionButtonSize}
-                  value={searchQuery}
-                  placeholder={searchPlaceholder}
-                  aria-label={searchAriaLabel}
-                  onChange={(event) => {
-                    handleSearchChange(event.currentTarget.value);
-                  }}
-                  style={{ paddingInlineStart: "2rem" }}
-                />
-              </div>
-            ) : null}
-          </div>
+            onSwitchToTableView?.();
+          }}
+          showRefresh={showRefresh}
+          refreshing={isRefreshing}
+          refreshLabel={refreshLabel}
+          refreshingLabel={refreshingLabel}
+          onRefresh={() => {
+            emitAction({
+              source: "refresh",
+              page: currentPage,
+              pageSize,
+              search: normalizedSearch === "" ? undefined : normalizedSearch,
+            });
 
-          <div style={toolbarRightStyle}>
-            {canShowViewSwitch ? (
-              <Button
-                size={sizeToken.actionButtonSize}
-                variant="outline"
-                compact
-                iconOnly
-                tooltip={switchToTableViewLabel}
-                aria-label={switchToTableViewLabel}
-                onAction={(event) => {
-                  emitAction({
-                    source: "view-switch",
-                    actionId: "table-view",
-                    page: currentPage,
-                    pageSize,
-                    search:
-                      normalizedSearch === "" ? undefined : normalizedSearch,
-                    event,
-                  });
-
-                  onSwitchToTableView?.();
-                }}
-              >
-                <FiList size={sizeToken.iconSize} />
-              </Button>
-            ) : null}
-
-            {showRefresh ? (
-              <Button
-                size={sizeToken.actionButtonSize}
-                variant="outline"
-                compact
-                iconOnly
-                tooltip={isRefreshing ? `${refreshingLabel}...` : refreshLabel}
-                aria-label={isRefreshing ? refreshingLabel : refreshLabel}
-                disabled={isRefreshing}
-                onAction={(event) => {
-                  emitAction({
-                    source: "refresh",
-                    page: currentPage,
-                    pageSize,
-                    search:
-                      normalizedSearch === "" ? undefined : normalizedSearch,
-                    event,
-                  });
-
-                  void handleRefresh();
-                }}
-              >
-                <FiRefreshCw size={sizeToken.iconSize} />
-              </Button>
-            ) : null}
-          </div>
-        </div>
+            return handleRefresh();
+          }}
+        />
       ) : null}
 
       {pageRows.length === 0 ? (

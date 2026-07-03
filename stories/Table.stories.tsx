@@ -1,27 +1,16 @@
 import { useMemo, useState, type CSSProperties } from "react";
 
-import {
-  QueryClient,
-  QueryClientProvider,
-  useQuery,
-} from "@tanstack/react-query";
+import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 import type { Meta, StoryObj } from "@storybook/react";
 import { FiEdit3, FiEye, FiTrash2 } from "../src/components/icons/feather";
 
 import {
-  Card,
-  CardData,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
+  AdaptiveCard,
+  DataToolbar,
   Table,
-  type CardDataAction,
-  type CardDataFieldSchema,
+  type AdaptiveCardAction,
+  type AdaptiveCardFieldSchema,
+  type AdvanceFilterColumn,
   type RowAction,
   type TableColumnDef,
   type TableProps,
@@ -31,54 +20,43 @@ interface TradeRow {
   id: string;
   symbol: string;
   sector: string;
+  status: "Open" | "Paused" | "Closed";
+  owner: string;
   price: number;
   change: number;
   volume: number;
-  status: "Open" | "Paused" | "Closed";
-  trader: string;
   updatedAt: string;
 }
 
-type TableSortState = Parameters<
-  NonNullable<TableProps<TradeRow>["onSortChange"]>
->[0];
-type TableFilterState = Parameters<
-  NonNullable<TableProps<TradeRow>["onFilterChange"]>
->[0];
-
-type TableCardViewMode = "table" | "cards";
-
+type ComposedView = "table" | "adaptive-card";
 type NumericFilterOperator = "gt" | "gte" | "lt" | "lte" | "eq" | "neq";
 
-type ParsedNumericFilterCondition = {
+interface ParsedNumericFilterCondition {
   operator: NumericFilterOperator;
   value: number;
-};
+}
 
 const sectors = ["Banking", "IT", "Energy", "Pharma", "Auto"];
+const owners = ["Mayur", "Anaya", "Vivaan", "Aditi", "Ishaan"];
 const statuses: TradeRow["status"][] = ["Open", "Paused", "Closed"];
-const traders = ["Mayur", "Anaya", "Vivaan", "Aditi", "Ishaan"];
 
-const mockRows: TradeRow[] = Array.from({ length: 96 }, (_, index) => {
+const tradeRows: TradeRow[] = Array.from({ length: 180 }, (_, index) => {
   const seed = index + 1;
-  const sector = sectors[index % sectors.length] ?? "Banking";
-  const price = 120 + ((seed * 17) % 1430);
-  const signedChange = ((seed % 2 === 0 ? 1 : -1) * ((seed * 11) % 145)) / 10;
 
   return {
-    id: `TRADE-${String(seed).padStart(4, "0")}`,
+    id: `TRD-${String(seed).padStart(4, "0")}`,
     symbol: `STK${String(100 + seed)}`,
-    sector,
-    price,
-    change: signedChange,
-    volume: 1200 + ((seed * 7531) % 89000),
+    sector: sectors[index % sectors.length] ?? "Banking",
     status: statuses[index % statuses.length] ?? "Open",
-    trader: traders[index % traders.length] ?? "Mayur",
-    updatedAt: `2026-06-${String((seed % 28) + 1).padStart(2, "0")}`,
+    owner: owners[index % owners.length] ?? "Mayur",
+    price: 120 + ((seed * 19) % 1450),
+    change: ((seed % 2 === 0 ? 1 : -1) * ((seed * 13) % 110)) / 10,
+    volume: 1400 + ((seed * 7027) % 98000),
+    updatedAt: `2026-07-${String((seed % 28) + 1).padStart(2, "0")}`,
   };
 });
 
-const baseColumns: TableColumnDef<TradeRow>[] = [
+const tableColumns: TableColumnDef<TradeRow>[] = [
   {
     accessorKey: "symbol",
     header: "Symbol",
@@ -88,11 +66,19 @@ const baseColumns: TableColumnDef<TradeRow>[] = [
     header: "Sector",
   },
   {
+    accessorKey: "status",
+    header: "Status",
+  },
+  {
+    accessorKey: "owner",
+    header: "Owner",
+  },
+  {
     accessorKey: "price",
     header: "Price",
     cell: ({ getValue }) => {
       const value = Number(getValue() ?? 0);
-      return `₹${value.toFixed(2)}`;
+      return `Rs ${value.toFixed(2)}`;
     },
   },
   {
@@ -117,18 +103,7 @@ const baseColumns: TableColumnDef<TradeRow>[] = [
   {
     accessorKey: "volume",
     header: "Volume",
-    cell: ({ getValue }) => {
-      const value = Number(getValue() ?? 0);
-      return value.toLocaleString("en-IN");
-    },
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-  },
-  {
-    accessorKey: "trader",
-    header: "Trader",
+    cell: ({ getValue }) => Number(getValue() ?? 0).toLocaleString("en-IN"),
   },
   {
     accessorKey: "updatedAt",
@@ -141,10 +116,9 @@ const tableRowActions: RowAction<TradeRow>[] = [
     id: "view",
     label: "",
     icon: <FiEye size={13} />,
-    variant: "secondary",
-    compact: true,
     iconOnly: true,
     iconOnlyTone: true,
+    compact: true,
     tooltip: "View",
     onClick: () => {},
   },
@@ -152,73 +126,71 @@ const tableRowActions: RowAction<TradeRow>[] = [
     id: "edit",
     label: "",
     icon: <FiEdit3 size={13} />,
-    variant: "primary",
-    compact: true,
     iconOnly: true,
     iconOnlyTone: true,
+    compact: true,
     tooltip: "Edit",
     onClick: () => {},
   },
   {
-    id: "remove",
+    id: "delete",
     label: "",
     icon: <FiTrash2 size={13} />,
-    variant: "destructive",
-    compact: true,
     iconOnly: true,
     iconOnlyTone: true,
+    compact: true,
     tooltip: "Delete",
+    variant: "destructive",
     onClick: () => {},
   },
 ];
 
-const parityCardSchema: CardDataFieldSchema<TradeRow>[] = [
-  {
-    key: "symbol",
-    label: "Symbol",
-    priority: 0,
-  },
-  {
-    key: "sector",
-    label: "Sector",
-    priority: 1,
-  },
+const adaptiveSchema: AdaptiveCardFieldSchema<TradeRow>[] = [
+  { key: "symbol", label: "Symbol", priority: 0 },
   {
     key: "status",
     label: "Status",
     type: "status",
-    priority: 2,
+    align: "right",
+    priority: 1,
   },
-  {
-    key: "trader",
-    label: "Trader",
-    priority: 3,
-  },
+  { key: "sector", label: "Sector", priority: 2 },
+  { key: "owner", label: "Owner", priority: 3 },
   {
     key: "price",
     label: "Price",
     type: "currency",
     currency: "INR",
-    maximumFractionDigits: 2,
     align: "right",
+    maximumFractionDigits: 2,
     priority: 4,
+  },
+  {
+    key: "change",
+    label: "Change",
+    type: "percent",
+    align: "right",
+    maximumFractionDigits: 2,
+    priority: 5,
+  },
+  {
+    key: "volume",
+    label: "Volume",
+    type: "number",
+    align: "right",
+    priority: 6,
   },
   {
     key: "updatedAt",
     label: "Updated",
     type: "date",
     dateOptions: { year: "numeric", month: "short", day: "numeric" },
-    priority: 5,
+    priority: 7,
   },
 ];
 
-const parityCardActions: CardDataAction<TradeRow>[] = [
-  {
-    id: "view",
-    label: "View",
-    icon: <FiEye size={13} />,
-    variant: "secondary",
-  },
+const adaptiveActions: AdaptiveCardAction<TradeRow>[] = [
+  { id: "view", label: "View", icon: <FiEye size={13} /> },
   {
     id: "edit",
     label: "Edit",
@@ -226,64 +198,51 @@ const parityCardActions: CardDataAction<TradeRow>[] = [
     variant: "outline",
   },
   {
-    id: "remove",
+    id: "delete",
     label: "Delete",
     icon: <FiTrash2 size={13} />,
     variant: "destructive",
   },
 ];
 
-const stackStyle: CSSProperties = {
+const toolbarColumns: AdvanceFilterColumn[] = [
+  { id: "symbol", label: "Symbol", canFilter: true, canSort: true },
+  { id: "sector", label: "Sector", canFilter: true, canSort: true },
+  { id: "status", label: "Status", canFilter: true, canSort: true },
+  { id: "owner", label: "Owner", canFilter: true, canSort: true },
+  { id: "price", label: "Price", canFilter: true, canSort: true },
+  { id: "change", label: "Change", canFilter: true, canSort: true },
+  { id: "volume", label: "Volume", canFilter: true, canSort: true },
+  { id: "updatedAt", label: "Updated", canFilter: true, canSort: true },
+];
+
+const shellStyle: CSSProperties = {
+  width: "100%",
+  maxWidth: "1200px",
+  minWidth: 0,
+  marginInline: "auto",
   display: "flex",
   flexDirection: "column",
-  gap: "1rem",
-  width: "100%",
-  maxWidth: "1200px",
-  minWidth: 0,
-  marginInline: "auto",
-  paddingInline: "clamp(0.75rem, 2.5vw, 1.5rem)",
+  gap: "0.85rem",
   boxSizing: "border-box",
 };
 
-const frameStyle: CSSProperties = {
-  width: "100%",
-  maxWidth: "1200px",
-  minWidth: 0,
-  marginInline: "auto",
-  boxSizing: "border-box",
-};
+function toFullscreenSurfaceStyle(enabled: boolean): CSSProperties {
+  if (!enabled) {
+    return shellStyle;
+  }
 
-const tableFrameStyle: CSSProperties = {
-  width: "100%",
-};
-
-const cardTableShellStyle: CSSProperties = {
-  width: "100%",
-  maxWidth: "1200px",
-  minWidth: 0,
-  marginInline: "auto",
-  boxSizing: "border-box",
-};
-
-const cardTableContentStyle: CSSProperties = {
-  width: "100%",
-  minWidth: 0,
-  padding: "0.65rem",
-  boxSizing: "border-box",
-};
-
-const meta: Meta<TableProps<TradeRow>> = {
-  title: "Data/Table",
-  component: Table as unknown as Meta<TableProps<TradeRow>>["component"],
-  tags: ["autodocs"],
-  parameters: {
-    layout: "padded",
-  },
-};
-
-export default meta;
-
-type Story = StoryObj<TableProps<TradeRow>>;
+  return {
+    ...shellStyle,
+    position: "fixed",
+    inset: "0.75rem",
+    zIndex: 250,
+    padding: "0.8rem",
+    borderRadius: "0.75rem",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    boxShadow: "0 26px 52px rgba(15, 23, 42, 0.26)",
+  };
+}
 
 function splitFilterTerms(filterValue: unknown): string[] {
   if (typeof filterValue !== "string") {
@@ -395,14 +354,14 @@ function matchesStringCondition(value: string, term: string): boolean {
     return expected === "" ? true : normalizedValue.startsWith(expected);
   }
 
-  if (normalizedTerm.startsWith("~")) {
-    const expected = normalizedTerm.slice(1).trim().toLowerCase();
-    return expected === "" ? true : normalizedValue.includes(expected);
-  }
-
   if (normalizedTerm.endsWith("$")) {
     const expected = normalizedTerm.slice(0, -1).trim().toLowerCase();
     return expected === "" ? true : normalizedValue.endsWith(expected);
+  }
+
+  if (normalizedTerm.startsWith("~")) {
+    const expected = normalizedTerm.slice(1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue.includes(expected);
   }
 
   return normalizedValue.includes(normalizedTerm.toLowerCase());
@@ -435,7 +394,7 @@ function matchesNumericCondition(
   return value === condition.value;
 }
 
-function matchesAdvancedColumnFilter(
+function matchesAdvancedFilter(
   rowValue: unknown,
   filterValue: unknown,
 ): boolean {
@@ -463,52 +422,48 @@ function matchesAdvancedColumnFilter(
   });
 }
 
-function applyServerFilters(
+function applyAdvancedFilters(
   rows: TradeRow[],
-  filters: TableFilterState,
+  filters: ColumnFiltersState,
+  globalSearch: string,
 ): TradeRow[] {
-  const globalSearch = String(
-    filters.find((filter) => filter.id === "__global")?.value ?? "",
-  )
-    .trim()
-    .toLowerCase();
-
-  const scopedFilters = filters.filter((filter) => filter.id !== "__global");
+  const normalizedSearch = globalSearch.trim().toLowerCase();
 
   return rows.filter((row) => {
-    if (globalSearch !== "") {
+    if (normalizedSearch !== "") {
       const searchableText = Object.values(row)
         .map((value) => String(value).toLowerCase())
         .join(" ");
 
-      if (!searchableText.includes(globalSearch)) {
+      if (!searchableText.includes(normalizedSearch)) {
         return false;
       }
     }
 
-    return scopedFilters.every((filter) => {
+    return filters.every((filter) => {
       const rowValue = row[filter.id as keyof TradeRow];
-      return matchesAdvancedColumnFilter(rowValue, filter.value);
+      return matchesAdvancedFilter(rowValue, filter.value);
     });
   });
 }
 
-function applyServerSorting(
-  rows: TradeRow[],
-  sorting: TableSortState,
-): TradeRow[] {
+function applySorting(rows: TradeRow[], sorting: SortingState): TradeRow[] {
   if (sorting.length === 0) {
     return rows;
   }
 
-  const [{ id, desc }] = sorting;
+  const [firstSort] = sorting;
+
+  if (firstSort == null) {
+    return rows;
+  }
 
   return [...rows].sort((leftRow, rightRow) => {
-    const left = leftRow[id as keyof TradeRow];
-    const right = rightRow[id as keyof TradeRow];
+    const left = leftRow[firstSort.id as keyof TradeRow];
+    const right = rightRow[firstSort.id as keyof TradeRow];
 
     if (typeof left === "number" && typeof right === "number") {
-      return desc ? right - left : left - right;
+      return firstSort.desc ? right - left : left - right;
     }
 
     const leftText = String(left ?? "").toLowerCase();
@@ -518,7 +473,7 @@ function applyServerSorting(
       return 0;
     }
 
-    return desc
+    return firstSort.desc
       ? leftText < rightText
         ? 1
         : -1
@@ -528,339 +483,189 @@ function applyServerSorting(
   });
 }
 
-function paginateRows(
-  rows: TradeRow[],
-  page: number,
-  pageSize: number,
-): TradeRow[] {
-  const safePageSize = Math.max(1, pageSize);
-  const safePage = Math.max(1, page);
+const meta: Meta<TableProps<TradeRow>> = {
+  title: "Data/Table",
+  component: Table as unknown as Meta<TableProps<TradeRow>>["component"],
+  tags: ["autodocs"],
+  parameters: {
+    layout: "padded",
+  },
+};
 
-  const startIndex = (safePage - 1) * safePageSize;
-  const endIndex = startIndex + safePageSize;
+export default meta;
 
-  return rows.slice(startIndex, endIndex);
-}
-
-function SelectionDemo(): JSX.Element {
-  const [selectedRows, setSelectedRows] = useState<TradeRow[]>([]);
-
-  return (
-    <div style={stackStyle}>
-      <Field style={frameStyle}>
-        <FieldLabel>Selectable + MultiSelect + Row Actions</FieldLabel>
-
-        <FieldContent>
-          <Table
-            data={mockRows.slice(0, 24)}
-            columns={baseColumns}
-            variant="outline"
-            size="sm"
-            selectable
-            multiSelect
-            onSelectionChange={setSelectedRows}
-            rowActions={tableRowActions}
-            sortable
-            filterable
-            columnFilters={["symbol", "sector", "status", "trader"]}
-            searchable
-            searchPlaceholder="Search selected-grid..."
-            showToolbar
-            columnVisibility
-            defaultHiddenColumns={["updatedAt"]}
-          />
-
-          <FieldDescription>{`Selected Rows: ${selectedRows.length}`}</FieldDescription>
-        </FieldContent>
-      </Field>
-    </div>
-  );
-}
-
-function ServerSideTableInner(): JSX.Element {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const [sorting, setSorting] = useState<TableSortState>([]);
-  const [filters, setFilters] = useState<TableFilterState>([]);
-  const [refreshToken, setRefreshToken] = useState(0);
-
-  const query = useQuery({
-    queryKey: ["table-server", page, pageSize, sorting, filters, refreshToken],
-    queryFn: async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 220);
-      });
-
-      const filteredRows = applyServerFilters(mockRows, filters);
-      const sortedRows = applyServerSorting(filteredRows, sorting);
-      const pagedRows = paginateRows(sortedRows, page, pageSize);
-
-      return {
-        rows: pagedRows,
-        totalRows: sortedRows.length,
-      };
-    },
-    placeholderData: (previousData) => previousData,
-    staleTime: 25_000,
-  });
-
-  return (
-    <Table
-      data={query.data?.rows ?? []}
-      columns={baseColumns}
-      variant="filled"
-      size="md"
-      sortable
-      filterable
-      columnFilters={["symbol", "sector", "status", "trader"]}
-      globalFilter
-      searchable
-      searchPlaceholder="Server search (TanStack Query)..."
-      serverSide
-      totalRows={query.data?.totalRows ?? mockRows.length}
-      pageIndex={page}
-      onPageChange={setPage}
-      onPageSizeChange={setPageSize}
-      onSortChange={setSorting}
-      onFilterChange={setFilters}
-      loading={query.isPending || query.isFetching}
-      showRefresh
-      onRefresh={() => {
-        setRefreshToken((current) => current + 1);
-      }}
-      showToolbar
-      columnVisibility
-      defaultHiddenColumns={["updatedAt"]}
-    />
-  );
-}
-
-function ServerSideQueryDemo(): JSX.Element {
-  const queryClient = useMemo(() => new QueryClient(), []);
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <ServerSideTableInner />
-    </QueryClientProvider>
-  );
-}
-
-const DEFAULT_PAGE_SIZE = 10;
+type Story = StoryObj<TableProps<TradeRow>>;
 
 export const Basic: Story = {
   render: () => (
-    <div style={stackStyle}>
-      <h3 style={{ margin: 0 }}>Basic</h3>
-
-      <Field style={frameStyle}>
-        <FieldLabel>Basic Table</FieldLabel>
-
-        <FieldContent>
-          <Table
-            data={mockRows.slice(0, 20)}
-            columns={baseColumns}
-            variant="basic"
-            size="md"
-            sortable
-            filterable
-            columnFilters={["symbol", "sector", "status"]}
-            searchable
-            searchPlaceholder="Search symbol, sector, status..."
-            hoverable
-            bordered
-            rounded
-            showToolbar
-            columnVisibility
-            defaultHiddenColumns={["updatedAt"]}
-          />
-
-          <FieldDescription>
-            Basic variant with sorting, filtering, search, pagination, and
-            column visibility state.
-          </FieldDescription>
-        </FieldContent>
-      </Field>
+    <div style={shellStyle}>
+      <Table
+        data={tradeRows.slice(0, 24)}
+        columns={tableColumns}
+        rowActions={tableRowActions}
+        variant="basic"
+        size="md"
+        sortable
+        filterable
+        searchable
+        showToolbar={false}
+        showPagination
+        hoverable
+        bordered
+        rounded
+      />
     </div>
   ),
 };
 
-export const Variants: Story = {
-  render: () => (
-    <div style={stackStyle}>
-      <h3 style={{ margin: 0 }}>Variants</h3>
+function ToolbarComposedView(args: Partial<TableProps<TradeRow>>): JSX.Element {
+  const [view, setView] = useState<ComposedView>("table");
+  const [searchValue, setSearchValue] = useState("");
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [fullscreen, setFullscreen] = useState(false);
 
-      {(
-        ["basic", "outline", "ghost", "filled", "minimal", "striped"] as const
-      ).map((variant) => (
-        <Field key={variant} style={frameStyle}>
-          <FieldLabel>{variant.toUpperCase()}</FieldLabel>
+  const filteredRows = useMemo(
+    () => applyAdvancedFilters(tradeRows, columnFilters, searchValue),
+    [columnFilters, searchValue],
+  );
+  const resolvedRows = useMemo(
+    () => applySorting(filteredRows, sorting),
+    [filteredRows, sorting],
+  );
 
-          <FieldContent>
-            <Table
-              data={mockRows.slice(0, 10)}
-              columns={baseColumns.slice(0, 6)}
-              variant={variant}
-              size="sm"
-              sortable
-              hoverable
-              bordered={variant !== "ghost"}
-              showToolbar={false}
-            />
-          </FieldContent>
-        </Field>
-      ))}
+  const switchMode: DataToolbarSwitchMode =
+    view === "table" ? "adaptive-card" : "table";
+
+  return (
+    <div style={toFullscreenSurfaceStyle(fullscreen)}>
+      <DataToolbar
+        size="sm"
+        showSearch
+        searchValue={searchValue}
+        searchPlaceholder="Search"
+        searchAriaLabel="Search records"
+        onSearchChange={setSearchValue}
+        showAdvanceFilter
+        advanceFilterColumns={toolbarColumns}
+        advanceFilterColumnFilters={columnFilters}
+        advanceFilterSorting={sorting}
+        advanceFilterGlobalSearch={searchValue}
+        advanceFilterCanUseGlobalFilter
+        advanceFilterEnableSorting
+        advanceFilterOpenLabel="Filter"
+        advanceFilterCloseLabel="Close"
+        advanceFilterTitle="Advance Filter"
+        advanceFilterDescription="Configure filters and sorting"
+        onAdvanceFilterApply={(result) => {
+          setColumnFilters(result.columnFilters);
+          setSorting(result.sorting);
+          setSearchValue(result.globalSearch);
+        }}
+        showSwitch
+        switchMode={switchMode}
+        switchLabel={view === "table" ? "Cards" : "Table"}
+        onSwitch={() => {
+          setView((current) =>
+            current === "table" ? "adaptive-card" : "table",
+          );
+        }}
+        showRefresh
+        refreshLabel="Refresh"
+        refreshingLabel="Refreshing"
+        onRefresh={async () => {
+          await new Promise((resolve) => {
+            setTimeout(resolve, 180);
+          });
+        }}
+        showFullscreen
+        fullscreen={fullscreen}
+        fullscreenLabel="Fullscreen"
+        exitFullscreenLabel="Exit"
+        onFullscreenChange={setFullscreen}
+      />
+
+      {view === "table" ? (
+        <Table
+          data={resolvedRows}
+          columns={tableColumns}
+          rowActions={tableRowActions}
+          variant={args.variant ?? "striped"}
+          size={args.size ?? "sm"}
+          compact={args.compact ?? true}
+          hoverable={args.hoverable ?? true}
+          bordered={args.bordered ?? true}
+          rounded={args.rounded ?? true}
+          showToolbar={false}
+          sortable={false}
+          filterable={false}
+          searchable={false}
+          showPagination
+          paginationVariant={args.paginationVariant ?? "advance"}
+          paginationDefaultPageSize={args.paginationDefaultPageSize ?? 10}
+          paginationPageSizeOptions={
+            args.paginationPageSizeOptions ?? [10, 20, 50]
+          }
+          paginationMaxVisiblePages={args.paginationMaxVisiblePages ?? 5}
+          paginationShowPageSizeSelector={
+            args.paginationShowPageSizeSelector ?? true
+          }
+          paginationShowSummary={args.paginationShowSummary ?? true}
+          paginationShowShowingPage={args.paginationShowShowingPage ?? true}
+          paginationResetPageOnPageSizeChange={
+            args.paginationResetPageOnPageSizeChange ?? true
+          }
+        />
+      ) : (
+        <AdaptiveCard<TradeRow>
+          data={resolvedRows}
+          rowKey="id"
+          schema={adaptiveSchema}
+          actions={adaptiveActions}
+          variant="default"
+          size="sm"
+          columns={{ mobile: 1, tablet: 1, web: 1 }}
+          insideColumns={2}
+          showToolbar={false}
+          searchable={false}
+          showPagination
+          paginationVariant="advance"
+          paginationDefaultPageSize={10}
+          paginationPageSizeOptions={[10, 20, 50]}
+          paginationMaxVisiblePages={5}
+          paginationShowPageSizeSelector
+          paginationShowSummary
+          paginationShowShowingPage
+          paginationResetPageOnPageSizeChange
+          virtualized={false}
+        />
+      )}
     </div>
-  ),
+  );
+}
+
+export const ToolbarComposedSwitch: Story = {
+  name: "Toolbar Composed Switch",
+  args: {
+    variant: "striped",
+    size: "sm",
+    compact: true,
+    hoverable: true,
+    bordered: true,
+    rounded: true,
+    paginationVariant: "advance",
+    paginationDefaultPageSize: 10,
+    paginationPageSizeOptions: [10, 20, 50],
+    paginationMaxVisiblePages: 5,
+    paginationShowPageSizeSelector: true,
+    paginationShowSummary: true,
+    paginationShowShowingPage: true,
+    paginationResetPageOnPageSizeChange: true,
+  },
+  render: (args) => <ToolbarComposedView {...args} />,
 };
 
-export const SelectionAndActions: Story = {
-  name: "Selection + Row Actions",
-  render: () => <SelectionDemo />,
-};
-
-export const LoadingSkeleton: Story = {
-  name: "Loading + Skeleton",
-  render: () => (
-    <div style={stackStyle}>
-      <h3 style={{ margin: 0 }}>Loading + Skeleton</h3>
-
-      <Field style={frameStyle}>
-        <FieldLabel>Skeleton Loader</FieldLabel>
-
-        <FieldContent>
-          <Table
-            data={[]}
-            columns={baseColumns}
-            variant="outline"
-            size="md"
-            loading
-            loadingRows={8}
-            skeleton
-            showToolbar
-            showRefresh
-          />
-        </FieldContent>
-      </Field>
-
-      <Field style={frameStyle}>
-        <FieldLabel>Spinner Loader</FieldLabel>
-
-        <FieldContent>
-          <Table
-            data={[]}
-            columns={baseColumns}
-            variant="minimal"
-            size="md"
-            loading
-            skeleton={false}
-            showToolbar
-          />
-        </FieldContent>
-      </Field>
-    </div>
-  ),
-};
-
-export const StickyHeaderFullscreen: Story = {
-  name: "Sticky Header + Fullscreen",
-  render: () => (
-    <div style={stackStyle}>
-      <h3 style={{ margin: 0 }}>Sticky Header + Fullscreen</h3>
-
-      <Field style={frameStyle}>
-        <FieldLabel>Large Dataset</FieldLabel>
-
-        <FieldContent>
-          <Table
-            data={mockRows}
-            columns={baseColumns}
-            variant="striped"
-            size="sm"
-            sortable
-            filterable
-            columnFilters={["symbol", "sector", "trader"]}
-            searchable
-            stickyHeader
-            fullscreen
-            showToolbar
-            columnVisibility
-            defaultHiddenColumns={["updatedAt"]}
-          />
-
-          <FieldDescription>
-            Uses sticky header and fullscreen mode for larger datasets.
-          </FieldDescription>
-        </FieldContent>
-      </Field>
-    </div>
-  ),
-};
-
-export const ServerSideTanstackQuery: Story = {
-  name: "Server-Side (TanStack Query)",
-  render: () => (
-    <div style={stackStyle}>
-      <h3 style={{ margin: 0 }}>Server-Side (TanStack Query)</h3>
-
-      <Field style={frameStyle}>
-        <FieldLabel>Manual pagination/sort/filter with query</FieldLabel>
-
-        <FieldContent>
-          <ServerSideQueryDemo />
-
-          <FieldDescription>
-            Server-side mode with TanStack Query for data fetching and TanStack
-            Table for table state.
-          </FieldDescription>
-        </FieldContent>
-      </Field>
-    </div>
-  ),
-};
-
-const tableInteractiveDefaultArgs: Story["args"] = {
-  variant: "striped",
-  compact: true,
-  size: "md",
-  sortable: true,
-  filterable: true,
-  searchable: true,
-  selectable: true,
-  multiSelect: true,
-  columnVisibility: true,
-  showToolbar: true,
-  showRefresh: true,
-  showPagination: true,
-  paginationVariant: "advance",
-  paginationDefaultPageSize: 10,
-  paginationPageSizeOptions: [10, 20, 50, 100],
-  paginationMaxVisiblePages: 5,
-  paginationShowPageSizeSelector: true,
-  paginationShowSummary: true,
-  paginationShowShowingPage: true,
-  paginationResetPageOnPageSizeChange: true,
-  loading: false,
-  loadingRows: 6,
-  skeleton: true,
-  hoverable: true,
-  bordered: true,
-  rounded: true,
-  stickyHeader: true,
-  fullscreen: true,
-  serverSide: false,
-  globalFilter: true,
-  showFiltersLabel: "Filters",
-  hideFiltersLabel: "Close",
-  switchToCardViewLabel: "Cards",
-  refreshLabel: "Refresh",
-  refreshingLabel: "Refreshing",
-  fullscreenLabel: "Fullscreen",
-  resetScreenLabel: "Reset",
-  columnFilters: ["symbol", "sector", "status", "price"],
-  defaultHiddenColumns: ["updatedAt"],
-};
-
-const tableInteractiveArgTypes = {
+const playgroundArgTypes = {
   variant: {
     control: "select",
     options: ["basic", "outline", "ghost", "filled", "minimal", "striped"],
@@ -870,24 +675,15 @@ const tableInteractiveArgTypes = {
     options: ["xs", "sm", "md", "lg"],
   },
   compact: { control: "boolean" },
-  sortable: { control: "boolean" },
-  filterable: { control: "boolean" },
-  searchable: { control: "boolean" },
-  globalFilter: { control: "boolean" },
-  selectable: { control: "boolean" },
-  multiSelect: { control: "boolean" },
-  columnVisibility: { control: "boolean" },
-  showToolbar: { control: "boolean" },
-  showViewSwitch: { control: "boolean" },
-  switchToCardViewLabel: { control: "text" },
-  showRefresh: { control: "boolean" },
-  showPagination: { control: "boolean" },
+  hoverable: { control: "boolean" },
+  bordered: { control: "boolean" },
+  rounded: { control: "boolean" },
   paginationVariant: {
     control: "select",
     options: ["basic", "advance", "compact"],
   },
   paginationDefaultPageSize: {
-    control: { type: "number", min: 1, max: 200, step: 1 },
+    control: { type: "number", min: 1, max: 100, step: 1 },
   },
   paginationPageSizeOptions: { control: "object" },
   paginationMaxVisiblePages: {
@@ -897,255 +693,35 @@ const tableInteractiveArgTypes = {
   paginationShowSummary: { control: "boolean" },
   paginationShowShowingPage: { control: "boolean" },
   paginationResetPageOnPageSizeChange: { control: "boolean" },
-  loading: { control: "boolean" },
-  loadingRows: { control: { type: "number", min: 1, max: 20, step: 1 } },
-  skeleton: { control: "boolean" },
-  hoverable: { control: "boolean" },
-  bordered: { control: "boolean" },
-  rounded: { control: "boolean" },
-  stickyHeader: { control: "boolean" },
-  fullscreen: { control: "boolean" },
-  onAction: { action: "action" },
-  onPageChange: { action: "page-change" },
-  onPageSizeChange: { action: "page-size-change" },
-  onSortChange: { action: "sort-change" },
-  onFilterChange: { action: "filter-change" },
-  onSelectionChange: { action: "selection-change" },
-  onRefresh: { action: "refresh" },
-  serverSide: { table: { disable: true } },
-  totalRows: { table: { disable: true } },
-  pageIndex: { table: { disable: true } },
-  rowActions: { table: { disable: true } },
+  onAction: { action: "table-action" },
   data: { table: { disable: true } },
   columns: { table: { disable: true } },
-  rowKey: { table: { disable: true } },
-  style: { table: { disable: true } },
-  className: { table: { disable: true } },
+  rowActions: { table: { disable: true } },
+  showToolbar: { table: { disable: true } },
+  searchable: { table: { disable: true } },
+  filterable: { table: { disable: true } },
+  sortable: { table: { disable: true } },
 } satisfies NonNullable<Story["argTypes"]>;
-
-export const CardTableFullWidthPlaybook: Story = {
-  name: "Card + Table Full Width Playbook",
-  args: {
-    ...tableInteractiveDefaultArgs,
-    compact: true,
-    size: "sm",
-    stickyHeader: false,
-    fullscreen: false,
-    rounded: false,
-    filterDialogTitle: "Advanced filters",
-    filterDialogDescription:
-      "Use one modal to build global and per-column rules with starts-with, ends-with, equals, and numeric operators.",
-    addFilterLabel: "Add rule",
-    clearFiltersLabel: "Clear filters",
-    applyFiltersLabel: "Apply filters",
-    showViewSwitch: true,
-  },
-  argTypes: tableInteractiveArgTypes,
-  render: (args) => {
-    const [view, setView] = useState<TableCardViewMode>("cards");
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(
-      args.paginationDefaultPageSize ?? DEFAULT_PAGE_SIZE,
-    );
-    const [sorting, setSorting] = useState<TableSortState>([]);
-    const [filters, setFilters] = useState<TableFilterState>([]);
-
-    const {
-      data: _data,
-      columns: _columns,
-      rowActions: _rowActions,
-      onPageChange: _onPageChange,
-      onPageSizeChange: _onPageSizeChange,
-      onSortChange: _onSortChange,
-      onFilterChange: _onFilterChange,
-      serverSide: _serverSide,
-      totalRows: _totalRows,
-      pageIndex: _pageIndex,
-      ...restArgs
-    } = args;
-
-    const filteredRows = applyServerFilters(mockRows, filters);
-    const sortedRows = applyServerSorting(filteredRows, sorting);
-    const pageRows = paginateRows(sortedRows, page, pageSize);
-    const parityFilterColumns = args.columnFilters ?? [
-      "symbol",
-      "sector",
-      "status",
-      "price",
-    ];
-    const resolvedCardVariant =
-      args.variant === "ghost"
-        ? "ghost"
-        : args.compact || args.variant === "minimal"
-          ? "compact"
-          : "default";
-
-    const sharedTableArgs = {
-      ...restArgs,
-      serverSide: true as const,
-      totalRows: sortedRows.length,
-      pageIndex: page,
-      paginationDefaultPageSize: pageSize,
-      onPageChange: setPage,
-      onPageSizeChange: setPageSize,
-      onSortChange: (next: TableSortState) => {
-        queueMicrotask(() => {
-          setSorting(next);
-        });
-      },
-      onFilterChange: (next: TableFilterState) => {
-        queueMicrotask(() => {
-          setFilters(next);
-        });
-      },
-    };
-
-    function handleSortChange(next: TableSortState): void {
-      queueMicrotask(() => {
-        setSorting(next);
-      });
-    }
-
-    function handleFilterChange(next: TableFilterState): void {
-      queueMicrotask(() => {
-        setFilters(next);
-      });
-    }
-
-    return (
-      <div style={stackStyle}>
-        <div style={cardTableShellStyle}>
-          <Card size="sm" spacing="sm" style={{ width: "100%" }}>
-            <CardHeader>
-              <CardTitle>Trade Monitor</CardTitle>
-              <CardDescription>
-                Table and CardData stay in sync with the same advanced filters,
-                pagination, and sorting while switching views.
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent style={cardTableContentStyle}>
-              {view === "table" ? (
-                <Table
-                  key={`card-playbook-table-${JSON.stringify(restArgs)}`}
-                  {...sharedTableArgs}
-                  data={pageRows}
-                  columns={baseColumns}
-                  rowActions={tableRowActions}
-                  columnFilters={parityFilterColumns}
-                  showViewSwitch={args.showViewSwitch}
-                  switchToCardViewLabel={args.switchToCardViewLabel ?? "Cards"}
-                  onSwitchToCardView={() => {
-                    setView("cards");
-                  }}
-                  onRefresh={args.onRefresh ?? (() => {})}
-                  style={{ width: "100%", maxWidth: "100%" }}
-                />
-              ) : (
-                <CardData<TradeRow>
-                  data={pageRows}
-                  rowKey="id"
-                  schema={parityCardSchema}
-                  variant={resolvedCardVariant}
-                  size={args.size ?? "sm"}
-                  showFieldLabels={false}
-                  actions={parityCardActions}
-                  sortable={args.sortable}
-                  filterable={args.filterable}
-                  columnFilters={parityFilterColumns}
-                  searchable={args.searchable}
-                  globalFilter={args.globalFilter}
-                  searchPlaceholder={args.searchPlaceholder}
-                  showToolbar={args.showToolbar}
-                  showFiltersLabel={args.showFiltersLabel}
-                  hideFiltersLabel={args.hideFiltersLabel}
-                  filterDialogTitle={args.filterDialogTitle}
-                  filterDialogDescription={args.filterDialogDescription}
-                  addFilterLabel={args.addFilterLabel}
-                  addSortLabel={args.addSortLabel}
-                  clearFiltersLabel={args.clearFiltersLabel}
-                  resetSortingLabel={args.resetSortingLabel}
-                  applyFiltersLabel={args.applyFiltersLabel}
-                  globalFilterLabel={args.globalFilterLabel}
-                  globalFilterPlaceholder={args.globalFilterPlaceholder}
-                  showRefresh={args.showRefresh}
-                  onRefresh={args.onRefresh ?? (() => {})}
-                  refreshLabel={args.refreshLabel}
-                  refreshingLabel={args.refreshingLabel}
-                  fullscreen={args.fullscreen}
-                  fullscreenLabel={args.fullscreenLabel}
-                  resetScreenLabel={args.resetScreenLabel}
-                  serverSide
-                  totalRows={sortedRows.length}
-                  pageIndex={page}
-                  paginationDefaultPageSize={pageSize}
-                  onPageChange={setPage}
-                  onPageSizeChange={setPageSize}
-                  showPagination={args.showPagination}
-                  paginationVariant={args.paginationVariant}
-                  paginationPageSizeOptions={args.paginationPageSizeOptions}
-                  paginationMaxVisiblePages={args.paginationMaxVisiblePages}
-                  paginationShowPageSizeSelector={
-                    args.paginationShowPageSizeSelector
-                  }
-                  paginationShowSummary={args.paginationShowSummary}
-                  paginationShowShowingPage={args.paginationShowShowingPage}
-                  paginationResetPageOnPageSizeChange={
-                    args.paginationResetPageOnPageSizeChange
-                  }
-                  onSortChange={handleSortChange}
-                  onFilterChange={handleFilterChange}
-                  onAction={(context) => {
-                    args.onAction?.(context as never);
-                  }}
-                  showViewSwitch={args.showViewSwitch}
-                  switchToTableViewLabel="Table"
-                  onSwitchToTableView={() => {
-                    setView("table");
-                  }}
-                />
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    );
-  },
-};
 
 export const TablePlayground: Story = {
   name: "Table Playground",
-  args: tableInteractiveDefaultArgs,
-  argTypes: tableInteractiveArgTypes,
-  render: (args) => {
-    const {
-      data: _data,
-      columns: _columns,
-      rowActions: _rowActions,
-      ...restArgs
-    } = args;
-
-    return (
-      <div style={stackStyle}>
-        <Field style={frameStyle}>
-          <FieldLabel>Interactive Playground</FieldLabel>
-
-          <FieldContent>
-            <Table
-              key={JSON.stringify(restArgs)}
-              {...restArgs}
-              data={mockRows}
-              columns={baseColumns}
-              rowActions={tableRowActions}
-              onRefresh={args.onRefresh ?? (() => {})}
-            />
-
-            <FieldDescription>
-              Validate each prop quickly using controls.
-            </FieldDescription>
-          </FieldContent>
-        </Field>
-      </div>
-    );
+  args: {
+    variant: "basic",
+    size: "md",
+    compact: false,
+    hoverable: true,
+    bordered: true,
+    rounded: true,
+    paginationVariant: "advance",
+    paginationDefaultPageSize: 10,
+    paginationPageSizeOptions: [10, 20, 50],
+    paginationMaxVisiblePages: 5,
+    paginationShowPageSizeSelector: true,
+    paginationShowSummary: true,
+    paginationShowShowingPage: true,
+    paginationResetPageOnPageSizeChange: true,
   },
+  argTypes: playgroundArgTypes,
+  render: (args) => <ToolbarComposedView {...args} />,
 };
+

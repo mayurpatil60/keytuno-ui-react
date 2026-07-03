@@ -1,0 +1,74 @@
+import { HTMLAttributes, CSSProperties, ReactNode } from 'react';
+import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
+import { AdvanceFilterColumn, AdvanceFilterResult, AdvanceFilterApplyReason } from './AdvanceFilter.js';
+import './Button.js';
+import './Tooltip.js';
+import './Sheet.js';
+
+type DataToolbarSize = "xs" | "sm" | "md" | "lg";
+type DataToolbarSwitchMode = "table" | "adaptive-card" | "custom";
+type DataToolbarActionSource = "search" | "filter-open-change" | "filter-apply" | "switch" | "refresh" | "fullscreen";
+interface DataToolbarActionContext {
+    source: DataToolbarActionSource;
+    search?: string;
+    open?: boolean;
+    switchMode?: DataToolbarSwitchMode;
+    fullscreen?: boolean;
+    filterResult?: AdvanceFilterResult;
+    filterReason?: AdvanceFilterApplyReason;
+    event?: unknown;
+}
+interface DataToolbarProps extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
+    size?: DataToolbarSize;
+    showSearch?: boolean;
+    searchValue?: string;
+    defaultSearchValue?: string;
+    onSearchChange?: (value: string) => void;
+    searchPlaceholder?: string;
+    searchAriaLabel?: string;
+    searchInputMinWidth?: CSSProperties["minWidth"];
+    searchInputMaxWidth?: CSSProperties["maxWidth"];
+    showAdvanceFilter?: boolean;
+    advanceFilterColumns?: AdvanceFilterColumn[];
+    advanceFilterColumnFilters?: ColumnFiltersState;
+    advanceFilterSorting?: SortingState;
+    advanceFilterGlobalSearch?: string;
+    advanceFilterCanUseGlobalFilter?: boolean;
+    advanceFilterEnableSorting?: boolean;
+    advanceFilterOpen?: boolean;
+    advanceFilterDefaultOpen?: boolean;
+    onAdvanceFilterOpenChange?: (open: boolean) => void;
+    onAdvanceFilterApply?: (result: AdvanceFilterResult, reason: AdvanceFilterApplyReason) => void;
+    advanceFilterOpenLabel?: string;
+    advanceFilterCloseLabel?: string;
+    advanceFilterAriaLabel?: string;
+    advanceFilterActiveCount?: number;
+    advanceFilterTitle?: ReactNode;
+    advanceFilterDescription?: ReactNode;
+    addFilterLabel?: string;
+    addSortLabel?: string;
+    clearFiltersLabel?: string;
+    resetSortingLabel?: string;
+    applyFiltersLabel?: string;
+    globalFilterLabel?: ReactNode;
+    globalFilterPlaceholder?: string;
+    showSwitch?: boolean;
+    switchMode?: DataToolbarSwitchMode;
+    switchIcon?: ReactNode;
+    switchLabel?: string;
+    onSwitch?: (mode: DataToolbarSwitchMode) => void;
+    showRefresh?: boolean;
+    refreshing?: boolean;
+    refreshLabel?: string;
+    refreshingLabel?: string;
+    onRefresh?: () => void | Promise<void>;
+    showFullscreen?: boolean;
+    fullscreen?: boolean;
+    fullscreenLabel?: string;
+    exitFullscreenLabel?: string;
+    onFullscreenChange?: (nextValue: boolean) => void;
+    onAction?: (context: DataToolbarActionContext) => void;
+}
+declare function DataToolbar({ size, showSearch, searchValue, defaultSearchValue, onSearchChange, searchPlaceholder, searchAriaLabel, searchInputMinWidth, searchInputMaxWidth, showAdvanceFilter, advanceFilterColumns, advanceFilterColumnFilters, advanceFilterSorting, advanceFilterGlobalSearch, advanceFilterCanUseGlobalFilter, advanceFilterEnableSorting, advanceFilterOpen, advanceFilterDefaultOpen, onAdvanceFilterOpenChange, onAdvanceFilterApply, advanceFilterOpenLabel, advanceFilterCloseLabel, advanceFilterAriaLabel, advanceFilterActiveCount, advanceFilterTitle, advanceFilterDescription, addFilterLabel, addSortLabel, clearFiltersLabel, resetSortingLabel, applyFiltersLabel, globalFilterLabel, globalFilterPlaceholder, showSwitch, switchMode, switchIcon, switchLabel, onSwitch, showRefresh, refreshing, refreshLabel, refreshingLabel, onRefresh, showFullscreen, fullscreen, fullscreenLabel, exitFullscreenLabel, onFullscreenChange, onAction, className, style, ...props }: DataToolbarProps): JSX.Element;
+
+export { DataToolbar, type DataToolbarActionContext, type DataToolbarActionSource, type DataToolbarProps, type DataToolbarSize, type DataToolbarSwitchMode };

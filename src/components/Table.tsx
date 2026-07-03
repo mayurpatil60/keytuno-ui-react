@@ -23,24 +23,14 @@ import {
   type SortingState,
   type VisibilityState,
 } from "@tanstack/react-table";
-import {
-  FiChevronDown,
-  FiChevronUp,
-  FiFilter,
-  FiGrid,
-  FiMaximize2,
-  FiMinimize2,
-  FiRefreshCw,
-  FiSearch,
-} from "./icons/feather";
+import { FiChevronDown, FiChevronUp } from "./icons/feather";
 
 import { Button, type ButtonProps } from "./Button";
 import {
-  DataFilterSortDialog,
-  type DataFilterSortDialogColumn,
-  type DataFilterSortDialogResult,
-} from "./DataFilterSortDialog";
-import { Input } from "./Input";
+  type AdvanceFilterColumn,
+  type AdvanceFilterResult,
+} from "./AdvanceFilter";
+import { DataToolbar } from "./DataToolbar";
 import {
   Pagination,
   type PaginationActionContext,
@@ -872,7 +862,7 @@ export function Table<TData extends object = object>({
   const [isFullscreenActive, setIsFullscreenActive] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-  const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
+  const [isAdvanceFilterOpen, setIsAdvanceFilterOpen] = useState(false);
   const isFullscreenMode = fullscreen && isFullscreenActive;
 
   useEffect(() => {
@@ -1409,7 +1399,7 @@ export function Table<TData extends object = object>({
     activeColumnFilterCount + (hasActiveGlobalSearch ? 1 : 0);
   const showAdvancedFilterTrigger = filterable && filterableColumns.length > 0;
 
-  const filterSortDialogColumns = useMemo<DataFilterSortDialogColumn[]>(() => {
+  const advanceFilterColumns = useMemo<AdvanceFilterColumn[]>(() => {
     return table
       .getAllLeafColumns()
       .filter(
@@ -1433,32 +1423,17 @@ export function Table<TData extends object = object>({
       });
   }, [columnFilters, filterable, filterableColumnSet, sortable, table]);
 
-  function handleAdvancedFilterDialogOpen(): void {
-    if (!filterable || filterableColumns.length === 0) {
-      return;
-    }
-
-    setIsFilterDialogOpen(true);
+  function handleAdvanceFilterOpenChange(nextOpen: boolean): void {
+    setIsAdvanceFilterOpen(nextOpen);
 
     onAction?.({
       source: "column-filters-toggle",
-      showColumnFilters: true,
+      showColumnFilters: nextOpen,
     });
   }
 
-  function handleAdvancedFilterDialogOpenChange(nextOpen: boolean): void {
-    setIsFilterDialogOpen(nextOpen);
-
-    if (!nextOpen) {
-      onAction?.({
-        source: "column-filters-toggle",
-        showColumnFilters: false,
-      });
-    }
-  }
-
-  function handleFilterSortDialogApply(
-    result: DataFilterSortDialogResult,
+  function handleAdvanceFilterApply(
+    result: AdvanceFilterResult,
     reason: "apply" | "clear-filters" | "reset-sorting",
   ): void {
     table.setColumnFilters(result.columnFilters);
@@ -1507,8 +1482,7 @@ export function Table<TData extends object = object>({
       showSearchInput ||
       showRefresh ||
       canShowViewSwitch ||
-      fullscreen ||
-      selectionCount > 0);
+      fullscreen);
 
   async function handleRefresh(): Promise<void> {
     if (onRefresh == null) {
@@ -1622,68 +1596,6 @@ export function Table<TData extends object = object>({
     flexDirection: "column",
     flex: isFullscreenMode ? 1 : undefined,
     minHeight: isFullscreenMode ? 0 : undefined,
-  };
-
-  const toolbarStyle: CSSProperties = {
-    width: "100%",
-    maxWidth: "100%",
-    minWidth: 0,
-    boxSizing: "border-box",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    flexWrap: "nowrap",
-    gap: sizeToken.toolbarGap,
-    padding: "0.12rem 0",
-  };
-
-  const toolbarLeftStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "nowrap",
-    gap: sizeToken.toolbarGap,
-    minWidth: 0,
-    maxWidth: "100%",
-    flex: "1 1 auto",
-  };
-
-  const toolbarRightStyle: CSSProperties = {
-    display: "flex",
-    alignItems: "center",
-    flexWrap: "nowrap",
-    gap: "0.4rem",
-    marginInlineStart: "auto",
-    minWidth: "fit-content",
-    maxWidth: "100%",
-  };
-
-  const searchWrapStyle: CSSProperties = {
-    position: "relative",
-    flex: "1 1 auto",
-    width: "auto",
-    boxSizing: "border-box",
-    minInlineSize: 0,
-    inlineSize: "auto",
-    maxWidth: "100%",
-    minWidth: 0,
-  };
-
-  const searchIconStyle: CSSProperties = {
-    position: "absolute",
-    insetInlineStart: "0.65rem",
-    insetBlockStart: "50%",
-    transform: "translateY(-50%)",
-    display: "inline-flex",
-    alignItems: "center",
-    color: colorToken.mutedTextColor,
-    pointerEvents: "none",
-    lineHeight: 0,
-  };
-
-  const selectedCountStyle: CSSProperties = {
-    color: colorToken.mutedTextColor,
-    fontSize: sizeToken.headerFontSize,
-    margin: 0,
   };
 
   const tableViewportStyle: CSSProperties = {
@@ -1840,13 +1752,6 @@ export function Table<TData extends object = object>({
   }
 
   const headerGroups = table.getHeaderGroups();
-  const filterTriggerTooltipLabel = isFilterDialogOpen
-    ? hideFiltersLabel
-    : showFiltersLabel;
-  const filterTriggerAriaLabel =
-    !isFilterDialogOpen && totalActiveAdvancedFilters > 0
-      ? `${showFiltersLabel} (${totalActiveAdvancedFilters} active)`
-      : filterTriggerTooltipLabel;
 
   return (
     <div
@@ -1855,137 +1760,72 @@ export function Table<TData extends object = object>({
       {...props}
     >
       {canShowToolbar ? (
-        <div style={toolbarStyle}>
-          <div style={toolbarLeftStyle}>
-            {showSearchInput ? (
-              <div style={searchWrapStyle}>
-                <span style={searchIconStyle}>
-                  <FiSearch size={sizeToken.iconSize} />
-                </span>
+        <DataToolbar
+          size={sizeToken.controlSize}
+          showSearch={showSearchInput}
+          searchValue={globalSearch}
+          searchPlaceholder={searchPlaceholder}
+          searchAriaLabel={searchAriaLabel}
+          onSearchChange={(nextSearch) => {
+            table.setGlobalFilter(nextSearch);
+          }}
+          showAdvanceFilter={showAdvancedFilterTrigger}
+          advanceFilterColumns={advanceFilterColumns}
+          advanceFilterColumnFilters={columnFilterState}
+          advanceFilterSorting={sortingState}
+          advanceFilterGlobalSearch={globalSearch}
+          advanceFilterCanUseGlobalFilter={canUseGlobalFilter}
+          advanceFilterEnableSorting={sortable}
+          advanceFilterOpen={isAdvanceFilterOpen}
+          onAdvanceFilterOpenChange={handleAdvanceFilterOpenChange}
+          onAdvanceFilterApply={handleAdvanceFilterApply}
+          advanceFilterOpenLabel={showFiltersLabel}
+          advanceFilterCloseLabel={hideFiltersLabel}
+          advanceFilterActiveCount={totalActiveAdvancedFilters}
+          advanceFilterTitle={filterDialogTitle}
+          advanceFilterDescription={filterDialogDescription}
+          addFilterLabel={addFilterLabel}
+          addSortLabel={addSortLabel}
+          clearFiltersLabel={clearFiltersLabel}
+          resetSortingLabel={resetSortingLabel}
+          applyFiltersLabel={applyFiltersLabel}
+          globalFilterLabel={globalFilterLabel}
+          globalFilterPlaceholder={globalFilterPlaceholder}
+          showSwitch={canShowViewSwitch}
+          switchMode="adaptive-card"
+          switchLabel={switchToCardViewLabel}
+          onSwitch={() => {
+            onAction?.({
+              source: "view-switch",
+              actionId: "adaptive-card",
+            });
 
-                <Input
-                  size={sizeToken.controlSize}
-                  value={globalSearch}
-                  placeholder={searchPlaceholder}
-                  aria-label={searchAriaLabel}
-                  onChange={(event) => {
-                    table.setGlobalFilter(event.currentTarget.value);
-                  }}
-                  style={{ paddingInlineStart: "1.95rem" }}
-                />
-              </div>
-            ) : null}
+            onSwitchToCardView?.();
+          }}
+          showRefresh={showRefresh}
+          refreshing={loading || isRefreshing}
+          refreshLabel={refreshLabel}
+          refreshingLabel={refreshingLabel}
+          onRefresh={() => {
+            onAction?.({
+              source: "refresh",
+            });
 
-            {selectable && selectionCount > 0 ? (
-              <p style={selectedCountStyle}>
-                {selectedCountFormatter(selectionCount)}
-              </p>
-            ) : null}
-          </div>
+            return handleRefresh();
+          }}
+          showFullscreen={fullscreen}
+          fullscreen={isFullscreenActive}
+          fullscreenLabel={fullscreenLabel}
+          exitFullscreenLabel={resetScreenLabel}
+          onFullscreenChange={(nextFullscreen) => {
+            setIsFullscreenActive(nextFullscreen);
 
-          <div style={toolbarRightStyle}>
-            {showAdvancedFilterTrigger ? (
-              <Button
-                size={sizeToken.controlSize}
-                variant={
-                  isFilterDialogOpen || totalActiveAdvancedFilters > 0
-                    ? "primary"
-                    : "outline"
-                }
-                iconOnly
-                tooltip={filterTriggerTooltipLabel}
-                tooltipSide="top"
-                tooltipSize="xs"
-                aria-label={filterTriggerAriaLabel}
-                onClick={() => {
-                  handleAdvancedFilterDialogOpen();
-                }}
-              >
-                <FiFilter size={sizeToken.iconSize} />
-              </Button>
-            ) : null}
-
-            {canShowViewSwitch ? (
-              <Button
-                size={sizeToken.controlSize}
-                variant="outline"
-                iconOnly
-                tooltip={switchToCardViewLabel}
-                tooltipSide="top"
-                tooltipSize="xs"
-                aria-label={switchToCardViewLabel}
-                onAction={(event) => {
-                  onAction?.({
-                    source: "view-switch",
-                    actionId: "card-data",
-                    event,
-                  });
-
-                  onSwitchToCardView?.();
-                }}
-              >
-                <FiGrid size={sizeToken.iconSize} />
-              </Button>
-            ) : null}
-
-            {showRefresh ? (
-              <Button
-                size={sizeToken.controlSize}
-                variant="outline"
-                iconOnly
-                tooltip={isRefreshing ? `${refreshingLabel}...` : refreshLabel}
-                tooltipSide="top"
-                tooltipSize="xs"
-                aria-label={isRefreshing ? refreshingLabel : refreshLabel}
-                disabled={loading || isRefreshing}
-                onClick={(event) => {
-                  onAction?.({
-                    source: "refresh",
-                    event,
-                  });
-
-                  void handleRefresh();
-                }}
-              >
-                <FiRefreshCw size={sizeToken.iconSize} />
-              </Button>
-            ) : null}
-
-            {fullscreen ? (
-              <Button
-                size={sizeToken.controlSize}
-                variant={isFullscreenActive ? "primary" : "outline"}
-                iconOnly
-                tooltip={
-                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
-                }
-                tooltipSide="top"
-                tooltipSize="xs"
-                aria-label={
-                  isFullscreenActive ? resetScreenLabel : fullscreenLabel
-                }
-                onClick={() => {
-                  setIsFullscreenActive((current) => {
-                    const next = !current;
-
-                    onAction?.({
-                      source: "fullscreen",
-                      fullscreen: next,
-                    });
-
-                    return next;
-                  });
-                }}
-              >
-                {isFullscreenActive ? (
-                  <FiMinimize2 size={sizeToken.iconSize} />
-                ) : (
-                  <FiMaximize2 size={sizeToken.iconSize} />
-                )}
-              </Button>
-            ) : null}
-          </div>
-        </div>
+            onAction?.({
+              source: "fullscreen",
+              fullscreen: nextFullscreen,
+            });
+          }}
+        />
       ) : null}
 
       <div style={containerStyle}>
@@ -2197,30 +2037,6 @@ export function Table<TData extends object = object>({
           </table>
         </Scrollbar>
       </div>
-
-      {showAdvancedFilterTrigger ? (
-        <DataFilterSortDialog
-          open={isFilterDialogOpen}
-          onOpenChange={handleAdvancedFilterDialogOpenChange}
-          columns={filterSortDialogColumns}
-          columnFilters={columnFilterState}
-          sorting={sortingState}
-          globalSearch={globalSearch}
-          canUseGlobalFilter={canUseGlobalFilter}
-          enableSorting={sortable}
-          controlSize={sizeToken.controlSize}
-          title={filterDialogTitle}
-          description={filterDialogDescription}
-          addFilterLabel={addFilterLabel}
-          addSortLabel={addSortLabel}
-          clearFiltersLabel={clearFiltersLabel}
-          resetSortingLabel={resetSortingLabel}
-          applyFiltersLabel={applyFiltersLabel}
-          globalFilterLabel={globalFilterLabel}
-          globalFilterPlaceholder={globalFilterPlaceholder}
-          onApply={handleFilterSortDialogApply}
-        />
-      ) : null}
 
       {showPagination ? (
         <Pagination

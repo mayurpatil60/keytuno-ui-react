@@ -5,7 +5,7 @@ Generated from all Storybook story files in `stories/` to provide Copilot-ready 
 ## 1. Component Index and Coverage Counts
 
 - Total components documented: 46
-- Total story exports covered: 292
+- Total story exports covered: 279
 - Total unique props detected across stories: 799
 - Total callback/action props detected: 117
 - Total unique accessibility signals detected: 13
@@ -20,7 +20,7 @@ Sequential index (component -> stories, props, actions, a11y signals):
 6. Button -> stories: 8, props: 21, actions: 2, a11y signals: 3
 7. ButtonGroup -> stories: 3, props: 12, actions: 1, a11y signals: 1
 8. Card -> stories: 6, props: 12, actions: 3, a11y signals: 0
-9. CardData -> stories: 9, props: 36, actions: 8, a11y signals: 0
+9. DataToolbar -> stories: 3, props: 40, actions: 6, a11y signals: 0
 10. Checkbox -> stories: 7, props: 15, actions: 3, a11y signals: 1
 11. ColorPicker -> stories: 8, props: 18, actions: 2, a11y signals: 4
 12. DatePicker -> stories: 10, props: 16, actions: 2, a11y signals: 0
@@ -48,7 +48,7 @@ Sequential index (component -> stories, props, actions, a11y signals):
 34. Spinner -> stories: 2, props: 12, actions: 4, a11y signals: 4
 35. Stepper -> stories: 10, props: 37, actions: 5, a11y signals: 2
 36. Switch -> stories: 7, props: 19, actions: 5, a11y signals: 5
-37. Table -> stories: 8, props: 44, actions: 7, a11y signals: 0
+37. Table -> stories: 3, props: 18, actions: 1, a11y signals: 0
 38. Tabs -> stories: 5, props: 14, actions: 2, a11y signals: 2
 39. Textarea -> stories: 5, props: 17, actions: 4, a11y signals: 4
 40. Theme -> stories: 1, props: 0, actions: 0, a11y signals: 0
@@ -56,7 +56,7 @@ Sequential index (component -> stories, props, actions, a11y signals):
 42. Toast -> stories: 4, props: 14, actions: 2, a11y signals: 1
 43. Toggle -> stories: 4, props: 18, actions: 5, a11y signals: 5
 44. Tooltip -> stories: 5, props: 16, actions: 5, a11y signals: 6
-45. AdaptiveCard -> stories: 6, props: 43, actions: 5, a11y signals: 1
+45. AdaptiveCard -> stories: 4, props: 24, actions: 1, a11y signals: 0
 46. AdvanceFilter -> stories: 4, props: 31, actions: 2, a11y signals: 1
 
 ## 2. Sequential Component Documentation
@@ -573,88 +573,81 @@ Accessibility tokens/signals found in story code:
 3. Preserve callback prop signatures from story controls (`on*` props) for predictable integration.
 4. Cross-check final production props with canonical API docs before release.
 
-### 2.9 CardData
+### 2.9 DataToolbar
 
-- Story source file: stories/CardData.stories.tsx
-- Storybook title: Data/CardData
-- Story exports count: 9
-- Props documented from stories: 43
-- Callback/action props detected: 8
+- Story source file: stories/DataToolbar.stories.tsx
+- Storybook title: Data/DataToolbar
+- Story exports count: 3
+- Props documented from stories: 40
+- Callback/action props detected: 6
 - Accessibility signals detected in stories: 0
-- Canonical API section: docs/keytuno-ui-react.md -> ### CardData
+- Canonical API section: docs/keytuno-ui-react.md -> ### DataToolbar
 
 #### Story Exports
 
-1. MinimalPropsFastDefault
-2. SchemaDrivenAdaptiveCards
-3. AutoConfiguredMixedLayout
-4. ActionOverflowMenu
-5. ResponsiveColumnsTopActions
-6. VirtualizedAdvancedFilterCards
-7. TableCardSwitchPlaybook
-8. CardTableUnifiedPlayground
-9. CardDataPlayground
+1. Basic
+2. ToolbarComposition
+3. DataToolbarPlayground
 
 #### Imported Keytuno Components in Story File
 
-1. Card
-2. CardContent
-3. CardData
-4. CardDataAction
-5. CardDataFieldSchema
-6. CardDataProps
-7. CardDescription
-8. CardHeader
-9. CardTitle
-10. RowAction
-11. Table
-12. TableColumnDef
-13. TableProps
+1. AdaptiveCard
+2. DataToolbar
+3. Table
+4. AdaptiveCardAction
+5. AdaptiveCardFieldSchema
+6. AdvanceFilterColumn
+7. DataToolbarProps
+8. TableColumnDef
 
 #### Props and Controls Matrix
 
 | Prop | Source(s) | Control / Type | Default(s) in Stories | Options | Description / Notes |
 | --- | --- | --- | --- | --- | --- |
-| actionAlignment | argTypes, args | select | right | left, right | - |
-| actionInlineMaxVisible | argTypes, args | number | 5 | - | - |
-| actionMode | argTypes, args | select | auto | auto, inline, menu | - |
-| actionPlacement | argTypes, args | select | bottom | bottom, top | - |
-| actions | argTypes, table-disabled | - | - | - | - |
-| columnBreakpoints | argTypes | object | - | - | - |
-| columnFilters | argTypes | object | - | - | - |
-| columns | argTypes, args | object | {object} | - | - |
-| data | argTypes, jsx-usage, table-disabled | - | - | - | - |
-| filterable | argTypes, args | boolean | true | - | - |
-| globalFilter | argTypes, args | boolean | true | - | - |
-| onAction | argTypes | - | - | - | action: action |
-| paginationDefaultPageSize | argTypes, args | number | 10 | - | - |
-| paginationMaxVisiblePages | argTypes, args | number | 5 | - | - |
-| paginationPageSizeOptions | argTypes, args | object | [array] | - | - |
-| paginationResetPageOnPageSizeChange | argTypes, args | boolean | true | - | - |
-| paginationShowPageSizeSelector | argTypes, args | boolean | true | - | - |
-| paginationShowShowingPage | argTypes, args | boolean | true | - | - |
-| paginationShowSummary | argTypes, args | boolean | true | - | - |
-| paginationVariant | argTypes, args | select | advance | advance, basic, compact | - |
-| rowKey | argTypes, jsx-usage, table-disabled | - | - | - | - |
-| safeAreaAware | argTypes, args | boolean | true | - | - |
-| schema | argTypes, table-disabled | - | - | - | - |
-| searchable | argTypes, args | boolean | true | - | - |
-| searchPlaceholder | argTypes | text | - | - | - |
-| showFieldLabels | argTypes, args | boolean | false | - | - |
-| showPagination | argTypes, args | boolean | true | - | - |
-| showToolbar | argTypes, args | boolean | true | - | - |
-| size | argTypes, args | select | sm | lg, md, sm, xs | - |
-| sortable | argTypes, args | boolean | true | - | - |
-| variant | argTypes, args | select | default | compact, default, ghost | - |
-| viewportMaxHeight | argTypes, args | text | 34rem | - | - |
-| virtualized | argTypes, args | boolean | false | - | - |
-| virtualizedEstimateSize | argTypes | number | - | - | - |
-| virtualizedMaxHeight | argTypes, args | text | 34rem | - | - |
-| virtualizedOverscan | argTypes, args | number | 6 | - | - |
+| addFilterLabel | argTypes | text | Add filter | - | Label for add filter action in AdvanceFilter sheet. |
+| addSortLabel | argTypes | text | Add sort | - | Label for add sort action in AdvanceFilter sheet. |
+| advanceFilterCloseLabel | argTypes | text | Close | - | One-word close tooltip/label for filter trigger. |
+| advanceFilterColumns | jsx-usage, table-disabled | - | - | - | Shared filterable/sortable column definitions. |
+| advanceFilterDescription | argTypes | text | Configure filters and sorting | - | Sheet description copy. |
+| advanceFilterEnableSorting | argTypes, args | boolean | true | - | Enables sorting rows in sheet. |
+| advanceFilterOpenLabel | argTypes | text | Filter | - | One-word open tooltip/label for filter trigger. |
+| advanceFilterTitle | argTypes | text | Advance Filter | - | Sheet title. |
+| applyFiltersLabel | argTypes | text | Apply filters | - | Commit filters/sorting. |
+| clearFiltersLabel | argTypes | text | Clear filters | - | Clear only filter rows. |
+| defaultSearchValue | argTypes, args | text | - | - | Uncontrolled search initial value. |
+| exitFullscreenLabel | argTypes | text | Exit | - | One-word fullscreen exit label. |
+| fullscreen | argTypes, args | boolean | false | - | Controlled fullscreen state. |
+| fullscreenLabel | argTypes | text | Fullscreen | - | One-word fullscreen entry label. |
+| globalFilterPlaceholder | argTypes | text | Search all columns | - | Placeholder for sheet global search field. |
+| onAction | argTypes | - | - | - | action: toolbar-action |
+| onAdvanceFilterApply | argTypes | - | - | - | action: apply-filter |
+| onFullscreenChange | argTypes | - | - | - | action: fullscreen-change |
+| onRefresh | argTypes | - | - | - | action: refresh |
+| onSearchChange | argTypes | - | - | - | action: search-change |
+| onSwitch | argTypes | - | - | - | action: switch |
+| refreshLabel | argTypes | text | Refresh | - | One-word refresh tooltip/label. |
+| refreshingLabel | argTypes | text | Refreshing | - | Refresh loading label. |
+| resetSortingLabel | argTypes | text | Reset sorting | - | Reset sorting rows in sheet. |
+| searchAriaLabel | argTypes | text | Search records | - | Search input accessible name. |
+| searchPlaceholder | argTypes, args | text | Search | - | Search input placeholder. |
+| searchValue | argTypes, args | text | - | - | Controlled search value. |
+| showAdvanceFilter | argTypes, args | boolean | true | - | Shows filter trigger and sheet. |
+| showFullscreen | argTypes, args | boolean | true | - | Shows fullscreen toggle icon action. |
+| showRefresh | argTypes, args | boolean | true | - | Shows refresh icon action. |
+| showSearch | argTypes, args | boolean | true | - | Shows right-side global search input. |
+| showSwitch | argTypes, args | boolean | true | - | Shows view-switch icon action. |
+| size | argTypes, args | select | sm | lg, md, sm, xs | Control density for toolbar actions/input. |
+| switchLabel | argTypes, args | text | Cards | - | One-word tooltip/aria-label for switch icon. |
+| switchMode | argTypes, args | select | adaptive-card | adaptive-card, custom, table | Determines default switch icon and semantics. |
 
 #### Actions and Event Contracts
 
-1. onAction -> action; No explicit description in argTypes.
+1. onAction -> toolbar-action; Unified callback with source metadata for search/filter/switch/refresh/fullscreen.
+2. onAdvanceFilterApply -> apply-filter; Receives `result` + `reason` from AdvanceFilter.
+3. onFullscreenChange -> fullscreen-change; Receives next fullscreen state.
+4. onRefresh -> refresh; Triggered from icon action.
+5. onSearchChange -> search-change; Triggered on search input change.
+6. onSwitch -> switch; Triggered from switch icon action.
 
 #### Accessibility Coverage
 
@@ -665,10 +658,10 @@ Accessibility tokens/signals found in story code:
 
 #### Implementation Guidance for Future Projects
 
-1. Start from this component's props matrix and action contract list when wiring app screens.
-2. Keep icon-only controls paired with accessible naming (`aria-label` or equivalent label props).
-3. Preserve callback prop signatures from story controls (`on*` props) for predictable integration.
-4. Cross-check final production props with canonical API docs before release.
+1. Keep one toolbar row only: left-side icon actions and right-side search field.
+2. Use one-word icon labels for compact tooltips and clearer a11y naming.
+3. Reuse the same toolbar state across composed `Table` and `AdaptiveCard` views.
+4. Set `showToolbar={false}` on middle data components when composing with `DataToolbar`.
 
 ### 2.10 Checkbox
 
@@ -2653,100 +2646,56 @@ Accessibility tokens/signals found in story code:
 
 - Story source file: stories/Table.stories.tsx
 - Storybook title: Data/Table
-- Story exports count: 8
-- Props documented from stories: 44
-- Callback/action props detected: 7
+- Story exports count: 3
+- Props documented from stories: 18
+- Callback/action props detected: 1
 - Accessibility signals detected in stories: 0
 - Canonical API section: docs/keytuno-ui-react.md -> ### Table
 
 #### Story Exports
 
 1. Basic
-2. Variants
-3. SelectionAndActions
-4. LoadingSkeleton
-5. StickyHeaderFullscreen
-6. ServerSideTanstackQuery
-7. CardTableFullWidthPlaybook
-8. TablePlayground
+2. ToolbarComposedSwitch
+3. TablePlayground
 
 #### Imported Keytuno Components in Story File
 
-1. Card
-2. CardContent
-3. CardData
-4. CardDataAction
-5. CardDataFieldSchema
-6. CardDescription
-7. CardHeader
-8. CardTitle
-9. Field
-10. FieldContent
-11. FieldDescription
-12. FieldLabel
-13. RowAction
-14. Table
-15. TableColumnDef
-16. TableProps
+1. AdaptiveCard
+2. DataToolbar
+3. Table
+4. AdaptiveCardAction
+5. AdaptiveCardFieldSchema
+6. AdvanceFilterColumn
+7. RowAction
+8. TableColumnDef
+9. TableProps
 
 #### Props and Controls Matrix
 
 | Prop | Source(s) | Control / Type | Default(s) in Stories | Options | Description / Notes |
 | --- | --- | --- | --- | --- | --- |
-| addFilterLabel | args | - | Add rule | - | - |
-| applyFiltersLabel | args | - | Apply filters | - | - |
 | bordered | jsx-usage | - | - | - | - |
-| clearFiltersLabel | args | - | Clear filters | - | - |
-| columnFilters | jsx-usage | - | - | - | - |
 | columns | jsx-usage | - | - | - | - |
-| columnVisibility | jsx-usage | - | - | - | - |
-| compact | args | - | true | - | - |
+| compact | args | - | false | - | - |
 | data | jsx-usage | - | - | - | - |
-| defaultHiddenColumns | jsx-usage | - | - | - | - |
-| filterable | jsx-usage | - | - | - | - |
-| filterDialogDescription | args | - | Use one modal to build global and per-column rules with starts-with, ends-with, equals, and numeric operators. | - | - |
-| filterDialogTitle | args | - | Advanced filters | - | - |
-| fullscreen | args, jsx-usage | - | false | - | - |
-| globalFilter | jsx-usage | - | - | - | - |
 | hoverable | jsx-usage | - | - | - | - |
-| key | jsx-usage | - | - | - | - |
-| loading | jsx-usage | - | - | - | - |
-| loadingRows | jsx-usage | - | - | - | - |
-| multiSelect | jsx-usage | - | - | - | - |
-| onFilterChange | jsx-usage | - | - | - | action: callback |
-| onPageChange | jsx-usage | - | - | - | action: callback |
-| onPageSizeChange | jsx-usage | - | - | - | action: callback |
-| onRefresh | jsx-usage | - | - | - | action: callback |
-| onSelectionChange | jsx-usage | - | - | - | action: callback |
-| onSortChange | jsx-usage | - | - | - | action: callback |
-| onSwitchToCardView | jsx-usage | - | - | - | action: callback |
-| pageIndex | jsx-usage | - | - | - | - |
 | rounded | args, jsx-usage | - | false | - | - |
 | rowActions | jsx-usage | - | - | - | - |
-| searchable | jsx-usage | - | - | - | - |
-| searchPlaceholder | jsx-usage | - | - | - | - |
-| selectable | jsx-usage | - | - | - | - |
-| serverSide | jsx-usage | - | - | - | - |
-| showRefresh | jsx-usage | - | - | - | - |
 | showToolbar | jsx-usage | - | - | - | - |
-| showViewSwitch | jsx-usage | - | - | - | - |
 | size | args, jsx-usage | - | sm | - | - |
-| skeleton | jsx-usage | - | - | - | - |
-| sortable | jsx-usage | - | - | - | - |
-| stickyHeader | args, jsx-usage | - | false | - | - |
-| switchToCardViewLabel | jsx-usage | - | - | - | - |
-| totalRows | jsx-usage | - | - | - | - |
+| paginationDefaultPageSize | args | number | 10 | - | - |
+| paginationMaxVisiblePages | args | number | 5 | - | - |
+| paginationPageSizeOptions | args | object | [array] | - | - |
+| paginationResetPageOnPageSizeChange | args | boolean | true | - | - |
+| paginationShowPageSizeSelector | args | boolean | true | - | - |
+| paginationShowShowingPage | args | boolean | true | - | - |
+| paginationShowSummary | args | boolean | true | - | - |
+| paginationVariant | args | select | advance | advance, basic, compact | - |
 | variant | jsx-usage | - | - | - | - |
 
 #### Actions and Event Contracts
 
-1. onFilterChange -> callback; No explicit description in argTypes.
-2. onPageChange -> callback; No explicit description in argTypes.
-3. onPageSizeChange -> callback; No explicit description in argTypes.
-4. onRefresh -> callback; No explicit description in argTypes.
-5. onSelectionChange -> callback; No explicit description in argTypes.
-6. onSortChange -> callback; No explicit description in argTypes.
-7. onSwitchToCardView -> callback; No explicit description in argTypes.
+1. onAction -> table-action; Triggered from row action interactions in table mode.
 
 #### Accessibility Coverage
 
@@ -2761,7 +2710,7 @@ Accessibility tokens/signals found in story code:
 2. Keep icon-only controls paired with accessible naming (`aria-label` or equivalent label props).
 3. Preserve callback prop signatures from story controls (`on*` props) for predictable integration.
 4. Cross-check final production props with canonical API docs before release.
-5. Prefer explicit local `useState<'table'|'cards'>('cards')` for card-first switching; wire `onSwitchToCardView` and `onSwitchToTableView` callbacks for manual toggles.
+5. Prefer composed data shells with `DataToolbar` on top and `Table` middle section with `showToolbar={false}`.
 
 ### 2.38 Tabs
 
@@ -3259,53 +3208,38 @@ Accessibility tokens/signals found in story code:
 
 - Story source file: stories/AdaptiveCard.stories.tsx
 - Storybook title: Data/AdaptiveCard
-- Story exports count: 6
-- Props documented from stories: 36
-- Callback/action props detected: 5
-- Accessibility signals detected in stories: 1
+- Story exports count: 4
+- Props documented from stories: 24
+- Callback/action props detected: 1
+- Accessibility signals detected in stories: 0
 - Canonical API section: docs/keytuno-ui-react.md -> ### AdaptiveCard
 
 #### Story Exports
 
-1. EnterpriseDefault
-2. InsideColumnVariants
-3. ResponsiveOutsideColumns
-4. VirtualizedOneColumn
-5. ServerSideTanstackQuery
-6. AdaptiveCardPlayground
+1. Basic
+2. ToolbarComposedSwitch
+3. VirtualizedOneColumn
+4. AdaptiveCardPlayground
 
 #### Imported Keytuno Components in Story File
 
 1. AdaptiveCard
-2. Card
-3. CardContent
-4. CardDescription
-5. CardHeader
-6. CardTitle
-7. Field
-8. FieldContent
-9. FieldDescription
-10. FieldLabel
+2. DataToolbar
+3. Table
+4. AdaptiveCardAction
+5. AdaptiveCardFieldSchema
+6. AdvanceFilterColumn
+7. TableColumnDef
 
 #### Props and Controls Matrix
 
 | Prop | Source(s) | Control / Type | Default(s) in Stories | Options | Description / Notes |
 | --- | --- | --- | --- | --- | --- |
-| actionAlignment | argTypes, args, jsx-usage | inline-radio | right | left, right | - |
-| actionInlineMaxVisible | argTypes, args, jsx-usage | number | 4 | - | - |
-| actionMode | argTypes, args, jsx-usage | select | auto | auto, inline, menu | - |
-| actionPlacement | argTypes, args, jsx-usage | inline-radio | bottom | bottom, top | - |
 | actions | argTypes, jsx-usage, table-disabled | - | - | - | - |
-| columnBreakpoints | argTypes, args | object | - | - | - |
 | columns | argTypes, args, jsx-usage | object | [object] | - | - |
 | data | argTypes, jsx-usage, table-disabled | - | - | - | - |
 | insideColumns | argTypes, args, jsx-usage | inline-radio | 2 | 1, 2, 3 | - |
 | onAction | argTypes, jsx-usage | - | - | - | action: action |
-| onPageChange | argTypes, jsx-usage | - | - | - | action: page-change |
-| onPageSizeChange | argTypes, jsx-usage | - | - | - | action: page-size-change |
-| onRefresh | argTypes, jsx-usage | - | - | - | action: refresh |
-| onSwitchToTableView | jsx-usage | - | - | - | Used in playground to wire table-view handoff action. |
-| pageIndex | jsx-usage | - | - | - | Server-side scenario controls current page index. |
 | paginationDefaultPageSize | argTypes, args, jsx-usage | number | 10 | - | - |
 | paginationMaxVisiblePages | argTypes, args, jsx-usage | number | 5 | - | - |
 | paginationPageSizeOptions | argTypes, args, jsx-usage | object | [array] | - | - |
@@ -3314,48 +3248,34 @@ Accessibility tokens/signals found in story code:
 | paginationShowShowingPage | argTypes, args, jsx-usage | boolean | true | - | - |
 | paginationShowSummary | argTypes, args, jsx-usage | boolean | true | - | - |
 | paginationVariant | argTypes, args, jsx-usage | select | advance | advance, basic, compact | - |
-| refreshLabel | argTypes | text | - | - | - |
-| refreshingLabel | argTypes | text | - | - | - |
 | rowKey | argTypes, jsx-usage, table-disabled | - | - | - | - |
 | schema | argTypes, jsx-usage, table-disabled | - | - | - | - |
-| searchPlaceholder | argTypes | text | - | - | - |
-| searchable | argTypes, args, jsx-usage | boolean | false, true | - | - |
-| serverSide | jsx-usage | - | - | - | Enables external page/page-size orchestration. |
 | showPagination | argTypes, args, jsx-usage | boolean | false, true | - | - |
-| showRefresh | argTypes, args, jsx-usage | boolean | true | - | - |
 | showToolbar | argTypes, args, jsx-usage | boolean | false, true | - | - |
-| showViewSwitch | argTypes, args, jsx-usage | boolean | true | - | - |
 | size | argTypes, args, jsx-usage | select | sm | lg, md, sm, xs | - |
-| switchToTableViewLabel | argTypes, args, jsx-usage | text | Table | - | - |
-| totalRows | jsx-usage | - | - | - | Server-side scenario total row contract. |
 | variant | argTypes, args, jsx-usage | select | default | compact, default, ghost | - |
-| viewportMaxHeight | argTypes, args | text | 36rem | - | - |
 | virtualized | argTypes, args, jsx-usage | boolean | false, true | - | - |
 | virtualizedEstimateSize | argTypes, args, jsx-usage | number | 240 | - | - |
-| virtualizedMaxHeight | argTypes, args, jsx-usage | text | 36rem, 38rem | - | - |
-| virtualizedOverscan | argTypes, args, jsx-usage | number | 6, 8 | - | - |
+| virtualizedMaxHeight | argTypes, args, jsx-usage | text | 38rem | - | - |
+| virtualizedOverscan | argTypes, args, jsx-usage | number | 8 | - | - |
 
 #### Actions and Event Contracts
 
-1. onAction -> action; No explicit description in argTypes.
-2. onPageChange -> page-change; No explicit description in argTypes.
-3. onPageSizeChange -> page-size-change; No explicit description in argTypes.
-4. onRefresh -> refresh; No explicit description in argTypes.
-5. onSwitchToTableView -> invoked from JSX usage in playground/server integration patterns.
+1. onAction -> action; Triggered from adaptive-card item actions in the rendered card surface.
 
 #### Accessibility Coverage
 
 1. No explicit accessibility-focused prop names were detected from argTypes/args/primary JSX props.
 
 Accessibility tokens/signals found in story code:
-1. htmlFor
+1. None explicitly detected.
 
 #### Implementation Guidance for Future Projects
 
 1. Keep one-card-per-row as the default (`columns={1}`) for enterprise readability.
-2. Use `insideColumns` for card body density and `columns` for outer responsive distribution.
+2. Compose `DataToolbar` externally when you need shared search/filter/switch behavior with table view.
 3. Prefer `virtualized` mode for large feeds and keep `columns={1}` in that mode for predictable measurement.
-4. Reuse existing callback contracts (`onAction`, pagination callbacks, refresh) to keep app integrations consistent with other data components.
+4. Reuse action contracts (`onAction`) to keep app integrations consistent across data components.
 
 ### 2.46 AdvanceFilter
 
