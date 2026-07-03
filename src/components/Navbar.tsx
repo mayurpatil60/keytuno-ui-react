@@ -489,6 +489,7 @@ export function Navbar({
     ? (activeItemId ?? null)
     : uncontrolledActiveItemId;
   const shouldRenderHamburger = showHamburger;
+  const shouldRenderDesktopNav = items.length > 0 || emptyText != null;
 
   function emitAction(
     source: NavbarActionSource,
@@ -949,20 +950,22 @@ export function Navbar({
         ) : null}
 
         <div style={desktopRightClusterStyle}>
-          <nav aria-label={desktopNavigationLabel} style={desktopNavStyle}>
-            {items.length > 0 ? (
-              items.map((item) => renderDesktopItem(item))
-            ) : (
-              <span
-                style={{
-                  color: colors.mutedTextColor,
-                  fontSize: tokens.itemFontSize,
-                }}
-              >
-                {emptyText}
-              </span>
-            )}
-          </nav>
+          {shouldRenderDesktopNav ? (
+            <nav aria-label={desktopNavigationLabel} style={desktopNavStyle}>
+              {items.length > 0 ? (
+                items.map((item) => renderDesktopItem(item))
+              ) : (
+                <span
+                  style={{
+                    color: colors.mutedTextColor,
+                    fontSize: tokens.itemFontSize,
+                  }}
+                >
+                  {emptyText}
+                </span>
+              )}
+            </nav>
+          ) : null}
 
           {actions != null ? <div style={actionsStyle}>{actions}</div> : null}
         </div>

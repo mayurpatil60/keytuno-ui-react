@@ -69,10 +69,12 @@ export function Separator({
   ...props
 }: SeparatorProps): JSX.Element {
   const tokens = sizeTokens[size];
+  const separatorColor =
+    "var(--ktn-separator-color, color-mix(in srgb, var(--ktn-border-muted, #d4dce6) 88%, var(--ktn-bg-default, #ffffff) 12%))";
 
   const separatorStyle: CSSProperties = {
     borderRadius: "999px",
-    backgroundColor: "var(--ktn-border-muted)",
+    backgroundColor: separatorColor,
     flexShrink: 0,
     ...(orientation === "vertical"
       ? {

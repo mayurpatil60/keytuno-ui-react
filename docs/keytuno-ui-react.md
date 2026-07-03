@@ -354,6 +354,10 @@ import { Separator } from '@keytuno/ui-react';
   size?={'xs'|'sm'|'md'|'lg'}
   decorative?={boolean}
 />
+
+// Theme behavior:
+// - Separator color resolves from semantic theme tokens.
+// - It automatically adapts in light and dark modes (no manual color override required).
 ```
 
 ### Tooltip
@@ -869,8 +873,10 @@ interface NavbarItem {
 // - Optional hamburger renders before brand/logo and is fully callback-driven (no hardcoded open/close behavior)
 // - Brand shows on the left (logo + text stack where tagline appears below name)
 // - Menu/actions area is right-aligned on desktop
+// - If `items` is empty and `emptyText={null}`, the menu area is hidden so navbar can render as a minimal header.
 // - Set showBrand={false} when you want only right-aligned controls
 // - Set defaultBrandName when you need fallback brand text (no project name is hardcoded)
+// - Minimal header playbook: ghost hamburger + logo + company name + tagline on the left, with theme (moon) and notification (bell) icon actions on the right.
 // Action behavior:
 // - Use onHamburgerAction to run any app logic (open/close sidebar, dialog, drawer, etc.)
 // - onAction emits source='hamburger-action' for hamburger clicks, and item/submenu sources for navigation
