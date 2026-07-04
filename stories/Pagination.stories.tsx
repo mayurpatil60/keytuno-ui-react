@@ -38,7 +38,7 @@ const frameStyle: CSSProperties = {
 
 function ControlledPaginationDemo(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(3);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(12);
 
   return (
     <div
@@ -54,7 +54,7 @@ function ControlledPaginationDemo(): JSX.Element {
         page={currentPage}
         pageSize={pageSize}
         totalPages={25}
-        pageSizeOptions={[10, 20, 25, 50]}
+        pageSizeOptions={[12, 24, 48]}
         labels={{ item: "rows" }}
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}
@@ -86,8 +86,8 @@ export const BasicVariant: Story = {
             variant="basic"
             totalPages={10}
             defaultPage={1}
-            defaultPageSize={10}
-            pageSizeOptions={[10, 20, 30, 50]}
+            defaultPageSize={12}
+            pageSizeOptions={[12, 24, 48]}
           />
           <FieldDescription>
             Basic variant includes icon-based first/prev/page numbers/next/last
@@ -113,8 +113,8 @@ export const AdvanceVariant: Story = {
             variant="advance"
             totalPages={10}
             defaultPage={1}
-            defaultPageSize={10}
-            pageSizeOptions={[10, 20, 30, 50]}
+            defaultPageSize={12}
+            pageSizeOptions={[12, 24, 48]}
           />
           <FieldDescription>
             Advance variant keeps concise controls: page-size selector,
@@ -140,8 +140,8 @@ export const CompactVariant: Story = {
             variant="compact"
             totalPages={10}
             defaultPage={1}
-            defaultPageSize={10}
-            pageSizeOptions={[10, 20, 30, 50]}
+            defaultPageSize={12}
+            pageSizeOptions={[12, 24, 48]}
             labels={{ item: "items", perPage: "page" }}
           />
           <FieldDescription>
@@ -278,8 +278,8 @@ export const PaginationActions: Story = {
             variant="basic"
             totalPages={12}
             defaultPage={3}
-            defaultPageSize={10}
-            pageSizeOptions={[10, 20, 30, 50]}
+            defaultPageSize={12}
+            pageSizeOptions={[12, 24, 48]}
             onAction={handleAction}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}
@@ -305,8 +305,8 @@ export const PaginationPlayground: StoryObj<PaginationPlaygroundProps> = {
     pageSizeSelectVariant: "inline",
     totalPages: 12,
     defaultPage: 1,
-    defaultPageSize: 10,
-    pageSizeOptions: [10, 20, 30, 50],
+    defaultPageSize: 12,
+    pageSizeOptions: [12, 24, 48],
     maxVisiblePages: 2,
     disabled: false,
     showPageSizeSelector: true,

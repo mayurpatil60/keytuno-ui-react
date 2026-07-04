@@ -528,6 +528,7 @@ export function FileUpload({
   const initialFilesSignatureRef = useRef<string>(
     normalizedInitialFilesSignature,
   );
+  const shouldNotifyFilesChangeRef = useRef(false);
 
   const {
     className: browseButtonClassName,
@@ -574,6 +575,15 @@ export function FileUpload({
     filesRef.current = files;
     initialFilesSignatureRef.current = createFilesSignature(files);
   }, [files]);
+
+  useEffect(() => {
+    if (!shouldNotifyFilesChangeRef.current) {
+      return;
+    }
+
+    shouldNotifyFilesChangeRef.current = false;
+    onFilesChange?.(files);
+  }, [files, onFilesChange]);
 
   useEffect(() => {
     if (initialFilesSignatureRef.current === normalizedInitialFilesSignature) {
@@ -629,7 +639,7 @@ export function FileUpload({
       }
 
       filesRef.current = nextFiles;
-      onFilesChange?.(nextFiles);
+      shouldNotifyFilesChangeRef.current = true;
       return nextFiles;
     });
   }
@@ -663,7 +673,7 @@ export function FileUpload({
       };
 
       filesRef.current = nextFiles;
-      onFilesChange?.(nextFiles);
+      shouldNotifyFilesChangeRef.current = true;
 
       return nextFiles;
     });

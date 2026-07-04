@@ -228,7 +228,7 @@ const baseClasses = "flex w-full min-w-0 flex-col";
 const SPECIAL_SELECT_COLUMN_ID = "__select";
 const SPECIAL_ACTIONS_COLUMN_ID = "__actions";
 const GLOBAL_FILTER_ID = "__global";
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 12;
 const DEFAULT_EMPTY_TEXT = "No records found.";
 
 const sizeTokens: Record<TableSize, TableSizeTokens> = {

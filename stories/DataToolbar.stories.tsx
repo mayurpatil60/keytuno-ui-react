@@ -317,8 +317,8 @@ export const ToolbarComposition: Story = {
             searchable={false}
             showPagination
             paginationVariant="advance"
-            paginationDefaultPageSize={10}
-            paginationPageSizeOptions={[10, 20, 50]}
+            paginationDefaultPageSize={12}
+            paginationPageSizeOptions={[12, 24, 48]}
             paginationMaxVisiblePages={5}
             paginationShowPageSizeSelector
             paginationShowSummary
@@ -339,8 +339,8 @@ export const ToolbarComposition: Story = {
             searchable={false}
             showPagination
             paginationVariant="advance"
-            paginationDefaultPageSize={10}
-            paginationPageSizeOptions={[10, 20, 50]}
+            paginationDefaultPageSize={12}
+            paginationPageSizeOptions={[12, 24, 48]}
             paginationMaxVisiblePages={5}
             paginationShowPageSizeSelector
             paginationShowSummary

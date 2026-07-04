@@ -602,9 +602,9 @@ function ToolbarComposedView(args: Partial<TableProps<TradeRow>>): JSX.Element {
           searchable={false}
           showPagination
           paginationVariant={args.paginationVariant ?? "advance"}
-          paginationDefaultPageSize={args.paginationDefaultPageSize ?? 10}
+          paginationDefaultPageSize={args.paginationDefaultPageSize ?? 12}
           paginationPageSizeOptions={
-            args.paginationPageSizeOptions ?? [10, 20, 50]
+            args.paginationPageSizeOptions ?? [12, 24, 48]
           }
           paginationMaxVisiblePages={args.paginationMaxVisiblePages ?? 5}
           paginationShowPageSizeSelector={
@@ -630,8 +630,8 @@ function ToolbarComposedView(args: Partial<TableProps<TradeRow>>): JSX.Element {
           searchable={false}
           showPagination
           paginationVariant="advance"
-          paginationDefaultPageSize={10}
-          paginationPageSizeOptions={[10, 20, 50]}
+          paginationDefaultPageSize={12}
+          paginationPageSizeOptions={[12, 24, 48]}
           paginationMaxVisiblePages={5}
           paginationShowPageSizeSelector
           paginationShowSummary
@@ -654,8 +654,8 @@ export const ToolbarComposedSwitch: Story = {
     bordered: true,
     rounded: true,
     paginationVariant: "advance",
-    paginationDefaultPageSize: 10,
-    paginationPageSizeOptions: [10, 20, 50],
+    paginationDefaultPageSize: 12,
+    paginationPageSizeOptions: [12, 24, 48],
     paginationMaxVisiblePages: 5,
     paginationShowPageSizeSelector: true,
     paginationShowSummary: true,
@@ -713,8 +713,8 @@ export const TablePlayground: Story = {
     bordered: true,
     rounded: true,
     paginationVariant: "advance",
-    paginationDefaultPageSize: 10,
-    paginationPageSizeOptions: [10, 20, 50],
+    paginationDefaultPageSize: 12,
+    paginationPageSizeOptions: [12, 24, 48],
     paginationMaxVisiblePages: 5,
     paginationShowPageSizeSelector: true,
     paginationShowSummary: true,
@@ -724,4 +724,3 @@ export const TablePlayground: Story = {
   argTypes: playgroundArgTypes,
   render: (args) => <ToolbarComposedView {...args} />,
 };
-

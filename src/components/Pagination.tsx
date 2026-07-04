@@ -105,7 +105,7 @@ type PaginationSizeTokens = {
 
 const baseClasses = "flex w-full min-w-0";
 
-const defaultPageSizeOptions = [10, 20, 50, 100];
+const defaultPageSizeOptions = [12, 24, 48];
 
 const iconSizeByPaginationSize: Record<PaginationSize, number> = {
   xs: 12,
@@ -311,7 +311,8 @@ export function Pagination({
     [pageSizeOptions],
   );
 
-  const fallbackPageSize = normalizedPageSizeOptions[0] ?? 10;
+  const fallbackPageSize =
+    normalizedPageSizeOptions[0] ?? defaultPageSizeOptions[0];
   const isPageSizeControlled = pageSize !== undefined;
 
   const [uncontrolledPageSize, setUncontrolledPageSize] = useState<number>(

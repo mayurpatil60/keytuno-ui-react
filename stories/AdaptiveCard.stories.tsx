@@ -560,9 +560,9 @@ function ToolbarAdaptiveLayout(
           searchable={false}
           showPagination
           paginationVariant={args.paginationVariant ?? "advance"}
-          paginationDefaultPageSize={args.paginationDefaultPageSize ?? 10}
+          paginationDefaultPageSize={args.paginationDefaultPageSize ?? 12}
           paginationPageSizeOptions={
-            args.paginationPageSizeOptions ?? [10, 20, 50]
+            args.paginationPageSizeOptions ?? [12, 24, 48]
           }
           paginationMaxVisiblePages={args.paginationMaxVisiblePages ?? 5}
           paginationShowPageSizeSelector={
@@ -588,8 +588,8 @@ function ToolbarAdaptiveLayout(
           searchable={false}
           showPagination
           paginationVariant="advance"
-          paginationDefaultPageSize={10}
-          paginationPageSizeOptions={[10, 20, 50]}
+          paginationDefaultPageSize={12}
+          paginationPageSizeOptions={[12, 24, 48]}
           paginationMaxVisiblePages={5}
           paginationShowPageSizeSelector
           paginationShowSummary
@@ -609,8 +609,8 @@ export const ToolbarComposedLayout: Story = {
     insideColumns: 2,
     columns: { mobile: 1, tablet: 1, web: 1 },
     paginationVariant: "advance",
-    paginationDefaultPageSize: 10,
-    paginationPageSizeOptions: [10, 20, 50],
+    paginationDefaultPageSize: 12,
+    paginationPageSizeOptions: [12, 24, 48],
     paginationMaxVisiblePages: 5,
     paginationShowPageSizeSelector: true,
     paginationShowSummary: true,
@@ -689,8 +689,8 @@ export const AdaptiveCardPlayground: Story = {
     insideColumns: 2,
     columns: { mobile: 1, tablet: 1, web: 1 },
     paginationVariant: "advance",
-    paginationDefaultPageSize: 10,
-    paginationPageSizeOptions: [10, 20, 50],
+    paginationDefaultPageSize: 12,
+    paginationPageSizeOptions: [12, 24, 48],
     paginationMaxVisiblePages: 5,
     paginationShowPageSizeSelector: true,
     paginationShowSummary: true,

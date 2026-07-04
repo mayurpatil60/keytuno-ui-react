@@ -663,7 +663,7 @@ import { Pagination } from '@keytuno/ui-react';
   defaultPage?={number}
   totalPages={number}
   pageSize?={number}
-  pageSizeOptions?={number[]}       // default [10, 25, 50, 100]
+  pageSizeOptions?={number[]}       // default [12, 24, 48]
   onPageChange?={(page: number) => void}
   onPageSizeChange?={(size: number) => void}
   maxVisiblePages?={number}
@@ -1959,7 +1959,7 @@ interface FileUploadProfileConfig {
   fileListEmptyText?={ReactNode}
   initialFiles?={FileUploadInitialFile[]} // preloaded files for edit screens
   profileConfig?={FileUploadProfileConfig}
-  onFilesChange?={(files: FileUploadFile[]) => void} // may include preloaded items without file
+  onFilesChange?={(files: FileUploadFile[]) => void} // fires on add/remove updates; may include preloaded items without file
 />
 ```
 

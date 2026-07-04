@@ -1705,7 +1705,7 @@ Accessibility tokens/signals found in story code:
 | --- | --- | --- | --- | --- | --- |
 | className | argTypes, table-disabled | - | - | - | - |
 | defaultPage | argTypes, args, jsx-usage | number | 1 | - | - |
-| defaultPageSize | argTypes, args, jsx-usage | number | 10 | - | - |
+| defaultPageSize | argTypes, args, jsx-usage | number | 12 | - | - |
 | disabled | argTypes, args | boolean | false | - | - |
 | item | jsx-usage | - | - | - | - |
 | key | jsx-usage | - | - | - | - |
@@ -2687,7 +2687,7 @@ Accessibility tokens/signals found in story code:
 | rowActions | jsx-usage | - | - | - | - |
 | showToolbar | jsx-usage | - | - | - | - |
 | size | args, jsx-usage | - | sm | - | - |
-| paginationDefaultPageSize | args | number | 10 | - | - |
+| paginationDefaultPageSize | args | number | 12 | - | - |
 | paginationMaxVisiblePages | args | number | 5 | - | - |
 | paginationPageSizeOptions | args | object | [array] | - | - |
 | paginationResetPageOnPageSizeChange | args | boolean | true | - | - |
@@ -3245,7 +3245,7 @@ Accessibility tokens/signals found in story code:
 | data | argTypes, jsx-usage, table-disabled | - | - | - | - |
 | insideColumns | argTypes, args, jsx-usage | inline-radio | 2 | 1, 2, 3 | - |
 | onAction | argTypes, jsx-usage | - | - | - | action: action |
-| paginationDefaultPageSize | argTypes, args, jsx-usage | number | 10 | - | - |
+| paginationDefaultPageSize | argTypes, args, jsx-usage | number | 12 | - | - |
 | paginationMaxVisiblePages | argTypes, args, jsx-usage | number | 5 | - | - |
 | paginationPageSizeOptions | argTypes, args, jsx-usage | object | [array] | - | - |
 | paginationResetPageOnPageSizeChange | argTypes, args, jsx-usage | boolean | true | - | - |

@@ -230,7 +230,7 @@ interface ResolvedAdaptiveCardFieldSchema<
 
 const baseClasses = "flex w-full min-w-0 flex-col";
 const defaultEmptyText = "No adaptive cards available.";
-const defaultPageSize = 10;
+const defaultPageSize = 12;
 
 const sizeTokens: Record<AdaptiveCardSize, AdaptiveCardSizeTokens> = {
   xs: {
