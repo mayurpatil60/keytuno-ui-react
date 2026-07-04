@@ -583,6 +583,7 @@ import { TimezonePicker } from '@keytuno/ui-react';
 <TimezonePicker
   size?={'xs'|'sm'|'md'|'lg'}
   variant?={'compact'|'detailed'}
+  selectVariant?={'inline'|'overlay'} // default 'inline' (forwarded to underlying Select)
   includeSystemTimezone?={boolean}   // include local/system timezone option at top
   systemTimezone?={string | null}    // override detected system timezone when needed
   timezones?={string[]}              // optional curated IANA list (defaults to important/common zones)
@@ -657,6 +658,7 @@ import { Pagination } from '@keytuno/ui-react';
 <Pagination
   variant?={'basic'|'advance'|'compact'}
   size?={'xs'|'sm'|'md'|'lg'}
+  pageSizeSelectVariant?={'inline'|'overlay'} // default 'inline' for page-size selector
   page?={number}                    // 1-based current page
   defaultPage?={number}
   totalPages={number}
@@ -1331,6 +1333,7 @@ interface AdvanceFilterColumn {
   canUseGlobalFilter?={boolean}
   enableSorting?={boolean}
   controlSize?={'xs'|'sm'|'md'|'lg'}
+  selectVariant?={'inline'|'overlay'} // default 'inline' for all internal Select controls
 
   // trigger (icon-only filter button)
   showTrigger?={boolean}            // default true
@@ -1903,13 +1906,25 @@ type FileUploadSide = 'left' | 'center' | 'right';
 
 interface FileUploadFile {
   id: string;
-  file: File;                       // native File object
+  file?: File;                      // present for newly selected local files
   name: string;
-  src: string;                      // object URL
-  sizeBytes: number;
+  src: string;                      // object URL or remote URL
+  sizeBytes?: number;
   mimeType?: string;
   extension: string;
   previewType: 'auto'|'image'|'pdf'|'video'|'audio'|'file';
+  width?: number;
+  height?: number;
+}
+
+interface FileUploadInitialFile {
+  id?: string;
+  name?: string;
+  src: string;
+  sizeBytes?: number;
+  mimeType?: string;
+  extension?: string;
+  previewType?: 'auto'|'image'|'pdf'|'video'|'audio'|'file';
   width?: number;
   height?: number;
 }
@@ -1942,8 +1957,9 @@ interface FileUploadProfileConfig {
   dialogTitle?={ReactNode}
   dialogDescription?={ReactNode}
   fileListEmptyText?={ReactNode}
+  initialFiles?={FileUploadInitialFile[]} // preloaded files for edit screens
   profileConfig?={FileUploadProfileConfig}
-  onFilesChange?={(files: FileUploadFile[]) => void}
+  onFilesChange?={(files: FileUploadFile[]) => void} // may include preloaded items without file
 />
 ```
 
@@ -1989,6 +2005,46 @@ import {
     />
   </FieldContent>
 </Field>
+
+// Edit mode profile: existing photo is shown in the same round avatar slot
+<FileUpload
+  variant="profile"
+  side="center"
+  initialFiles={[
+    {
+      id: 'profile-photo-existing',
+      name: 'profile-photo.png',
+      src: user.profilePhotoUrl,
+      mimeType: 'image/png',
+      previewType: 'image',
+    },
+  ]}
+  profileConfig={{
+    hint: 'Hover/focus the round image to remove it, then click to upload a new one.',
+  }}
+/>
+
+// Edit mode attachments: already uploaded files appear inside the same field
+<FileUpload
+  variant="dropzone"
+  multiple
+  initialFiles={[
+    {
+      id: 'invoice-v4',
+      name: 'invoice-v4.pdf',
+      src: invoiceUrl,
+      mimeType: 'application/pdf',
+      previewType: 'pdf',
+    },
+    {
+      id: 'site-photo-1',
+      name: 'site-photo.jpg',
+      src: sitePhotoUrl,
+      mimeType: 'image/jpeg',
+      previewType: 'image',
+    },
+  ]}
+/>
 ```
 
 ---

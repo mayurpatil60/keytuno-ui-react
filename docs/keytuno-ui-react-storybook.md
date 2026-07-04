@@ -5,8 +5,8 @@ Generated from all Storybook story files in `stories/` to provide Copilot-ready 
 ## 1. Component Index and Coverage Counts
 
 - Total components documented: 46
-- Total story exports covered: 279
-- Total unique props detected across stories: 799
+- Total story exports covered: 280
+- Total unique props detected across stories: 802
 - Total callback/action props detected: 117
 - Total unique accessibility signals detected: 13
 
@@ -29,13 +29,13 @@ Sequential index (component -> stories, props, actions, a11y signals):
 15. Field -> stories: 7, props: 14, actions: 1, a11y signals: 3
 16. FileList -> stories: 6, props: 22, actions: 1, a11y signals: 0
 17. FilePreview -> stories: 4, props: 15, actions: 0, a11y signals: 0
-18. FileUpload -> stories: 8, props: 24, actions: 1, a11y signals: 0
+18. FileUpload -> stories: 9, props: 25, actions: 1, a11y signals: 0
 19. Icons -> stories: 2, props: 3, actions: 0, a11y signals: 0
 20. Input -> stories: 6, props: 17, actions: 4, a11y signals: 5
 21. InputGroup -> stories: 5, props: 11, actions: 1, a11y signals: 1
 22. List -> stories: 7, props: 24, actions: 1, a11y signals: 3
 23. Navbar -> stories: 1, props: 14, actions: 3, a11y signals: 2
-24. Pagination -> stories: 8, props: 26, actions: 3, a11y signals: 0
+24. Pagination -> stories: 8, props: 27, actions: 3, a11y signals: 0
 25. Progress -> stories: 5, props: 14, actions: 1, a11y signals: 0
 26. Radio -> stories: 8, props: 23, actions: 2, a11y signals: 0
 27. Scrollbar -> stories: 4, props: 9, actions: 4, a11y signals: 0
@@ -52,12 +52,12 @@ Sequential index (component -> stories, props, actions, a11y signals):
 38. Tabs -> stories: 5, props: 14, actions: 2, a11y signals: 2
 39. Textarea -> stories: 5, props: 17, actions: 4, a11y signals: 4
 40. Theme -> stories: 1, props: 0, actions: 0, a11y signals: 0
-41. TimezonePicker -> stories: 9, props: 21, actions: 2, a11y signals: 3
+41. TimezonePicker -> stories: 9, props: 22, actions: 2, a11y signals: 3
 42. Toast -> stories: 4, props: 14, actions: 2, a11y signals: 1
 43. Toggle -> stories: 4, props: 18, actions: 5, a11y signals: 5
 44. Tooltip -> stories: 5, props: 16, actions: 5, a11y signals: 6
 45. AdaptiveCard -> stories: 4, props: 24, actions: 1, a11y signals: 0
-46. AdvanceFilter -> stories: 4, props: 31, actions: 2, a11y signals: 1
+46. AdvanceFilter -> stories: 4, props: 32, actions: 2, a11y signals: 1
 
 ## 2. Sequential Component Documentation
 
@@ -1268,8 +1268,8 @@ Accessibility tokens/signals found in story code:
 
 - Story source file: stories/FileUpload.stories.tsx
 - Storybook title: Forms/FileUpload
-- Story exports count: 8
-- Props documented from stories: 24
+- Story exports count: 9
+- Props documented from stories: 25
 - Callback/action props detected: 1
 - Accessibility signals detected in stories: 0
 - Canonical API section: docs/keytuno-ui-react.md -> ### FileUpload
@@ -1279,11 +1279,12 @@ Accessibility tokens/signals found in story code:
 1. CompactVariant
 2. DropzoneVariant
 3. ProfilePhotoVariant
-4. SizesAndDisabled
-5. FileUploadPlayground
-6. CompactVariantPlayground
-7. DropzoneVariantPlayground
-8. ProfileVariantPlayground
+4. EditModeWithPreloadedFiles
+5. SizesAndDisabled
+6. FileUploadPlayground
+7. CompactVariantPlayground
+8. DropzoneVariantPlayground
+9. ProfileVariantPlayground
 
 #### Imported Keytuno Components in Story File
 
@@ -1310,6 +1311,7 @@ Accessibility tokens/signals found in story code:
 | errorMessage | argTypes, args, jsx-usage | text | - | - | - |
 | fileListEmptyText | argTypes, args, jsx-usage, table-disabled | text | No files uploaded yet. | - | - |
 | hint | jsx-usage | - | - | - | - |
+| initialFiles | argTypes, jsx-usage | object | - | - | Preloaded files for edit mode (already uploaded assets). |
 | invalid | argTypes, args, jsx-usage | boolean | false | - | - |
 | key | jsx-usage | - | - | - | - |
 | multiple | argTypes, args, jsx-usage, table-disabled | boolean | true | - | - |
@@ -1670,7 +1672,7 @@ Accessibility tokens/signals found in story code:
 - Story source file: stories/Pagination.stories.tsx
 - Storybook title: Navigation/Pagination
 - Story exports count: 8
-- Props documented from stories: 26
+- Props documented from stories: 27
 - Callback/action props detected: 3
 - Accessibility signals detected in stories: 0
 - Canonical API section: docs/keytuno-ui-react.md -> ### Pagination
@@ -1714,6 +1716,7 @@ Accessibility tokens/signals found in story code:
 | onPageSizeChange | argTypes, args, jsx-usage | - | undefined | - | action: page-size-change \| Fires with the next page size when selector value changes. |
 | page | argTypes, jsx-usage, table-disabled | - | - | - | - |
 | pageSize | argTypes, jsx-usage, table-disabled | - | - | - | - |
+| pageSizeSelectVariant | argTypes, args, jsx-usage | inline-radio | inline | inline, overlay | Variant used by the internal page-size Select. |
 | pageSizeOptions | argTypes, args, jsx-usage | object | [array] | - | - |
 | perPage | jsx-usage | - | - | - | - |
 | resetPageOnPageSizeChange | argTypes, args | boolean | true | - | - |
@@ -2910,7 +2913,7 @@ Accessibility tokens/signals found in story code:
 - Story source file: stories/TimezonePicker.stories.tsx
 - Storybook title: Forms/TimezonePicker
 - Story exports count: 9
-- Props documented from stories: 21
+- Props documented from stories: 22
 - Callback/action props detected: 2
 - Accessibility signals detected in stories: 3
 - Canonical API section: docs/keytuno-ui-react.md -> ### TimezonePicker
@@ -2956,6 +2959,7 @@ Accessibility tokens/signals found in story code:
 | placeholder | argTypes, args, jsx-usage | text | Select timezone | - | - |
 | preferredTimezones | argTypes, jsx-usage, table-disabled | - | - | - | - |
 | required | argTypes, args, jsx-usage | boolean | false | - | - |
+| selectVariant | argTypes, args, jsx-usage | inline-radio | inline | inline, overlay | Variant forwarded to underlying Select. |
 | searchPlaceholder | argTypes, args, jsx-usage | text | Search timezone... | - | - |
 | showClear | argTypes, args, jsx-usage | boolean | true | - | - |
 | size | argTypes, args, jsx-usage | select | md | lg, md, sm, xs | - |
@@ -3283,7 +3287,7 @@ Accessibility tokens/signals found in story code:
 - Story source file: stories/AdvanceFilter.stories.tsx
 - Storybook title: Data/AdvanceFilter
 - Story exports count: 4
-- Props documented from stories: 31
+- Props documented from stories: 32
 - Callback/action props detected: 2
 - Accessibility signals detected in stories: 1
 - Canonical API section: docs/keytuno-ui-react.md -> ### AdvanceFilter
@@ -3315,6 +3319,7 @@ Accessibility tokens/signals found in story code:
 | --- | --- | --- | --- | --- | --- |
 | side | argTypes, args, jsx-usage | select | right | left, right, top, bottom | Sheet side where AdvanceFilter opens. |
 | controlSize | argTypes, args, jsx-usage | select | sm | xs, sm, md, lg | Shared control size for trigger/rule controls/footer actions. |
+| selectVariant | argTypes, args, jsx-usage | inline-radio | inline | inline, overlay | Shared Select variant for filter/sort dropdown controls. |
 | showTrigger | argTypes, args, jsx-usage | boolean | true | - | Toggle icon-only trigger rendering. |
 | triggerDisabled | argTypes, args, jsx-usage | boolean | false | - | Disables trigger interactions. |
 | triggerOpenLabel | argTypes, args, jsx-usage | text | Advance Filter | - | Trigger tooltip/label while closed. |
