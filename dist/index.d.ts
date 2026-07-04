@@ -28,7 +28,7 @@ export { Skeleton, SkeletonActionContext, SkeletonActionSource, SkeletonProps, S
 export { Separator, SeparatorActionContext, SeparatorActionSource, SeparatorOrientation, SeparatorProps, SeparatorSize, SeparatorVariant } from './components/Separator.js';
 export { Radio, RadioActionContext, RadioActionSource, RadioAlign, RadioOption, RadioOrientation, RadioProps, RadioSize } from './components/Radio.js';
 export { InputGroup, InputGroupActionContext, InputGroupActionSource, InputGroupAddon, InputGroupAddonProps, InputGroupAlign, InputGroupButton, InputGroupButtonProps, InputGroupInput, InputGroupInputProps, InputGroupProps, InputGroupSize, InputGroupTextarea, InputGroupTextareaProps, InputGroupVariant } from './components/InputGroup.js';
-export { Select, SelectActionContext, SelectActionSource, SelectGroup, SelectOption, SelectProps, SelectSize, SelectValue } from './components/Select.js';
+export { Select, SelectActionContext, SelectActionSource, SelectGroup, SelectOption, SelectProps, SelectSize, SelectValue, SelectVariant } from './components/Select.js';
 export { DatePicker, DatePickerActionContext, DatePickerActionSource, DatePickerMode, DatePickerProps, DatePickerSize, DatePickerValue, DatePickerVariant, DateRangeValue } from './components/DatePicker.js';
 export { TimezonePicker, TimezonePickerActionContext, TimezonePickerActionSource, TimezonePickerOption, TimezonePickerProps, TimezonePickerSize, TimezonePickerVariant } from './components/TimezonePicker.js';
 export { ColorPicker, ColorPickerActionContext, ColorPickerActionSource, ColorPickerProps, ColorPickerSize, ColorPickerVariant } from './components/ColorPicker.js';
