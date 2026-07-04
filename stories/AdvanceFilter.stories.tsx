@@ -162,6 +162,10 @@ const playgroundArgTypes = {
     control: "select",
     options: ["xs", "sm", "md", "lg"],
   },
+  selectVariant: {
+    control: "inline-radio",
+    options: ["inline", "overlay"],
+  },
   showTrigger: {
     control: "boolean",
   },
@@ -256,6 +260,7 @@ export const AdvanceFilterPlayground: Story = {
   args: {
     side: "right",
     controlSize: "sm",
+    selectVariant: "inline",
     showTrigger: true,
     triggerDisabled: false,
     triggerOpenLabel: "Advance Filter",

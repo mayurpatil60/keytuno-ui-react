@@ -295,6 +295,7 @@ export const TimezonePickerPlayground: Story = {
   args: {
     size: "md",
     variant: "detailed",
+    selectVariant: "inline",
     disabled: false,
     required: false,
     invalid: false,
@@ -312,6 +313,10 @@ export const TimezonePickerPlayground: Story = {
     variant: {
       control: "inline-radio",
       options: ["compact", "detailed"],
+    },
+    selectVariant: {
+      control: "inline-radio",
+      options: ["inline", "overlay"],
     },
     disabled: { control: "boolean" },
     required: { control: "boolean" },
@@ -341,9 +346,10 @@ export const TimezonePickerPlayground: Story = {
 
       <FieldContent>
         <TimezonePicker
-          key={`${args.size}-${args.variant}-${args.disabled}-${args.required}-${args.invalid}-${args.includeSystemTimezone}-${args.showClear}`}
+          key={`${args.size}-${args.variant}-${args.selectVariant}-${args.disabled}-${args.required}-${args.invalid}-${args.includeSystemTimezone}-${args.showClear}`}
           size={args.size}
           variant={args.variant}
+          selectVariant={args.selectVariant}
           disabled={args.disabled}
           required={args.required}
           invalid={args.invalid}
@@ -377,6 +383,7 @@ export const CompactTimezonePlayground: Story = {
   args: {
     size: "md",
     variant: "compact",
+    selectVariant: "inline",
     disabled: false,
     required: false,
     invalid: false,
@@ -394,6 +401,10 @@ export const CompactTimezonePlayground: Story = {
     variant: {
       control: "inline-radio",
       options: ["compact", "detailed"],
+    },
+    selectVariant: {
+      control: "inline-radio",
+      options: ["inline", "overlay"],
     },
     disabled: { control: "boolean" },
     required: { control: "boolean" },
@@ -423,9 +434,10 @@ export const CompactTimezonePlayground: Story = {
 
       <FieldContent>
         <TimezonePicker
-          key={`compact-${args.size}-${args.variant}-${args.disabled}-${args.required}-${args.invalid}-${args.includeSystemTimezone}-${args.showClear}`}
+          key={`compact-${args.size}-${args.variant}-${args.selectVariant}-${args.disabled}-${args.required}-${args.invalid}-${args.includeSystemTimezone}-${args.showClear}`}
           size={args.size}
           variant={args.variant}
+          selectVariant={args.selectVariant}
           disabled={args.disabled}
           required={args.required}
           invalid={args.invalid}
@@ -453,4 +465,3 @@ export const CompactTimezonePlayground: Story = {
     </Field>
   ),
 };
-

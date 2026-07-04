@@ -7,6 +7,7 @@ import {
   FieldDescription,
   FieldLabel,
   FileUpload,
+  type FileUploadInitialFile,
 } from "../src/index";
 
 const meta: Meta<typeof FileUpload> = {
@@ -40,6 +41,51 @@ const profileFrameStyle: CSSProperties = {
   width: "100%",
   maxWidth: "36rem",
 };
+
+const presetProfilePhotoDataUrl =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 320'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0%25' stop-color='%230ea5e9'/%3E%3Cstop offset='1' stop-color='%2322c55e'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='320' height='320' fill='url(%23g)'/%3E%3Ccircle cx='160' cy='120' r='58' fill='%23ffffff' fill-opacity='0.75'/%3E%3Cpath d='M62 286c18-58 66-90 98-90s80 32 98 90' fill='%23ffffff' fill-opacity='0.75'/%3E%3C/svg%3E";
+
+const presetProfileFiles: FileUploadInitialFile[] = [
+  {
+    id: "profile-photo-existing",
+    name: "profile-photo.png",
+    src: presetProfilePhotoDataUrl,
+    mimeType: "image/png",
+    previewType: "image",
+    sizeBytes: 241260,
+    width: 320,
+    height: 320,
+  },
+];
+
+const presetUploadedFiles: FileUploadInitialFile[] = [
+  {
+    id: "upload-quote-pdf",
+    name: "quote-v4.pdf",
+    src: "https://example.com/uploads/quote-v4.pdf",
+    mimeType: "application/pdf",
+    previewType: "pdf",
+    sizeBytes: 934120,
+  },
+  {
+    id: "upload-booth-photo",
+    name: "booth-image.jpg",
+    src: presetProfilePhotoDataUrl,
+    mimeType: "image/jpeg",
+    previewType: "image",
+    sizeBytes: 421300,
+    width: 320,
+    height: 320,
+  },
+  {
+    id: "upload-audio-note",
+    name: "voice-note.mp3",
+    src: "https://example.com/uploads/voice-note.mp3",
+    mimeType: "audio/mpeg",
+    previewType: "audio",
+    sizeBytes: 1750040,
+  },
+];
 
 function toProfileSupportTextStyle(side: ProfileSide): CSSProperties {
   const alignSelf =
@@ -159,6 +205,72 @@ export const ProfilePhotoVariant: Story = {
           <FieldDescription style={toProfileSupportTextStyle("right")}>
             Disabled state keeps the same circular layout and side-aware text
             alignment.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
+export const EditModeWithPreloadedFiles: Story = {
+  name: "Edit Mode With Preloaded Files",
+  render: () => (
+    <div style={stackStyle}>
+      <Field style={profileFrameStyle}>
+        <FieldLabel>Edit Profile Photo</FieldLabel>
+
+        <FieldContent>
+          <FileUpload
+            variant="profile"
+            size="md"
+            side="center"
+            initialFiles={presetProfileFiles}
+            profileConfig={{
+              hint: "Existing profile photo shown. Hover to remove, click empty state to upload a new one.",
+            }}
+          />
+
+          <FieldDescription style={toProfileSupportTextStyle("center")}>
+            In edit mode, an already uploaded profile image renders in the same
+            circular slot. Hover/focus shows the remove icon in that same round
+            overlay.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Edit Existing Attachments (Dropzone)</FieldLabel>
+
+        <FieldContent>
+          <FileUpload
+            variant="dropzone"
+            size="md"
+            multiple
+            initialFiles={presetUploadedFiles}
+            dropzoneHint="Existing files are listed below. Add more by dropping or browsing."
+          />
+
+          <FieldDescription>
+            Existing uploaded files are shown in the same dropzone field so
+            users immediately understand what is already attached.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Edit Existing Attachments (Compact)</FieldLabel>
+
+        <FieldContent>
+          <FileUpload
+            variant="compact"
+            size="md"
+            multiple
+            initialFiles={presetUploadedFiles}
+          />
+
+          <FieldDescription>
+            Compact mode shows existing first filename plus count and opens the
+            same dialog list for preview and remove actions.
           </FieldDescription>
         </FieldContent>
       </Field>
@@ -289,6 +401,10 @@ export const FileUploadPlayground: Story = {
       description:
         "Optional profile-variant settings (hint, icons, labels, imageAlt).",
     },
+    initialFiles: {
+      control: "object",
+      description: "Preloaded files for edit mode (already uploaded assets).",
+    },
     browseButtonProps: {
       control: "object",
       description: "Pass-through props for the upload browse button.",
@@ -351,6 +467,7 @@ export const FileUploadPlayground: Story = {
             placeholder={normalizedPlaceholder}
             dropzoneHint={normalizedDropzoneHint}
             browseLabel={normalizedBrowseLabel}
+            initialFiles={args.initialFiles}
             profileConfig={args.profileConfig}
             browseButtonProps={args.browseButtonProps}
             dialogProps={args.dialogProps}
@@ -410,6 +527,10 @@ export const CompactVariantPlayground: Story = {
     placeholder: { control: "text" },
     browseLabel: { control: "text" },
     fileListEmptyText: { control: "text" },
+    initialFiles: {
+      control: "object",
+      description: "Preloaded uploaded files shown in compact edit mode.",
+    },
     browseButtonProps: {
       control: "object",
       description: "Props forwarded to the compact browse button.",
@@ -473,6 +594,7 @@ export const CompactVariantPlayground: Story = {
             placeholder={normalizedPlaceholder}
             browseLabel={normalizedBrowseLabel}
             fileListEmptyText={normalizedFileListEmptyText}
+            initialFiles={args.initialFiles}
             browseButtonProps={args.browseButtonProps}
             dialogProps={args.dialogProps}
           />
@@ -521,6 +643,10 @@ export const DropzoneVariantPlayground: Story = {
     dropzoneHint: { control: "text" },
     browseLabel: { control: "text" },
     fileListEmptyText: { control: "text" },
+    initialFiles: {
+      control: "object",
+      description: "Preloaded uploaded files shown in dropzone edit mode.",
+    },
     browseButtonProps: {
       control: "object",
       description: "Props forwarded to the dropzone browse button.",
@@ -588,6 +714,7 @@ export const DropzoneVariantPlayground: Story = {
             dropzoneHint={normalizedDropzoneHint}
             browseLabel={normalizedBrowseLabel}
             fileListEmptyText={normalizedFileListEmptyText}
+            initialFiles={args.initialFiles}
             browseButtonProps={args.browseButtonProps}
           />
 
@@ -638,6 +765,10 @@ export const ProfileVariantPlayground: Story = {
       description:
         "Profile props: hint, labels, imageAlt, and optional custom icons.",
     },
+    initialFiles: {
+      control: "object",
+      description: "Preloaded profile file shown in edit mode.",
+    },
     multiple: { table: { disable: true } },
     placeholder: { table: { disable: true } },
     dropzoneHint: { table: { disable: true } },
@@ -683,6 +814,7 @@ export const ProfileVariantPlayground: Story = {
             invalid={args.invalid}
             errorMessage={normalizedErrorMessage}
             accept={normalizedAccept}
+            initialFiles={args.initialFiles}
             profileConfig={args.profileConfig}
           />
 

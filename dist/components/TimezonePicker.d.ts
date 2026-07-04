@@ -1,5 +1,5 @@
 import { HTMLAttributes } from 'react';
-import { SelectOption } from './Select.js';
+import { SelectVariant, SelectOption } from './Select.js';
 
 type TimezonePickerSize = "xs" | "sm" | "md" | "lg";
 type TimezonePickerVariant = "compact" | "detailed";
@@ -25,6 +25,7 @@ interface TimezonePickerOption extends SelectOption {
 interface TimezonePickerProps extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onChange"> {
     size?: TimezonePickerSize;
     variant?: TimezonePickerVariant;
+    selectVariant?: SelectVariant;
     disabled?: boolean;
     required?: boolean;
     invalid?: boolean;
@@ -41,6 +42,6 @@ interface TimezonePickerProps extends Omit<HTMLAttributes<HTMLDivElement>, "chil
     onValueChange?: (value: string | null) => void;
     onAction?: (context: TimezonePickerActionContext) => void;
 }
-declare function TimezonePicker({ size, variant, disabled, required, invalid, showClear, includeSystemTimezone, systemTimezone, placeholder, searchPlaceholder, emptyText, timezones, preferredTimezones, value, defaultValue, onValueChange, onAction, className, style, ["aria-label"]: ariaLabel, ["aria-labelledby"]: ariaLabelledBy, ["aria-describedby"]: ariaDescribedBy, ...props }: TimezonePickerProps): JSX.Element;
+declare function TimezonePicker({ size, variant, selectVariant, disabled, required, invalid, showClear, includeSystemTimezone, systemTimezone, placeholder, searchPlaceholder, emptyText, timezones, preferredTimezones, value, defaultValue, onValueChange, onAction, className, style, ["aria-label"]: ariaLabel, ["aria-labelledby"]: ariaLabelledBy, ["aria-describedby"]: ariaDescribedBy, ...props }: TimezonePickerProps): JSX.Element;
 
 export { TimezonePicker, type TimezonePickerActionContext, type TimezonePickerActionSource, type TimezonePickerOption, type TimezonePickerProps, type TimezonePickerSize, type TimezonePickerVariant };

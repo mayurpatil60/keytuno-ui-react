@@ -15,7 +15,12 @@ import {
 } from "./icons/feather";
 
 import { Button } from "./Button";
-import { Select, type SelectOption, type SelectValue } from "./Select";
+import {
+  Select,
+  type SelectOption,
+  type SelectValue,
+  type SelectVariant,
+} from "./Select";
 
 export type PaginationVariant = "basic" | "advance" | "compact";
 export type PaginationSize = "xs" | "sm" | "md" | "lg";
@@ -66,6 +71,7 @@ export interface PaginationProps extends Omit<
 > {
   variant?: PaginationVariant;
   size?: PaginationSize;
+  pageSizeSelectVariant?: SelectVariant;
   page?: number;
   defaultPage?: number;
   totalPages?: number;
@@ -230,6 +236,7 @@ function buildPageTokens(
 export function Pagination({
   variant = "basic",
   size = "md",
+  pageSizeSelectVariant = "inline",
   page,
   defaultPage = 1,
   totalPages = 1,
@@ -560,7 +567,7 @@ export function Pagination({
     <div style={pageSizeSelectWrapStyle}>
       <Select
         size={size}
-        variant="overlay"
+        variant={pageSizeSelectVariant}
         options={pageSizeSelectOptions}
         value={`${resolvedPageSize}`}
         onValueChange={handlePageSizeSelectChange}

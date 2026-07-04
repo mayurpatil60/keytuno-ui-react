@@ -1,6 +1,7 @@
 import {
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type ChangeEvent,
@@ -42,13 +43,25 @@ export interface FileUploadProfileConfig {
 
 export interface FileUploadFile {
   id: string;
-  file: File;
+  file?: File;
   name: string;
   src: string;
-  sizeBytes: number;
+  sizeBytes?: number;
   mimeType?: string;
   extension: string;
   previewType: FilePreviewType;
+  width?: number;
+  height?: number;
+}
+
+export interface FileUploadInitialFile {
+  id?: string;
+  name?: string;
+  src: string;
+  sizeBytes?: number;
+  mimeType?: string;
+  extension?: string;
+  previewType?: FilePreviewType;
   width?: number;
   height?: number;
 }
@@ -73,6 +86,7 @@ export interface FileUploadProps extends Omit<
   dialogTitle?: ReactNode;
   dialogDescription?: ReactNode;
   fileListEmptyText?: ReactNode;
+  initialFiles?: FileUploadInitialFile[];
   onFilesChange?: (files: FileUploadFile[]) => void;
   profileConfig?: FileUploadProfileConfig;
   browseButtonProps?: Omit<
@@ -309,6 +323,137 @@ function resolvePreviewType(
   return "file";
 }
 
+function getFileNameFromSource(source: string): string {
+  const normalizedSource = source.split("#")[0]?.split("?")[0] ?? source;
+  const lastSlashIndex = normalizedSource.lastIndexOf("/");
+  const encodedFileName =
+    lastSlashIndex >= 0
+      ? normalizedSource.slice(lastSlashIndex + 1)
+      : normalizedSource;
+
+  if (encodedFileName.trim() === "") {
+    return "";
+  }
+
+  try {
+    return decodeURIComponent(encodedFileName).trim();
+  } catch {
+    return encodedFileName.trim();
+  }
+}
+
+function normalizeInitialFiles(
+  initialFiles: readonly FileUploadInitialFile[] | undefined,
+  singleFileOnly: boolean,
+): FileUploadFile[] {
+  if (initialFiles == null || initialFiles.length === 0) {
+    return [];
+  }
+
+  const normalizedFiles: FileUploadFile[] = [];
+
+  initialFiles.forEach((initialFile, index) => {
+    const normalizedSrc =
+      typeof initialFile.src === "string" ? initialFile.src.trim() : "";
+
+    if (normalizedSrc === "") {
+      return;
+    }
+
+    const normalizedNameCandidate =
+      typeof initialFile.name === "string" ? initialFile.name.trim() : "";
+    const normalizedName =
+      normalizedNameCandidate !== ""
+        ? normalizedNameCandidate
+        : getFileNameFromSource(normalizedSrc) || `file-${index + 1}`;
+
+    const normalizedMimeType =
+      typeof initialFile.mimeType === "string" &&
+      initialFile.mimeType.trim() !== ""
+        ? initialFile.mimeType.trim()
+        : undefined;
+
+    const normalizedExtensionCandidate =
+      typeof initialFile.extension === "string"
+        ? initialFile.extension.trim().toLowerCase()
+        : "";
+    const normalizedExtension =
+      normalizedExtensionCandidate !== ""
+        ? normalizedExtensionCandidate
+        : getLowerFileExtension(normalizedName || normalizedSrc);
+
+    const normalizedSizeBytes =
+      typeof initialFile.sizeBytes === "number" &&
+      Number.isFinite(initialFile.sizeBytes) &&
+      initialFile.sizeBytes >= 0
+        ? initialFile.sizeBytes
+        : undefined;
+
+    const normalizedWidth =
+      typeof initialFile.width === "number" &&
+      Number.isFinite(initialFile.width) &&
+      initialFile.width > 0
+        ? initialFile.width
+        : undefined;
+
+    const normalizedHeight =
+      typeof initialFile.height === "number" &&
+      Number.isFinite(initialFile.height) &&
+      initialFile.height > 0
+        ? initialFile.height
+        : undefined;
+
+    const normalizedPreviewType =
+      initialFile.previewType != null && initialFile.previewType !== "auto"
+        ? initialFile.previewType
+        : resolvePreviewType(normalizedMimeType, normalizedExtension);
+
+    const normalizedId =
+      typeof initialFile.id === "string" && initialFile.id.trim() !== ""
+        ? initialFile.id.trim()
+        : `fup-existing-${index + 1}-${normalizedName}`;
+
+    normalizedFiles.push({
+      id: normalizedId,
+      file: undefined,
+      name: normalizedName,
+      src: normalizedSrc,
+      sizeBytes: normalizedSizeBytes,
+      mimeType: normalizedMimeType,
+      extension: normalizedExtension,
+      previewType: normalizedPreviewType,
+      width: normalizedWidth,
+      height: normalizedHeight,
+    });
+  });
+
+  if (!singleFileOnly) {
+    return normalizedFiles;
+  }
+
+  return normalizedFiles.length > 0
+    ? [normalizedFiles[0] as FileUploadFile]
+    : [];
+}
+
+function createFilesSignature(files: readonly FileUploadFile[]): string {
+  return files
+    .map((file) =>
+      [
+        file.id,
+        file.name,
+        file.src,
+        file.sizeBytes ?? "",
+        file.mimeType ?? "",
+        file.extension,
+        file.previewType,
+        file.width ?? "",
+        file.height ?? "",
+      ].join("||"),
+    )
+    .join("::");
+}
+
 function createFileUploadId(file: File): string {
   return `fup-${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -346,6 +491,7 @@ export function FileUpload({
   dialogTitle = "Uploaded Files",
   dialogDescription = "Click filename or thumbnail to open preview. Use the trash action to remove files.",
   fileListEmptyText = "No files uploaded yet.",
+  initialFiles,
   onFilesChange,
   profileConfig,
   browseButtonProps,
@@ -357,18 +503,31 @@ export function FileUpload({
   const resolvedVariant = variant ?? "compact";
   const isCompact = resolvedVariant === "compact";
   const isProfile = resolvedVariant === "profile";
+  const shouldKeepSingleFile = isProfile || !multiple;
   const sizeToken = sizeTokens[size];
   const inputId = useId();
   const errorId = `${inputId}-error`;
 
-  const [files, setFiles] = useState<FileUploadFile[]>([]);
+  const normalizedInitialFiles = useMemo(
+    () => normalizeInitialFiles(initialFiles, shouldKeepSingleFile),
+    [initialFiles, shouldKeepSingleFile],
+  );
+  const normalizedInitialFilesSignature = useMemo(
+    () => createFilesSignature(normalizedInitialFiles),
+    [normalizedInitialFiles],
+  );
+
+  const [files, setFiles] = useState<FileUploadFile[]>(normalizedInitialFiles);
   const [isDragging, setIsDragging] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isProfileHovered, setIsProfileHovered] = useState(false);
   const [isProfileFocused, setIsProfileFocused] = useState(false);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const filesRef = useRef<FileUploadFile[]>([]);
+  const filesRef = useRef<FileUploadFile[]>(normalizedInitialFiles);
+  const initialFilesSignatureRef = useRef<string>(
+    normalizedInitialFilesSignature,
+  );
 
   const {
     className: browseButtonClassName,
@@ -413,7 +572,30 @@ export function FileUpload({
 
   useEffect(() => {
     filesRef.current = files;
+    initialFilesSignatureRef.current = createFilesSignature(files);
   }, [files]);
+
+  useEffect(() => {
+    if (initialFilesSignatureRef.current === normalizedInitialFilesSignature) {
+      return;
+    }
+
+    setFiles((currentFiles) => {
+      const nextFiles = normalizedInitialFiles;
+      const nextFileIds = new Set(nextFiles.map((file) => file.id));
+
+      currentFiles.forEach((file) => {
+        if (!nextFileIds.has(file.id)) {
+          revokeItemObjectUrl(file);
+        }
+      });
+
+      filesRef.current = nextFiles;
+      initialFilesSignatureRef.current = normalizedInitialFilesSignature;
+
+      return nextFiles;
+    });
+  }, [normalizedInitialFiles, normalizedInitialFilesSignature]);
 
   useEffect(() => {
     return () => {
@@ -540,7 +722,6 @@ export function FileUpload({
       return;
     }
 
-    const shouldKeepSingleFile = isProfile || !multiple;
     const acceptedFiles = shouldKeepSingleFile
       ? [selectedFiles[0] as File]
       : selectedFiles;

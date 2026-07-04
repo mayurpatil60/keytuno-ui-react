@@ -3,6 +3,7 @@ import { ColumnDef, SortingState, ColumnFiltersState } from '@tanstack/react-tab
 import { ButtonProps } from './Button.js';
 import { PaginationProps } from './Pagination.js';
 import './Tooltip.js';
+import './Select.js';
 
 type TableVariant = "basic" | "outline" | "ghost" | "filled" | "minimal" | "striped";
 type TableSize = "xs" | "sm" | "md" | "lg";

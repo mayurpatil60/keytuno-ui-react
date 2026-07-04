@@ -43,7 +43,7 @@ export { AdaptiveCard, AdaptiveCardAction, AdaptiveCardActionAlignment, Adaptive
 export { FilePreview, FilePreviewProps, FilePreviewSize, FilePreviewType } from './components/FilePreview.js';
 export { FileList, FileListItem, FileListProps, FileListSize, FileListVariant } from './components/FileList.js';
 export { List, ListActionContext, ListActionSource, ListColumns, ListHoverActionId, ListItem, ListItemValues, ListLine, ListProps, ListResolvedColumns, ListSize, ListTone } from './components/List.js';
-export { FileUpload, FileUploadFile, FileUploadProfileConfig, FileUploadProps, FileUploadSide, FileUploadSize, FileUploadVariant } from './components/FileUpload.js';
+export { FileUpload, FileUploadFile, FileUploadInitialFile, FileUploadProfileConfig, FileUploadProps, FileUploadSide, FileUploadSize, FileUploadVariant } from './components/FileUpload.js';
 export { basePrimitiveTokens } from './tokens/primitives.js';
 export { createSemanticColors } from './tokens/semantic.js';
 export { selectorToCssBlock, themeToCssVariables } from './adapters/web.js';

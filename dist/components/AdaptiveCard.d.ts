@@ -2,6 +2,7 @@ import { HTMLAttributes, ReactNode } from 'react';
 import { ButtonProps } from './Button.js';
 import { PaginationProps } from './Pagination.js';
 import './Tooltip.js';
+import './Select.js';
 
 type AdaptiveCardVariant = "default" | "compact" | "ghost";
 type AdaptiveCardSize = "xs" | "sm" | "md" | "lg";

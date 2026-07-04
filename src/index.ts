@@ -465,6 +465,7 @@ export type {
 export { FileUpload } from "./components/FileUpload";
 export type {
   FileUploadFile,
+  FileUploadInitialFile,
   FileUploadProfileConfig,
   FileUploadProps,
   FileUploadSize,

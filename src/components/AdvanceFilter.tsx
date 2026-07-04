@@ -12,7 +12,12 @@ import { Button, type ButtonProps } from "./Button";
 import { Field, FieldContent, FieldDescription, FieldLabel } from "./Field";
 import { Input } from "./Input";
 import { FiFilter, FiX } from "./icons/feather";
-import { Select, type SelectOption, type SelectValue } from "./Select";
+import {
+  Select,
+  type SelectOption,
+  type SelectValue,
+  type SelectVariant,
+} from "./Select";
 import {
   Sheet,
   SheetContent,
@@ -89,6 +94,7 @@ export interface AdvanceFilterProps {
   canUseGlobalFilter?: boolean;
   enableSorting?: boolean;
   controlSize?: "xs" | "sm" | "md" | "lg";
+  selectVariant?: SelectVariant;
 
   showTrigger?: boolean;
   triggerDisabled?: boolean;
@@ -455,6 +461,7 @@ export function AdvanceFilter({
   canUseGlobalFilter = true,
   enableSorting = true,
   controlSize = "sm",
+  selectVariant = "inline",
   showTrigger = true,
   triggerDisabled = false,
   triggerTooltipSide = "top",
@@ -988,6 +995,7 @@ export function AdvanceFilter({
               <div key={rule.id} style={filterRuleRowStyle}>
                 <Select
                   size={controlSize}
+                  variant={selectVariant}
                   options={filterColumnSelectOptions}
                   value={rule.columnId}
                   placeholder="Column"
@@ -1010,6 +1018,7 @@ export function AdvanceFilter({
 
                 <Select
                   size={controlSize}
+                  variant={selectVariant}
                   options={filterOperatorSelectOptions}
                   value={rule.operator}
                   placeholder="Operator"
@@ -1097,6 +1106,7 @@ export function AdvanceFilter({
                   <div key={rule.id} style={sortRuleRowStyle}>
                     <Select
                       size={controlSize}
+                      variant={selectVariant}
                       options={sortableColumnSelectOptions}
                       value={rule.columnId}
                       placeholder="Column"
@@ -1119,6 +1129,7 @@ export function AdvanceFilter({
 
                     <Select
                       size={controlSize}
+                      variant={selectVariant}
                       options={sortDirectionSelectOptions}
                       value={rule.direction}
                       placeholder="Direction"

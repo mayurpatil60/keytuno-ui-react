@@ -3,6 +3,7 @@ import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 import { AdvanceFilterColumn, AdvanceFilterResult, AdvanceFilterApplyReason } from './AdvanceFilter.js';
 import './Button.js';
 import './Tooltip.js';
+import './Select.js';
 import './Sheet.js';
 
 type DataToolbarSize = "xs" | "sm" | "md" | "lg";

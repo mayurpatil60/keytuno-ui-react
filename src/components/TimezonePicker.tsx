@@ -4,6 +4,7 @@ import {
   Select,
   type SelectActionContext,
   type SelectOption,
+  type SelectVariant,
   type SelectValue,
 } from "./Select";
 
@@ -44,6 +45,7 @@ export interface TimezonePickerProps extends Omit<
 > {
   size?: TimezonePickerSize;
   variant?: TimezonePickerVariant;
+  selectVariant?: SelectVariant;
   disabled?: boolean;
   required?: boolean;
   invalid?: boolean;
@@ -244,6 +246,7 @@ function toSingleSelectValue(value: SelectValue | undefined): string | null {
 export function TimezonePicker({
   size = "md",
   variant,
+  selectVariant = "inline",
   disabled = false,
   required = false,
   invalid = false,
@@ -392,6 +395,7 @@ export function TimezonePicker({
       className={composedClassName}
       style={style}
       size={size}
+      variant={selectVariant}
       disabled={disabled}
       required={required}
       invalid={invalid}

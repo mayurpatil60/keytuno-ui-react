@@ -19,13 +19,24 @@ interface FileUploadProfileConfig {
 }
 interface FileUploadFile {
     id: string;
-    file: File;
+    file?: File;
     name: string;
     src: string;
-    sizeBytes: number;
+    sizeBytes?: number;
     mimeType?: string;
     extension: string;
     previewType: FilePreviewType;
+    width?: number;
+    height?: number;
+}
+interface FileUploadInitialFile {
+    id?: string;
+    name?: string;
+    src: string;
+    sizeBytes?: number;
+    mimeType?: string;
+    extension?: string;
+    previewType?: FilePreviewType;
     width?: number;
     height?: number;
 }
@@ -46,11 +57,12 @@ interface FileUploadProps extends Omit<HTMLAttributes<HTMLDivElement>, "children
     dialogTitle?: ReactNode;
     dialogDescription?: ReactNode;
     fileListEmptyText?: ReactNode;
+    initialFiles?: FileUploadInitialFile[];
     onFilesChange?: (files: FileUploadFile[]) => void;
     profileConfig?: FileUploadProfileConfig;
     browseButtonProps?: Omit<ButtonProps, "children" | "onClick" | "disabled" | "size" | "type">;
     dialogProps?: Pick<DialogProps, "size" | "variant" | "closeOnEscape" | "closeOnOverlayClick">;
 }
-declare function FileUpload({ variant, size, side, disabled, required, invalid, errorMessage, multiple, accept, placeholder, dropzoneHint, dropzoneTitle, browseLabel, dialogTitle, dialogDescription, fileListEmptyText, onFilesChange, profileConfig, browseButtonProps, dialogProps, className, style, ...props }: FileUploadProps): JSX.Element;
+declare function FileUpload({ variant, size, side, disabled, required, invalid, errorMessage, multiple, accept, placeholder, dropzoneHint, dropzoneTitle, browseLabel, dialogTitle, dialogDescription, fileListEmptyText, initialFiles, onFilesChange, profileConfig, browseButtonProps, dialogProps, className, style, ...props }: FileUploadProps): JSX.Element;
 
-export { FileUpload, type FileUploadFile, type FileUploadProfileConfig, type FileUploadProps, type FileUploadSide, type FileUploadSize, type FileUploadVariant };
+export { FileUpload, type FileUploadFile, type FileUploadInitialFile, type FileUploadProfileConfig, type FileUploadProps, type FileUploadSide, type FileUploadSize, type FileUploadVariant };

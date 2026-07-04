@@ -1,4 +1,5 @@
 import { HTMLAttributes, ReactNode } from 'react';
+import { SelectVariant } from './Select.js';
 
 type PaginationVariant = "basic" | "advance" | "compact";
 type PaginationSize = "xs" | "sm" | "md" | "lg";
@@ -35,6 +36,7 @@ interface PaginationLabels {
 interface PaginationProps extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onChange"> {
     variant?: PaginationVariant;
     size?: PaginationSize;
+    pageSizeSelectVariant?: SelectVariant;
     page?: number;
     defaultPage?: number;
     totalPages?: number;
@@ -54,6 +56,6 @@ interface PaginationProps extends Omit<HTMLAttributes<HTMLDivElement>, "children
     summaryFormatter?: (context: PaginationTextContext) => ReactNode;
     showingPageFormatter?: (context: PaginationTextContext) => ReactNode;
 }
-declare function Pagination({ variant, size, page, defaultPage, totalPages, pageSize, defaultPageSize, pageSizeOptions, onAction, onPageChange, onPageSizeChange, disabled, maxVisiblePages, showPageSizeSelector, showSummary, showShowingPage, resetPageOnPageSizeChange, labels, summaryFormatter, showingPageFormatter, className, style, role, ["aria-label"]: ariaLabel, ...props }: PaginationProps): JSX.Element;
+declare function Pagination({ variant, size, pageSizeSelectVariant, page, defaultPage, totalPages, pageSize, defaultPageSize, pageSizeOptions, onAction, onPageChange, onPageSizeChange, disabled, maxVisiblePages, showPageSizeSelector, showSummary, showShowingPage, resetPageOnPageSizeChange, labels, summaryFormatter, showingPageFormatter, className, style, role, ["aria-label"]: ariaLabel, ...props }: PaginationProps): JSX.Element;
 
 export { Pagination, type PaginationActionContext, type PaginationActionSource, type PaginationLabels, type PaginationProps, type PaginationSize, type PaginationTextContext, type PaginationVariant };
