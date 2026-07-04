@@ -365,10 +365,54 @@ export const LargeDataScrollbar: Story = {
   ),
 };
 
+export const PanelVariants: Story = {
+  name: "Panel Variants",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Panel Variants</h3>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Inline (Consumes Layout Space)</FieldLabel>
+
+        <FieldContent>
+          <Select
+            variant="inline"
+            options={frameworkOptions}
+            placeholder="Open inline panel"
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Inline variant expands in normal document flow and pushes content
+            below.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+
+      <Field style={frameStyle}>
+        <FieldLabel>Overlay (Floats Above Content)</FieldLabel>
+
+        <FieldContent>
+          <Select
+            variant="overlay"
+            options={frameworkOptions}
+            placeholder="Open overlay panel"
+            style={{ width: "100%" }}
+          />
+          <FieldDescription>
+            Overlay variant is absolutely positioned and does not consume extra
+            layout space.
+          </FieldDescription>
+        </FieldContent>
+      </Field>
+    </div>
+  ),
+};
+
 export const SelectPlayground: Story = {
   name: "Select Playground",
   args: {
     size: "md",
+    variant: "inline",
     disabled: false,
     required: false,
     invalid: false,
@@ -383,6 +427,10 @@ export const SelectPlayground: Story = {
     size: {
       control: "select",
       options: ["xs", "sm", "md", "lg"],
+    },
+    variant: {
+      control: "inline-radio",
+      options: ["inline", "overlay"],
     },
     disabled: { control: "boolean" },
     required: { control: "boolean" },
@@ -417,8 +465,9 @@ export const SelectPlayground: Story = {
 
         <FieldContent>
           <Select
-            key={`${args.size}-${args.disabled}-${args.required}-${args.invalid}-${args.multiple}-${args.showClear}-${withAction}`}
+            key={`${args.size}-${args.variant}-${args.disabled}-${args.required}-${args.invalid}-${args.multiple}-${args.showClear}-${withAction}`}
             size={args.size}
+            variant={args.variant}
             disabled={args.disabled}
             required={args.required}
             invalid={args.invalid}

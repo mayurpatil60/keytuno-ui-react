@@ -113,7 +113,7 @@ const sizeTokens: Record<PaginationSize, PaginationSizeTokens> = {
     fontSize: "0.72rem",
     gap: "0.45rem",
     controlGap: "0.3rem",
-    selectorWidth: "7rem",
+    selectorWidth: "5.85rem",
     buttonSize: "xs",
     symbolButtonMinWidth: "1.55rem",
   },
@@ -121,7 +121,7 @@ const sizeTokens: Record<PaginationSize, PaginationSizeTokens> = {
     fontSize: "0.78rem",
     gap: "0.55rem",
     controlGap: "0.35rem",
-    selectorWidth: "7.4rem",
+    selectorWidth: "6.2rem",
     buttonSize: "sm",
     symbolButtonMinWidth: "1.8rem",
   },
@@ -129,7 +129,7 @@ const sizeTokens: Record<PaginationSize, PaginationSizeTokens> = {
     fontSize: "0.84rem",
     gap: "0.65rem",
     controlGap: "0.4rem",
-    selectorWidth: "7.8rem",
+    selectorWidth: "6.55rem",
     buttonSize: "md",
     symbolButtonMinWidth: "2.05rem",
   },
@@ -137,7 +137,7 @@ const sizeTokens: Record<PaginationSize, PaginationSizeTokens> = {
     fontSize: "0.92rem",
     gap: "0.75rem",
     controlGap: "0.45rem",
-    selectorWidth: "8.2rem",
+    selectorWidth: "6.95rem",
     buttonSize: "lg",
     symbolButtonMinWidth: "2.25rem",
   },
@@ -461,6 +461,8 @@ export function Pagination({
     showingPageFormatter?.(summaryContext) ??
     `${resolvedLabels.showingPage} ${resolvedPage}/${resolvedTotalPages}`;
 
+  const preferSingleRow = variant === "advance" || variant === "compact";
+
   const composedClassName = `${baseClasses} ${className}`.trim();
 
   const rootStyle: CSSProperties = {
@@ -469,7 +471,7 @@ export function Pagination({
     minWidth: 0,
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: preferSingleRow ? "flex-start" : "space-between",
     flexWrap: "wrap",
     gap: resolvedSizeTokens.gap,
     boxSizing: "border-box",
@@ -480,11 +482,12 @@ export function Pagination({
   const infoStyle: CSSProperties = {
     display: "flex",
     alignItems: "center",
-    flexWrap: "wrap",
+    flexWrap: preferSingleRow ? "nowrap" : "wrap",
     gap: resolvedSizeTokens.controlGap,
     color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     minWidth: 0,
     maxWidth: "100%",
+    flexShrink: 1,
     boxSizing: "border-box",
   };
 
@@ -503,22 +506,33 @@ export function Pagination({
   };
 
   const pageSizeSelectWrapStyle: CSSProperties = {
-    width: `min(100%, ${resolvedSizeTokens.selectorWidth})`,
-    maxWidth: "100%",
+    width: preferSingleRow
+      ? resolvedSizeTokens.selectorWidth
+      : `min(100%, ${resolvedSizeTokens.selectorWidth})`,
+    maxWidth: preferSingleRow ? resolvedSizeTokens.selectorWidth : "100%",
     minWidth: 0,
+    flexShrink: preferSingleRow ? 0 : 1,
+    flexGrow: 0,
+    flexBasis: preferSingleRow ? resolvedSizeTokens.selectorWidth : "auto",
   };
 
   const navStyle: CSSProperties = {
     display: "flex",
     alignItems: "center",
-    flexWrap: "wrap",
+    flexWrap: preferSingleRow ? "nowrap" : "wrap",
     gap: resolvedSizeTokens.controlGap,
     minWidth: 0,
     maxWidth: "100%",
+    flexShrink: 1,
     boxSizing: "border-box",
   };
 
   const compactNavStyle: CSSProperties = {
+    ...navStyle,
+    marginInlineStart: "auto",
+  };
+
+  const advanceNavStyle: CSSProperties = {
     ...navStyle,
     marginInlineStart: "auto",
   };
@@ -546,6 +560,7 @@ export function Pagination({
     <div style={pageSizeSelectWrapStyle}>
       <Select
         size={size}
+        variant="overlay"
         options={pageSizeSelectOptions}
         value={`${resolvedPageSize}`}
         onValueChange={handlePageSizeSelectChange}
@@ -668,7 +683,7 @@ export function Pagination({
         <>
           <div style={infoStyle}>{pageSizeSelectorNode}</div>
 
-          <div style={navStyle}>
+          <div style={advanceNavStyle}>
             {showShowingPage ? (
               <span style={showingPageStyle}>{showingPageText}</span>
             ) : null}

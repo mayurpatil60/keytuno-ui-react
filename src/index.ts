@@ -278,6 +278,7 @@ export type {
   SelectOption,
   SelectProps,
   SelectSize,
+  SelectVariant,
   SelectValue,
 } from "./components/Select";
 export { DatePicker } from "./components/DatePicker";

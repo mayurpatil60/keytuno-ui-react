@@ -1,6 +1,7 @@
 import { HTMLAttributes, ReactNode } from 'react';
 
 type SelectSize = "xs" | "sm" | "md" | "lg";
+type SelectVariant = "inline" | "overlay";
 type SelectValue = string | string[] | null;
 type SelectActionSource = "open" | "close" | "search" | "select" | "clear";
 interface SelectActionContext {
@@ -27,6 +28,7 @@ interface SelectGroup {
 }
 interface SelectProps extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "defaultValue" | "onChange"> {
     size?: SelectSize;
+    variant?: SelectVariant;
     disabled?: boolean;
     required?: boolean;
     invalid?: boolean;
@@ -48,6 +50,6 @@ interface SelectProps extends Omit<HTMLAttributes<HTMLDivElement>, "children" | 
         selected: boolean;
     }) => ReactNode;
 }
-declare function Select({ size, disabled, required, invalid, multiple, showClear, clearLabel, openOptionsLabel, closeOptionsLabel, placeholder, searchPlaceholder, emptyText, options, groups, value, defaultValue, onValueChange, onAction, renderItem, className, style, ["aria-label"]: ariaLabel, ["aria-labelledby"]: ariaLabelledBy, ["aria-describedby"]: ariaDescribedBy, ...props }: SelectProps): JSX.Element;
+declare function Select({ size, variant, disabled, required, invalid, multiple, showClear, clearLabel, openOptionsLabel, closeOptionsLabel, placeholder, searchPlaceholder, emptyText, options, groups, value, defaultValue, onValueChange, onAction, renderItem, className, style, ["aria-label"]: ariaLabel, ["aria-labelledby"]: ariaLabelledBy, ["aria-describedby"]: ariaDescribedBy, ...props }: SelectProps): JSX.Element;
 
-export { Select, type SelectActionContext, type SelectActionSource, type SelectGroup, type SelectOption, type SelectProps, type SelectSize, type SelectValue };
+export { Select, type SelectActionContext, type SelectActionSource, type SelectGroup, type SelectOption, type SelectProps, type SelectSize, type SelectValue, type SelectVariant };

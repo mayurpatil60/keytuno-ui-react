@@ -526,6 +526,9 @@ interface SelectGroup  { label: string; options: SelectOption[]; }
   searchPlaceholder?={string}
   emptyText?={string}
   size?={'xs'|'sm'|'md'|'lg'}
+  variant?={'inline'|'overlay'}      // default 'inline'
+                                      // inline: panel consumes layout space
+                                      // overlay: panel floats above content
   disabled?={boolean}
   invalid?={boolean}
   onValueChange?={(value) => void}

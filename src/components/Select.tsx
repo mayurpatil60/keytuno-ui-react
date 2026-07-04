@@ -15,6 +15,7 @@ import { Button } from "./Button";
 import { Scrollbar } from "./Scrollbar";
 
 export type SelectSize = "xs" | "sm" | "md" | "lg";
+export type SelectVariant = "inline" | "overlay";
 export type SelectValue = string | string[] | null;
 export type SelectActionSource =
   | "open"
@@ -53,6 +54,7 @@ export interface SelectProps extends Omit<
   "children" | "defaultValue" | "onChange"
 > {
   size?: SelectSize;
+  variant?: SelectVariant;
   disabled?: boolean;
   required?: boolean;
   invalid?: boolean;
@@ -220,6 +222,7 @@ function getFirstEnabledOption(groups: NormalizedGroup[]): SelectOption | null {
 
 export function Select({
   size = "md",
+  variant = "inline",
   disabled = false,
   required = false,
   invalid = false,
@@ -298,6 +301,7 @@ export function Select({
   }, [isOpen]);
 
   const tokens = sizeTokens[size];
+  const isOverlayVariant = variant === "overlay";
   const resolvedValue = normalizeValue(
     isControlled ? value : uncontrolledValue,
     multiple,
@@ -599,11 +603,19 @@ export function Select({
   };
 
   const panelStyle: CSSProperties = {
-    position: "absolute",
-    insetInlineStart: 0,
-    insetInlineEnd: 0,
-    insetBlockStart: "calc(100% + 0.35rem)",
-    zIndex: 20,
+    ...(isOverlayVariant
+      ? {
+          position: "absolute",
+          insetInlineStart: 0,
+          insetInlineEnd: 0,
+          insetBlockStart: "calc(100% + 0.35rem)",
+          zIndex: 20,
+        }
+      : {
+          position: "relative",
+          marginBlockStart: "0.35rem",
+          width: "100%",
+        }),
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: invalid
