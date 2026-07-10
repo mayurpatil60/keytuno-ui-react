@@ -5,7 +5,7 @@ Generated from all Storybook story files in `stories/` to provide Copilot-ready 
 ## 1. Component Index and Coverage Counts
 
 - Total components documented: 46
-- Total story exports covered: 280
+- Total story exports covered: 281
 - Total unique props detected across stories: 802
 - Total callback/action props detected: 117
 - Total unique accessibility signals detected: 13
@@ -56,7 +56,7 @@ Sequential index (component -> stories, props, actions, a11y signals):
 42. Toast -> stories: 4, props: 14, actions: 2, a11y signals: 1
 43. Toggle -> stories: 4, props: 18, actions: 5, a11y signals: 5
 44. Tooltip -> stories: 5, props: 16, actions: 5, a11y signals: 6
-45. AdaptiveCard -> stories: 4, props: 24, actions: 1, a11y signals: 0
+45. AdaptiveCard -> stories: 5, props: 29, actions: 1, a11y signals: 0
 46. AdvanceFilter -> stories: 4, props: 32, actions: 2, a11y signals: 1
 
 ## 2. Sequential Component Documentation
@@ -164,7 +164,7 @@ Accessibility tokens/signals found in story code:
 | areaMode | argTypes, args | inline-radio | full-viewport | custom-area, full-viewport | - |
 | backgroundColor | argTypes, args, jsx-usage | color | #fff7ed | - | - |
 | borderColor | argTypes, args, jsx-usage | color | #fb923c | - | - |
-| children | argTypes, table-disabled | - | - | - | - |
+| children | argTypes, table-disabled | - | - | - | Main content renders in the top row with close button; direct AlertAction children flow to a separate action row below. |
 | className | argTypes, table-disabled | - | - | - | - |
 | closeOnEscape | argTypes, args, jsx-usage | boolean | true | - | - |
 | customColors | jsx-usage | - | - | - | - |
@@ -191,6 +191,11 @@ Accessibility tokens/signals found in story code:
 
 1. onAction -> action; No explicit description in argTypes.
 2. onOpenChange -> open-change; No explicit description in argTypes.
+
+Layout behavior notes:
+1. Alert close button is row-scoped with the main content header.
+2. Direct AlertAction children render in a dedicated row under content.
+3. Alert no longer uses a full-height side column for close/action controls.
 
 #### Accessibility Coverage
 
@@ -3213,8 +3218,8 @@ Accessibility tokens/signals found in story code:
 
 - Story source file: stories/AdaptiveCard.stories.tsx
 - Storybook title: Data/AdaptiveCard
-- Story exports count: 4
-- Props documented from stories: 24
+- Story exports count: 5
+- Props documented from stories: 29
 - Callback/action props detected: 1
 - Accessibility signals detected in stories: 0
 - Canonical API section: docs/keytuno-ui-react.md -> ### AdaptiveCard
@@ -3222,9 +3227,10 @@ Accessibility tokens/signals found in story code:
 #### Story Exports
 
 1. Basic
-2. ToolbarComposedSwitch
+2. ToolbarComposedLayout
 3. VirtualizedOneColumn
-4. AdaptiveCardPlayground
+4. ActionPositionMatrix
+5. AdaptiveCardPlayground
 
 #### Imported Keytuno Components in Story File
 
@@ -3240,11 +3246,16 @@ Accessibility tokens/signals found in story code:
 
 | Prop | Source(s) | Control / Type | Default(s) in Stories | Options | Description / Notes |
 | --- | --- | --- | --- | --- | --- |
+| actionAlignment | argTypes, args, jsx-usage | inline-radio | right | left, right | Aligns actions inside the selected action row/section. |
+| actionInlineMaxVisible | argTypes, args, jsx-usage | number | 4 | - | Max inline actions before auto/menu fallback. |
+| actionLayout | argTypes, args, jsx-usage | inline-radio | own-row, same-row | own-row, same-row | `same-row` anchors actions to one row only (top or bottom based on `actionPlacement`). |
+| actionMode | argTypes, args, jsx-usage | select | auto, inline | auto, inline, menu | - |
+| actionPlacement | argTypes, args, jsx-usage | inline-radio | bottom, top | top, bottom | Chooses whether the action row is anchored at the top or bottom. |
 | actions | argTypes, jsx-usage, table-disabled | - | - | - | - |
 | columns | argTypes, args, jsx-usage | object | [object] | - | - |
 | data | argTypes, jsx-usage, table-disabled | - | - | - | - |
 | insideColumns | argTypes, args, jsx-usage | inline-radio | 2 | 1, 2, 3 | - |
-| onAction | argTypes, jsx-usage | - | - | - | action: action |
+| onAction | argTypes, jsx-usage | - | - | - | action: adaptive-action |
 | paginationDefaultPageSize | argTypes, args, jsx-usage | number | 12 | - | - |
 | paginationMaxVisiblePages | argTypes, args, jsx-usage | number | 5 | - | - |
 | paginationPageSizeOptions | argTypes, args, jsx-usage | object | [array] | - | - |
@@ -3266,7 +3277,7 @@ Accessibility tokens/signals found in story code:
 
 #### Actions and Event Contracts
 
-1. onAction -> action; Triggered from adaptive-card item actions in the rendered card surface.
+1. onAction -> adaptive-action; Triggered from adaptive-card item actions in the rendered card surface.
 
 #### Accessibility Coverage
 
@@ -3280,7 +3291,8 @@ Accessibility tokens/signals found in story code:
 1. Keep one-card-per-row as the default (`columns={1}`) for enterprise readability.
 2. Compose `DataToolbar` externally when you need shared search/filter/switch behavior with table view.
 3. Prefer `virtualized` mode for large feeds and keep `columns={1}` in that mode for predictable measurement.
-4. Reuse action contracts (`onAction`) to keep app integrations consistent across data components.
+4. Use `ActionPositionMatrix` to validate `top-left`, `top-right`, `bottom-left`, and `bottom-right` combinations for both `same-row` and `own-row`.
+5. Reuse action contracts (`onAction`) to keep app integrations consistent across data components.
 
 ### 2.46 AdvanceFilter
 

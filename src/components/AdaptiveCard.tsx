@@ -48,6 +48,7 @@ export type AdaptiveCardFieldType =
 export type AdaptiveCardActionMode = "auto" | "inline" | "menu";
 export type AdaptiveCardActionAlignment = "left" | "right";
 export type AdaptiveCardActionPlacement = "top" | "bottom";
+export type AdaptiveCardActionLayout = "own-row" | "same-row";
 export type AdaptiveCardInnerColumns = 1 | 2 | 3;
 
 type AdaptiveCardStatusTone = "neutral" | "positive" | "warning" | "negative";
@@ -135,6 +136,7 @@ export interface AdaptiveCardProps<TData extends object = object> extends Omit<
   actionInlineMaxVisible?: number;
   actionAlignment?: AdaptiveCardActionAlignment;
   actionPlacement?: AdaptiveCardActionPlacement;
+  actionLayout?: AdaptiveCardActionLayout;
   actionMenuLabel?: ReactNode;
 
   searchable?: boolean;
@@ -774,6 +776,7 @@ export function AdaptiveCard<TData extends object = object>({
   actionInlineMaxVisible,
   actionAlignment = "right",
   actionPlacement = "bottom",
+  actionLayout = "own-row",
   actionMenuLabel = "Actions",
   searchable = false,
   searchPlaceholder = "Search adaptive cards...",
@@ -1330,12 +1333,18 @@ export function AdaptiveCard<TData extends object = object>({
     return toTextValue(rawValue);
   }
 
-  function renderCardActions(row: TData, rowIndex: number): ReactNode {
+  function renderCardActions(
+    row: TData,
+    rowIndex: number,
+    layout: AdaptiveCardActionLayout,
+  ): ReactNode {
     const rowActions = resolveRowActions(row, rowIndex);
 
     if (rowActions.length === 0) {
       return null;
     }
+
+    const isSameRowLayout = layout === "same-row";
 
     const resolvedActionMode = resolveActionMode(
       actionMode,
@@ -1344,15 +1353,20 @@ export function AdaptiveCard<TData extends object = object>({
     );
 
     const rowActionStyle: CSSProperties = {
-      width: "100%",
       minWidth: 0,
+      width: isSameRowLayout ? "auto" : "100%",
       display: "flex",
-      flexWrap: "wrap",
+      flexWrap: isSameRowLayout ? "nowrap" : "wrap",
+      flexShrink: isSameRowLayout ? 0 : undefined,
       gap: sizeToken.actionGap,
       justifyContent: actionAlignment === "left" ? "flex-start" : "flex-end",
       alignItems: "center",
-      paddingTop: actionPlacement === "bottom" ? "0.12rem" : undefined,
-      paddingBottom: actionPlacement === "top" ? "0.12rem" : undefined,
+      paddingTop:
+        !isSameRowLayout && actionPlacement === "bottom"
+          ? "0.12rem"
+          : undefined,
+      paddingBottom:
+        !isSameRowLayout && actionPlacement === "top" ? "0.12rem" : undefined,
     };
 
     if (resolvedActionMode === "menu") {
@@ -1461,42 +1475,99 @@ export function AdaptiveCard<TData extends object = object>({
       boxSizing: "border-box",
     };
 
+    const sameRowLayoutStyle: CSSProperties = {
+      width: "100%",
+      minWidth: 0,
+      display: "flex",
+      alignItems: "center",
+      gap: sizeToken.cardGap,
+      boxSizing: "border-box",
+    };
+
+    const sameRowFieldContainerStyle: CSSProperties = {
+      flex: 1,
+      minWidth: 0,
+    };
+
     const cardAriaLabel = toCardAriaLabel(row, rowIndex, resolvedSchema);
+    const cardActions = renderCardActions(row, rowIndex, actionLayout);
+    const usesSameRowLayout =
+      actionLayout === "same-row" && cardActions != null;
 
-    return (
-      <Card
-        key={rowId}
-        size={sizeToken.cardSize}
-        spacing={toCardSpacing(sizeToken.cardSize)}
-        style={cardStyle}
-        role="article"
-        aria-label={cardAriaLabel}
-      >
-        {actionPlacement === "top" ? renderCardActions(row, rowIndex) : null}
+    const resolvedFieldEntries: Array<{
+      field: ResolvedAdaptiveCardFieldSchema<TData>;
+      rawValue: unknown;
+      resolvedSpan: number;
+    }> = [];
 
-        <div style={fieldsGridStyle}>
-          {resolvedSchema.map((field) => {
-            const rawValue = getPathValue(row, field.key);
+    for (const field of resolvedSchema) {
+      const rawValue = getPathValue(row, field.key);
 
-            if (field.hideIfEmpty && isEmptyValue(rawValue)) {
-              return null;
-            }
+      if (field.hideIfEmpty && isEmptyValue(rawValue)) {
+        continue;
+      }
 
-            const resolvedSpan =
-              field.span === "full"
-                ? resolvedInnerColumns
-                : clampNumber(field.span, 1, resolvedInnerColumns);
+      const resolvedSpan =
+        field.span === "full"
+          ? resolvedInnerColumns
+          : clampNumber(field.span, 1, resolvedInnerColumns);
 
+      resolvedFieldEntries.push({
+        field,
+        rawValue,
+        resolvedSpan,
+      });
+    }
+
+    const fieldRows: (typeof resolvedFieldEntries)[] = [];
+    let activeRow: typeof resolvedFieldEntries = [];
+    let activeRowSpan = 0;
+
+    for (const entry of resolvedFieldEntries) {
+      const canFitCurrentRow =
+        activeRowSpan + entry.resolvedSpan <= resolvedInnerColumns;
+
+      if (!canFitCurrentRow && activeRow.length > 0) {
+        fieldRows.push(activeRow);
+        activeRow = [];
+        activeRowSpan = 0;
+      }
+
+      activeRow.push(entry);
+      activeRowSpan += entry.resolvedSpan;
+
+      if (activeRowSpan >= resolvedInnerColumns) {
+        fieldRows.push(activeRow);
+        activeRow = [];
+        activeRowSpan = 0;
+      }
+    }
+
+    if (activeRow.length > 0) {
+      fieldRows.push(activeRow);
+    }
+
+    function renderFieldRow(
+      rowEntries: typeof resolvedFieldEntries,
+      rowSlotIndex: number,
+      keyPrefix: string,
+    ): JSX.Element {
+      return (
+        <div
+          key={`${rowId}-${keyPrefix}-${rowSlotIndex}`}
+          style={fieldsGridStyle}
+        >
+          {rowEntries.map((entry, entryIndex) => {
             const fieldStyle: CSSProperties = {
               minWidth: 0,
               display: "flex",
               flexDirection: "column",
               gap: sizeToken.fieldGap,
               gridColumn:
-                resolvedSpan >= resolvedInnerColumns
+                entry.resolvedSpan >= resolvedInnerColumns
                   ? "1 / -1"
-                  : `span ${resolvedSpan}`,
-              textAlign: field.align,
+                  : `span ${entry.resolvedSpan}`,
+              textAlign: entry.field.align,
             };
 
             const labelStyle: CSSProperties = {
@@ -1518,20 +1589,77 @@ export function AdaptiveCard<TData extends object = object>({
             };
 
             return (
-              <div key={`${rowId}-${field.key}`} style={fieldStyle}>
-                {field.showLabel ? (
-                  <p style={labelStyle}>{field.label}</p>
+              <div
+                key={`${rowId}-${keyPrefix}-${rowSlotIndex}-${entry.field.key}-${entryIndex}`}
+                style={fieldStyle}
+              >
+                {entry.field.showLabel ? (
+                  <p style={labelStyle}>{entry.field.label}</p>
                 ) : null}
 
                 <div style={valueStyle}>
-                  {renderFieldValue(field, rawValue, row, rowIndex)}
+                  {renderFieldValue(entry.field, entry.rawValue, row, rowIndex)}
                 </div>
               </div>
             );
           })}
         </div>
+      );
+    }
 
-        {actionPlacement === "bottom" ? renderCardActions(row, rowIndex) : null}
+    return (
+      <Card
+        key={rowId}
+        size={sizeToken.cardSize}
+        spacing={toCardSpacing(sizeToken.cardSize)}
+        style={cardStyle}
+        role="article"
+        aria-label={cardAriaLabel}
+      >
+        {usesSameRowLayout ? (
+          fieldRows.length === 0 ? (
+            cardActions
+          ) : (
+            fieldRows.map((rowEntries, rowSlotIndex) => {
+              const targetRowIndex =
+                actionPlacement === "top" ? 0 : fieldRows.length - 1;
+              const isActionRow = rowSlotIndex === targetRowIndex;
+
+              if (!isActionRow) {
+                return renderFieldRow(rowEntries, rowSlotIndex, "same-row");
+              }
+
+              return (
+                <div
+                  key={`${rowId}-same-row-action-${rowSlotIndex}`}
+                  style={sameRowLayoutStyle}
+                >
+                  {actionAlignment === "left" ? cardActions : null}
+
+                  <div style={sameRowFieldContainerStyle}>
+                    {renderFieldRow(
+                      rowEntries,
+                      rowSlotIndex,
+                      "same-row-action",
+                    )}
+                  </div>
+
+                  {actionAlignment === "right" ? cardActions : null}
+                </div>
+              );
+            })
+          )
+        ) : (
+          <>
+            {actionPlacement === "top" ? cardActions : null}
+
+            {fieldRows.map((rowEntries, rowSlotIndex) =>
+              renderFieldRow(rowEntries, rowSlotIndex, "own-row"),
+            )}
+
+            {actionPlacement === "bottom" ? cardActions : null}
+          </>
+        )}
       </Card>
     );
   }

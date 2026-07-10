@@ -35,6 +35,17 @@ interface ParsedNumericFilterCondition {
   value: number;
 }
 
+interface ActionAnchorOption {
+  id: string;
+  label: string;
+  actionPlacement: NonNullable<
+    AdaptiveCardProps<PortfolioRow>["actionPlacement"]
+  >;
+  actionAlignment: NonNullable<
+    AdaptiveCardProps<PortfolioRow>["actionAlignment"]
+  >;
+}
+
 const desks = ["Derivatives", "Cash", "Arbitrage", "Commodities"];
 const owners = ["Mayur", "Anaya", "Vivaan", "Aditi", "Ishaan"];
 const statuses: PortfolioRow["status"][] = ["Open", "Review", "Closed"];
@@ -172,6 +183,33 @@ const toolbarColumns: AdvanceFilterColumn[] = [
   { id: "change", label: "Change", canFilter: true, canSort: true },
   { id: "exposure", label: "Exposure", canFilter: true, canSort: true },
   { id: "updatedAt", label: "Updated", canFilter: true, canSort: true },
+];
+
+const actionAnchorOptions: ActionAnchorOption[] = [
+  {
+    id: "top-left",
+    label: "Top Left",
+    actionPlacement: "top",
+    actionAlignment: "left",
+  },
+  {
+    id: "top-right",
+    label: "Top Right",
+    actionPlacement: "top",
+    actionAlignment: "right",
+  },
+  {
+    id: "bottom-left",
+    label: "Bottom Left",
+    actionPlacement: "bottom",
+    actionAlignment: "left",
+  },
+  {
+    id: "bottom-right",
+    label: "Bottom Right",
+    actionPlacement: "bottom",
+    actionAlignment: "right",
+  },
 ];
 
 const shellStyle: CSSProperties = {
@@ -471,6 +509,9 @@ export const Basic: Story = {
         size="sm"
         columns={{ mobile: 1, tablet: 1, web: 1 }}
         insideColumns={2}
+        actionLayout="same-row"
+        actionPlacement="top"
+        actionAlignment="right"
         showToolbar={false}
         showPagination
       />
@@ -552,6 +593,11 @@ function ToolbarAdaptiveLayout(
           rowKey="id"
           schema={adaptiveSchema}
           actions={adaptiveActions}
+          actionMode={args.actionMode ?? "auto"}
+          actionInlineMaxVisible={args.actionInlineMaxVisible ?? 4}
+          actionAlignment={args.actionAlignment ?? "right"}
+          actionPlacement={args.actionPlacement ?? "bottom"}
+          actionLayout={args.actionLayout ?? "own-row"}
           variant={args.variant ?? "default"}
           size={args.size ?? "sm"}
           insideColumns={args.insideColumns ?? 2}
@@ -604,6 +650,11 @@ function ToolbarAdaptiveLayout(
 export const ToolbarComposedLayout: Story = {
   name: "Toolbar Composed Layout",
   args: {
+    actionMode: "auto",
+    actionInlineMaxVisible: 4,
+    actionPlacement: "bottom",
+    actionAlignment: "right",
+    actionLayout: "own-row",
     variant: "default",
     size: "sm",
     insideColumns: 2,
@@ -636,6 +687,7 @@ export const VirtualizedOneColumn: Story = {
         virtualizedMaxHeight="38rem"
         virtualizedEstimateSize={240}
         virtualizedOverscan={8}
+        actionLayout="own-row"
         showToolbar={false}
         showPagination={false}
       />
@@ -643,7 +695,108 @@ export const VirtualizedOneColumn: Story = {
   ),
 };
 
+export const ActionPositionMatrix: Story = {
+  name: "Action Position Matrix",
+  render: () => (
+    <div style={{ ...shellStyle, maxWidth: "100%", gap: "1.1rem" }}>
+      {(["same-row", "own-row"] as const).map((layoutMode) => (
+        <section
+          key={layoutMode}
+          style={{
+            width: "100%",
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: "0.68rem",
+          }}
+        >
+          <p
+            style={{
+              margin: 0,
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              letterSpacing: "0.02em",
+              color: "var(--ktn-text-secondary, #475569)",
+            }}
+          >
+            {layoutMode === "same-row" ? "Same Row Layout" : "Own Row Layout"}
+          </p>
+
+          <div
+            style={{
+              width: "100%",
+              minWidth: 0,
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+              gap: "0.75rem",
+            }}
+          >
+            {actionAnchorOptions.map((option) => (
+              <div
+                key={`${layoutMode}-${option.id}`}
+                style={{
+                  width: "100%",
+                  minWidth: 0,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.45rem",
+                }}
+              >
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "0.76rem",
+                    color: "var(--ktn-text-secondary, #64748b)",
+                  }}
+                >
+                  {option.label}
+                </p>
+
+                <AdaptiveCard<PortfolioRow>
+                  data={portfolioRows.slice(0, 2)}
+                  rowKey="id"
+                  schema={adaptiveSchema}
+                  actions={adaptiveActions}
+                  actionMode="inline"
+                  actionLayout={layoutMode}
+                  actionPlacement={option.actionPlacement}
+                  actionAlignment={option.actionAlignment}
+                  variant="default"
+                  size="sm"
+                  insideColumns={2}
+                  columns={1}
+                  showToolbar={false}
+                  showPagination={false}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  ),
+};
+
 const playgroundArgTypes = {
+  actionMode: {
+    control: "select",
+    options: ["auto", "inline", "menu"],
+  },
+  actionInlineMaxVisible: {
+    control: { type: "number", min: 1, max: 8, step: 1 },
+  },
+  actionPlacement: {
+    control: "inline-radio",
+    options: ["top", "bottom"],
+  },
+  actionAlignment: {
+    control: "inline-radio",
+    options: ["left", "right"],
+  },
+  actionLayout: {
+    control: "inline-radio",
+    options: ["own-row", "same-row"],
+  },
   variant: {
     control: "select",
     options: ["default", "compact", "ghost"],
@@ -684,6 +837,11 @@ const playgroundArgTypes = {
 export const AdaptiveCardPlayground: Story = {
   name: "AdaptiveCard Playground",
   args: {
+    actionMode: "auto",
+    actionInlineMaxVisible: 4,
+    actionPlacement: "bottom",
+    actionAlignment: "right",
+    actionLayout: "own-row",
     variant: "default",
     size: "sm",
     insideColumns: 2,

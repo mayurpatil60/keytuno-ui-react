@@ -423,6 +423,7 @@ export type {
   AdaptiveCardAction,
   AdaptiveCardActionAlignment,
   AdaptiveCardActionContext,
+  AdaptiveCardActionLayout,
   AdaptiveCardActionMode,
   AdaptiveCardActionPlacement,
   AdaptiveCardActionSource,

@@ -1,5 +1,6 @@
 import {
   Children,
+  cloneElement,
   createContext,
   isValidElement,
   useContext,
@@ -558,6 +559,35 @@ function containsAlertAction(children: ReactNode): boolean {
   });
 }
 
+function partitionAlertChildren(children: ReactNode): {
+  contentChildren: ReactNode[];
+  actionChildren: ReactElement<AlertActionProps>[];
+} {
+  const contentChildren: ReactNode[] = [];
+  const actionChildren: ReactElement<AlertActionProps>[] = [];
+
+  Children.toArray(children).forEach((child) => {
+    if (!isValidElement(child)) {
+      contentChildren.push(child);
+      return;
+    }
+
+    const element = child as ReactElement<AlertActionProps>;
+
+    if (isAlertActionType(element.type)) {
+      actionChildren.push(element);
+      return;
+    }
+
+    contentChildren.push(child);
+  });
+
+  return {
+    contentChildren,
+    actionChildren,
+  };
+}
+
 export function Alert({
   children,
   open,
@@ -615,6 +645,10 @@ export function Alert({
 
   const hasActionableChild = useMemo(
     () => containsAlertAction(children),
+    [children],
+  );
+  const { contentChildren, actionChildren } = useMemo(
+    () => partitionAlertChildren(children),
     [children],
   );
   const resolvedActionRequired = actionRequired ?? hasActionableChild;
@@ -934,10 +968,9 @@ export function Alert({
     ...placementStyle,
     width: `min(${sizeToken.maxWidth}, calc(100vw - 1rem))`,
     minHeight: sizeToken.minHeight,
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr) auto",
-    gap: "0.45rem",
-    alignItems: "start",
+    display: "flex",
+    flexDirection: "column",
+    gap: 0,
     boxSizing: "border-box",
     borderWidth: "1px",
     borderStyle: "solid",
@@ -956,16 +989,34 @@ export function Alert({
     ...style,
   };
 
+  const headerRowStyle: CSSProperties = {
+    minWidth: 0,
+    display: "flex",
+    alignItems: "flex-start",
+    gap: "0.45rem",
+  };
+
   const contentStyle: CSSProperties = {
     minWidth: 0,
+    flex: 1,
     display: "flex",
     flexDirection: "column",
     gap: sizeToken.contentGap,
   };
 
+  const actionRowStyle: CSSProperties = {
+    minWidth: 0,
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: sizeToken.actionGap,
+    marginTop: contentChildren.length > 0 ? sizeToken.actionGap : 0,
+  };
+
   const closeButtonStyle: CSSProperties = {
     color: customColors?.actionColor ?? variantToken.actionColor,
     marginTop: "-0.1rem",
+    flexShrink: 0,
   };
 
   const contextValue: AlertContextValue = {
@@ -997,19 +1048,35 @@ export function Alert({
         onFocus={handleRootFocus}
         onBlur={handleRootBlur}
       >
-        <div style={contentStyle}>{children}</div>
+        <div style={headerRowStyle}>
+          <div style={contentStyle}>{contentChildren}</div>
 
-        <Button
-          type="button"
-          iconOnly
-          size={sizeToken.closeButtonSize}
-          variant="ghost"
-          aria-label={closeButtonLabel}
-          onClick={handleCloseButtonClick}
-          style={closeButtonStyle}
-        >
-          <FiX size={14} aria-hidden />
-        </Button>
+          <Button
+            type="button"
+            iconOnly
+            size={sizeToken.closeButtonSize}
+            variant="ghost"
+            aria-label={closeButtonLabel}
+            onClick={handleCloseButtonClick}
+            style={closeButtonStyle}
+          >
+            <FiX size={14} aria-hidden />
+          </Button>
+        </div>
+
+        {actionChildren.length > 0 ? (
+          <div style={actionRowStyle}>
+            {actionChildren.map((actionChild, index) =>
+              cloneElement(actionChild, {
+                key: actionChild.key ?? `alert-action-${index}`,
+                style: {
+                  ...(actionChild.props.style ?? {}),
+                  marginTop: 0,
+                },
+              }),
+            )}
+          </div>
+        ) : null}
       </div>
     </AlertContext.Provider>
   );

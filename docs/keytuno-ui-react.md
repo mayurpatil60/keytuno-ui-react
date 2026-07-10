@@ -1239,6 +1239,12 @@ import { Alert, AlertTitle, AlertDescription, AlertAction } from '@keytuno/ui-re
 </Alert>
 ```
 
+Alert layout behavior:
+
+- The close button is aligned in the top content row only.
+- Direct `AlertAction` children are rendered in a dedicated row below the main content.
+- The component does not reserve a full-height side column for close/action controls.
+
 ### Toast
 
 ```ts
@@ -1626,6 +1632,7 @@ import { AdaptiveCard } from '@keytuno/ui-react';
 import type {
   AdaptiveCardAction,
   AdaptiveCardActionAlignment,
+  AdaptiveCardActionLayout,
   AdaptiveCardActionContext,
   AdaptiveCardActionMode,
   AdaptiveCardActionPlacement,
@@ -1662,6 +1669,7 @@ import type {
   actionInlineMaxVisible?={number}
   actionAlignment?={'left'|'right'}
   actionPlacement?={'top'|'bottom'}
+  actionLayout?={'own-row'|'same-row'}
   actionMenuLabel?={ReactNode}
   onAction?={(ctx: AdaptiveCardActionContext<User>) => void}
 
@@ -1742,18 +1750,23 @@ type AdaptiveCardActionSource =
   | 'pagination'
   | 'page-size';
 
+type AdaptiveCardActionLayout = 'own-row' | 'same-row';
+
 // Behavior notes:
 // - This is the native enterprise card surface for app-owned data (no external Adaptive Cards SDK required).
 // - `insideColumns` controls field layout inside each card (1, 2, or 3 columns).
 // - `columns` + `columnBreakpoints` control the outer responsive grid of cards.
+// - `actionLayout='same-row'` attaches actions to one row only:
+//   - `actionPlacement='top'` -> actions share only the first rendered field row.
+//   - `actionPlacement='bottom'` -> actions share only the last rendered field row.
+//   - Other field rows keep full-width card layout (no full-height side action column).
 // - One-card-per-row enterprise mode: set `columns={1}` and optionally enable `virtualized`.
 // - Uses inbuilt primitives (Card, Button, Badge, Progress, DropdownMenu, Input, Pagination, Scrollbar).
 // - Storybook references:
-//   - Enterprise Adaptive Card (One Card Per Row)
-//   - Inside Columns: 1/2/3
-//   - Outside Grid: Mobile 1 / Tablet 2 / Web 4
-//   - Virtualized Adaptive Cards
-//   - Server-Side (TanStack Query)
+//   - Basic
+//   - Toolbar Composed Layout
+//   - Virtualized One Column
+//   - Action Position Matrix
 //   - AdaptiveCard Playground
 ```
 
