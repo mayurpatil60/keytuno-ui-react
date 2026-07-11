@@ -332,7 +332,6 @@ export function SheetContent({
   const resolvedCloseButtonLabel = closeButtonLabel ?? contextCloseButtonLabel;
   const isVerticalSheet = resolvedSide === "top" || resolvedSide === "bottom";
   const resolvedMaxContentHeight = `min(${maxContentHeight}, calc(100vh - 2.5rem))`;
-  const sectionSpacing = scrollable ? "calc(0.6rem + 0.18rem)" : "0.6rem";
 
   const headerChildren: ReactNode[] = [];
   const bodyChildren: ReactNode[] = [];
@@ -356,6 +355,72 @@ export function SheetContent({
     headerChildren.length > 0 && bodyChildren.length > 0;
   const hasFooterBodySeparation =
     footerChildren.length > 0 && bodyChildren.length > 0;
+  const [bodyViewportNode, setBodyViewportNode] =
+    useState<HTMLDivElement | null>(null);
+  const [bodyContentNode, setBodyContentNode] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const [shouldUseBodyScrollbar, setShouldUseBodyScrollbar] = useState(false);
+  const shouldUseMiddleScrollbar = scrollable || shouldUseBodyScrollbar;
+  const sectionSpacing = shouldUseMiddleScrollbar
+    ? "calc(0.6rem + 0.18rem)"
+    : "0.6rem";
+
+  useEffect(() => {
+    if (bodyChildren.length === 0) {
+      setShouldUseBodyScrollbar(false);
+      return;
+    }
+
+    if (bodyViewportNode == null || bodyContentNode == null) {
+      return;
+    }
+
+    let frameId: number | null = null;
+
+    const measureOverflow = (): void => {
+      const nextShouldScroll =
+        bodyContentNode.scrollHeight - bodyViewportNode.clientHeight > 1;
+
+      setShouldUseBodyScrollbar((previousValue) =>
+        previousValue === nextShouldScroll ? previousValue : nextShouldScroll,
+      );
+    };
+
+    const scheduleMeasure = (): void => {
+      if (frameId != null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        measureOverflow();
+      });
+    };
+
+    scheduleMeasure();
+
+    let resizeObserver: ResizeObserver | null = null;
+
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        scheduleMeasure();
+      });
+      resizeObserver.observe(bodyViewportNode);
+      resizeObserver.observe(bodyContentNode);
+    }
+
+    window.addEventListener("resize", scheduleMeasure);
+
+    return () => {
+      if (frameId != null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", scheduleMeasure);
+    };
+  }, [bodyChildren.length, bodyContentNode, bodyViewportNode]);
 
   const shellStyle: CSSProperties = {
     position: "fixed",
@@ -406,12 +471,8 @@ export function SheetContent({
       : "0px",
     ...getSheetPanelStyle(resolvedSide),
     ...getSheetPanelRadiusStyle(resolvedSide),
-    ...(scrollable
-      ? {
-          overflow: "hidden",
-          ...(isVerticalSheet ? { maxHeight: resolvedMaxContentHeight } : {}),
-        }
-      : {}),
+    overflow: "hidden",
+    ...(isVerticalSheet ? { maxHeight: resolvedMaxContentHeight } : {}),
     ...style,
   };
 
@@ -434,19 +495,15 @@ export function SheetContent({
     width: "100%",
   };
 
-  const bodySectionStyle: CSSProperties = {
+  const bodyViewportStyle: CSSProperties = {
     ...sectionStyle,
-    ...(scrollable
-      ? {
-          flex: 1,
-          minHeight: 0,
-          paddingBlock: "0.1rem",
-        }
-      : {}),
+    flex: 1,
+    minHeight: 0,
+    paddingBlock: "0.1rem",
   };
 
   const bodyScrollbarStyle: CSSProperties = {
-    ...bodySectionStyle,
+    height: "100%",
     boxSizing: "border-box",
     paddingInlineStart: "0.1rem",
     paddingInlineEnd: "0.4rem",
@@ -513,15 +570,34 @@ export function SheetContent({
         ) : null}
 
         {bodyChildren.length > 0 ? (
-          scrollable ? (
-            <Scrollbar axis="y" style={bodyScrollbarStyle}>
-              <div style={bodyContentStyle}>{bodyChildren}</div>
-            </Scrollbar>
-          ) : (
-            <div style={bodySectionStyle}>
-              <div style={bodyContentStyle}>{bodyChildren}</div>
-            </div>
-          )
+          <div
+            ref={(node) => {
+              setBodyViewportNode(node);
+            }}
+            style={bodyViewportStyle}
+          >
+            {shouldUseMiddleScrollbar ? (
+              <Scrollbar axis="y" style={bodyScrollbarStyle}>
+                <div
+                  ref={(node) => {
+                    setBodyContentNode(node);
+                  }}
+                  style={bodyContentStyle}
+                >
+                  {bodyChildren}
+                </div>
+              </Scrollbar>
+            ) : (
+              <div
+                ref={(node) => {
+                  setBodyContentNode(node);
+                }}
+                style={bodyContentStyle}
+              >
+                {bodyChildren}
+              </div>
+            )}
+          </div>
         ) : null}
 
         {footerChildren.length > 0 ? (

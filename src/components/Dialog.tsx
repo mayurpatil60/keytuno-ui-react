@@ -623,6 +623,69 @@ export function DialogContent({
     headerChildren.length > 0 && bodyChildren.length > 0;
   const hasFooterBodySeparation =
     footerChildren.length > 0 && bodyChildren.length > 0;
+  const [bodyViewportNode, setBodyViewportNode] =
+    useState<HTMLDivElement | null>(null);
+  const [bodyContentNode, setBodyContentNode] = useState<HTMLDivElement | null>(
+    null,
+  );
+  const [shouldUseBodyScrollbar, setShouldUseBodyScrollbar] = useState(false);
+  const shouldUseMiddleScrollbar = scrollable || shouldUseBodyScrollbar;
+
+  useEffect(() => {
+    if (bodyChildren.length === 0) {
+      setShouldUseBodyScrollbar(false);
+      return;
+    }
+
+    if (bodyViewportNode == null || bodyContentNode == null) {
+      return;
+    }
+
+    let frameId: number | null = null;
+
+    const measureOverflow = (): void => {
+      const nextShouldScroll =
+        bodyContentNode.scrollHeight - bodyViewportNode.clientHeight > 1;
+
+      setShouldUseBodyScrollbar((previousValue) =>
+        previousValue === nextShouldScroll ? previousValue : nextShouldScroll,
+      );
+    };
+
+    const scheduleMeasure = (): void => {
+      if (frameId != null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        measureOverflow();
+      });
+    };
+
+    scheduleMeasure();
+
+    let resizeObserver: ResizeObserver | null = null;
+
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        scheduleMeasure();
+      });
+      resizeObserver.observe(bodyViewportNode);
+      resizeObserver.observe(bodyContentNode);
+    }
+
+    window.addEventListener("resize", scheduleMeasure);
+
+    return () => {
+      if (frameId != null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", scheduleMeasure);
+    };
+  }, [bodyChildren.length, bodyContentNode, bodyViewportNode]);
 
   function closeDialog(event?: unknown): void {
     if (!disabled) {
@@ -664,7 +727,7 @@ export function DialogContent({
   }
 
   const resolvedMaxContentHeight = `min(${maxContentHeight}, calc(100vh - 2.5rem))`;
-  const sectionSpacing = scrollable
+  const sectionSpacing = shouldUseMiddleScrollbar
     ? `calc(${sizeToken.sectionGap} + 0.18rem)`
     : sizeToken.sectionGap;
 
@@ -672,8 +735,8 @@ export function DialogContent({
     position: "relative",
     pointerEvents: "auto",
     width: `min(100%, ${sizeToken.maxWidth})`,
-    maxHeight: scrollable ? resolvedMaxContentHeight : undefined,
-    overflow: scrollable ? "hidden" : undefined,
+    maxHeight: resolvedMaxContentHeight,
+    overflow: "hidden",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: variantToken.borderColor,
@@ -727,19 +790,15 @@ export function DialogContent({
     width: "100%",
   };
 
-  const bodySectionStyle: CSSProperties = {
+  const bodyViewportStyle: CSSProperties = {
     ...sectionStyle,
-    ...(scrollable
-      ? {
-          flex: 1,
-          minHeight: 0,
-          paddingBlock: "0.1rem",
-        }
-      : {}),
+    flex: 1,
+    minHeight: 0,
+    paddingBlock: "0.1rem",
   };
 
   const bodyScrollbarStyle: CSSProperties = {
-    ...bodySectionStyle,
+    height: "100%",
     boxSizing: "border-box",
     paddingInlineStart: "0.1rem",
     paddingInlineEnd: "0.4rem",
@@ -779,15 +838,34 @@ export function DialogContent({
       ) : null}
 
       {bodyChildren.length > 0 ? (
-        scrollable ? (
-          <Scrollbar axis="y" style={bodyScrollbarStyle}>
-            <div style={bodyContentStyle}>{bodyChildren}</div>
-          </Scrollbar>
-        ) : (
-          <div style={bodySectionStyle}>
-            <div style={bodyContentStyle}>{bodyChildren}</div>
-          </div>
-        )
+        <div
+          ref={(node) => {
+            setBodyViewportNode(node);
+          }}
+          style={bodyViewportStyle}
+        >
+          {shouldUseMiddleScrollbar ? (
+            <Scrollbar axis="y" style={bodyScrollbarStyle}>
+              <div
+                ref={(node) => {
+                  setBodyContentNode(node);
+                }}
+                style={bodyContentStyle}
+              >
+                {bodyChildren}
+              </div>
+            </Scrollbar>
+          ) : (
+            <div
+              ref={(node) => {
+                setBodyContentNode(node);
+              }}
+              style={bodyContentStyle}
+            >
+              {bodyChildren}
+            </div>
+          )}
+        </div>
       ) : null}
 
       {footerChildren.length > 0 ? (
