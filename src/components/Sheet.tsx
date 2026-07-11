@@ -379,12 +379,24 @@ export function SheetContent({
     let frameId: number | null = null;
 
     const measureOverflow = (): void => {
-      const nextShouldScroll =
-        bodyContentNode.scrollHeight - bodyViewportNode.clientHeight > 1;
-
-      setShouldUseBodyScrollbar((previousValue) =>
-        previousValue === nextShouldScroll ? previousValue : nextShouldScroll,
+      const contentHeight = Math.max(
+        bodyContentNode.getBoundingClientRect().height,
+        bodyContentNode.scrollHeight,
       );
+      const viewportHeight = bodyViewportNode.clientHeight;
+      const overflowDelta = contentHeight - viewportHeight;
+
+      setShouldUseBodyScrollbar((previousValue) => {
+        // Add a tiny hysteresis band to avoid rapid on/off jitter on
+        // sub-pixel layout changes.
+        const nextShouldScroll = previousValue
+          ? overflowDelta > 0.5
+          : overflowDelta > 1.5;
+
+        return previousValue === nextShouldScroll
+          ? previousValue
+          : nextShouldScroll;
+      });
     };
 
     const scheduleMeasure = (): void => {
@@ -401,6 +413,7 @@ export function SheetContent({
     scheduleMeasure();
 
     let resizeObserver: ResizeObserver | null = null;
+    let mutationObserver: MutationObserver | null = null;
 
     if (typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(() => {
@@ -408,6 +421,18 @@ export function SheetContent({
       });
       resizeObserver.observe(bodyViewportNode);
       resizeObserver.observe(bodyContentNode);
+    }
+
+    if (typeof MutationObserver !== "undefined") {
+      mutationObserver = new MutationObserver(() => {
+        scheduleMeasure();
+      });
+
+      mutationObserver.observe(bodyContentNode, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+      });
     }
 
     window.addEventListener("resize", scheduleMeasure);
@@ -418,6 +443,7 @@ export function SheetContent({
       }
 
       resizeObserver?.disconnect();
+      mutationObserver?.disconnect();
       window.removeEventListener("resize", scheduleMeasure);
     };
   }, [bodyChildren.length, bodyContentNode, bodyViewportNode]);
@@ -471,7 +497,7 @@ export function SheetContent({
       : "0px",
     ...getSheetPanelStyle(resolvedSide),
     ...getSheetPanelRadiusStyle(resolvedSide),
-    overflow: "hidden",
+    overflow: "visible",
     ...(isVerticalSheet ? { maxHeight: resolvedMaxContentHeight } : {}),
     ...style,
   };
@@ -506,7 +532,8 @@ export function SheetContent({
     height: "100%",
     boxSizing: "border-box",
     paddingInlineStart: "0.1rem",
-    paddingInlineEnd: "0.4rem",
+    paddingInlineEnd: shouldUseMiddleScrollbar ? "0.4rem" : "0.1rem",
+    overflowY: shouldUseMiddleScrollbar ? "auto" : "hidden",
   };
 
   const bodyContentStyle: CSSProperties = {
@@ -576,18 +603,12 @@ export function SheetContent({
             }}
             style={bodyViewportStyle}
           >
-            {shouldUseMiddleScrollbar ? (
-              <Scrollbar axis="y" style={bodyScrollbarStyle}>
-                <div
-                  ref={(node) => {
-                    setBodyContentNode(node);
-                  }}
-                  style={bodyContentStyle}
-                >
-                  {bodyChildren}
-                </div>
-              </Scrollbar>
-            ) : (
+            <Scrollbar
+              axis="y"
+              role="presentation"
+              tabIndex={-1}
+              style={bodyScrollbarStyle}
+            >
               <div
                 ref={(node) => {
                   setBodyContentNode(node);
@@ -596,7 +617,7 @@ export function SheetContent({
               >
                 {bodyChildren}
               </div>
-            )}
+            </Scrollbar>
           </div>
         ) : null}
 
