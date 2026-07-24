@@ -62,7 +62,7 @@ const variantStyles: Record<ButtonVariantValue, CSSProperties> = {
     borderColor: 'var(--ktn-border-muted)',
   },
   secondary: {
-    backgroundColor: 'var(--ktn-bg-surface)',
+    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
     color: 'var(--ktn-text-primary)',
     borderColor: 'var(--ktn-border-muted)',
   },
@@ -96,7 +96,7 @@ const hoverStyles: Record<ButtonVariantValue, CSSProperties> = {
     borderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
   },
   secondary: {
-    backgroundColor: 'color-mix(in srgb, var(--ktn-bg-surface) 88%, var(--ktn-text-primary))',
+    backgroundColor: 'color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, var(--ktn-text-primary, #0f172a))',
     borderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
   },
   ghost: {

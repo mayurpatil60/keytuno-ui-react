@@ -435,7 +435,7 @@ export const DataToolbarPlayground: Story = {
     advanceFilterTitle: "Advance Filter",
     advanceFilterDescription: "Configure filters and sorting",
     advanceFilterTriggerButtonProps: {
-      iconOnlyTone: true,
+      variant: "secondary",
     },
     showSwitch: true,
     switchMode: "adaptive-card",

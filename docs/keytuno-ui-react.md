@@ -258,6 +258,8 @@ import { Button } from '@keytuno/ui-react';
 />
 ```
 
+- `secondary` Button variant uses the same surface background token as Select (`--ktn-bg-surface`), so light and dark themes stay visually aligned.
+
 ### Toggle
 
 ```ts
