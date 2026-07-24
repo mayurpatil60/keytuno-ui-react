@@ -283,6 +283,8 @@ export type {
 } from "./components/Select";
 export { DatePicker } from "./components/DatePicker";
 export type {
+  DatePickerCalendarSelectProps,
+  DatePickerControlButtonProps,
   DatePickerActionContext,
   DatePickerActionSource,
   DatePickerMode,

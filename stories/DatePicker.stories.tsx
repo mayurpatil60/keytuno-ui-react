@@ -300,8 +300,9 @@ export const DatePickerPlayground: Story = {
   name: "Date Playground",
   args: {
     mode: "date",
-    variant: "primary",
+    variant: "default",
     size: "md",
+    calendarSelectVariant: "overlay",
     disabled: false,
     required: false,
     invalid: false,
@@ -316,6 +317,8 @@ export const DatePickerPlayground: Story = {
     variant: {
       control: "select",
       options: [
+        "default",
+        "compact",
         "primary",
         "secondary",
         "destructive",
@@ -323,6 +326,10 @@ export const DatePickerPlayground: Story = {
         "ghost",
         "link",
       ],
+    },
+    calendarSelectVariant: {
+      control: "inline-radio",
+      options: ["inline", "overlay"],
     },
     size: {
       control: "select",
@@ -359,6 +366,7 @@ export const DatePickerPlayground: Story = {
             mode="date"
             variant={args.variant}
             size={args.size}
+            calendarSelectVariant={args.calendarSelectVariant}
             disabled={args.disabled}
             required={args.required}
             invalid={args.invalid}
@@ -386,8 +394,9 @@ export const RangePickerPlayground: Story = {
   name: "Range Playground",
   args: {
     mode: "range",
-    variant: "primary",
+    variant: "default",
     size: "md",
+    calendarSelectVariant: "overlay",
     disabled: false,
     required: false,
     invalid: false,
@@ -403,6 +412,8 @@ export const RangePickerPlayground: Story = {
     variant: {
       control: "select",
       options: [
+        "default",
+        "compact",
         "primary",
         "secondary",
         "destructive",
@@ -410,6 +421,10 @@ export const RangePickerPlayground: Story = {
         "ghost",
         "link",
       ],
+    },
+    calendarSelectVariant: {
+      control: "inline-radio",
+      options: ["inline", "overlay"],
     },
     size: {
       control: "select",
@@ -446,6 +461,7 @@ export const RangePickerPlayground: Story = {
             mode="range"
             variant={args.variant}
             size={args.size}
+            calendarSelectVariant={args.calendarSelectVariant}
             disabled={args.disabled}
             required={args.required}
             invalid={args.invalid}
@@ -474,8 +490,9 @@ export const TimePickerPlayground: Story = {
   name: "Time Playground",
   args: {
     mode: "time",
-    variant: "primary",
+    variant: "default",
     size: "md",
+    calendarSelectVariant: "overlay",
     disabled: false,
     required: false,
     invalid: false,
@@ -490,6 +507,8 @@ export const TimePickerPlayground: Story = {
     variant: {
       control: "select",
       options: [
+        "default",
+        "compact",
         "primary",
         "secondary",
         "destructive",
@@ -497,6 +516,10 @@ export const TimePickerPlayground: Story = {
         "ghost",
         "link",
       ],
+    },
+    calendarSelectVariant: {
+      control: "inline-radio",
+      options: ["inline", "overlay"],
     },
     size: {
       control: "select",
@@ -533,6 +556,7 @@ export const TimePickerPlayground: Story = {
             mode="time"
             variant={args.variant}
             size={args.size}
+            calendarSelectVariant={args.calendarSelectVariant}
             disabled={args.disabled}
             required={args.required}
             invalid={args.invalid}

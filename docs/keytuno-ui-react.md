@@ -545,6 +545,9 @@ import { DatePicker } from '@keytuno/ui-react';
 // mode 'date'  → value is ISO string 'YYYY-MM-DD' or null
 // mode 'range' → value is { start: string|null, end: string|null }
 // mode 'time'  → value is 'HH:MM' string or null
+// responsive panel:
+// - date + range render one calendar viewport (mobile friendly)
+// - range uses From/To selector row and switches the same calendar context
 
 <DatePicker
   mode?={'date'|'range'|'time'}     // default 'date'
@@ -552,7 +555,9 @@ import { DatePicker } from '@keytuno/ui-react';
   defaultValue?={DatePickerValue}
   onValueChange?={(value) => void}
   size?={'xs'|'sm'|'md'|'lg'}
-  variant?={'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+  variant?={'default'|'compact'|'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+                                   // default/compact control picker density/layout
+                                   // primary/outline/... keep tone compatibility
   disabled?={boolean}
   invalid?={boolean}
   placeholder?={string}
@@ -571,6 +576,13 @@ import { DatePicker } from '@keytuno/ui-react';
   timePanelTitle?={string}
   timeOptionAriaFormatter?={(time12Hour, time24Hour) => string}
   rangeSeparator?={string}           // separator shown between start and end dates
+  calendarSelectVariant?={'inline'|'overlay'} // month/year Select panel behavior
+  monthSelectProps?={DatePickerCalendarSelectProps}
+  yearSelectProps?={DatePickerCalendarSelectProps}
+  navigationButtonProps?={DatePickerControlButtonProps}
+  dayButtonProps?={DatePickerControlButtonProps}
+  timeOptionButtonProps?={DatePickerControlButtonProps}
+  rangeFieldButtonProps?={DatePickerControlButtonProps}
 />
 ```
 

@@ -1357,16 +1357,6 @@ export function Table<TData extends object = object>({
           {selectedCountFormatter(selectionCount)}
         </p>
       ) : null}
-
-      <p
-        style={{
-          margin: 0,
-          fontSize: sizeToken.headerFontSize,
-          color: colorToken.mutedTextColor,
-        }}
-      >
-        {`${totalRowsCount} total rows`}
-      </p>
     </div>
   );
 }

@@ -9,7 +9,13 @@ import {
   type KeyboardEvent,
 } from "react";
 
-import { Button } from "./Button";
+import { Button, type ButtonProps } from "./Button";
+import {
+  Select,
+  type SelectProps,
+  type SelectSize,
+  type SelectVariant,
+} from "./Select";
 import { Scrollbar } from "./Scrollbar";
 import {
   FiCalendar,
@@ -21,12 +27,17 @@ import {
 } from "./icons/feather";
 
 export type DatePickerVariant =
+  | "default"
+  | "compact"
   | "primary"
   | "secondary"
   | "destructive"
   | "outline"
   | "ghost"
   | "link";
+
+type DatePickerToneVariant = Exclude<DatePickerVariant, "default" | "compact">;
+type DatePickerLayoutVariant = "default" | "compact";
 
 export type DatePickerSize = "xs" | "sm" | "md" | "lg";
 export type DatePickerMode = "date" | "range" | "time";
@@ -58,6 +69,16 @@ export interface DateRangeValue {
 
 export type DatePickerValue = string | DateRangeValue | null;
 
+export type DatePickerCalendarSelectProps = Omit<
+  SelectProps,
+  "options" | "groups" | "multiple" | "value" | "defaultValue" | "onValueChange"
+>;
+
+export type DatePickerControlButtonProps = Omit<
+  ButtonProps,
+  "type" | "children" | "onClick" | "onMouseDown" | "disabled"
+>;
+
 export interface DatePickerProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
   "children" | "defaultValue" | "onChange"
@@ -84,6 +105,13 @@ export interface DatePickerProps extends Omit<
   rangeEndEmptyText?: string;
   timePanelTitle?: string;
   timeOptionAriaFormatter?: (time12Hour: string, time24Hour: string) => string;
+  calendarSelectVariant?: SelectVariant;
+  monthSelectProps?: DatePickerCalendarSelectProps;
+  yearSelectProps?: DatePickerCalendarSelectProps;
+  navigationButtonProps?: DatePickerControlButtonProps;
+  dayButtonProps?: DatePickerControlButtonProps;
+  timeOptionButtonProps?: DatePickerControlButtonProps;
+  rangeFieldButtonProps?: DatePickerControlButtonProps;
   value?: DatePickerValue;
   defaultValue?: DatePickerValue;
   onValueChange?: (value: DatePickerValue) => void;
@@ -94,7 +122,9 @@ type DatePickerSizeTokens = {
   height: string;
   fontSize: string;
   panelPadding: string;
+  compactPanelPadding: string;
   dayCellSize: string;
+  compactDayCellSize: string;
 };
 
 type CalendarMonthState = {
@@ -129,29 +159,47 @@ const sizeTokens: Record<DatePickerSize, DatePickerSizeTokens> = {
     height: "1.9rem",
     fontSize: "0.75rem",
     panelPadding: "0.55rem",
+    compactPanelPadding: "0.42rem",
     dayCellSize: "1.65rem",
+    compactDayCellSize: "1.5rem",
   },
   sm: {
     height: "2.15rem",
     fontSize: "0.8125rem",
     panelPadding: "0.65rem",
+    compactPanelPadding: "0.5rem",
     dayCellSize: "1.8rem",
+    compactDayCellSize: "1.62rem",
   },
   md: {
     height: "2.4rem",
     fontSize: "0.875rem",
     panelPadding: "0.75rem",
+    compactPanelPadding: "0.56rem",
     dayCellSize: "2rem",
+    compactDayCellSize: "1.72rem",
   },
   lg: {
     height: "2.65rem",
     fontSize: "0.9375rem",
     panelPadding: "0.875rem",
+    compactPanelPadding: "0.64rem",
     dayCellSize: "2.2rem",
+    compactDayCellSize: "1.86rem",
   },
 };
 
 const variantStyles: Record<DatePickerVariant, CSSProperties> = {
+  default: {
+    borderColor: "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
+  },
+  compact: {
+    borderColor: "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
+  },
   primary: {
     borderColor:
       "color-mix(in srgb, var(--ktn-action-primary-bg) 42%, var(--ktn-border-muted))",
@@ -189,6 +237,12 @@ const variantStyles: Record<DatePickerVariant, CSSProperties> = {
 };
 
 const focusStyles: Record<DatePickerVariant, CSSProperties> = {
+  default: {
+    boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.2)",
+  },
+  compact: {
+    boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.2)",
+  },
   primary: {
     boxShadow: "0 0 0 2px rgba(37, 99, 235, 0.24)",
   },
@@ -622,6 +676,13 @@ export function DatePicker({
   rangeEndEmptyText = "End date",
   timePanelTitle = "Select Time",
   timeOptionAriaFormatter,
+  calendarSelectVariant = "overlay",
+  monthSelectProps,
+  yearSelectProps,
+  navigationButtonProps,
+  dayButtonProps,
+  timeOptionButtonProps,
+  rangeFieldButtonProps,
   value,
   defaultValue,
   onValueChange,
@@ -634,11 +695,21 @@ export function DatePicker({
   "aria-describedby": ariaDescribedBy,
   ...props
 }: DatePickerProps): JSX.Element {
-  const resolvedVariant = variant ?? "outline";
+  const resolvedVariant = variant ?? "default";
+  const resolvedLayoutVariant: DatePickerLayoutVariant =
+    resolvedVariant === "compact" ? "compact" : "default";
+  const resolvedToneVariant: DatePickerToneVariant =
+    resolvedVariant === "default" || resolvedVariant === "compact"
+      ? "outline"
+      : resolvedVariant;
+  const isCompactLayout = resolvedLayoutVariant === "compact";
   const isControlled = value !== undefined;
 
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+  const [activeRangeField, setActiveRangeField] = useState<"start" | "end">(
+    "start",
+  );
 
   const [uncontrolledValue, setUncontrolledValue] = useState<DatePickerValue>(
     () => normalizeValueByMode(defaultValue, mode, rangeSeparator),
@@ -662,19 +733,15 @@ export function DatePicker({
     ),
   );
 
-  const [leftMonth, setLeftMonth] = useState<CalendarMonthState>(() => {
+  const [calendarMonth, setCalendarMonth] = useState<CalendarMonthState>(() => {
     const normalizedDefault = normalizeValueByMode(
       defaultValue,
       mode,
       rangeSeparator,
     );
 
-    if (
-      mode === "range" &&
-      isDateRangeValue(normalizedDefault) &&
-      normalizedDefault.start != null
-    ) {
-      return toMonthState(normalizedDefault.start);
+    if (mode === "range" && isDateRangeValue(normalizedDefault)) {
+      return toMonthState(normalizedDefault.start ?? normalizedDefault.end);
     }
 
     if (mode === "date" && typeof normalizedDefault === "string") {
@@ -684,40 +751,46 @@ export function DatePicker({
     return toMonthState(null);
   });
 
-  const [rightMonth, setRightMonth] = useState<CalendarMonthState>(() => {
-    const normalizedDefault = normalizeValueByMode(
-      defaultValue,
-      mode,
-      rangeSeparator,
-    );
-
-    if (mode === "range" && isDateRangeValue(normalizedDefault)) {
-      if (normalizedDefault.end != null) {
-        return toMonthState(normalizedDefault.end);
-      }
-
-      if (normalizedDefault.start != null) {
-        return shiftMonth(toMonthState(normalizedDefault.start), 1);
-      }
-    }
-
-    return shiftMonth(toMonthState(null), 1);
-  });
-
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pickerId = useId();
 
   const tokens = sizeTokens[size];
+  const compactPanelPadding = isCompactLayout
+    ? tokens.compactPanelPadding
+    : tokens.panelPadding;
+  const resolvedDayCellSize = isCompactLayout
+    ? tokens.compactDayCellSize
+    : tokens.dayCellSize;
+  const resolvedMonthSelectSize: SelectSize =
+    monthSelectProps?.size ??
+    (isCompactLayout
+      ? size === "lg"
+        ? "sm"
+        : "xs"
+      : size === "xs"
+        ? "xs"
+        : "sm");
+  const resolvedYearSelectSize: SelectSize =
+    yearSelectProps?.size ?? resolvedMonthSelectSize;
+
+  const monthSelectOverrides = monthSelectProps ?? {};
+  const yearSelectOverrides = yearSelectProps ?? {};
+  const navigationButtonOverrides = navigationButtonProps ?? {};
+  const dayButtonOverrides = dayButtonProps ?? {};
+  const timeOptionButtonOverrides = timeOptionButtonProps ?? {};
+  const rangeFieldButtonOverrides = rangeFieldButtonProps ?? {};
+
   const idBase = id ?? pickerId;
   const inputElementId = `${idBase}-input`;
   const panelElementId = `${idBase}-panel`;
   const resolvedPanelAriaLabel =
-    (panelAriaLabel ?? mode === "time")
+    panelAriaLabel ??
+    (mode === "time"
       ? "Time picker panel"
       : mode === "range"
         ? "Date range picker panel"
-        : "Date picker panel";
+        : "Date picker panel");
   const resolvedInputAriaLabel =
     ariaLabel ??
     inputAriaLabel ??
@@ -753,13 +826,21 @@ export function DatePicker({
       : displayValue.trim() !== "";
 
   const timeOptions = useMemo(() => createTimeOptions(15), []);
-  const leftYearOptions = useMemo(
-    () => createYearOptions(leftMonth.year),
-    [leftMonth.year],
+  const monthOptions = useMemo(
+    () =>
+      MONTH_LABELS.map((label, index) => ({
+        value: String(index),
+        label,
+      })),
+    [],
   );
-  const rightYearOptions = useMemo(
-    () => createYearOptions(rightMonth.year),
-    [rightMonth.year],
+  const yearOptions = useMemo(
+    () =>
+      createYearOptions(calendarMonth.year).map((yearValue) => ({
+        value: String(yearValue),
+        label: String(yearValue),
+      })),
+    [calendarMonth.year],
   );
   const todayIso = useMemo(() => {
     const now = new Date();
@@ -807,27 +888,23 @@ export function DatePicker({
       return;
     }
 
-    if (mode === "date" && selectedDate != null) {
-      setLeftMonth(toMonthState(selectedDate));
-      return;
-    }
-
-    if (mode === "range" && rangeValue.start != null) {
-      const nextLeftMonth = toMonthState(rangeValue.start);
-      setLeftMonth(nextLeftMonth);
-
-      if (rangeValue.end != null) {
-        setRightMonth(toMonthState(rangeValue.end));
-      } else {
-        setRightMonth(shiftMonth(nextLeftMonth, 1));
-      }
+    if (mode === "date") {
+      setCalendarMonth(toMonthState(selectedDate));
       return;
     }
 
     if (mode === "range") {
-      const nextLeftMonth = toMonthState(null);
-      setLeftMonth(nextLeftMonth);
-      setRightMonth(shiftMonth(nextLeftMonth, 1));
+      const nextActiveField: "start" | "end" =
+        rangeValue.start != null && rangeValue.end == null ? "end" : "start";
+
+      setActiveRangeField(nextActiveField);
+
+      const anchorDate =
+        nextActiveField === "start"
+          ? (rangeValue.start ?? rangeValue.end)
+          : (rangeValue.end ?? rangeValue.start);
+
+      setCalendarMonth(toMonthState(anchorDate));
     }
   }, [isOpen, mode, rangeValue.end, rangeValue.start, selectedDate]);
 
@@ -865,10 +942,7 @@ export function DatePicker({
     });
   }
 
-  function updateValue(
-    nextValue: DatePickerValue,
-    source: DatePickerActionSource,
-  ): DatePickerValue {
+  function updateValue(nextValue: DatePickerValue): DatePickerValue {
     const normalized = normalizeValueByMode(nextValue, mode, rangeSeparator);
 
     if (!isControlled) {
@@ -884,7 +958,7 @@ export function DatePicker({
     nextValue: DatePickerValue,
     source: DatePickerActionSource,
   ): void {
-    const normalized = updateValue(nextValue, source);
+    const normalized = updateValue(nextValue);
     const nextDisplayValue = formatDisplayValue(
       normalized,
       mode,
@@ -905,6 +979,16 @@ export function DatePicker({
 
       if (parsedRange != null) {
         setValueAndSync(parsedRange, "input-commit");
+
+        if (parsedRange.start != null && parsedRange.end == null) {
+          setActiveRangeField("end");
+          setCalendarMonth(toMonthState(parsedRange.start));
+        }
+
+        if (parsedRange.end != null) {
+          setCalendarMonth(toMonthState(parsedRange.end));
+        }
+
         return;
       }
 
@@ -1008,6 +1092,8 @@ export function DatePicker({
 
     if (mode === "range") {
       setValueAndSync({ start: null, end: null }, "clear");
+      setActiveRangeField("start");
+      setCalendarMonth(toMonthState(null));
     } else {
       setValueAndSync(null, "clear");
     }
@@ -1021,31 +1107,47 @@ export function DatePicker({
     }
 
     if (mode === "range") {
-      let nextRange: DateRangeValue;
+      if (activeRangeField === "start") {
+        const nextRange: DateRangeValue = {
+          start: isoDate,
+          end:
+            rangeValue.end != null && rangeValue.end >= isoDate
+              ? rangeValue.end
+              : null,
+        };
 
-      if (rangeValue.start == null || rangeValue.end != null) {
-        nextRange = {
+        setValueAndSync(nextRange, "date-select");
+        setActiveRangeField("end");
+        setCalendarMonth(toMonthState(nextRange.end ?? isoDate));
+
+        return;
+      }
+
+      if (rangeValue.start == null) {
+        const nextRange: DateRangeValue = {
           start: isoDate,
           end: null,
         };
-      } else if (isoDate < rangeValue.start) {
-        nextRange = {
-          start: isoDate,
-          end: rangeValue.start,
-        };
-      } else {
-        nextRange = {
-          start: rangeValue.start,
-          end: isoDate,
-        };
+
+        setValueAndSync(nextRange, "date-select");
+        setActiveRangeField("end");
+        setCalendarMonth(toMonthState(isoDate));
+        return;
       }
+
+      const nextRange: DateRangeValue =
+        isoDate < rangeValue.start
+          ? {
+              start: isoDate,
+              end: rangeValue.start,
+            }
+          : {
+              start: rangeValue.start,
+              end: isoDate,
+            };
 
       setValueAndSync(nextRange, "date-select");
-
-      if (nextRange.end != null) {
-        closePanel(false);
-      }
-
+      closePanel(false);
       return;
     }
 
@@ -1062,8 +1164,8 @@ export function DatePicker({
     closePanel(false);
   }
 
-  function updateLeftMonth(partial: Partial<CalendarMonthState>): void {
-    setLeftMonth((current) => {
+  function updateCalendarMonth(partial: Partial<CalendarMonthState>): void {
+    setCalendarMonth((current) => {
       const nextMonth = partial.month ?? current.month;
       const nextYear = partial.year ?? current.year;
 
@@ -1074,16 +1176,23 @@ export function DatePicker({
     });
   }
 
-  function updateRightMonth(partial: Partial<CalendarMonthState>): void {
-    setRightMonth((current) => {
-      const nextMonth = partial.month ?? current.month;
-      const nextYear = partial.year ?? current.year;
+  function shiftCalendarMonth(delta: number): void {
+    setCalendarMonth((current) => shiftMonth(current, delta));
+  }
 
-      return {
-        month: Math.min(11, Math.max(0, nextMonth)),
-        year: nextYear,
-      };
-    });
+  function focusRangeField(field: "start" | "end"): void {
+    if (mode !== "range") {
+      return;
+    }
+
+    setActiveRangeField(field);
+
+    const anchorDate =
+      field === "start"
+        ? (rangeValue.start ?? rangeValue.end)
+        : (rangeValue.end ?? rangeValue.start);
+
+    setCalendarMonth(toMonthState(anchorDate));
   }
 
   const rootStyle: CSSProperties = {
@@ -1130,7 +1239,7 @@ export function DatePicker({
 
   const fieldStyle: CSSProperties = {
     ...fieldBaseStyle,
-    ...variantStyles[resolvedVariant],
+    ...variantStyles[resolvedToneVariant],
     color:
       inputText.trim() === ""
         ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
@@ -1144,7 +1253,7 @@ export function DatePicker({
               : undefined,
         }
       : isFocused || isOpen
-        ? focusStyles[resolvedVariant]
+        ? focusStyles[resolvedToneVariant]
         : {}),
     ...(disabled
       ? {
@@ -1167,9 +1276,9 @@ export function DatePicker({
   };
 
   const iconButtonStyle: CSSProperties = {
-    width: "1.45rem",
-    height: "1.45rem",
-    minHeight: "1.45rem",
+    width: isCompactLayout ? "1.35rem" : "1.45rem",
+    height: isCompactLayout ? "1.35rem" : "1.45rem",
+    minHeight: isCompactLayout ? "1.35rem" : "1.45rem",
     paddingInline: 0,
     paddingBlock: 0,
     borderRadius: "999px",
@@ -1192,11 +1301,13 @@ export function DatePicker({
     insetBlockStart: "calc(100% + 0.35rem)",
     zIndex: 20,
     width:
-      mode === "range"
-        ? "min(44rem, calc(100vw - 1rem))"
-        : mode === "time"
-          ? "min(18.5rem, calc(100vw - 1rem))"
-          : "min(20rem, calc(100vw - 1rem))",
+      mode === "time"
+        ? isCompactLayout
+          ? "min(16rem, calc(100vw - 1rem))"
+          : "min(17.5rem, calc(100vw - 1rem))"
+        : isCompactLayout
+          ? "min(16rem, calc(100vw - 1rem))"
+          : "min(18.75rem, calc(100vw - 1rem))",
     maxWidth: "calc(100vw - 1rem)",
     borderWidth: "1px",
     borderStyle: "solid",
@@ -1206,10 +1317,10 @@ export function DatePicker({
     borderRadius: "var(--ktn-radius-md, 0.5rem)",
     backgroundColor: "var(--ktn-bg-surface, #ffffff)",
     boxShadow: "0 10px 28px rgba(15, 23, 42, 0.12)",
-    padding: tokens.panelPadding,
+    padding: compactPanelPadding,
     display: "flex",
     flexDirection: "column",
-    gap: "0.65rem",
+    gap: isCompactLayout ? "0.5rem" : "0.65rem",
   };
 
   const panelHeaderStyle: CSSProperties = {
@@ -1220,125 +1331,102 @@ export function DatePicker({
   };
 
   const panelNavigationButtonStyle: CSSProperties = {
-    width: "1.65rem",
-    height: "1.65rem",
-    minHeight: "1.65rem",
+    width: isCompactLayout ? "1.5rem" : "1.65rem",
+    height: isCompactLayout ? "1.5rem" : "1.65rem",
+    minHeight: isCompactLayout ? "1.5rem" : "1.65rem",
     paddingInline: 0,
     paddingBlock: 0,
     borderRadius: "999px",
   };
 
   const monthYearControlWrapStyle: CSSProperties = {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: "0.35rem",
+    display: "grid",
+    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+    gap: isCompactLayout ? "0.25rem" : "0.35rem",
     flex: 1,
     minWidth: 0,
   };
 
   const monthYearSelectStyle: CSSProperties = {
-    height: "1.75rem",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: "var(--ktn-border-muted)",
-    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
-    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
-    color: "var(--ktn-text-primary)",
-    fontSize: "0.78rem",
-    fontWeight: 500,
-    paddingInline: "0.4rem",
-    outline: "none",
+    minWidth: 0,
   };
 
   const calendarHeaderStyle: CSSProperties = {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: "0.35rem",
+    gap: isCompactLayout ? "0.3rem" : "0.35rem",
   };
 
   const panelHeaderTitleStyle: CSSProperties = {
-    fontSize: "0.8rem",
+    fontSize: isCompactLayout ? "0.75rem" : "0.8rem",
     fontWeight: 600,
     color: "var(--ktn-text-primary)",
     textAlign: "center",
     display: "inline-flex",
     alignItems: "center",
     justifyContent: "center",
-    gap: "0.3rem",
+    gap: isCompactLayout ? "0.25rem" : "0.3rem",
   };
 
   const calendarStackStyle: CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    gap: "0.55rem",
+    gap: isCompactLayout ? "0.45rem" : "0.55rem",
   };
 
-  const rangeSummaryStyle: CSSProperties = {
+  const rangeFieldRowStyle: CSSProperties = {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: "0.5rem",
+    gap: isCompactLayout ? "0.35rem" : "0.5rem",
   };
 
-  const rangeSummaryItemStyle: CSSProperties = {
-    display: "flex",
+  const rangeFieldButtonStyle: CSSProperties = {
+    width: "100%",
+    height: "auto",
+    minHeight: "unset",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
     flexDirection: "column",
-    gap: "0.1rem",
+    gap: "0.12rem",
     borderWidth: "1px",
     borderStyle: "solid",
-    borderColor: "var(--ktn-border-muted)",
     borderRadius: "var(--ktn-radius-sm, 0.375rem)",
-    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
-    paddingInline: "0.55rem",
-    paddingBlock: "0.35rem",
+    paddingInline: isCompactLayout ? "0.4rem" : "0.55rem",
+    paddingBlock: isCompactLayout ? "0.3rem" : "0.35rem",
+    lineHeight: 1.2,
   };
 
-  const rangeSummaryLabelStyle: CSSProperties = {
-    fontSize: "0.68rem",
+  const rangeFieldLabelStyle: CSSProperties = {
+    fontSize: isCompactLayout ? "0.64rem" : "0.68rem",
     textTransform: "uppercase",
     letterSpacing: "0.04em",
     color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   };
 
-  const rangeSummaryValueStyle: CSSProperties = {
-    fontSize: "0.78rem",
+  const rangeFieldValueStyle: CSSProperties = {
+    fontSize: isCompactLayout ? "0.74rem" : "0.78rem",
     color: "var(--ktn-text-primary)",
     minHeight: "1rem",
-  };
-
-  const calendarRowStyle: CSSProperties = {
-    display: "grid",
-    gridTemplateColumns:
-      mode === "range"
-        ? "repeat(auto-fit, minmax(16rem, 1fr))"
-        : "minmax(16rem, 1fr)",
-    gap: "0.75rem",
-    alignItems: "start",
+    fontVariantNumeric: "tabular-nums",
   };
 
   const calendarBoxStyle: CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    gap: "0.35rem",
+    gap: isCompactLayout ? "0.3rem" : "0.35rem",
     minWidth: 0,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: "var(--ktn-border-muted)",
-    borderRadius: "var(--ktn-radius-sm, 0.375rem)",
-    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.06))",
-    padding: "0.45rem",
   };
 
   const weekHeaderStyle: CSSProperties = {
     display: "grid",
     gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
-    gap: "0.25rem",
+    gap: isCompactLayout ? "0.16rem" : "0.25rem",
   };
 
   const weekDayStyle: CSSProperties = {
     textAlign: "center",
-    fontSize: "0.72rem",
+    fontSize: isCompactLayout ? "0.68rem" : "0.72rem",
     color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     fontWeight: 500,
   };
@@ -1346,29 +1434,29 @@ export function DatePicker({
   const dayGridStyle: CSSProperties = {
     display: "grid",
     gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
-    gap: "0.25rem",
+    gap: isCompactLayout ? "0.16rem" : "0.25rem",
     alignItems: "center",
   };
 
   const timeListStyle: CSSProperties = {
     display: "flex",
     flexDirection: "column",
-    gap: "0.35rem",
+    gap: isCompactLayout ? "0.3rem" : "0.35rem",
   };
 
   const timeListViewportStyle: CSSProperties = {
-    maxHeight: "15rem",
+    maxHeight: isCompactLayout ? "13.5rem" : "15rem",
     paddingInlineEnd: "0.2rem",
   };
 
   const timeButtonStyle: CSSProperties = {
     width: "100%",
     justifyContent: "space-between",
-    height: "1.95rem",
+    height: isCompactLayout ? "1.7rem" : "1.95rem",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: "transparent",
-    paddingInline: "0.65rem",
+    paddingInline: isCompactLayout ? "0.5rem" : "0.65rem",
   };
 
   const timeTextRowStyle: CSSProperties = {
@@ -1387,7 +1475,7 @@ export function DatePicker({
   };
 
   const timeTextSecondaryStyle: CSSProperties = {
-    fontSize: "0.78em",
+    fontSize: isCompactLayout ? "0.74em" : "0.78em",
     color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     letterSpacing: "0.02em",
   };
@@ -1400,8 +1488,7 @@ export function DatePicker({
         ? rangePlaceholder
         : datePlaceholder);
 
-  const leftMonthCells = buildCalendarCells(leftMonth);
-  const rightMonthCells = buildCalendarCells(rightMonth);
+  const calendarCells = buildCalendarCells(calendarMonth);
 
   function isInRange(isoDate: string): boolean {
     if (rangeValue.start == null || rangeValue.end == null) {
@@ -1411,38 +1498,27 @@ export function DatePicker({
     return isoDate > rangeValue.start && isoDate < rangeValue.end;
   }
 
-  function renderCalendar({
-    monthState,
-    cells,
-    yearOptions,
-    onSetMonth,
-    onSetYear,
-    onShiftMonth,
-    ariaPrefix,
-  }: {
-    monthState: CalendarMonthState;
-    cells: CalendarDayCell[];
-    yearOptions: number[];
-    onSetMonth: (month: number) => void;
-    onSetYear: (year: number) => void;
-    onShiftMonth: (delta: number) => void;
-    ariaPrefix: string;
-  }): JSX.Element {
+  function renderCalendar(ariaPrefix: string): JSX.Element {
     return (
       <div style={calendarBoxStyle}>
         <div style={calendarHeaderStyle}>
           <Button
+            {...navigationButtonOverrides}
             type="button"
-            size="xs"
-            variant="ghost"
+            size={navigationButtonOverrides.size ?? "xs"}
+            variant={navigationButtonOverrides.variant ?? "ghost"}
+            compact={navigationButtonOverrides.compact ?? isCompactLayout}
             disabled={disabled}
             aria-label={`${ariaPrefix} previous month`}
-            style={panelNavigationButtonStyle}
+            style={{
+              ...panelNavigationButtonStyle,
+              ...navigationButtonOverrides.style,
+            }}
             onMouseDown={(event) => {
               event.preventDefault();
             }}
             onClick={() => {
-              onShiftMonth(-1);
+              shiftCalendarMonth(-1);
               emitAction("month-shift");
             }}
           >
@@ -1452,73 +1528,82 @@ export function DatePicker({
           </Button>
 
           <div style={monthYearControlWrapStyle}>
-            <select
+            <Select
+              {...monthSelectOverrides}
               aria-label={`${ariaPrefix} month`}
-              value={monthState.month}
+              value={String(calendarMonth.month)}
               disabled={disabled}
+              size={resolvedMonthSelectSize}
+              variant={monthSelectOverrides.variant ?? calendarSelectVariant}
+              showClear={monthSelectOverrides.showClear ?? false}
+              options={monthOptions}
+              placeholder={monthSelectOverrides.placeholder ?? "Month"}
+              searchPlaceholder={
+                monthSelectOverrides.searchPlaceholder ?? "Search month..."
+              }
+              emptyText={monthSelectOverrides.emptyText ?? "No month found."}
               style={{
                 ...monthYearSelectStyle,
-                minWidth: "5.1rem",
+                ...monthSelectOverrides.style,
               }}
-              onChange={(event) => {
-                const nextMonth = Number(event.currentTarget.value);
+              onValueChange={(nextValue) => {
+                const nextMonth =
+                  typeof nextValue === "string" ? Number(nextValue) : NaN;
 
                 if (Number.isFinite(nextMonth)) {
-                  onSetMonth(nextMonth);
+                  updateCalendarMonth({ month: nextMonth });
                   emitAction("month-set");
                 }
               }}
-            >
-              {MONTH_LABELS.map((monthLabel, monthIndex) => (
-                <option
-                  key={`${ariaPrefix}-month-option-${monthLabel}`}
-                  value={monthIndex}
-                >
-                  {monthLabel}
-                </option>
-              ))}
-            </select>
+            />
 
-            <select
+            <Select
+              {...yearSelectOverrides}
               aria-label={`${ariaPrefix} year`}
-              value={monthState.year}
+              value={String(calendarMonth.year)}
               disabled={disabled}
+              size={resolvedYearSelectSize}
+              variant={yearSelectOverrides.variant ?? calendarSelectVariant}
+              showClear={yearSelectOverrides.showClear ?? false}
+              options={yearOptions}
+              placeholder={yearSelectOverrides.placeholder ?? "Year"}
+              searchPlaceholder={
+                yearSelectOverrides.searchPlaceholder ?? "Search year..."
+              }
+              emptyText={yearSelectOverrides.emptyText ?? "No year found."}
               style={{
                 ...monthYearSelectStyle,
-                minWidth: "4.65rem",
+                ...yearSelectOverrides.style,
               }}
-              onChange={(event) => {
-                const nextYear = Number(event.currentTarget.value);
+              onValueChange={(nextValue) => {
+                const nextYear =
+                  typeof nextValue === "string" ? Number(nextValue) : NaN;
 
                 if (Number.isFinite(nextYear)) {
-                  onSetYear(nextYear);
+                  updateCalendarMonth({ year: nextYear });
                   emitAction("year-set");
                 }
               }}
-            >
-              {yearOptions.map((yearValue) => (
-                <option
-                  key={`${ariaPrefix}-year-option-${yearValue}`}
-                  value={yearValue}
-                >
-                  {yearValue}
-                </option>
-              ))}
-            </select>
+            />
           </div>
 
           <Button
+            {...navigationButtonOverrides}
             type="button"
-            size="xs"
-            variant="ghost"
+            size={navigationButtonOverrides.size ?? "xs"}
+            variant={navigationButtonOverrides.variant ?? "ghost"}
+            compact={navigationButtonOverrides.compact ?? isCompactLayout}
             disabled={disabled}
             aria-label={`${ariaPrefix} next month`}
-            style={panelNavigationButtonStyle}
+            style={{
+              ...panelNavigationButtonStyle,
+              ...navigationButtonOverrides.style,
+            }}
             onMouseDown={(event) => {
               event.preventDefault();
             }}
             onClick={() => {
-              onShiftMonth(1);
+              shiftCalendarMonth(1);
               emitAction("month-shift");
             }}
           >
@@ -1531,7 +1616,7 @@ export function DatePicker({
         <div style={weekHeaderStyle}>
           {WEEKDAY_LABELS.map((label) => (
             <div
-              key={`weekday-${monthState.year}-${monthState.month}-${label}`}
+              key={`weekday-${calendarMonth.year}-${calendarMonth.month}-${label}`}
               style={weekDayStyle}
             >
               {label}
@@ -1540,7 +1625,7 @@ export function DatePicker({
         </div>
 
         <div style={dayGridStyle}>
-          {cells.map((cell) => {
+          {calendarCells.map((cell) => {
             const isSelectedDate = mode === "date" && selectedDate === cell.iso;
             const isRangeStart =
               mode === "range" && rangeValue.start === cell.iso;
@@ -1578,10 +1663,12 @@ export function DatePicker({
 
             return (
               <Button
-                key={`day-${monthState.year}-${monthState.month}-${cell.iso}`}
+                {...dayButtonOverrides}
+                key={`day-${calendarMonth.year}-${calendarMonth.month}-${cell.iso}`}
                 type="button"
-                variant="ghost"
-                size="xs"
+                variant={dayButtonOverrides.variant ?? "ghost"}
+                size={dayButtonOverrides.size ?? "xs"}
+                compact={dayButtonOverrides.compact ?? isCompactLayout}
                 disabled={disabled}
                 onMouseDown={(event) => {
                   event.preventDefault();
@@ -1594,7 +1681,7 @@ export function DatePicker({
                 aria-current={isToday ? "date" : undefined}
                 style={{
                   width: "100%",
-                  minHeight: tokens.dayCellSize,
+                  minHeight: resolvedDayCellSize,
                   paddingInline: 0,
                   paddingBlock: 0,
                   justifyContent: "center",
@@ -1620,8 +1707,9 @@ export function DatePicker({
                         ? "var(--ktn-text-primary)"
                         : "var(--ktn-text-secondary, var(--ktn-text-primary))",
                   opacity: cell.inCurrentMonth ? 1 : 0.6,
-                  fontSize: tokens.fontSize,
+                  fontSize: isCompactLayout ? "0.78em" : tokens.fontSize,
                   aspectRatio: "1 / 1",
+                  ...dayButtonOverrides.style,
                 }}
               >
                 {cell.day}
@@ -1764,62 +1852,92 @@ export function DatePicker({
             <>
               <div style={calendarStackStyle}>
                 {mode === "range" ? (
-                  <div style={rangeSummaryStyle}>
-                    <div style={rangeSummaryItemStyle}>
-                      <span style={rangeSummaryLabelStyle}>
-                        {rangeFromLabel}
-                      </span>
-                      <span style={rangeSummaryValueStyle}>
+                  <div style={rangeFieldRowStyle}>
+                    <Button
+                      {...rangeFieldButtonOverrides}
+                      type="button"
+                      size={rangeFieldButtonOverrides.size ?? "xs"}
+                      compact={
+                        rangeFieldButtonOverrides.compact ?? isCompactLayout
+                      }
+                      variant={rangeFieldButtonOverrides.variant ?? "secondary"}
+                      disabled={disabled}
+                      aria-label={`${rangeFromLabel}: ${
+                        rangeValue.start ?? rangeStartEmptyText
+                      }`}
+                      aria-pressed={activeRangeField === "start"}
+                      style={{
+                        ...rangeFieldButtonStyle,
+                        borderColor:
+                          activeRangeField === "start"
+                            ? "var(--ktn-action-primary-bg)"
+                            : "var(--ktn-border-muted)",
+                        backgroundColor:
+                          activeRangeField === "start"
+                            ? "color-mix(in srgb, var(--ktn-action-primary-bg) 10%, var(--ktn-bg-surface, #ffffff))"
+                            : "var(--ktn-bg-muted, rgba(100, 116, 139, 0.06))",
+                        ...rangeFieldButtonOverrides.style,
+                      }}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                      }}
+                      onClick={() => {
+                        focusRangeField("start");
+                      }}
+                    >
+                      <span style={rangeFieldLabelStyle}>{rangeFromLabel}</span>
+                      <span style={rangeFieldValueStyle}>
                         {rangeValue.start ?? rangeStartEmptyText}
                       </span>
-                    </div>
+                    </Button>
 
-                    <div style={rangeSummaryItemStyle}>
-                      <span style={rangeSummaryLabelStyle}>{rangeToLabel}</span>
-                      <span style={rangeSummaryValueStyle}>
+                    <Button
+                      {...rangeFieldButtonOverrides}
+                      type="button"
+                      size={rangeFieldButtonOverrides.size ?? "xs"}
+                      compact={
+                        rangeFieldButtonOverrides.compact ?? isCompactLayout
+                      }
+                      variant={rangeFieldButtonOverrides.variant ?? "secondary"}
+                      disabled={disabled}
+                      aria-label={`${rangeToLabel}: ${
+                        rangeValue.end ?? rangeEndEmptyText
+                      }`}
+                      aria-pressed={activeRangeField === "end"}
+                      style={{
+                        ...rangeFieldButtonStyle,
+                        borderColor:
+                          activeRangeField === "end"
+                            ? "var(--ktn-action-primary-bg)"
+                            : "var(--ktn-border-muted)",
+                        backgroundColor:
+                          activeRangeField === "end"
+                            ? "color-mix(in srgb, var(--ktn-action-primary-bg) 10%, var(--ktn-bg-surface, #ffffff))"
+                            : "var(--ktn-bg-muted, rgba(100, 116, 139, 0.06))",
+                        ...rangeFieldButtonOverrides.style,
+                      }}
+                      onMouseDown={(event) => {
+                        event.preventDefault();
+                      }}
+                      onClick={() => {
+                        focusRangeField("end");
+                      }}
+                    >
+                      <span style={rangeFieldLabelStyle}>{rangeToLabel}</span>
+                      <span style={rangeFieldValueStyle}>
                         {rangeValue.end ?? rangeEndEmptyText}
                       </span>
-                    </div>
+                    </Button>
                   </div>
                 ) : null}
 
-                <div style={calendarRowStyle}>
-                  {renderCalendar({
-                    monthState: leftMonth,
-                    cells: leftMonthCells,
-                    yearOptions: leftYearOptions,
-                    onSetMonth: (nextMonth) => {
-                      updateLeftMonth({ month: nextMonth });
-                    },
-                    onSetYear: (nextYear) => {
-                      updateLeftMonth({ year: nextYear });
-                    },
-                    onShiftMonth: (delta) => {
-                      setLeftMonth((current) => shiftMonth(current, delta));
-                    },
-                    ariaPrefix: mode === "range" ? "Left calendar" : "Calendar",
-                  })}
-
-                  {mode === "range"
-                    ? renderCalendar({
-                        monthState: rightMonth,
-                        cells: rightMonthCells,
-                        yearOptions: rightYearOptions,
-                        onSetMonth: (nextMonth) => {
-                          updateRightMonth({ month: nextMonth });
-                        },
-                        onSetYear: (nextYear) => {
-                          updateRightMonth({ year: nextYear });
-                        },
-                        onShiftMonth: (delta) => {
-                          setRightMonth((current) =>
-                            shiftMonth(current, delta),
-                          );
-                        },
-                        ariaPrefix: "Right calendar",
-                      })
-                    : null}
-                </div>
+                {renderCalendar(
+                  mode === "range"
+                    ? activeRangeField === "start"
+                      ? "From date calendar"
+                      : "To date calendar"
+                    : "Date calendar",
+                )}
               </div>
             </>
           ) : (
@@ -1844,10 +1962,14 @@ export function DatePicker({
 
                     return (
                       <Button
+                        {...timeOptionButtonOverrides}
                         key={`time-${timeValue}`}
                         type="button"
-                        variant="ghost"
-                        size="xs"
+                        variant={timeOptionButtonOverrides.variant ?? "ghost"}
+                        size={timeOptionButtonOverrides.size ?? "xs"}
+                        compact={
+                          timeOptionButtonOverrides.compact ?? isCompactLayout
+                        }
                         disabled={disabled}
                         onMouseDown={(event) => {
                           event.preventDefault();
@@ -1863,6 +1985,7 @@ export function DatePicker({
                         aria-pressed={selected}
                         style={{
                           ...timeButtonStyle,
+                          ...timeOptionButtonOverrides.style,
                           backgroundColor: selected
                             ? "var(--ktn-bg-muted, rgba(100, 116, 139, 0.16))"
                             : "transparent",
