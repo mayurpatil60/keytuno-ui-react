@@ -1023,13 +1023,17 @@ import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, 
   onCollapseChange?={(collapsed: boolean) => void}
 >
   <CardHeader>
-    <CardTitle>Title</CardTitle>
-    <CardDescription>Subtitle</CardDescription>
+    <CardTitle collapseTrigger?={boolean}>Title</CardTitle>
+    <CardDescription collapseTrigger?={boolean}>Subtitle</CardDescription>
     <CardAction>…buttons…</CardAction>
   </CardHeader>
   <CardContent>…</CardContent>
   <CardFooter>…</CardFooter>
 </Card>
+
+// Notes:
+// - CardTitle/CardDescription collapseTrigger is optional and only applies when Card has collapse={true}.
+// - When collapseTrigger is enabled, title/description can collapse and reopen card content via click or keyboard (Enter/Space).
 ```
 
 ### Field

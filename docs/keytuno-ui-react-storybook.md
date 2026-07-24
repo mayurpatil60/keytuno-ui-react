@@ -564,6 +564,11 @@ Accessibility tokens/signals found in story code:
 2. onClick -> click; No explicit description in argTypes.
 3. onCollapseChange -> collapse-change; No explicit description in argTypes.
 
+Card API update notes:
+1. `CardTitle` supports optional `collapseTrigger` to collapse/reopen when parent `Card` has `collapse={true}`.
+2. `CardDescription` supports optional `collapseTrigger` with the same behavior.
+3. Title/description-triggered toggles follow the same action source path (`collapse-toggle`) used by the chevron control.
+
 #### Accessibility Coverage
 
 1. No explicit accessibility-focused prop names were detected from argTypes/args/primary JSX props.

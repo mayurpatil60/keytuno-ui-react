@@ -1,5 +1,5 @@
-import type { CSSProperties } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { CSSProperties } from "react";
+import type { Meta, StoryObj } from "@storybook/react";
 
 import {
   Button,
@@ -10,14 +10,14 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@keytuno/ui-react';
+} from "@keytuno/ui-react";
 
 const meta: Meta<typeof Card> = {
-  title: 'Data/Card',
+  title: "Data/Card",
   component: Card,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -26,30 +26,32 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 const stackStyle: CSSProperties = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '1rem',
-  width: 'min(860px, 92vw)',
+  display: "flex",
+  flexDirection: "column",
+  gap: "1rem",
+  width: "min(860px, 92vw)",
 };
 
 const cardWidthStyle: CSSProperties = {
-  width: 'min(560px, 92vw)',
+  width: "min(560px, 92vw)",
 };
 
 export const CardBasic: Story = {
-  name: 'Card',
+  name: "Card",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Basic Card</h3>
       <Card style={cardWidthStyle}>
         <CardHeader>
           <CardTitle>Portfolio Summary</CardTitle>
-          <CardDescription>Track today&apos;s movement and portfolio updates.</CardDescription>
+          <CardDescription>
+            Track today&apos;s movement and portfolio updates.
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
-          Your total invested amount is updated every 15 minutes. Open performance details to see
-          allocation, trend, and category split.
+          Your total invested amount is updated every 15 minutes. Open
+          performance details to see allocation, trend, and category split.
         </CardContent>
 
         <CardFooter>
@@ -66,16 +68,18 @@ export const CardBasic: Story = {
 };
 
 export const CardSizes: Story = {
-  name: 'Card Sizes',
+  name: "Card Sizes",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Sizes</h3>
 
-      {(['xs', 'sm', 'md', 'lg'] as const).map((size) => (
+      {(["xs", "sm", "md", "lg"] as const).map((size) => (
         <Card key={size} size={size} style={cardWidthStyle}>
           <CardHeader>
             <CardTitle>{size.toUpperCase()} Card</CardTitle>
-            <CardDescription>Size controls typography and icon scale.</CardDescription>
+            <CardDescription>
+              Size controls typography and icon scale.
+            </CardDescription>
           </CardHeader>
           <CardContent>This card is using size {size}.</CardContent>
         </Card>
@@ -85,16 +89,18 @@ export const CardSizes: Story = {
 };
 
 export const CardSpacing: Story = {
-  name: 'Card Spacing',
+  name: "Card Spacing",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Spacing</h3>
 
-      {(['xs', 'sm', 'md', 'lg'] as const).map((spacing) => (
+      {(["xs", "sm", "md", "lg"] as const).map((spacing) => (
         <Card key={spacing} spacing={spacing} style={cardWidthStyle}>
           <CardHeader>
             <CardTitle>{spacing.toUpperCase()} Spacing</CardTitle>
-            <CardDescription>Spacing controls section padding and gaps.</CardDescription>
+            <CardDescription>
+              Spacing controls section padding and gaps.
+            </CardDescription>
           </CardHeader>
           <CardContent>This card is using spacing {spacing}.</CardContent>
         </Card>
@@ -104,18 +110,21 @@ export const CardSpacing: Story = {
 };
 
 export const CardCollapse: Story = {
-  name: 'Card Collapse',
+  name: "Card Collapse",
   render: () => (
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Collapsible</h3>
       <Card collapse style={cardWidthStyle}>
         <CardHeader>
           <CardTitle>Market Notifications</CardTitle>
-          <CardDescription>Chevron appears because collapse is true.</CardDescription>
+          <CardDescription>
+            Chevron appears because collapse is true.
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
-          Notifications can include threshold alerts, circuit activity, and unusual volume tracking.
+          Notifications can include threshold alerts, circuit activity, and
+          unusual volume tracking.
         </CardContent>
 
         <CardFooter>
@@ -129,15 +138,15 @@ export const CardCollapse: Story = {
 };
 
 export const CardActions: Story = {
-  name: 'Card Actions',
+  name: "Card Actions",
   args: {
     onAction: undefined,
   },
   argTypes: {
     onAction: {
-      action: 'action',
+      action: "action",
       description:
-        'Fires for card surface clicks and collapse toggle actions with source metadata.',
+        "Fires for card surface clicks and collapse toggle actions with source metadata.",
     },
   },
   render: (args) => {
@@ -161,7 +170,8 @@ export const CardActions: Story = {
           </CardHeader>
 
           <CardContent>
-            This card emits action context from both card surface interaction and collapse toggle.
+            This card emits action context from both card surface interaction
+            and collapse toggle.
           </CardContent>
 
           <CardFooter>
@@ -176,40 +186,52 @@ export const CardActions: Story = {
 };
 
 export const CardPlayground: Story = {
-  name: 'Card Playground',
+  name: "Card Playground",
   args: {
-    size: 'md',
-    spacing: 'md',
-    collapse: false,
+    size: "md",
+    spacing: "md",
+    collapse: true,
     defaultCollapsed: false,
     withAction: false,
+    titleCollapseTrigger: false,
+    descriptionCollapseTrigger: false,
   },
   argTypes: {
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
     spacing: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
     collapse: {
-      control: 'boolean',
+      control: "boolean",
     },
     defaultCollapsed: {
-      control: 'boolean',
+      control: "boolean",
+    },
+    titleCollapseTrigger: {
+      control: "boolean",
+      description:
+        "Enable collapse toggle when CardTitle is clicked or activated with keyboard.",
+    },
+    descriptionCollapseTrigger: {
+      control: "boolean",
+      description:
+        "Enable collapse toggle when CardDescription is clicked or activated with keyboard.",
     },
     withAction: {
-      control: 'boolean',
+      control: "boolean",
     },
     onAction: {
-      action: 'action',
+      action: "action",
     },
     onCollapseChange: {
-      action: 'collapse-change',
+      action: "collapse-change",
     },
     onClick: {
-      action: 'click',
+      action: "click",
     },
     children: { table: { disable: true } },
     className: { table: { disable: true } },
@@ -217,9 +239,11 @@ export const CardPlayground: Story = {
   },
   render: (args) => {
     const withAction = args.withAction ?? false;
+    const cardInstanceKey = `${args.collapse ? "collapse-on" : "collapse-off"}-${args.defaultCollapsed ? "default-collapsed" : "default-expanded"}`;
 
     return (
       <Card
+        key={cardInstanceKey}
         size={args.size}
         spacing={args.spacing}
         collapse={args.collapse}
@@ -230,12 +254,17 @@ export const CardPlayground: Story = {
         style={cardWidthStyle}
       >
         <CardHeader>
-          <CardTitle>Card Playground</CardTitle>
-          <CardDescription>Try size, spacing, collapse and action controls.</CardDescription>
+          <CardTitle collapseTrigger={args.titleCollapseTrigger}>
+            Card Playground
+          </CardTitle>
+          <CardDescription collapseTrigger={args.descriptionCollapseTrigger}>
+            Try size, spacing, collapse, trigger and action controls.
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
-          This content and footer will hide when the card is collapsed via the chevron button.
+          This content and footer will hide when the card is collapsed via the
+          chevron, title, or description trigger.
         </CardContent>
 
         <CardFooter>
