@@ -641,7 +641,7 @@ export function Pagination({
           <div style={navStyle}>
             <Button
               {...firstButtonOverrides}
-              variant="outline"
+              variant={firstButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||
@@ -667,7 +667,7 @@ export function Pagination({
 
             <Button
               {...previousButtonOverrides}
-              variant="outline"
+              variant={previousButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||
@@ -746,7 +746,7 @@ export function Pagination({
 
             <Button
               {...nextButtonOverrides}
-              variant="outline"
+              variant={nextButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||
@@ -772,7 +772,7 @@ export function Pagination({
 
             <Button
               {...lastButtonOverrides}
-              variant="outline"
+              variant={lastButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||
@@ -810,7 +810,7 @@ export function Pagination({
 
             <Button
               {...previousButtonOverrides}
-              variant="outline"
+              variant={previousButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||
@@ -836,7 +836,7 @@ export function Pagination({
 
             <Button
               {...nextButtonOverrides}
-              variant="outline"
+              variant={nextButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||
@@ -870,7 +870,7 @@ export function Pagination({
           <div style={compactNavStyle}>
             <Button
               {...previousButtonOverrides}
-              variant="outline"
+              variant={previousButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||
@@ -900,7 +900,7 @@ export function Pagination({
 
             <Button
               {...nextButtonOverrides}
-              variant="outline"
+              variant={nextButtonOverrides.variant ?? "outline"}
               size={resolvedSizeTokens.buttonSize}
               disabled={
                 disabled ||

@@ -685,6 +685,9 @@ import { Pagination } from '@keytuno/ui-react';
 // PaginationButtonProps = Omit<ButtonProps, 'children' | 'onAction' | 'size' | 'type'>
 ```
 
+- Navigation buttons (`firstButtonProps`, `previousButtonProps`, `nextButtonProps`, `lastButtonProps`) now honor the provided `variant` override (for example `secondary`) instead of always forcing `outline`.
+- `secondary` pagination buttons follow the same Button surface tokens in both light and dark themes.
+
 ### Accordion
 
 ```ts
