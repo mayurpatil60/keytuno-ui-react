@@ -1,27 +1,20 @@
 import { ReactNode, CSSProperties, HTMLAttributes } from 'react';
 import { ColumnDef, SortingState, ColumnFiltersState } from '@tanstack/react-table';
 import { ButtonProps } from './Button.js';
-import { PaginationProps } from './Pagination.js';
 import './Tooltip.js';
-import './Select.js';
 
 type TableVariant = "basic" | "outline" | "ghost" | "filled" | "minimal" | "striped";
 type TableSize = "xs" | "sm" | "md" | "lg";
-type TableActionSource = "search" | "sort" | "sort-reset" | "filter" | "selection" | "column-visibility" | "column-filters-toggle" | "column-filters-apply" | "column-filters-clear" | "refresh" | "view-switch" | "fullscreen" | "pagination" | "page-size" | "row-action";
+type TableActionSource = "sort" | "filter" | "selection" | "column-visibility" | "row-action";
 interface TableActionContext<TData extends object = object> {
     source: TableActionSource;
-    page?: number;
-    pageSize?: number;
     sort?: SortingState;
     filters?: ColumnFiltersState;
-    search?: string;
     selectedRows?: TData[];
     visibleColumnIds?: string[];
     actionId?: string;
     row?: TData;
     rowIndex?: number;
-    fullscreen?: boolean;
-    showColumnFilters?: boolean;
     event?: unknown;
 }
 type TableColumnDef<TData extends object = object> = ColumnDef<TData, unknown>;
@@ -54,10 +47,6 @@ interface TableProps<TData extends object = object> extends Omit<HTMLAttributes<
     sortable?: boolean;
     filterable?: boolean;
     columnFilters?: string[];
-    globalFilter?: boolean;
-    searchable?: boolean;
-    searchPlaceholder?: string;
-    searchAriaLabel?: string;
     selectable?: boolean;
     multiSelect?: boolean;
     selectAllRowsAriaLabel?: string;
@@ -68,27 +57,6 @@ interface TableProps<TData extends object = object> extends Omit<HTMLAttributes<
     rowActions?: RowAction<TData>[];
     columnVisibility?: boolean;
     defaultHiddenColumns?: string[];
-    showToolbar?: boolean;
-    showViewSwitch?: boolean;
-    switchToCardViewLabel?: string;
-    onSwitchToCardView?: () => void;
-    showFiltersLabel?: string;
-    hideFiltersLabel?: string;
-    filterDialogTitle?: string;
-    filterDialogDescription?: string;
-    addFilterLabel?: string;
-    addSortLabel?: string;
-    clearFiltersLabel?: string;
-    resetSortingLabel?: string;
-    applyFiltersLabel?: string;
-    globalFilterLabel?: string;
-    globalFilterPlaceholder?: string;
-    refreshLabel?: string;
-    refreshingLabel?: string;
-    fullscreenLabel?: string;
-    resetScreenLabel?: string;
-    showRefresh?: boolean;
-    onRefresh?: () => void | Promise<void>;
     loading?: boolean;
     loadingRows?: number;
     loadingText?: ReactNode;
@@ -98,28 +66,8 @@ interface TableProps<TData extends object = object> extends Omit<HTMLAttributes<
     bordered?: boolean;
     rounded?: boolean;
     stickyHeader?: boolean;
-    fullscreen?: boolean;
-    serverSide?: boolean;
-    totalRows?: number;
-    pageIndex?: number;
-    onPageChange?: (page: number) => void;
-    onPageSizeChange?: (pageSize: number) => void;
-    showPagination?: boolean;
-    paginationVariant?: PaginationProps["variant"];
-    paginationDefaultPageSize?: number;
-    paginationPageSizeOptions?: number[];
-    paginationMaxVisiblePages?: number;
-    paginationShowPageSizeSelector?: boolean;
-    paginationShowSummary?: boolean;
-    paginationShowShowingPage?: boolean;
-    paginationResetPageOnPageSizeChange?: boolean;
-    paginationLabels?: PaginationProps["labels"];
-    paginationSummaryFormatter?: PaginationProps["summaryFormatter"];
-    paginationShowingPageFormatter?: PaginationProps["showingPageFormatter"];
-    onSortChange?: (sort: SortingState) => void;
-    onFilterChange?: (filters: ColumnFiltersState) => void;
     emptyText?: ReactNode;
 }
-declare function Table<TData extends object = object>({ data, columns, rowKey, variant, size, compact, sortable, filterable, columnFilters, globalFilter, searchable, searchPlaceholder, searchAriaLabel, selectable, multiSelect, selectAllRowsAriaLabel, selectRowAriaLabelFormatter, selectedCountFormatter, onSelectionChange, onAction, rowActions, columnVisibility, defaultHiddenColumns, showToolbar, showViewSwitch, switchToCardViewLabel, onSwitchToCardView, showFiltersLabel, hideFiltersLabel, filterDialogTitle, filterDialogDescription, addFilterLabel, addSortLabel, clearFiltersLabel, resetSortingLabel, applyFiltersLabel, globalFilterLabel, globalFilterPlaceholder, refreshLabel, refreshingLabel, fullscreenLabel, resetScreenLabel, showRefresh, onRefresh, loading, loadingRows, loadingText, skeleton, striped, hoverable, bordered, rounded, stickyHeader, fullscreen, serverSide, totalRows, pageIndex, onPageChange, onPageSizeChange, showPagination, paginationVariant, paginationDefaultPageSize, paginationPageSizeOptions, paginationMaxVisiblePages, paginationShowPageSizeSelector, paginationShowSummary, paginationShowShowingPage, paginationResetPageOnPageSizeChange, paginationLabels, paginationSummaryFormatter, paginationShowingPageFormatter, onSortChange, onFilterChange, emptyText, className, style, ...props }: TableProps<TData>): JSX.Element;
+declare function Table<TData extends object = object>({ data, columns, rowKey, variant, size, compact, sortable, filterable, columnFilters, selectable, multiSelect, selectAllRowsAriaLabel, selectRowAriaLabelFormatter, selectedCountFormatter, onSelectionChange, onAction, rowActions, columnVisibility, defaultHiddenColumns, loading, loadingRows, loadingText, skeleton, striped, hoverable, bordered, rounded, stickyHeader, emptyText, className, style, ...props }: TableProps<TData>): JSX.Element;
 
 export { type RowAction, Table, type TableActionContext, type TableActionSource, type TableColumnDef, type TableProps, type TableSize, type TableVariant };

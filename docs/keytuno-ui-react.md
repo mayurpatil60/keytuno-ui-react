@@ -275,7 +275,6 @@ import { Toggle } from '@keytuno/ui-react';
 ```
 
 ### ButtonGroup
-
 ```ts
 import { ButtonGroup } from '@keytuno/ui-react';
 
@@ -671,7 +670,17 @@ import { Pagination } from '@keytuno/ui-react';
   showSummary?={boolean}
   showShowingPage?={boolean}
   labels?={PaginationLabels}        // includes text labels + navigation/first/previous/next/last aria labels + pageAriaFormatter
+
+  // Internal button overrides
+  firstButtonProps?={PaginationButtonProps}
+  previousButtonProps?={PaginationButtonProps}
+  nextButtonProps?={PaginationButtonProps}
+  lastButtonProps?={PaginationButtonProps}
+  pageButtonProps?={PaginationButtonProps}
+  activePageButtonProps?={PaginationButtonProps}
 />
+
+// PaginationButtonProps = Omit<ButtonProps, 'children' | 'onAction' | 'size' | 'type'>
 ```
 
 ### Accordion
@@ -1352,6 +1361,7 @@ interface AdvanceFilterColumn {
   triggerCloseLabel?={string}
   triggerAriaLabel?={string}
   activeFilterCount?={number}       // optional external badge/count state
+  triggerButtonProps?={AdvanceFilterButtonProps}
 
   // sheet
   side?={'left'|'right'|'top'|'bottom'}
@@ -1368,6 +1378,13 @@ interface AdvanceFilterColumn {
   clearFiltersLabel?={string}
   resetSortingLabel?={string}
   applyFiltersLabel?={string}
+  addFilterButtonProps?={AdvanceFilterButtonProps}
+  addSortButtonProps?={AdvanceFilterButtonProps}
+  resetFilterButtonProps?={AdvanceFilterButtonProps}
+  resetSortButtonProps?={AdvanceFilterButtonProps}
+  clearFiltersButtonProps?={AdvanceFilterButtonProps}
+  resetSortingButtonProps?={AdvanceFilterButtonProps}
+  applyFiltersButtonProps?={AdvanceFilterButtonProps}
 
   // global search and rule text
   globalFilterLabel?={ReactNode}
@@ -1383,6 +1400,7 @@ interface AdvanceFilterColumn {
 // operator options:
 //   contains | starts with | ends with | equals | not equals
 //   greater than | greater than or equal | less than | less than or equal
+// AdvanceFilterButtonProps = Omit<ButtonProps, 'children' | 'onAction' | 'size' | 'type'>
 ```
 
 AdvanceFilter behavior notes:
@@ -1391,7 +1409,7 @@ AdvanceFilter behavior notes:
 - Sheet layout includes global search, multiple filter rules, multiple sort rules, per-rule clear icon actions, and sticky footer actions.
 - Footer actions: `Clear filters`, `Reset filters` (sorting reset label configurable), and `Apply filters`.
 - Internally uses inbuilt primitives (`Button`, `Sheet`, `Field`, `Input`, `Select`) and token-based styling.
-- Table, AdaptiveCard, and DataToolbar-composed surfaces use the same filter token model, so behavior is consistent across view modes.
+- Table and AdaptiveCard surfaces use the same filter token model, so behavior stays consistent across view modes.
 
 ### DataToolbar
 
@@ -1433,22 +1451,26 @@ import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
   advanceFilterCloseLabel?={string}  // one-word recommended: 'Close'
   advanceFilterTitle?={ReactNode}
   advanceFilterDescription?={ReactNode}
+  advanceFilterTriggerButtonProps?={AdvanceFilterButtonProps}
 
   // Icon actions
   showSwitch?={boolean}
   switchMode?={DataToolbarSwitchMode} // 'table' | 'adaptive-card' | 'custom'
   switchLabel?={string}               // one-word recommended: 'Table' or 'Cards'
+  switchButtonProps?={DataToolbarButtonProps}
   onSwitch?={(mode: DataToolbarSwitchMode) => void}
 
   showRefresh?={boolean}
   refreshLabel?={string}              // one-word recommended: 'Refresh'
   refreshingLabel?={string}
+  refreshButtonProps?={DataToolbarButtonProps}
   onRefresh?={() => void | Promise<void>}
 
   showFullscreen?={boolean}
   fullscreen?={boolean}
   fullscreenLabel?={string}           // one-word recommended: 'Fullscreen'
   exitFullscreenLabel?={string}       // one-word recommended: 'Exit'
+  fullscreenButtonProps?={DataToolbarButtonProps}
   onFullscreenChange?={(next: boolean) => void}
 
   // Unified event feed
@@ -1457,6 +1479,7 @@ import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
 
 // DataToolbar action sources:
 //   search | filter-open-change | filter-apply | switch | refresh | fullscreen
+// DataToolbarButtonProps = Omit<ButtonProps, 'children' | 'onAction' | 'size' | 'type'>
 ```
 
 DataToolbar behavior notes:
@@ -1464,8 +1487,6 @@ DataToolbar behavior notes:
 - One responsive row only: global search on the left, then filter/switch/refresh/fullscreen icon actions.
 - Search is compact-first for small widths (`searchInputMinWidth='20px'`) so icon actions remain visible in one row.
 - Reuses inbuilt primitives (`AdvanceFilter`, `Button`, `Input`) and inherits theme tokens.
-- Designed for composed data shells: top `DataToolbar`, middle `Table` or `AdaptiveCard`, bottom `Pagination`.
-- In composed shells, set `showToolbar={false}` on `Table`/`AdaptiveCard` to avoid duplicate controls.
 
 ### Table
 
@@ -1502,14 +1523,10 @@ const rowActions: RowAction<User>[] = [
   compact?={boolean}
   stickyHeader?={boolean}
 
-  // Features (all off by default)
+  // Features (all off by default unless enabled)
   sortable?={boolean}
-  searchable?={boolean}             // global text search input
-  searchPlaceholder?={string}
-  searchAriaLabel?={string}
-  filterable?={boolean}             // toolbar filter icon opens AdvanceFilter sheet
+  filterable?={boolean}             // column filter function support
   columnFilters?={string[]}         // limit filterable columns by id
-  globalFilter?={boolean}
   selectable?={boolean}
   multiSelect?={boolean}
   selectAllRowsAriaLabel?={string}
@@ -1517,30 +1534,6 @@ const rowActions: RowAction<User>[] = [
   selectedCountFormatter?={(count: number) => ReactNode}
   columnVisibility?={boolean}
   defaultHiddenColumns?={string[]}
-  fullscreen?={boolean}
-
-  // Toolbar controls
-  showToolbar?={boolean}
-  showViewSwitch?={boolean}
-  switchToCardViewLabel?={string}   // keep icon tooltip short, e.g. 'Cards'
-  onSwitchToCardView?={() => void}  // e.g. setView('cards')
-  showFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Filters'
-  hideFiltersLabel?={string}        // keep icon tooltip short, e.g. 'Close'
-  filterDialogTitle?={string}
-  filterDialogDescription?={string}
-  addFilterLabel?={string}
-  addSortLabel?={string}
-  clearFiltersLabel?={string}
-  resetSortingLabel?={string}
-  applyFiltersLabel?={string}
-  globalFilterLabel?={string}
-  globalFilterPlaceholder?={string}
-  showRefresh?={boolean}
-  refreshLabel?={string}            // keep icon tooltip short, e.g. 'Refresh'
-  refreshingLabel?={string}         // keep icon tooltip short, e.g. 'Refreshing'
-  fullscreenLabel?={string}         // keep icon tooltip short, e.g. 'Fullscreen'
-  resetScreenLabel?={string}        // keep icon tooltip short, e.g. 'Reset'
-  onRefresh?={() => void | Promise<void>}
 
   // Row actions
   rowActions={rowActions}
@@ -1551,82 +1544,16 @@ const rowActions: RowAction<User>[] = [
   loadingRows?={number}
   loadingText?={ReactNode}
 
-  // Pagination (built-in, enabled by default)
-  showPagination?={boolean}
-  paginationVariant?={'basic'|'advance'|'compact'}
-  paginationDefaultPageSize?={number}
-  paginationPageSizeOptions?={number[]}
-  paginationShowPageSizeSelector?={boolean}
-  paginationShowSummary?={boolean}
-
-  // Server-side mode
-  serverSide?={boolean}
-  totalRows?={number}
-  pageIndex?={number}
-  onPageChange?={(page: number) => void}
-  onPageSizeChange?={(size: number) => void}
-  onSortChange?={(sort) => void}
-  onFilterChange?={(filters) => void}
-
   // Events
   onSelectionChange?={(rows: User[]) => void}
   onAction?={(ctx: TableActionContext<User>) => void}
   emptyText?={ReactNode}
 />
 
-// Advanced filter behavior:
-// - Click toolbar filter icon to open an AdvanceFilter Sheet-based builder.
-// - Add multiple rules with: contains, starts with, ends with, equals,
-//   not equals, greater than, greater/equal, less than, less/equal.
-// - Each rule has an X reset button (row-level reset/removal).
-// - Sheet supports multi-column sorting with add/remove and Reset Sorting.
-// - Use Clear Filters to reset all filters and Apply Filters to commit.
-// - Includes optional global search field inside the sheet when globalFilter/searchable is enabled.
-// - Advanced filter UI uses inbuilt Field, Input, Select, Button, and Scrollbar primitives with theme-token styling.
+// Composition notes:
+// - Table is a standalone data surface renderer.
 // - Table viewport uses the inbuilt Scrollbar component (axis='both').
-// - Toolbar and sortable headers use inbuilt Button controls with inbuilt feather icons.
-// - Toolbar parity mode keeps one row with search first, then icon controls ordered as filter, view switch, refresh, and fullscreen.
-// - For icon-only toolbar controls, keep tooltip labels one-word and short in stories/playbooks.
-// - In shared table/card playbooks, if page-size state is shared via `onPageSizeChange` and `paginationDefaultPageSize`, Table picks up adaptive-card page-size updates.
-// - Storybook reference: Toolbar Composed Switch (shared toolbar + table/adaptive-card state).
-```
-
-#### DataToolbar-Composed Table/Card Switch
-
-```ts
-import { useState } from 'react';
-import { AdaptiveCard, DataToolbar, Table } from '@keytuno/ui-react';
-
-type View = 'table' | 'adaptive-card';
-
-const [view, setView] = useState<View>('table');
-
-<DataToolbar
-  showSearch
-  showAdvanceFilter
-  showSwitch
-  switchMode={view === 'table' ? 'adaptive-card' : 'table'}
-  switchLabel={view === 'table' ? 'Cards' : 'Table'}
-  showRefresh
-  showFullscreen
-  onSwitch={() => {
-    setView((current) =>
-      current === 'table' ? 'adaptive-card' : 'table',
-    );
-  }}
-/>
-
-{view === 'table' ? (
-  <Table
-    showToolbar={false}
-    {...tableProps}
-  />
-) : (
-  <AdaptiveCard
-    showToolbar={false}
-    {...adaptiveCardProps}
-  />
-)}
+// - Sort headers and row actions use inbuilt Button controls and feather icons.
 ```
 
 ### AdaptiveCard
@@ -1677,42 +1604,11 @@ import type {
   actionMenuLabel?={ReactNode}
   onAction?={(ctx: AdaptiveCardActionContext<User>) => void}
 
-  // Toolbar
-  searchable?={boolean}
-  searchPlaceholder?={string}
-  searchAriaLabel?={string}
-  showToolbar?={boolean}
-  showRefresh?={boolean}
-  onRefresh?={() => void | Promise<void>}
-  refreshLabel?={string}
-  refreshingLabel?={string}
-
-  // Optional table switch hook-up
-  showViewSwitch?={boolean}
-  switchToTableViewLabel?={string}
-  onSwitchToTableView?={() => void}
-
   // Virtualization
   virtualized?={boolean}            // optimized for one-card-per-row mode
   virtualizedMaxHeight?={number | string}
   virtualizedEstimateSize?={number}
   virtualizedOverscan?={number}
-
-  // Pagination + server-side mode
-  serverSide?={boolean}
-  totalRows?={number}
-  pageIndex?={number}
-  onPageChange?={(page: number) => void}
-  onPageSizeChange?={(size: number) => void}
-  showPagination?={boolean}
-  paginationVariant?={'basic'|'advance'|'compact'}
-  paginationDefaultPageSize?={number}
-  paginationPageSizeOptions?={number[]}
-  paginationMaxVisiblePages?={number}
-  paginationShowPageSizeSelector?={boolean}
-  paginationShowSummary?={boolean}
-  paginationShowShowingPage?={boolean}
-  paginationResetPageOnPageSizeChange?={boolean}
 
   // Viewport/state
   viewportMaxHeight?={number | string}
@@ -1746,13 +1642,7 @@ type AdaptiveCardFieldType =
   | 'progress'
   | 'media';
 
-type AdaptiveCardActionSource =
-  | 'item-action'
-  | 'search'
-  | 'refresh'
-  | 'view-switch'
-  | 'pagination'
-  | 'page-size';
+type AdaptiveCardActionSource = 'item-action';
 
 type AdaptiveCardActionLayout = 'own-row' | 'same-row';
 
@@ -1765,49 +1655,13 @@ type AdaptiveCardActionLayout = 'own-row' | 'same-row';
 //   - `actionPlacement='bottom'` -> actions share only the last rendered field row.
 //   - Other field rows keep full-width card layout (no full-height side action column).
 // - One-card-per-row enterprise mode: set `columns={1}` and optionally enable `virtualized`.
-// - Uses inbuilt primitives (Card, Button, Badge, Progress, DropdownMenu, Input, Pagination, Scrollbar).
+// - Uses inbuilt primitives (Card, Button, Badge, Progress, DropdownMenu, Scrollbar).
 // - Storybook references:
 //   - Basic
-//   - Toolbar Composed Layout
 //   - Virtualized One Column
 //   - Action Position Matrix
 //   - AdaptiveCard Playground
 ```
-
-### Data Surface Composition
-
-Use this composition pattern for data-heavy screens that need one toolbar row, switchable middle content, and shared state across views.
-
-```ts
-import { AdaptiveCard, DataToolbar, Pagination, Table } from '@keytuno/ui-react';
-
-<div style={{ display: 'grid', gap: '0.85rem' }}>
-  <DataToolbar
-    showSearch
-    showAdvanceFilter
-    showSwitch
-    showRefresh
-    showFullscreen
-  />
-
-  {/* Middle region */}
-  {view === 'table' ? (
-    <Table showToolbar={false} {...tableProps} />
-  ) : (
-    <AdaptiveCard showToolbar={false} {...adaptiveCardProps} />
-  )}
-
-  {/* Bottom region */}
-  <Pagination {...paginationProps} />
-</div>
-```
-
-Composition notes:
-
-- Keep `DataToolbar` as the only top-row toolbar to avoid duplicate search/filter/switch controls.
-- Keep icon-only labels short and one-word where possible: `Filter`, `Table`, `Cards`, `Refresh`, `Fullscreen`, `Exit`.
-- Reuse one shared state model for search, advance-filter results, sorting, and pagination across middle views.
-- For virtualized adaptive-card experiences, keep the middle view fixed and hide the switch action.
 
 ### List
 
@@ -2097,21 +1951,16 @@ const [open, setOpen] = useState(false);
 <Button onClick={() => setOpen(true)}>Save</Button>
 ```
 
-### Data table with server-side pagination
+### Data table with sorting and filtering
 
 ```tsx
 <Table
-  data={data}
+  data={rows}
   columns={columns}
-  serverSide
-  totalRows={total}
-  pageIndex={page}
   loading={isLoading}
   skeleton
-  onPageChange={setPage}
-  onSortChange={setSort}
   sortable
-  searchable
+  filterable
 />
 ```
 

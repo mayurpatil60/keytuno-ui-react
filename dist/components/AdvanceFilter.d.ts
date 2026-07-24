@@ -31,6 +31,7 @@ interface AdvanceFilterActionContext {
     sortRuleCount: number;
     activeFilterCount: number;
 }
+type AdvanceFilterButtonProps = Omit<ButtonProps, "children" | "onAction" | "size" | "type">;
 interface AdvanceFilterProps {
     open?: boolean;
     defaultOpen?: boolean;
@@ -52,6 +53,7 @@ interface AdvanceFilterProps {
     triggerIcon?: ReactNode;
     triggerAriaLabel?: string;
     activeFilterCount?: number;
+    triggerButtonProps?: AdvanceFilterButtonProps;
     side?: SheetSide;
     title?: ReactNode;
     description?: ReactNode;
@@ -62,12 +64,19 @@ interface AdvanceFilterProps {
     clearFiltersLabel?: string;
     resetSortingLabel?: string;
     applyFiltersLabel?: string;
+    addFilterButtonProps?: AdvanceFilterButtonProps;
+    addSortButtonProps?: AdvanceFilterButtonProps;
+    resetFilterButtonProps?: AdvanceFilterButtonProps;
+    resetSortButtonProps?: AdvanceFilterButtonProps;
+    clearFiltersButtonProps?: AdvanceFilterButtonProps;
+    resetSortingButtonProps?: AdvanceFilterButtonProps;
+    applyFiltersButtonProps?: AdvanceFilterButtonProps;
     globalFilterLabel?: ReactNode;
     globalFilterPlaceholder?: string;
     ruleValuePlaceholder?: string;
     onApply: (result: AdvanceFilterResult, reason: AdvanceFilterApplyReason) => void;
     onAction?: (context: AdvanceFilterActionContext) => void;
 }
-declare function AdvanceFilter({ open, defaultOpen, onOpenChange, columns, columnFilters, sorting, globalSearch, canUseGlobalFilter, enableSorting, controlSize, selectVariant, showTrigger, triggerDisabled, triggerTooltipSide, triggerTooltipSize, triggerOpenLabel, triggerCloseLabel, triggerIcon, triggerAriaLabel, activeFilterCount, side, title, description, filtersSectionLabel, sortSectionLabel, addFilterLabel, addSortLabel, clearFiltersLabel, resetSortingLabel, applyFiltersLabel, globalFilterLabel, globalFilterPlaceholder, ruleValuePlaceholder, onApply, onAction, }: AdvanceFilterProps): JSX.Element;
+declare function AdvanceFilter({ open, defaultOpen, onOpenChange, columns, columnFilters, sorting, globalSearch, canUseGlobalFilter, enableSorting, controlSize, selectVariant, showTrigger, triggerDisabled, triggerTooltipSide, triggerTooltipSize, triggerOpenLabel, triggerCloseLabel, triggerIcon, triggerAriaLabel, activeFilterCount, triggerButtonProps, side, title, description, filtersSectionLabel, sortSectionLabel, addFilterLabel, addSortLabel, clearFiltersLabel, resetSortingLabel, applyFiltersLabel, addFilterButtonProps, addSortButtonProps, resetFilterButtonProps, resetSortButtonProps, clearFiltersButtonProps, resetSortingButtonProps, applyFiltersButtonProps, globalFilterLabel, globalFilterPlaceholder, ruleValuePlaceholder, onApply, onAction, }: AdvanceFilterProps): JSX.Element;
 
-export { AdvanceFilter, type AdvanceFilterActionContext, type AdvanceFilterActionSource, type AdvanceFilterApplyReason, type AdvanceFilterColumn, type AdvanceFilterOperator, type AdvanceFilterProps, type AdvanceFilterResult, type AdvanceSortDirection };
+export { AdvanceFilter, type AdvanceFilterActionContext, type AdvanceFilterActionSource, type AdvanceFilterApplyReason, type AdvanceFilterButtonProps, type AdvanceFilterColumn, type AdvanceFilterOperator, type AdvanceFilterProps, type AdvanceFilterResult, type AdvanceSortDirection };

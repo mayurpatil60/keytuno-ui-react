@@ -1,8 +1,6 @@
 import { HTMLAttributes, ReactNode } from 'react';
 import { ButtonProps } from './Button.js';
-import { PaginationProps } from './Pagination.js';
 import './Tooltip.js';
-import './Select.js';
 
 type AdaptiveCardVariant = "default" | "compact" | "ghost";
 type AdaptiveCardSize = "xs" | "sm" | "md" | "lg";
@@ -47,15 +45,12 @@ interface AdaptiveCardAction<TData extends object = object> {
     disabled?: boolean | ((row: TData, rowIndex: number) => boolean);
     onAction?: (row: TData, rowIndex: number) => void;
 }
-type AdaptiveCardActionSource = "item-action" | "search" | "refresh" | "view-switch" | "pagination" | "page-size";
+type AdaptiveCardActionSource = "item-action";
 interface AdaptiveCardActionContext<TData extends object = object> {
     source: AdaptiveCardActionSource;
     actionId?: string;
     row?: TData;
     rowIndex?: number;
-    page?: number;
-    pageSize?: number;
-    search?: string;
     event?: unknown;
 }
 interface AdaptiveCardProps<TData extends object = object> extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
@@ -77,42 +72,14 @@ interface AdaptiveCardProps<TData extends object = object> extends Omit<HTMLAttr
     actionPlacement?: AdaptiveCardActionPlacement;
     actionLayout?: AdaptiveCardActionLayout;
     actionMenuLabel?: ReactNode;
-    searchable?: boolean;
-    searchPlaceholder?: string;
-    searchAriaLabel?: string;
-    showToolbar?: boolean;
-    showViewSwitch?: boolean;
-    switchToTableViewLabel?: string;
-    onSwitchToTableView?: () => void;
-    showRefresh?: boolean;
-    onRefresh?: () => void | Promise<void>;
-    refreshLabel?: string;
-    refreshingLabel?: string;
     virtualized?: boolean;
     virtualizedMaxHeight?: number | string;
     virtualizedEstimateSize?: number;
     virtualizedOverscan?: number;
-    serverSide?: boolean;
-    totalRows?: number;
-    pageIndex?: number;
-    onPageChange?: (page: number) => void;
-    onPageSizeChange?: (pageSize: number) => void;
-    showPagination?: boolean;
-    paginationVariant?: PaginationProps["variant"];
-    paginationDefaultPageSize?: number;
-    paginationPageSizeOptions?: number[];
-    paginationMaxVisiblePages?: number;
-    paginationShowPageSizeSelector?: boolean;
-    paginationShowSummary?: boolean;
-    paginationShowShowingPage?: boolean;
-    paginationResetPageOnPageSizeChange?: boolean;
-    paginationLabels?: PaginationProps["labels"];
-    paginationSummaryFormatter?: PaginationProps["summaryFormatter"];
-    paginationShowingPageFormatter?: PaginationProps["showingPageFormatter"];
     viewportMaxHeight?: number | string;
     emptyText?: ReactNode;
     onAction?: (context: AdaptiveCardActionContext<TData>) => void;
 }
-declare function AdaptiveCard<TData extends object = object>({ data, schema, rowKey, variant, size, locale, currency, showFieldLabels, insideColumns, columns, columnBreakpoints, actions, actionMode, actionInlineMaxVisible, actionAlignment, actionPlacement, actionLayout, actionMenuLabel, searchable, searchPlaceholder, searchAriaLabel, showToolbar, showViewSwitch, switchToTableViewLabel, onSwitchToTableView, showRefresh, onRefresh, refreshLabel, refreshingLabel, virtualized, virtualizedMaxHeight, virtualizedEstimateSize, virtualizedOverscan, serverSide, totalRows, pageIndex, onPageChange, onPageSizeChange, showPagination, paginationVariant, paginationDefaultPageSize, paginationPageSizeOptions, paginationMaxVisiblePages, paginationShowPageSizeSelector, paginationShowSummary, paginationShowShowingPage, paginationResetPageOnPageSizeChange, paginationLabels, paginationSummaryFormatter, paginationShowingPageFormatter, viewportMaxHeight, emptyText, onAction, className, style, ...props }: AdaptiveCardProps<TData>): JSX.Element;
+declare function AdaptiveCard<TData extends object = object>({ data, schema, rowKey, variant, size, locale, currency, showFieldLabels, insideColumns, columns, columnBreakpoints, actions, actionMode, actionInlineMaxVisible, actionAlignment, actionPlacement, actionLayout, actionMenuLabel, virtualized, virtualizedMaxHeight, virtualizedEstimateSize, virtualizedOverscan, viewportMaxHeight, emptyText, onAction, className, style, ...props }: AdaptiveCardProps<TData>): JSX.Element;
 
 export { AdaptiveCard, type AdaptiveCardAction, type AdaptiveCardActionAlignment, type AdaptiveCardActionContext, type AdaptiveCardActionLayout, type AdaptiveCardActionMode, type AdaptiveCardActionPlacement, type AdaptiveCardActionSource, type AdaptiveCardColumnBreakpoints, type AdaptiveCardColumns, type AdaptiveCardFieldSchema, type AdaptiveCardFieldType, type AdaptiveCardInnerColumns, type AdaptiveCardProps, type AdaptiveCardSize, type AdaptiveCardVariant };

@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 import type { Meta, StoryObj } from "@storybook/react";
@@ -7,6 +7,7 @@ import { FiEdit3, FiEye } from "../src/components/icons/feather";
 import {
   AdaptiveCard,
   DataToolbar,
+  Pagination,
   Table,
   type AdaptiveCardAction,
   type AdaptiveCardFieldSchema,
@@ -227,14 +228,17 @@ export const Basic: Story = {
           advanceFilterColumnFilters={[]}
           advanceFilterSorting={[]}
           advanceFilterGlobalSearch={searchValue}
+          advanceFilterTriggerButtonProps={{ iconOnlyTone: true }}
           onAdvanceFilterApply={() => {}}
           showSwitch
           switchMode="adaptive-card"
           switchLabel="Cards"
+          switchButtonProps={{ iconOnlyTone: true }}
           onSwitch={() => {}}
           showRefresh
           refreshLabel="Refresh"
           refreshingLabel="Refreshing"
+          refreshButtonProps={{ iconOnlyTone: true }}
           onRefresh={async () => {
             await new Promise((resolve) => {
               setTimeout(resolve, 120);
@@ -244,6 +248,7 @@ export const Basic: Story = {
           fullscreen={fullscreen}
           fullscreenLabel="Fullscreen"
           exitFullscreenLabel="Exit"
+          fullscreenButtonProps={{ iconOnlyTone: true }}
           onFullscreenChange={setFullscreen}
         />
       </div>
@@ -259,12 +264,29 @@ export const ToolbarComposition: Story = {
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [fullscreen, setFullscreen] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(12);
+    const pageSizeOptions = [12, 24, 48];
 
     const rows = useMemo(() => {
       const searchedRows = applySearch(demoRows, searchValue);
       const filteredRows = applyColumnFilters(searchedRows, columnFilters);
       return applySorting(filteredRows, sorting);
     }, [columnFilters, searchValue, sorting]);
+
+    const totalPages = useMemo(
+      () => Math.max(1, Math.ceil(rows.length / Math.max(1, pageSize))),
+      [pageSize, rows.length],
+    );
+
+    useEffect(() => {
+      setPage((current) => Math.min(current, totalPages));
+    }, [totalPages]);
+
+    const pagedRows = useMemo(() => {
+      const startIndex = (page - 1) * pageSize;
+      return rows.slice(startIndex, startIndex + pageSize);
+    }, [page, pageSize, rows]);
 
     return (
       <div style={shellStyle}>
@@ -273,7 +295,10 @@ export const ToolbarComposition: Story = {
           searchValue={searchValue}
           searchPlaceholder="Search"
           searchAriaLabel="Search records"
-          onSearchChange={setSearchValue}
+          onSearchChange={(value) => {
+            setSearchValue(value);
+            setPage(1);
+          }}
           showAdvanceFilter
           advanceFilterColumns={toolbarColumns}
           advanceFilterColumnFilters={columnFilters}
@@ -283,6 +308,7 @@ export const ToolbarComposition: Story = {
             setColumnFilters(result.columnFilters);
             setSorting(result.sorting);
             setSearchValue(result.globalSearch);
+            setPage(1);
           }}
           showSwitch
           switchMode={viewMode === "table" ? "adaptive-card" : "table"}
@@ -309,25 +335,14 @@ export const ToolbarComposition: Story = {
 
         {viewMode === "table" ? (
           <Table
-            data={rows}
+            data={pagedRows}
             columns={tableColumns}
-            showToolbar={false}
             sortable={false}
             filterable={false}
-            searchable={false}
-            showPagination
-            paginationVariant="advance"
-            paginationDefaultPageSize={12}
-            paginationPageSizeOptions={[12, 24, 48]}
-            paginationMaxVisiblePages={5}
-            paginationShowPageSizeSelector
-            paginationShowSummary
-            paginationShowShowingPage
-            paginationResetPageOnPageSizeChange
           />
         ) : (
           <AdaptiveCard<DemoRow>
-            data={rows}
+            data={pagedRows}
             rowKey="id"
             schema={adaptiveSchema}
             actions={adaptiveActions}
@@ -335,20 +350,29 @@ export const ToolbarComposition: Story = {
             size="sm"
             columns={{ mobile: 1, tablet: 1, web: 1 }}
             insideColumns={2}
-            showToolbar={false}
-            searchable={false}
-            showPagination
-            paginationVariant="advance"
-            paginationDefaultPageSize={12}
-            paginationPageSizeOptions={[12, 24, 48]}
-            paginationMaxVisiblePages={5}
-            paginationShowPageSizeSelector
-            paginationShowSummary
-            paginationShowShowingPage
-            paginationResetPageOnPageSizeChange
             virtualized={false}
           />
         )}
+
+        <Pagination
+          variant="advance"
+          size="sm"
+          page={page}
+          totalPages={totalPages}
+          pageSize={pageSize}
+          pageSizeOptions={pageSizeOptions}
+          maxVisiblePages={5}
+          showPageSizeSelector
+          showSummary
+          showShowingPage
+          resetPageOnPageSizeChange
+          labels={{ item: "rows", perPage: "page" }}
+          onPageChange={setPage}
+          onPageSizeChange={(nextPageSize) => {
+            setPageSize(nextPageSize);
+            setPage(1);
+          }}
+        />
       </div>
     );
   },
@@ -367,18 +391,22 @@ const playgroundArgTypes = {
   advanceFilterCloseLabel: { control: "text" },
   advanceFilterTitle: { control: "text" },
   advanceFilterDescription: { control: "text" },
+  advanceFilterTriggerButtonProps: { control: "object" },
   showSwitch: { control: "boolean" },
   switchMode: {
     control: "select",
     options: ["table", "adaptive-card", "custom"],
   },
   switchLabel: { control: "text" },
+  switchButtonProps: { control: "object" },
   showRefresh: { control: "boolean" },
   refreshLabel: { control: "text" },
   refreshingLabel: { control: "text" },
+  refreshButtonProps: { control: "object" },
   showFullscreen: { control: "boolean" },
   fullscreenLabel: { control: "text" },
   exitFullscreenLabel: { control: "text" },
+  fullscreenButtonProps: { control: "object" },
   onAction: { action: "toolbar-action" },
   onSearchChange: { action: "search-change" },
   onAdvanceFilterOpenChange: { action: "filter-open-change" },
@@ -406,15 +434,27 @@ export const DataToolbarPlayground: Story = {
     advanceFilterCloseLabel: "Close",
     advanceFilterTitle: "Advance Filter",
     advanceFilterDescription: "Configure filters and sorting",
+    advanceFilterTriggerButtonProps: {
+      iconOnlyTone: true,
+    },
     showSwitch: true,
     switchMode: "adaptive-card",
     switchLabel: "Cards",
+    switchButtonProps: {
+      iconOnlyTone: true,
+    },
     showRefresh: true,
     refreshLabel: "Refresh",
     refreshingLabel: "Refreshing",
+    refreshButtonProps: {
+      iconOnlyTone: true,
+    },
     showFullscreen: true,
     fullscreenLabel: "Fullscreen",
     exitFullscreenLabel: "Exit",
+    fullscreenButtonProps: {
+      iconOnlyTone: true,
+    },
   },
   argTypes: playgroundArgTypes,
   render: (args) => {

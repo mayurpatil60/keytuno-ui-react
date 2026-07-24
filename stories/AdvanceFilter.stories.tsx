@@ -105,6 +105,11 @@ export const Basic: Story = {
       description="Filter columns with multiple rules and operators"
       triggerOpenLabel="Advance Filter"
       triggerCloseLabel="Close Advance Filter"
+      triggerButtonProps={{ iconOnlyTone: true }}
+      addFilterButtonProps={{ variant: "outline" }}
+      addSortButtonProps={{ variant: "outline" }}
+      clearFiltersButtonProps={{ variant: "outline" }}
+      applyFiltersButtonProps={{ variant: "primary" }}
     />
   ),
 };
@@ -181,6 +186,9 @@ const playgroundArgTypes = {
   triggerAriaLabel: {
     control: "text",
   },
+  triggerButtonProps: {
+    control: "object",
+  },
   activeFilterCount: {
     control: { type: "number", min: 0, max: 20, step: 1 },
   },
@@ -205,17 +213,38 @@ const playgroundArgTypes = {
   addFilterLabel: {
     control: "text",
   },
+  addFilterButtonProps: {
+    control: "object",
+  },
   addSortLabel: {
     control: "text",
+  },
+  addSortButtonProps: {
+    control: "object",
   },
   clearFiltersLabel: {
     control: "text",
   },
+  clearFiltersButtonProps: {
+    control: "object",
+  },
   resetSortingLabel: {
     control: "text",
   },
+  resetSortingButtonProps: {
+    control: "object",
+  },
   applyFiltersLabel: {
     control: "text",
+  },
+  applyFiltersButtonProps: {
+    control: "object",
+  },
+  resetFilterButtonProps: {
+    control: "object",
+  },
+  resetSortButtonProps: {
+    control: "object",
   },
   globalFilterLabel: {
     control: "text",
@@ -266,6 +295,9 @@ export const AdvanceFilterPlayground: Story = {
     triggerOpenLabel: "Advance Filter",
     triggerCloseLabel: "Close Advance Filter",
     triggerAriaLabel: "Open advance filter sheet",
+    triggerButtonProps: {
+      iconOnlyTone: true,
+    },
     canUseGlobalFilter: true,
     enableSorting: true,
     title: "Advance Filter",
@@ -273,10 +305,31 @@ export const AdvanceFilterPlayground: Story = {
     filtersSectionLabel: "Filter rules",
     sortSectionLabel: "Sort rules",
     addFilterLabel: "Add filter",
+    addFilterButtonProps: {
+      variant: "outline",
+    },
     addSortLabel: "Add sort",
+    addSortButtonProps: {
+      variant: "outline",
+    },
     clearFiltersLabel: "Clear filters",
+    clearFiltersButtonProps: {
+      variant: "outline",
+    },
     resetSortingLabel: "Reset sorting",
+    resetSortingButtonProps: {
+      variant: "outline",
+    },
     applyFiltersLabel: "Apply filters",
+    applyFiltersButtonProps: {
+      variant: "primary",
+    },
+    resetFilterButtonProps: {
+      iconOnlyTone: true,
+    },
+    resetSortButtonProps: {
+      iconOnlyTone: true,
+    },
     globalFilterLabel: "Global search",
     globalFilterPlaceholder: "Search all columns",
     ruleValuePlaceholder: "Enter value",

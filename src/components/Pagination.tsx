@@ -14,7 +14,7 @@ import {
   FiChevronsRight,
 } from "./icons/feather";
 
-import { Button } from "./Button";
+import { Button, type ButtonProps } from "./Button";
 import {
   Select,
   type SelectOption,
@@ -65,6 +65,11 @@ export interface PaginationLabels {
   last?: ReactNode;
 }
 
+export type PaginationButtonProps = Omit<
+  ButtonProps,
+  "children" | "onAction" | "size" | "type"
+>;
+
 export interface PaginationProps extends Omit<
   HTMLAttributes<HTMLDivElement>,
   "children" | "defaultValue" | "onChange"
@@ -88,6 +93,12 @@ export interface PaginationProps extends Omit<
   showShowingPage?: boolean;
   resetPageOnPageSizeChange?: boolean;
   labels?: PaginationLabels;
+  firstButtonProps?: PaginationButtonProps;
+  previousButtonProps?: PaginationButtonProps;
+  nextButtonProps?: PaginationButtonProps;
+  lastButtonProps?: PaginationButtonProps;
+  pageButtonProps?: PaginationButtonProps;
+  activePageButtonProps?: PaginationButtonProps;
   summaryFormatter?: (context: PaginationTextContext) => ReactNode;
   showingPageFormatter?: (context: PaginationTextContext) => ReactNode;
 }
@@ -253,6 +264,12 @@ export function Pagination({
   showShowingPage = true,
   resetPageOnPageSizeChange = true,
   labels,
+  firstButtonProps,
+  previousButtonProps,
+  nextButtonProps,
+  lastButtonProps,
+  pageButtonProps,
+  activePageButtonProps,
   summaryFormatter,
   showingPageFormatter,
   className = "",
@@ -263,6 +280,12 @@ export function Pagination({
 }: PaginationProps): JSX.Element {
   const resolvedSizeTokens = sizeTokens[size];
   const navigationIconSize = iconSizeByPaginationSize[size];
+  const firstButtonOverrides = firstButtonProps ?? {};
+  const previousButtonOverrides = previousButtonProps ?? {};
+  const nextButtonOverrides = nextButtonProps ?? {};
+  const lastButtonOverrides = lastButtonProps ?? {};
+  const pageButtonOverrides = pageButtonProps ?? {};
+  const activePageButtonOverrides = activePageButtonProps ?? {};
 
   const navIconWrapStyle: CSSProperties = {
     display: "inline-flex",
@@ -318,34 +341,40 @@ export function Pagination({
   const [uncontrolledPageSize, setUncontrolledPageSize] = useState<number>(
     () => {
       const initial = toInteger(defaultPageSize, fallbackPageSize);
-      return initial > 0 ? initial : fallbackPageSize;
+      if (initial <= 0) {
+        return fallbackPageSize;
+      }
+
+      return normalizedPageSizeOptions.includes(initial)
+        ? initial
+        : fallbackPageSize;
     },
   );
 
   useEffect(() => {
     if (
       !isPageSizeControlled &&
-      (uncontrolledPageSize <= 0 || Number.isNaN(uncontrolledPageSize))
+      (uncontrolledPageSize <= 0 ||
+        Number.isNaN(uncontrolledPageSize) ||
+        !normalizedPageSizeOptions.includes(uncontrolledPageSize))
     ) {
       setUncontrolledPageSize(fallbackPageSize);
     }
-  }, [fallbackPageSize, isPageSizeControlled, uncontrolledPageSize]);
+  }, [
+    fallbackPageSize,
+    isPageSizeControlled,
+    normalizedPageSizeOptions,
+    uncontrolledPageSize,
+  ]);
 
   const resolvedPageSizeRaw = isPageSizeControlled
     ? toInteger(pageSize, fallbackPageSize)
     : uncontrolledPageSize;
   const resolvedPageSize =
-    resolvedPageSizeRaw > 0 ? resolvedPageSizeRaw : fallbackPageSize;
-
-  const resolvedPageSizeOptions = useMemo(() => {
-    if (normalizedPageSizeOptions.includes(resolvedPageSize)) {
-      return normalizedPageSizeOptions;
-    }
-
-    return [...normalizedPageSizeOptions, resolvedPageSize].sort(
-      (left, right) => left - right,
-    );
-  }, [normalizedPageSizeOptions, resolvedPageSize]);
+    resolvedPageSizeRaw > 0 &&
+    normalizedPageSizeOptions.includes(resolvedPageSizeRaw)
+      ? resolvedPageSizeRaw
+      : fallbackPageSize;
 
   const resolvedTotalPages = Math.max(1, toInteger(totalPages, 1));
 
@@ -382,12 +411,24 @@ export function Pagination({
 
   const pageSizeSelectOptions: SelectOption[] = useMemo(
     () =>
-      resolvedPageSizeOptions.map((optionValue) => ({
+      normalizedPageSizeOptions.map((optionValue) => ({
         value: `${optionValue}`,
         label: `${optionValue} / ${resolvedLabels.perPage}`,
       })),
-    [resolvedLabels.perPage, resolvedPageSizeOptions],
+    [normalizedPageSizeOptions, resolvedLabels.perPage],
   );
+
+  const pageSizeSelectorMinWidth = useMemo(() => {
+    const longestOptionLabelLength = pageSizeSelectOptions.reduce(
+      (longestLength, option) => Math.max(longestLength, option.label.length),
+      0,
+    );
+    const safeLabelLength = Math.max(7, longestOptionLabelLength);
+
+    return `calc(${safeLabelLength}ch + 3.35rem)`;
+  }, [pageSizeSelectOptions]);
+
+  const pageSizeSelectorWidth = `max(${resolvedSizeTokens.selectorWidth}, ${pageSizeSelectorMinWidth})`;
 
   function setPage(
     nextPage: number,
@@ -515,13 +556,13 @@ export function Pagination({
 
   const pageSizeSelectWrapStyle: CSSProperties = {
     width: preferSingleRow
-      ? resolvedSizeTokens.selectorWidth
-      : `min(100%, ${resolvedSizeTokens.selectorWidth})`,
-    maxWidth: preferSingleRow ? resolvedSizeTokens.selectorWidth : "100%",
+      ? pageSizeSelectorWidth
+      : `min(100%, ${pageSizeSelectorWidth})`,
+    maxWidth: preferSingleRow ? pageSizeSelectorWidth : "100%",
     minWidth: 0,
     flexShrink: preferSingleRow ? 0 : 1,
     flexGrow: 0,
-    flexBasis: preferSingleRow ? resolvedSizeTokens.selectorWidth : "auto",
+    flexBasis: preferSingleRow ? pageSizeSelectorWidth : "auto",
   };
 
   const navStyle: CSSProperties = {
@@ -599,27 +640,53 @@ export function Pagination({
 
           <div style={navStyle}>
             <Button
+              {...firstButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage <= 1}
+              disabled={
+                disabled ||
+                resolvedPage <= 1 ||
+                firstButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(1, "first", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.firstAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(firstButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof firstButtonOverrides["aria-label"] === "string" &&
+                firstButtonOverrides["aria-label"].trim() !== ""
+                  ? firstButtonOverrides["aria-label"]
+                  : resolvedLabels.firstAria
+              }
             >
               {resolvedLabels.first}
             </Button>
 
             <Button
+              {...previousButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage <= 1}
+              disabled={
+                disabled ||
+                resolvedPage <= 1 ||
+                previousButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(resolvedPage - 1, "previous", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.previousAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(previousButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof previousButtonOverrides["aria-label"] === "string" &&
+                previousButtonOverrides["aria-label"].trim() !== ""
+                  ? previousButtonOverrides["aria-label"]
+                  : resolvedLabels.previousAria
+              }
             >
               {resolvedLabels.previous}
             </Button>
@@ -639,18 +706,37 @@ export function Pagination({
 
               const pageNumber = token;
               const isActive = pageNumber === resolvedPage;
+              const mergedPageButtonOverrides = {
+                ...pageButtonOverrides,
+                ...(isActive ? activePageButtonOverrides : {}),
+              };
 
               return (
                 <Button
                   key={`page-${pageNumber}`}
-                  variant={isActive ? "primary" : "outline"}
+                  {...mergedPageButtonOverrides}
+                  variant={
+                    mergedPageButtonOverrides.variant ??
+                    (isActive ? "primary" : "outline")
+                  }
                   size={resolvedSizeTokens.buttonSize}
-                  disabled={disabled}
+                  disabled={
+                    disabled || mergedPageButtonOverrides.disabled === true
+                  }
                   onAction={(event) => {
                     setPage(pageNumber, "page-number", event);
                   }}
-                  style={pageButtonStyle}
-                  aria-label={resolvedLabels.pageAriaFormatter(pageNumber)}
+                  style={{
+                    ...pageButtonStyle,
+                    ...(mergedPageButtonOverrides.style ?? {}),
+                  }}
+                  aria-label={
+                    typeof mergedPageButtonOverrides["aria-label"] ===
+                      "string" &&
+                    mergedPageButtonOverrides["aria-label"].trim() !== ""
+                      ? mergedPageButtonOverrides["aria-label"]
+                      : resolvedLabels.pageAriaFormatter(pageNumber)
+                  }
                   aria-current={isActive ? "page" : undefined}
                 >
                   {pageNumber}
@@ -659,27 +745,53 @@ export function Pagination({
             })}
 
             <Button
+              {...nextButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage >= resolvedTotalPages}
+              disabled={
+                disabled ||
+                resolvedPage >= resolvedTotalPages ||
+                nextButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(resolvedPage + 1, "next", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.nextAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(nextButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof nextButtonOverrides["aria-label"] === "string" &&
+                nextButtonOverrides["aria-label"].trim() !== ""
+                  ? nextButtonOverrides["aria-label"]
+                  : resolvedLabels.nextAria
+              }
             >
               {resolvedLabels.next}
             </Button>
 
             <Button
+              {...lastButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage >= resolvedTotalPages}
+              disabled={
+                disabled ||
+                resolvedPage >= resolvedTotalPages ||
+                lastButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(resolvedTotalPages, "last", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.lastAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(lastButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof lastButtonOverrides["aria-label"] === "string" &&
+                lastButtonOverrides["aria-label"].trim() !== ""
+                  ? lastButtonOverrides["aria-label"]
+                  : resolvedLabels.lastAria
+              }
             >
               {resolvedLabels.last}
             </Button>
@@ -697,27 +809,53 @@ export function Pagination({
             ) : null}
 
             <Button
+              {...previousButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage <= 1}
+              disabled={
+                disabled ||
+                resolvedPage <= 1 ||
+                previousButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(resolvedPage - 1, "previous", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.previousAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(previousButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof previousButtonOverrides["aria-label"] === "string" &&
+                previousButtonOverrides["aria-label"].trim() !== ""
+                  ? previousButtonOverrides["aria-label"]
+                  : resolvedLabels.previousAria
+              }
             >
               {resolvedLabels.previous}
             </Button>
 
             <Button
+              {...nextButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage >= resolvedTotalPages}
+              disabled={
+                disabled ||
+                resolvedPage >= resolvedTotalPages ||
+                nextButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(resolvedPage + 1, "next", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.nextAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(nextButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof nextButtonOverrides["aria-label"] === "string" &&
+                nextButtonOverrides["aria-label"].trim() !== ""
+                  ? nextButtonOverrides["aria-label"]
+                  : resolvedLabels.nextAria
+              }
             >
               {resolvedLabels.next}
             </Button>
@@ -731,14 +869,27 @@ export function Pagination({
 
           <div style={compactNavStyle}>
             <Button
+              {...previousButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage <= 1}
+              disabled={
+                disabled ||
+                resolvedPage <= 1 ||
+                previousButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(resolvedPage - 1, "previous", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.previousAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(previousButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof previousButtonOverrides["aria-label"] === "string" &&
+                previousButtonOverrides["aria-label"].trim() !== ""
+                  ? previousButtonOverrides["aria-label"]
+                  : resolvedLabels.previousAria
+              }
             >
               {resolvedLabels.previous}
             </Button>
@@ -748,14 +899,27 @@ export function Pagination({
             ) : null}
 
             <Button
+              {...nextButtonOverrides}
               variant="outline"
               size={resolvedSizeTokens.buttonSize}
-              disabled={disabled || resolvedPage >= resolvedTotalPages}
+              disabled={
+                disabled ||
+                resolvedPage >= resolvedTotalPages ||
+                nextButtonOverrides.disabled === true
+              }
               onAction={(event) => {
                 setPage(resolvedPage + 1, "next", event);
               }}
-              style={symbolButtonStyle}
-              aria-label={resolvedLabels.nextAria}
+              style={{
+                ...symbolButtonStyle,
+                ...(nextButtonOverrides.style ?? {}),
+              }}
+              aria-label={
+                typeof nextButtonOverrides["aria-label"] === "string" &&
+                nextButtonOverrides["aria-label"].trim() !== ""
+                  ? nextButtonOverrides["aria-label"]
+                  : resolvedLabels.nextAria
+              }
             >
               {resolvedLabels.next}
             </Button>

@@ -11,13 +11,11 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type Column,
   type ColumnDef,
   type ColumnFiltersState,
-  type PaginationState,
   type Row,
   type RowSelectionState,
   type SortingState,
@@ -26,17 +24,6 @@ import {
 import { FiChevronDown, FiChevronUp } from "./icons/feather";
 
 import { Button, type ButtonProps } from "./Button";
-import {
-  type AdvanceFilterColumn,
-  type AdvanceFilterResult,
-} from "./AdvanceFilter";
-import { DataToolbar } from "./DataToolbar";
-import {
-  Pagination,
-  type PaginationActionContext,
-  type PaginationProps,
-  type PaginationSize,
-} from "./Pagination";
 import { Scrollbar } from "./Scrollbar";
 import { Skeleton } from "./Skeleton";
 import { Spinner } from "./Spinner";
@@ -49,37 +36,23 @@ export type TableVariant =
   | "minimal"
   | "striped";
 export type TableSize = "xs" | "sm" | "md" | "lg";
+
 export type TableActionSource =
-  | "search"
   | "sort"
-  | "sort-reset"
   | "filter"
   | "selection"
   | "column-visibility"
-  | "column-filters-toggle"
-  | "column-filters-apply"
-  | "column-filters-clear"
-  | "refresh"
-  | "view-switch"
-  | "fullscreen"
-  | "pagination"
-  | "page-size"
   | "row-action";
 
 export interface TableActionContext<TData extends object = object> {
   source: TableActionSource;
-  page?: number;
-  pageSize?: number;
   sort?: SortingState;
   filters?: ColumnFiltersState;
-  search?: string;
   selectedRows?: TData[];
   visibleColumnIds?: string[];
   actionId?: string;
   row?: TData;
   rowIndex?: number;
-  fullscreen?: boolean;
-  showColumnFilters?: boolean;
   event?: unknown;
 }
 
@@ -125,11 +98,6 @@ export interface TableProps<TData extends object = object> extends Omit<
 
   filterable?: boolean;
   columnFilters?: string[];
-  globalFilter?: boolean;
-
-  searchable?: boolean;
-  searchPlaceholder?: string;
-  searchAriaLabel?: string;
 
   selectable?: boolean;
   multiSelect?: boolean;
@@ -144,28 +112,6 @@ export interface TableProps<TData extends object = object> extends Omit<
   columnVisibility?: boolean;
   defaultHiddenColumns?: string[];
 
-  showToolbar?: boolean;
-  showViewSwitch?: boolean;
-  switchToCardViewLabel?: string;
-  onSwitchToCardView?: () => void;
-  showFiltersLabel?: string;
-  hideFiltersLabel?: string;
-  filterDialogTitle?: string;
-  filterDialogDescription?: string;
-  addFilterLabel?: string;
-  addSortLabel?: string;
-  clearFiltersLabel?: string;
-  resetSortingLabel?: string;
-  applyFiltersLabel?: string;
-  globalFilterLabel?: string;
-  globalFilterPlaceholder?: string;
-  refreshLabel?: string;
-  refreshingLabel?: string;
-  fullscreenLabel?: string;
-  resetScreenLabel?: string;
-  showRefresh?: boolean;
-  onRefresh?: () => void | Promise<void>;
-
   loading?: boolean;
   loadingRows?: number;
   loadingText?: ReactNode;
@@ -177,28 +123,6 @@ export interface TableProps<TData extends object = object> extends Omit<
   rounded?: boolean;
   stickyHeader?: boolean;
 
-  fullscreen?: boolean;
-
-  serverSide?: boolean;
-  totalRows?: number;
-  pageIndex?: number;
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  showPagination?: boolean;
-  paginationVariant?: PaginationProps["variant"];
-  paginationDefaultPageSize?: number;
-  paginationPageSizeOptions?: number[];
-  paginationMaxVisiblePages?: number;
-  paginationShowPageSizeSelector?: boolean;
-  paginationShowSummary?: boolean;
-  paginationShowShowingPage?: boolean;
-  paginationResetPageOnPageSizeChange?: boolean;
-  paginationLabels?: PaginationProps["labels"];
-  paginationSummaryFormatter?: PaginationProps["summaryFormatter"];
-  paginationShowingPageFormatter?: PaginationProps["showingPageFormatter"];
-  onSortChange?: (sort: SortingState) => void;
-  onFilterChange?: (filters: ColumnFiltersState) => void;
-
   emptyText?: ReactNode;
 }
 
@@ -206,9 +130,7 @@ type TableSizeTokens = {
   tableFontSize: string;
   headerFontSize: string;
   cellPadding: string;
-  toolbarGap: string;
   controlSize: "xs" | "sm" | "md" | "lg";
-  paginationSize: PaginationSize;
   iconSize: number;
 };
 
@@ -227,8 +149,6 @@ type TableVariantTokens = {
 const baseClasses = "flex w-full min-w-0 flex-col";
 const SPECIAL_SELECT_COLUMN_ID = "__select";
 const SPECIAL_ACTIONS_COLUMN_ID = "__actions";
-const GLOBAL_FILTER_ID = "__global";
-const DEFAULT_PAGE_SIZE = 12;
 const DEFAULT_EMPTY_TEXT = "No records found.";
 
 const sizeTokens: Record<TableSize, TableSizeTokens> = {
@@ -236,36 +156,28 @@ const sizeTokens: Record<TableSize, TableSizeTokens> = {
     tableFontSize: "0.75rem",
     headerFontSize: "0.7rem",
     cellPadding: "0.38rem 0.45rem",
-    toolbarGap: "0.45rem",
     controlSize: "xs",
-    paginationSize: "xs",
     iconSize: 12,
   },
   sm: {
     tableFontSize: "0.8125rem",
     headerFontSize: "0.74rem",
     cellPadding: "0.45rem 0.55rem",
-    toolbarGap: "0.55rem",
     controlSize: "sm",
-    paginationSize: "sm",
     iconSize: 13,
   },
   md: {
     tableFontSize: "0.875rem",
     headerFontSize: "0.78rem",
     cellPadding: "0.55rem 0.65rem",
-    toolbarGap: "0.65rem",
     controlSize: "md",
-    paginationSize: "md",
     iconSize: 14,
   },
   lg: {
     tableFontSize: "0.9375rem",
     headerFontSize: "0.84rem",
     cellPadding: "0.65rem 0.8rem",
-    toolbarGap: "0.75rem",
     controlSize: "lg",
-    paginationSize: "lg",
     iconSize: 15,
   },
 };
@@ -360,25 +272,46 @@ const variantTokens: Record<TableVariant, TableVariantTokens> = {
   },
 };
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
+function toCompactTableSize(size: TableSize): TableSize {
+  if (size === "lg") {
+    return "md";
+  }
+
+  if (size === "md") {
+    return "sm";
+  }
+
+  if (size === "sm") {
+    return "xs";
+  }
+
+  return "xs";
 }
 
-function normalizePositiveInteger(
-  value: number | undefined,
-  fallback: number,
-): number {
-  if (value == null || Number.isNaN(value) || !Number.isFinite(value)) {
-    return fallback;
+function resolveColumnId<TData extends object>(
+  column: TableColumnDef<TData>,
+  index: number,
+): string {
+  const columnCandidate = column as {
+    id?: unknown;
+    accessorKey?: unknown;
+  };
+
+  if (
+    typeof columnCandidate.id === "string" &&
+    columnCandidate.id.trim() !== ""
+  ) {
+    return columnCandidate.id;
   }
 
-  const nextValue = Math.round(value);
-
-  if (nextValue <= 0) {
-    return fallback;
+  if (
+    typeof columnCandidate.accessorKey === "string" &&
+    columnCandidate.accessorKey.trim() !== ""
+  ) {
+    return columnCandidate.accessorKey;
   }
 
-  return nextValue;
+  return `col_${index}`;
 }
 
 function splitColumnFilterTerms(filterValue: unknown): string[] {
@@ -421,44 +354,26 @@ function parseNumericFilterCondition(
     }
 
     if (operatorToken === ">") {
-      return {
-        operator: "gt",
-        value: numericValue,
-      };
+      return { operator: "gt", value: numericValue };
     }
 
     if (operatorToken === ">=") {
-      return {
-        operator: "gte",
-        value: numericValue,
-      };
+      return { operator: "gte", value: numericValue };
     }
 
     if (operatorToken === "<") {
-      return {
-        operator: "lt",
-        value: numericValue,
-      };
+      return { operator: "lt", value: numericValue };
     }
 
     if (operatorToken === "<=") {
-      return {
-        operator: "lte",
-        value: numericValue,
-      };
+      return { operator: "lte", value: numericValue };
     }
 
     if (operatorToken === "!=") {
-      return {
-        operator: "neq",
-        value: numericValue,
-      };
+      return { operator: "neq", value: numericValue };
     }
 
-    return {
-      operator: "eq",
-      value: numericValue,
-    };
+    return { operator: "eq", value: numericValue };
   }
 
   const bareNumberMatch = normalizedTerm.match(/^-?(?:\d+(?:\.\d+)?|\.\d+)$/);
@@ -473,90 +388,7 @@ function parseNumericFilterCondition(
     return null;
   }
 
-  return {
-    operator: "eq",
-    value: numericValue,
-  };
-}
-
-function toFiniteNumber(value: unknown): number | null {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : null;
-  }
-
-  if (typeof value === "string") {
-    const normalizedValue = value.trim();
-
-    if (!/^-?(?:\d+(?:\.\d+)?|\.\d+)$/.test(normalizedValue)) {
-      return null;
-    }
-
-    const parsedValue = Number.parseFloat(normalizedValue);
-    return Number.isFinite(parsedValue) ? parsedValue : null;
-  }
-
-  return null;
-}
-
-function matchesStringCondition(source: string, term: string): boolean {
-  const normalizedSource = source.toLowerCase();
-  const normalizedTerm = term.trim();
-
-  if (normalizedTerm === "") {
-    return true;
-  }
-
-  if (normalizedTerm.startsWith("!=")) {
-    const expected = normalizedTerm.slice(2).trim().toLowerCase();
-
-    if (expected === "") {
-      return true;
-    }
-
-    return normalizedSource !== expected;
-  }
-
-  if (normalizedTerm.startsWith("=")) {
-    const expected = normalizedTerm.slice(1).trim().toLowerCase();
-
-    if (expected === "") {
-      return true;
-    }
-
-    return normalizedSource === expected;
-  }
-
-  if (normalizedTerm.startsWith("^")) {
-    const expected = normalizedTerm.slice(1).trim().toLowerCase();
-
-    if (expected === "") {
-      return true;
-    }
-
-    return normalizedSource.startsWith(expected);
-  }
-
-  if (normalizedTerm.startsWith("~")) {
-    const expected = normalizedTerm.slice(1).trim().toLowerCase();
-
-    if (expected === "") {
-      return true;
-    }
-
-    return normalizedSource.includes(expected);
-  }
-
-  if (normalizedTerm.endsWith("$")) {
-    const expected = normalizedTerm.slice(0, -1).trim().toLowerCase();
-
-    if (expected === "") {
-      return true;
-    }
-
-    return normalizedSource.endsWith(expected);
-  }
-
-  return normalizedSource.includes(normalizedTerm.toLowerCase());
+  return { operator: "eq", value: numericValue };
 }
 
 function matchesNumericCondition(
@@ -586,8 +418,44 @@ function matchesNumericCondition(
   return value === condition.value;
 }
 
+function matchesStringCondition(value: string, term: string): boolean {
+  const normalizedValue = value.toLowerCase();
+  const normalizedTerm = term.trim();
+
+  if (normalizedTerm === "") {
+    return true;
+  }
+
+  if (normalizedTerm.startsWith("!=")) {
+    const expected = normalizedTerm.slice(2).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue !== expected;
+  }
+
+  if (normalizedTerm.startsWith("=")) {
+    const expected = normalizedTerm.slice(1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue === expected;
+  }
+
+  if (normalizedTerm.startsWith("^")) {
+    const expected = normalizedTerm.slice(1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue.startsWith(expected);
+  }
+
+  if (normalizedTerm.endsWith("$")) {
+    const expected = normalizedTerm.slice(0, -1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue.endsWith(expected);
+  }
+
+  if (normalizedTerm.startsWith("~")) {
+    const expected = normalizedTerm.slice(1).trim().toLowerCase();
+    return expected === "" ? true : normalizedValue.includes(expected);
+  }
+
+  return normalizedValue.includes(normalizedTerm.toLowerCase());
+}
+
 function matchesAdvancedColumnFilter(
-  cellValue: unknown,
+  rowValue: unknown,
   filterValue: unknown,
 ): boolean {
   const terms = splitColumnFilterTerms(filterValue);
@@ -596,89 +464,43 @@ function matchesAdvancedColumnFilter(
     return true;
   }
 
-  const numericCellValue = toFiniteNumber(cellValue);
-  const stringCellValue = toCellText(cellValue);
+  const stringValue = String(rowValue ?? "");
+  const numericValue = Number.parseFloat(stringValue);
+  const hasNumericValue = Number.isFinite(numericValue);
 
   return terms.some((term) => {
-    const numericCondition = parseNumericFilterCondition(term);
+    const parsedNumeric = parseNumericFilterCondition(term);
 
-    if (numericCondition != null) {
-      if (numericCellValue == null) {
+    if (parsedNumeric != null) {
+      if (!hasNumericValue) {
         return false;
       }
 
-      return matchesNumericCondition(numericCellValue, numericCondition);
+      return matchesNumericCondition(numericValue, parsedNumeric);
     }
 
-    return matchesStringCondition(stringCellValue, term);
+    return matchesStringCondition(stringValue, term);
   });
-}
-
-function toCompactTableSize(size: TableSize): TableSize {
-  if (size === "lg") {
-    return "md";
-  }
-
-  if (size === "md") {
-    return "sm";
-  }
-
-  return "xs";
-}
-
-function resolveColumnId<TData extends object>(
-  column: TableColumnDef<TData>,
-  index: number,
-): string {
-  const maybeId = (column as { id?: unknown }).id;
-
-  if (typeof maybeId === "string" && maybeId.trim() !== "") {
-    return maybeId;
-  }
-
-  const maybeAccessorKey = (column as { accessorKey?: unknown }).accessorKey;
-
-  if (typeof maybeAccessorKey === "string" && maybeAccessorKey.trim() !== "") {
-    return maybeAccessorKey;
-  }
-
-  return `column-${index + 1}`;
 }
 
 function toHeaderLabel<TData extends object>(
   column: Column<TData, unknown>,
 ): string {
-  const header = column.columnDef.header;
+  const headerCandidate = column.columnDef.header;
 
-  if (typeof header === "string" || typeof header === "number") {
-    return String(header);
+  if (typeof headerCandidate === "string" && headerCandidate.trim() !== "") {
+    return headerCandidate;
   }
 
-  return column.id;
-}
-
-function toCellText(value: unknown): string {
-  if (value == null) {
-    return "";
+  if (column.id.trim() !== "") {
+    return column.id
+      .replaceAll(/[._-]+/g, " ")
+      .replaceAll(/\s+/g, " ")
+      .trim()
+      .replaceAll(/\b\w/g, (char) => char.toUpperCase());
   }
 
-  if (
-    typeof value === "string" ||
-    typeof value === "number" ||
-    typeof value === "boolean"
-  ) {
-    return String(value);
-  }
-
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return String(value);
-  }
+  return "Column";
 }
 
 function isRowActionLabelEmpty(label: ReactNode): boolean {
@@ -741,13 +563,9 @@ export function Table<TData extends object = object>({
   sortable = false,
   filterable = false,
   columnFilters,
-  globalFilter,
-  searchable = false,
-  searchPlaceholder = "Search table...",
-  searchAriaLabel = "Search table",
   selectable = false,
   multiSelect = true,
-  selectAllRowsAriaLabel = "Select all rows on current page",
+  selectAllRowsAriaLabel = "Select all rows",
   selectRowAriaLabelFormatter = (rowNumber: number) =>
     `Select row ${rowNumber}`,
   selectedCountFormatter = (count: number) => `${count} selected`,
@@ -756,27 +574,6 @@ export function Table<TData extends object = object>({
   rowActions,
   columnVisibility = false,
   defaultHiddenColumns,
-  showToolbar = true,
-  showViewSwitch = false,
-  switchToCardViewLabel = "Cards",
-  onSwitchToCardView,
-  showFiltersLabel = "Filters",
-  hideFiltersLabel = "Close",
-  filterDialogTitle = "Advanced column filters",
-  filterDialogDescription = "Build multiple per-column rules with operators, then apply or clear in one place.",
-  addFilterLabel = "Add filter",
-  addSortLabel = "Add sort",
-  clearFiltersLabel = "Clear filters",
-  resetSortingLabel = "Reset sorting",
-  applyFiltersLabel = "Apply filters",
-  globalFilterLabel = "Global search",
-  globalFilterPlaceholder = "Search all columns",
-  refreshLabel = "Refresh",
-  refreshingLabel = "Refreshing",
-  fullscreenLabel = "Fullscreen",
-  resetScreenLabel = "Reset",
-  showRefresh = false,
-  onRefresh,
   loading = false,
   loadingRows = 6,
   loadingText = "Loading table...",
@@ -786,26 +583,6 @@ export function Table<TData extends object = object>({
   bordered = true,
   rounded = true,
   stickyHeader = false,
-  fullscreen = false,
-  serverSide = false,
-  totalRows,
-  pageIndex,
-  onPageChange,
-  onPageSizeChange,
-  showPagination = true,
-  paginationVariant = "advance",
-  paginationDefaultPageSize = DEFAULT_PAGE_SIZE,
-  paginationPageSizeOptions,
-  paginationMaxVisiblePages = 5,
-  paginationShowPageSizeSelector = true,
-  paginationShowSummary = true,
-  paginationShowShowingPage = true,
-  paginationResetPageOnPageSizeChange = true,
-  paginationLabels,
-  paginationSummaryFormatter,
-  paginationShowingPageFormatter,
-  onSortChange,
-  onFilterChange,
   emptyText = DEFAULT_EMPTY_TEXT,
   className = "",
   style,
@@ -817,13 +594,7 @@ export function Table<TData extends object = object>({
   const colorToken = variantTokens[resolvedVariant];
 
   const shouldStriped = striped ?? resolvedVariant === "striped";
-  const canUseGlobalFilter = globalFilter ?? searchable;
-  const showSearchInput = searchable && canUseGlobalFilter;
   const hasRowActions = rowActions != null && rowActions.length > 0;
-  const normalizedDefaultPageSize = normalizePositiveInteger(
-    paginationDefaultPageSize,
-    DEFAULT_PAGE_SIZE,
-  );
 
   const filterableColumnSet = useMemo(
     () => new Set(columnFilters ?? []),
@@ -845,80 +616,17 @@ export function Table<TData extends object = object>({
   const [sortingState, setSortingState] = useState<SortingState>([]);
   const [columnFilterState, setColumnFilterState] =
     useState<ColumnFiltersState>([]);
-  const [globalSearch, setGlobalSearch] = useState("");
   const [rowSelectionState, setRowSelectionState] = useState<RowSelectionState>(
     {},
   );
   const [visibilityState, setVisibilityState] = useState<VisibilityState>(
     initialVisibilityState,
   );
-  const [paginationState, setPaginationState] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: normalizedDefaultPageSize,
-  });
-  const [uncontrolledPage, setUncontrolledPage] = useState(
-    Math.max(1, pageIndex ?? 1),
-  );
-  const [isFullscreenActive, setIsFullscreenActive] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hoveredRowId, setHoveredRowId] = useState<string | null>(null);
-  const [isAdvanceFilterOpen, setIsAdvanceFilterOpen] = useState(false);
-  const isFullscreenMode = fullscreen && isFullscreenActive;
 
   useEffect(() => {
     setVisibilityState(initialVisibilityState);
   }, [initialVisibilityState]);
-
-  useEffect(() => {
-    if (pageIndex != null) {
-      setUncontrolledPage(Math.max(1, pageIndex));
-    }
-  }, [pageIndex]);
-
-  useEffect(() => {
-    setPaginationState((current) => {
-      if (current.pageSize === normalizedDefaultPageSize) {
-        return current;
-      }
-
-      return {
-        ...current,
-        pageIndex: 0,
-        pageSize: normalizedDefaultPageSize,
-      };
-    });
-  }, [normalizedDefaultPageSize]);
-
-  useEffect(() => {
-    if (!fullscreen || !isFullscreenActive) {
-      return;
-    }
-
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, [fullscreen, isFullscreenActive]);
-
-  useEffect(() => {
-    if (!fullscreen || !isFullscreenActive) {
-      return;
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsFullscreenActive(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [fullscreen, isFullscreenActive]);
 
   const normalizedColumns = useMemo<TableColumnDef<TData>[]>(() => {
     return columns.map((column, index) => {
@@ -986,22 +694,22 @@ export function Table<TData extends object = object>({
           <input
             type="checkbox"
             aria-label={selectAllRowsAriaLabel}
-            checked={table.getIsAllPageRowsSelected()}
+            checked={table.getIsAllRowsSelected()}
             ref={(element) => {
               if (element != null) {
                 element.indeterminate =
-                  table.getIsSomePageRowsSelected() &&
-                  !table.getIsAllPageRowsSelected();
+                  table.getIsSomeRowsSelected() &&
+                  !table.getIsAllRowsSelected();
               }
             }}
             onChange={(event) => {
-              table.toggleAllPageRowsSelected(event.currentTarget.checked);
+              table.toggleAllRowsSelected(event.currentTarget.checked);
 
               onAction?.({
                 source: "selection",
                 actionId: event.currentTarget.checked
-                  ? "select-all-page"
-                  : "clear-page-selection",
+                  ? "select-all"
+                  : "clear-selection",
                 event,
               });
             }}
@@ -1044,7 +752,13 @@ export function Table<TData extends object = object>({
       enableHiding: false,
       size: 36,
     };
-  }, [multiSelect, onAction, selectable]);
+  }, [
+    multiSelect,
+    onAction,
+    selectAllRowsAriaLabel,
+    selectRowAriaLabelFormatter,
+    selectable,
+  ]);
 
   const rowActionsColumn = useMemo<TableColumnDef<TData> | null>(() => {
     if (!hasRowActions || rowActions == null) {
@@ -1145,88 +859,29 @@ export function Table<TData extends object = object>({
     return nextColumns;
   }, [normalizedColumns, rowActionsColumn, selectionColumn]);
 
-  const isPageControlled = pageIndex !== undefined;
-  const resolvedServerRowCount = Math.max(0, totalRows ?? data.length);
-  const serverPageCount = Math.max(
-    1,
-    Math.ceil(resolvedServerRowCount / paginationState.pageSize),
-  );
-
-  const currentServerPageRaw = isPageControlled
-    ? Math.max(1, pageIndex ?? 1)
-    : uncontrolledPage;
-  const currentServerPage = clamp(currentServerPageRaw, 1, serverPageCount);
-
-  const tablePaginationState: PaginationState = {
-    pageIndex: serverSide ? currentServerPage - 1 : paginationState.pageIndex,
-    pageSize: paginationState.pageSize,
-  };
-
-  function buildExternalFilterState(
-    filters: ColumnFiltersState,
-    searchValue: string,
-  ): ColumnFiltersState {
-    const withoutGlobal = filters.filter(
-      (item) => item.id !== GLOBAL_FILTER_ID,
-    );
-
-    if (!canUseGlobalFilter) {
-      return withoutGlobal;
-    }
-
-    const normalizedSearch = searchValue.trim();
-
-    if (normalizedSearch === "") {
-      return withoutGlobal;
-    }
-
-    return [
-      ...withoutGlobal,
-      { id: GLOBAL_FILTER_ID, value: normalizedSearch },
-    ];
-  }
-
   const table = useReactTable<TData>({
     data,
     columns: tableColumns,
     state: {
       sorting: sortingState,
       columnFilters: columnFilterState,
-      globalFilter: canUseGlobalFilter ? globalSearch : undefined,
       rowSelection: rowSelectionState,
       columnVisibility: visibilityState,
-      pagination: tablePaginationState,
     },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     enableSorting: sortable,
     enableSortingRemoval: true,
     enableRowSelection: selectable,
     enableMultiRowSelection: multiSelect,
-    globalFilterFn: "includesString",
-    manualSorting: serverSide,
-    manualFiltering: serverSide,
-    manualPagination: serverSide,
-    pageCount: serverSide ? serverPageCount : undefined,
-    autoResetPageIndex: !serverSide,
     onSortingChange: (updater) => {
       setSortingState((current) => {
         const next = typeof updater === "function" ? updater(current) : updater;
-        onSortChange?.(next);
         onAction?.({
           source: "sort",
           sort: next,
         });
-
-        if (serverSide) {
-          if (!isPageControlled) {
-            setUncontrolledPage(1);
-          }
-
-          onPageChange?.(1);
-        }
 
         return next;
       });
@@ -1234,51 +889,10 @@ export function Table<TData extends object = object>({
     onColumnFiltersChange: (updater) => {
       setColumnFilterState((current) => {
         const next = typeof updater === "function" ? updater(current) : updater;
-        const externalFilters = buildExternalFilterState(next, globalSearch);
-
-        onFilterChange?.(externalFilters);
         onAction?.({
           source: "filter",
-          filters: externalFilters,
-          search: globalSearch,
+          filters: next,
         });
-
-        if (serverSide) {
-          if (!isPageControlled) {
-            setUncontrolledPage(1);
-          }
-
-          onPageChange?.(1);
-        }
-
-        return next;
-      });
-    },
-    onGlobalFilterChange: (updater) => {
-      setGlobalSearch((current) => {
-        const next =
-          typeof updater === "function"
-            ? updater(current)
-            : String(updater ?? "");
-        const externalFilters = buildExternalFilterState(
-          columnFilterState,
-          next,
-        );
-
-        onFilterChange?.(externalFilters);
-        onAction?.({
-          source: "search",
-          search: next,
-          filters: externalFilters,
-        });
-
-        if (serverSide) {
-          if (!isPageControlled) {
-            setUncontrolledPage(1);
-          }
-
-          onPageChange?.(1);
-        }
 
         return next;
       });
@@ -1322,29 +936,6 @@ export function Table<TData extends object = object>({
   });
 
   const filteredRowCount = table.getFilteredRowModel().rows.length;
-  const clientPageCount = Math.max(
-    1,
-    Math.ceil(filteredRowCount / paginationState.pageSize),
-  );
-
-  useEffect(() => {
-    if (serverSide) {
-      return;
-    }
-
-    const maxPageIndex = clientPageCount - 1;
-
-    setPaginationState((current) => {
-      if (current.pageIndex <= maxPageIndex) {
-        return current;
-      }
-
-      return {
-        ...current,
-        pageIndex: maxPageIndex,
-      };
-    });
-  }, [clientPageCount, serverSide]);
 
   useEffect(() => {
     if (!selectable) {
@@ -1359,201 +950,10 @@ export function Table<TData extends object = object>({
 
   const visibleColumns = table.getVisibleLeafColumns();
   const selectionCount = table.getSelectedRowModel().rows.length;
-
-  const totalRowsCount = serverSide ? resolvedServerRowCount : filteredRowCount;
-  const totalPages = serverSide ? serverPageCount : clientPageCount;
-  const currentPage = serverSide
-    ? currentServerPage
-    : table.getState().pagination.pageIndex + 1;
-
-  const filterableColumns = table.getAllLeafColumns().filter((column) => {
-    if (
-      column.id === SPECIAL_SELECT_COLUMN_ID ||
-      column.id === SPECIAL_ACTIONS_COLUMN_ID
-    ) {
-      return false;
-    }
-
-    if (!column.getCanFilter()) {
-      return false;
-    }
-
-    if (columnFilters == null || columnFilters.length === 0) {
-      return true;
-    }
-
-    return filterableColumnSet.has(column.id);
-  });
-
-  const activeColumnFilterCount = columnFilterState.reduce((count, filter) => {
-    if (filter.id === GLOBAL_FILTER_ID) {
-      return count;
-    }
-
-    return count + splitColumnFilterTerms(filter.value).length;
-  }, 0);
-
-  const hasActiveGlobalSearch =
-    canUseGlobalFilter && globalSearch.trim() !== "";
-  const totalActiveAdvancedFilters =
-    activeColumnFilterCount + (hasActiveGlobalSearch ? 1 : 0);
-  const showAdvancedFilterTrigger = filterable && filterableColumns.length > 0;
-
-  const advanceFilterColumns = useMemo<AdvanceFilterColumn[]>(() => {
-    return table
-      .getAllLeafColumns()
-      .filter(
-        (column) =>
-          column.id !== SPECIAL_SELECT_COLUMN_ID &&
-          column.id !== SPECIAL_ACTIONS_COLUMN_ID,
-      )
-      .map((column) => {
-        const canFilterColumn =
-          filterable &&
-          (columnFilters == null ||
-            columnFilters.length === 0 ||
-            filterableColumnSet.has(column.id));
-
-        return {
-          id: column.id,
-          label: toHeaderLabel(column),
-          canFilter: canFilterColumn && column.getCanFilter(),
-          canSort: sortable && column.getCanSort(),
-        };
-      });
-  }, [columnFilters, filterable, filterableColumnSet, sortable, table]);
-
-  function handleAdvanceFilterOpenChange(nextOpen: boolean): void {
-    setIsAdvanceFilterOpen(nextOpen);
-
-    onAction?.({
-      source: "column-filters-toggle",
-      showColumnFilters: nextOpen,
-    });
-  }
-
-  function handleAdvanceFilterApply(
-    result: AdvanceFilterResult,
-    reason: "apply" | "clear-filters" | "reset-sorting",
-  ): void {
-    table.setColumnFilters(result.columnFilters);
-
-    if (canUseGlobalFilter) {
-      table.setGlobalFilter(result.globalSearch);
-    }
-
-    if (sortable) {
-      table.setSorting(result.sorting);
-    }
-
-    if (reason === "clear-filters") {
-      onAction?.({
-        source: "column-filters-clear",
-        filters: [],
-        search: "",
-      });
-      return;
-    }
-
-    if (reason === "reset-sorting") {
-      onAction?.({
-        source: "sort-reset",
-        sort: [],
-      });
-      return;
-    }
-
-    onAction?.({
-      source: "column-filters-apply",
-      filters: buildExternalFilterState(
-        result.columnFilters,
-        canUseGlobalFilter ? result.globalSearch : "",
-      ),
-      sort: result.sorting,
-      search: canUseGlobalFilter ? result.globalSearch : undefined,
-    });
-  }
-
-  const canShowViewSwitch = showViewSwitch && onSwitchToCardView != null;
-
-  const canShowToolbar =
-    showToolbar &&
-    (showAdvancedFilterTrigger ||
-      showSearchInput ||
-      showRefresh ||
-      canShowViewSwitch ||
-      fullscreen);
-
-  async function handleRefresh(): Promise<void> {
-    if (onRefresh == null) {
-      return;
-    }
-
-    setIsRefreshing(true);
-
-    try {
-      await Promise.resolve(onRefresh());
-    } finally {
-      setIsRefreshing(false);
-    }
-  }
-
-  function handlePageChange(nextPage: number): void {
-    const normalized = clamp(nextPage, 1, totalPages);
-
-    if (serverSide) {
-      if (!isPageControlled) {
-        setUncontrolledPage(normalized);
-      }
-
-      onPageChange?.(normalized);
-      return;
-    }
-
-    setPaginationState((current) => ({
-      ...current,
-      pageIndex: normalized - 1,
-    }));
-
-    onPageChange?.(normalized);
-  }
-
-  function handlePageSizeChange(nextPageSize: number): void {
-    const safePageSize = Math.max(1, nextPageSize);
-
-    setPaginationState((current) => ({
-      ...current,
-      pageIndex: 0,
-      pageSize: safePageSize,
-    }));
-
-    onPageSizeChange?.(safePageSize);
-
-    if (serverSide) {
-      if (!isPageControlled) {
-        setUncontrolledPage(1);
-      }
-
-      onPageChange?.(1);
-    }
-  }
-
-  function handlePaginationAction(context: PaginationActionContext): void {
-    const source =
-      context.source === "page-size" || context.source === "page-size-reset"
-        ? "page-size"
-        : "pagination";
-
-    onAction?.({
-      source,
-      page: context.page,
-      pageSize: context.pageSize,
-      event: context.event,
-    });
-  }
+  const totalRowsCount = filteredRowCount;
 
   const rootStyle: CSSProperties = {
-    width: isFullscreenMode ? "auto" : "100%",
+    width: "100%",
     maxWidth: "100%",
     minWidth: 0,
     display: "flex",
@@ -1561,21 +961,6 @@ export function Table<TData extends object = object>({
     gap: "0.45rem",
     boxSizing: "border-box",
     fontSize: sizeToken.tableFontSize,
-    position: isFullscreenMode ? "fixed" : undefined,
-    inset: isFullscreenMode ? "1rem" : undefined,
-    zIndex: isFullscreenMode ? 220 : undefined,
-    padding: isFullscreenMode ? "0.8rem" : undefined,
-    backgroundColor: isFullscreenMode
-      ? colorToken.rootBackgroundColor
-      : undefined,
-    borderRadius: isFullscreenMode
-      ? "var(--ktn-radius-lg, 0.625rem)"
-      : undefined,
-    boxShadow: isFullscreenMode
-      ? "0 28px 60px rgba(15, 23, 42, 0.28)"
-      : undefined,
-    overflow: isFullscreenMode ? "hidden" : undefined,
-    minHeight: isFullscreenMode ? 0 : undefined,
     ...style,
   };
 
@@ -1594,8 +979,6 @@ export function Table<TData extends object = object>({
     overflow: "hidden",
     display: "flex",
     flexDirection: "column",
-    flex: isFullscreenMode ? 1 : undefined,
-    minHeight: isFullscreenMode ? 0 : undefined,
   };
 
   const tableViewportStyle: CSSProperties = {
@@ -1605,13 +988,7 @@ export function Table<TData extends object = object>({
     boxSizing: "border-box",
     overflow: "auto",
     backgroundColor: colorToken.rootBackgroundColor,
-    flex: isFullscreenMode ? 1 : undefined,
-    minHeight: isFullscreenMode ? 0 : undefined,
-    maxHeight: stickyHeader
-      ? isFullscreenMode
-        ? "calc(100vh - 14rem)"
-        : "34rem"
-      : undefined,
+    maxHeight: stickyHeader ? "34rem" : undefined,
   };
 
   const tableStyle: CSSProperties = {
@@ -1759,75 +1136,6 @@ export function Table<TData extends object = object>({
       style={rootStyle}
       {...props}
     >
-      {canShowToolbar ? (
-        <DataToolbar
-          size={sizeToken.controlSize}
-          showSearch={showSearchInput}
-          searchValue={globalSearch}
-          searchPlaceholder={searchPlaceholder}
-          searchAriaLabel={searchAriaLabel}
-          onSearchChange={(nextSearch) => {
-            table.setGlobalFilter(nextSearch);
-          }}
-          showAdvanceFilter={showAdvancedFilterTrigger}
-          advanceFilterColumns={advanceFilterColumns}
-          advanceFilterColumnFilters={columnFilterState}
-          advanceFilterSorting={sortingState}
-          advanceFilterGlobalSearch={globalSearch}
-          advanceFilterCanUseGlobalFilter={canUseGlobalFilter}
-          advanceFilterEnableSorting={sortable}
-          advanceFilterOpen={isAdvanceFilterOpen}
-          onAdvanceFilterOpenChange={handleAdvanceFilterOpenChange}
-          onAdvanceFilterApply={handleAdvanceFilterApply}
-          advanceFilterOpenLabel={showFiltersLabel}
-          advanceFilterCloseLabel={hideFiltersLabel}
-          advanceFilterActiveCount={totalActiveAdvancedFilters}
-          advanceFilterTitle={filterDialogTitle}
-          advanceFilterDescription={filterDialogDescription}
-          addFilterLabel={addFilterLabel}
-          addSortLabel={addSortLabel}
-          clearFiltersLabel={clearFiltersLabel}
-          resetSortingLabel={resetSortingLabel}
-          applyFiltersLabel={applyFiltersLabel}
-          globalFilterLabel={globalFilterLabel}
-          globalFilterPlaceholder={globalFilterPlaceholder}
-          showSwitch={canShowViewSwitch}
-          switchMode="adaptive-card"
-          switchLabel={switchToCardViewLabel}
-          onSwitch={() => {
-            onAction?.({
-              source: "view-switch",
-              actionId: "adaptive-card",
-            });
-
-            onSwitchToCardView?.();
-          }}
-          showRefresh={showRefresh}
-          refreshing={loading || isRefreshing}
-          refreshLabel={refreshLabel}
-          refreshingLabel={refreshingLabel}
-          onRefresh={() => {
-            onAction?.({
-              source: "refresh",
-            });
-
-            return handleRefresh();
-          }}
-          showFullscreen={fullscreen}
-          fullscreen={isFullscreenActive}
-          fullscreenLabel={fullscreenLabel}
-          exitFullscreenLabel={resetScreenLabel}
-          onFullscreenChange={(nextFullscreen) => {
-            setIsFullscreenActive(nextFullscreen);
-
-            onAction?.({
-              source: "fullscreen",
-              fullscreen: nextFullscreen,
-            });
-          }}
-        />
-      ) : null}
-
       <div style={containerStyle}>
         <Scrollbar
           axis="both"
@@ -1939,9 +1247,9 @@ export function Table<TData extends object = object>({
                             <Skeleton
                               width="100%"
                               height={
-                                size === "xs"
+                                resolvedSize === "xs"
                                   ? "0.7rem"
-                                  : size === "lg"
+                                  : resolvedSize === "lg"
                                     ? "0.95rem"
                                     : "0.82rem"
                               }
@@ -2038,26 +1346,16 @@ export function Table<TData extends object = object>({
         </Scrollbar>
       </div>
 
-      {showPagination ? (
-        <Pagination
-          variant={paginationVariant}
-          size={sizeToken.paginationSize}
-          page={currentPage}
-          totalPages={totalPages}
-          pageSize={paginationState.pageSize}
-          pageSizeOptions={paginationPageSizeOptions}
-          maxVisiblePages={paginationMaxVisiblePages}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          showSummary={paginationShowSummary}
-          showShowingPage={paginationShowShowingPage}
-          showPageSizeSelector={paginationShowPageSizeSelector}
-          resetPageOnPageSizeChange={paginationResetPageOnPageSizeChange}
-          labels={paginationLabels ?? { item: "rows", perPage: "page" }}
-          summaryFormatter={paginationSummaryFormatter}
-          showingPageFormatter={paginationShowingPageFormatter}
-          onAction={handlePaginationAction}
-        />
+      {selectable && selectionCount > 0 ? (
+        <p
+          style={{
+            margin: 0,
+            fontSize: sizeToken.headerFontSize,
+            color: colorToken.mutedTextColor,
+          }}
+        >
+          {selectedCountFormatter(selectionCount)}
+        </p>
       ) : null}
 
       <p

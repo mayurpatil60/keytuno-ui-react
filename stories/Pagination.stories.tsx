@@ -88,6 +88,8 @@ export const BasicVariant: Story = {
             defaultPage={1}
             defaultPageSize={12}
             pageSizeOptions={[12, 24, 48]}
+            firstButtonProps={{ iconOnlyTone: true }}
+            activePageButtonProps={{ variant: "primary" }}
           />
           <FieldDescription>
             Basic variant includes icon-based first/prev/page numbers/next/last
@@ -115,6 +117,8 @@ export const AdvanceVariant: Story = {
             defaultPage={1}
             defaultPageSize={12}
             pageSizeOptions={[12, 24, 48]}
+            previousButtonProps={{ iconOnlyTone: true }}
+            nextButtonProps={{ iconOnlyTone: true }}
           />
           <FieldDescription>
             Advance variant keeps concise controls: page-size selector,
@@ -319,6 +323,24 @@ export const PaginationPlayground: StoryObj<PaginationPlaygroundProps> = {
       perPage: "page",
       showingPage: "Page",
     },
+    firstButtonProps: {
+      iconOnlyTone: true,
+    },
+    previousButtonProps: {
+      iconOnlyTone: true,
+    },
+    nextButtonProps: {
+      iconOnlyTone: true,
+    },
+    lastButtonProps: {
+      iconOnlyTone: true,
+    },
+    pageButtonProps: {
+      variant: "outline",
+    },
+    activePageButtonProps: {
+      variant: "primary",
+    },
   },
   argTypes: {
     variant: {
@@ -344,6 +366,12 @@ export const PaginationPlayground: StoryObj<PaginationPlaygroundProps> = {
     showShowingPage: { control: "boolean" },
     resetPageOnPageSizeChange: { control: "boolean" },
     labels: { control: "object" },
+    firstButtonProps: { control: "object" },
+    previousButtonProps: { control: "object" },
+    nextButtonProps: { control: "object" },
+    lastButtonProps: { control: "object" },
+    pageButtonProps: { control: "object" },
+    activePageButtonProps: { control: "object" },
     page: { table: { disable: true } },
     pageSize: { table: { disable: true } },
     onAction: { action: "action" },

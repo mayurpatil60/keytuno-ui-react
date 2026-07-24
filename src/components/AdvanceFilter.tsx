@@ -81,6 +81,11 @@ export interface AdvanceFilterActionContext {
   activeFilterCount: number;
 }
 
+export type AdvanceFilterButtonProps = Omit<
+  ButtonProps,
+  "children" | "onAction" | "size" | "type"
+>;
+
 export interface AdvanceFilterProps {
   open?: boolean;
   defaultOpen?: boolean;
@@ -105,6 +110,7 @@ export interface AdvanceFilterProps {
   triggerIcon?: ReactNode;
   triggerAriaLabel?: string;
   activeFilterCount?: number;
+  triggerButtonProps?: AdvanceFilterButtonProps;
 
   side?: SheetSide;
   title?: ReactNode;
@@ -117,6 +123,13 @@ export interface AdvanceFilterProps {
   clearFiltersLabel?: string;
   resetSortingLabel?: string;
   applyFiltersLabel?: string;
+  addFilterButtonProps?: AdvanceFilterButtonProps;
+  addSortButtonProps?: AdvanceFilterButtonProps;
+  resetFilterButtonProps?: AdvanceFilterButtonProps;
+  resetSortButtonProps?: AdvanceFilterButtonProps;
+  clearFiltersButtonProps?: AdvanceFilterButtonProps;
+  resetSortingButtonProps?: AdvanceFilterButtonProps;
+  applyFiltersButtonProps?: AdvanceFilterButtonProps;
 
   globalFilterLabel?: ReactNode;
   globalFilterPlaceholder?: string;
@@ -471,6 +484,7 @@ export function AdvanceFilter({
   triggerIcon,
   triggerAriaLabel,
   activeFilterCount,
+  triggerButtonProps,
   side = "right",
   title = "Advance Filter",
   description = "Filter columns with multiple rules and operators",
@@ -481,6 +495,13 @@ export function AdvanceFilter({
   clearFiltersLabel = "Clear filters",
   resetSortingLabel = "Reset sorting",
   applyFiltersLabel = "Apply filters",
+  addFilterButtonProps,
+  addSortButtonProps,
+  resetFilterButtonProps,
+  resetSortButtonProps,
+  clearFiltersButtonProps,
+  resetSortingButtonProps,
+  applyFiltersButtonProps,
   globalFilterLabel = "Global search",
   globalFilterPlaceholder = "Search all columns",
   ruleValuePlaceholder = "Enter value",
@@ -772,6 +793,21 @@ export function AdvanceFilter({
   const triggerCountLabel =
     resolvedActiveFilterCount > 99 ? "99+" : String(resolvedActiveFilterCount);
 
+  const triggerButtonOverrides = triggerButtonProps ?? {};
+  const addFilterButtonOverrides = addFilterButtonProps ?? {};
+  const addSortButtonOverrides = addSortButtonProps ?? {};
+  const resetFilterButtonOverrides = resetFilterButtonProps ?? {};
+  const resetSortButtonOverrides = resetSortButtonProps ?? {};
+  const clearFiltersButtonOverrides = clearFiltersButtonProps ?? {};
+  const resetSortingButtonOverrides = resetSortingButtonProps ?? {};
+  const applyFiltersButtonOverrides = applyFiltersButtonProps ?? {};
+
+  const resolvedTriggerButtonAriaLabel =
+    typeof triggerButtonOverrides["aria-label"] === "string" &&
+    triggerButtonOverrides["aria-label"].trim() !== ""
+      ? triggerButtonOverrides["aria-label"]
+      : resolvedTriggerAriaLabel;
+
   const bodyStyle: CSSProperties = {
     display: "flex",
     flexDirection: "column",
@@ -913,16 +949,24 @@ export function AdvanceFilter({
       trigger={
         showTrigger ? (
           <Button
+            {...triggerButtonOverrides}
             size={controlSize}
             variant={
-              isOpen || resolvedActiveFilterCount > 0 ? "primary" : "outline"
+              triggerButtonOverrides.variant ??
+              (isOpen || resolvedActiveFilterCount > 0 ? "primary" : "outline")
             }
-            iconOnly
-            tooltip={triggerTooltip}
-            tooltipSide={triggerTooltipSide}
-            tooltipSize={triggerTooltipSize}
-            aria-label={resolvedTriggerAriaLabel}
-            disabled={triggerDisabled}
+            iconOnly={triggerButtonOverrides.iconOnly ?? true}
+            tooltip={triggerButtonOverrides.tooltip ?? triggerTooltip}
+            tooltipSide={
+              triggerButtonOverrides.tooltipSide ?? triggerTooltipSide
+            }
+            tooltipSize={
+              triggerButtonOverrides.tooltipSize ?? triggerTooltipSize
+            }
+            aria-label={resolvedTriggerButtonAriaLabel}
+            disabled={
+              triggerDisabled || triggerButtonOverrides.disabled === true
+            }
           >
             <span style={triggerIconWrapStyle}>
               {triggerIcon ?? <FiFilter size={14} />}
@@ -972,8 +1016,9 @@ export function AdvanceFilter({
             <p style={sectionLabelStyle}>{filtersSectionLabel}</p>
 
             <Button
+              {...addFilterButtonOverrides}
               size={controlSize}
-              variant="outline"
+              variant={addFilterButtonOverrides.variant ?? "outline"}
               onAction={() => {
                 if (firstFilterableColumnId === "") {
                   return;
@@ -1054,14 +1099,27 @@ export function AdvanceFilter({
 
                 <div style={clearRuleButtonWrapStyle}>
                   <Button
+                    {...resetFilterButtonOverrides}
                     size={controlSize}
-                    variant="ghost"
-                    iconOnly
-                    iconOnlyTone
-                    tooltip="Reset this filter"
-                    tooltipSide="top"
-                    tooltipSize="xs"
-                    aria-label={`Reset filter ${index + 1}`}
+                    variant={resetFilterButtonOverrides.variant ?? "ghost"}
+                    iconOnly={resetFilterButtonOverrides.iconOnly ?? true}
+                    iconOnlyTone={
+                      resetFilterButtonOverrides.iconOnlyTone ?? true
+                    }
+                    tooltip={
+                      resetFilterButtonOverrides.tooltip ?? "Reset this filter"
+                    }
+                    tooltipSide={
+                      resetFilterButtonOverrides.tooltipSide ?? "top"
+                    }
+                    tooltipSize={resetFilterButtonOverrides.tooltipSize ?? "xs"}
+                    aria-label={
+                      typeof resetFilterButtonOverrides["aria-label"] ===
+                        "string" &&
+                      resetFilterButtonOverrides["aria-label"].trim() !== ""
+                        ? resetFilterButtonOverrides["aria-label"]
+                        : `Reset filter ${index + 1}`
+                    }
                     onAction={() => {
                       resetFilterRule(rule.id);
                     }}
@@ -1083,8 +1141,9 @@ export function AdvanceFilter({
                 <p style={sectionLabelStyle}>{sortSectionLabel}</p>
 
                 <Button
+                  {...addSortButtonOverrides}
                   size={controlSize}
-                  variant="outline"
+                  variant={addSortButtonOverrides.variant ?? "outline"}
                   onAction={() => {
                     if (firstSortableColumnId === "") {
                       return;
@@ -1155,14 +1214,29 @@ export function AdvanceFilter({
 
                     <div style={clearRuleButtonWrapStyle}>
                       <Button
+                        {...resetSortButtonOverrides}
                         size={controlSize}
-                        variant="ghost"
-                        iconOnly
-                        iconOnlyTone
-                        tooltip="Reset this sort"
-                        tooltipSide="top"
-                        tooltipSize="xs"
-                        aria-label={`Reset sort ${index + 1}`}
+                        variant={resetSortButtonOverrides.variant ?? "ghost"}
+                        iconOnly={resetSortButtonOverrides.iconOnly ?? true}
+                        iconOnlyTone={
+                          resetSortButtonOverrides.iconOnlyTone ?? true
+                        }
+                        tooltip={
+                          resetSortButtonOverrides.tooltip ?? "Reset this sort"
+                        }
+                        tooltipSide={
+                          resetSortButtonOverrides.tooltipSide ?? "top"
+                        }
+                        tooltipSize={
+                          resetSortButtonOverrides.tooltipSize ?? "xs"
+                        }
+                        aria-label={
+                          typeof resetSortButtonOverrides["aria-label"] ===
+                            "string" &&
+                          resetSortButtonOverrides["aria-label"].trim() !== ""
+                            ? resetSortButtonOverrides["aria-label"]
+                            : `Reset sort ${index + 1}`
+                        }
                         onAction={() => {
                           resetSortRule(rule.id);
                         }}
@@ -1186,8 +1260,9 @@ export function AdvanceFilter({
         <SheetFooter style={footerStyle} sticky>
           <div style={footerLeftStyle}>
             <Button
+              {...clearFiltersButtonOverrides}
               size={controlSize}
-              variant="outline"
+              variant={clearFiltersButtonOverrides.variant ?? "outline"}
               onAction={handleClearFilters}
             >
               {clearFiltersLabel}
@@ -1195,8 +1270,9 @@ export function AdvanceFilter({
 
             {enableSorting && sortableColumns.length > 0 ? (
               <Button
+                {...resetSortingButtonOverrides}
                 size={controlSize}
-                variant="outline"
+                variant={resetSortingButtonOverrides.variant ?? "outline"}
                 onAction={handleResetSorting}
               >
                 {resetSortingLabel}
@@ -1204,7 +1280,12 @@ export function AdvanceFilter({
             ) : null}
           </div>
 
-          <Button size={controlSize} variant="primary" onAction={handleApply}>
+          <Button
+            {...applyFiltersButtonOverrides}
+            size={controlSize}
+            variant={applyFiltersButtonOverrides.variant ?? "primary"}
+            onAction={handleApply}
+          >
             {applyFiltersLabel}
           </Button>
         </SheetFooter>

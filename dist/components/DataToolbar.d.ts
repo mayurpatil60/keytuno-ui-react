@@ -1,14 +1,15 @@
 import { HTMLAttributes, CSSProperties, ReactNode } from 'react';
 import { ColumnFiltersState, SortingState } from '@tanstack/react-table';
-import { AdvanceFilterColumn, AdvanceFilterResult, AdvanceFilterApplyReason } from './AdvanceFilter.js';
-import './Button.js';
-import './Tooltip.js';
+import { AdvanceFilterColumn, AdvanceFilterResult, AdvanceFilterApplyReason, AdvanceFilterButtonProps } from './AdvanceFilter.js';
+import { ButtonProps } from './Button.js';
 import './Select.js';
 import './Sheet.js';
+import './Tooltip.js';
 
 type DataToolbarSize = "xs" | "sm" | "md" | "lg";
 type DataToolbarSwitchMode = "table" | "adaptive-card" | "custom";
 type DataToolbarActionSource = "search" | "filter-open-change" | "filter-apply" | "switch" | "refresh" | "fullscreen";
+type DataToolbarButtonProps = Omit<ButtonProps, "children" | "onAction" | "size" | "type">;
 interface DataToolbarActionContext {
     source: DataToolbarActionSource;
     search?: string;
@@ -46,6 +47,7 @@ interface DataToolbarProps extends Omit<HTMLAttributes<HTMLDivElement>, "childre
     advanceFilterActiveCount?: number;
     advanceFilterTitle?: ReactNode;
     advanceFilterDescription?: ReactNode;
+    advanceFilterTriggerButtonProps?: AdvanceFilterButtonProps;
     addFilterLabel?: string;
     addSortLabel?: string;
     clearFiltersLabel?: string;
@@ -57,19 +59,22 @@ interface DataToolbarProps extends Omit<HTMLAttributes<HTMLDivElement>, "childre
     switchMode?: DataToolbarSwitchMode;
     switchIcon?: ReactNode;
     switchLabel?: string;
+    switchButtonProps?: DataToolbarButtonProps;
     onSwitch?: (mode: DataToolbarSwitchMode) => void;
     showRefresh?: boolean;
     refreshing?: boolean;
     refreshLabel?: string;
     refreshingLabel?: string;
+    refreshButtonProps?: DataToolbarButtonProps;
     onRefresh?: () => void | Promise<void>;
     showFullscreen?: boolean;
     fullscreen?: boolean;
     fullscreenLabel?: string;
     exitFullscreenLabel?: string;
+    fullscreenButtonProps?: DataToolbarButtonProps;
     onFullscreenChange?: (nextValue: boolean) => void;
     onAction?: (context: DataToolbarActionContext) => void;
 }
-declare function DataToolbar({ size, showSearch, searchValue, defaultSearchValue, onSearchChange, searchPlaceholder, searchAriaLabel, searchInputMinWidth, searchInputMaxWidth, showAdvanceFilter, advanceFilterColumns, advanceFilterColumnFilters, advanceFilterSorting, advanceFilterGlobalSearch, advanceFilterCanUseGlobalFilter, advanceFilterEnableSorting, advanceFilterOpen, advanceFilterDefaultOpen, onAdvanceFilterOpenChange, onAdvanceFilterApply, advanceFilterOpenLabel, advanceFilterCloseLabel, advanceFilterAriaLabel, advanceFilterActiveCount, advanceFilterTitle, advanceFilterDescription, addFilterLabel, addSortLabel, clearFiltersLabel, resetSortingLabel, applyFiltersLabel, globalFilterLabel, globalFilterPlaceholder, showSwitch, switchMode, switchIcon, switchLabel, onSwitch, showRefresh, refreshing, refreshLabel, refreshingLabel, onRefresh, showFullscreen, fullscreen, fullscreenLabel, exitFullscreenLabel, onFullscreenChange, onAction, className, style, ...props }: DataToolbarProps): JSX.Element;
+declare function DataToolbar({ size, showSearch, searchValue, defaultSearchValue, onSearchChange, searchPlaceholder, searchAriaLabel, searchInputMinWidth, searchInputMaxWidth, showAdvanceFilter, advanceFilterColumns, advanceFilterColumnFilters, advanceFilterSorting, advanceFilterGlobalSearch, advanceFilterCanUseGlobalFilter, advanceFilterEnableSorting, advanceFilterOpen, advanceFilterDefaultOpen, onAdvanceFilterOpenChange, onAdvanceFilterApply, advanceFilterOpenLabel, advanceFilterCloseLabel, advanceFilterAriaLabel, advanceFilterActiveCount, advanceFilterTitle, advanceFilterDescription, advanceFilterTriggerButtonProps, addFilterLabel, addSortLabel, clearFiltersLabel, resetSortingLabel, applyFiltersLabel, globalFilterLabel, globalFilterPlaceholder, showSwitch, switchMode, switchIcon, switchLabel, switchButtonProps, onSwitch, showRefresh, refreshing, refreshLabel, refreshingLabel, refreshButtonProps, onRefresh, showFullscreen, fullscreen, fullscreenLabel, exitFullscreenLabel, fullscreenButtonProps, onFullscreenChange, onAction, className, style, ...props }: DataToolbarProps): JSX.Element;
 
-export { DataToolbar, type DataToolbarActionContext, type DataToolbarActionSource, type DataToolbarProps, type DataToolbarSize, type DataToolbarSwitchMode };
+export { DataToolbar, type DataToolbarActionContext, type DataToolbarActionSource, type DataToolbarButtonProps, type DataToolbarProps, type DataToolbarSize, type DataToolbarSwitchMode };

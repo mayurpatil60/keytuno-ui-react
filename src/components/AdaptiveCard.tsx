@@ -19,14 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./DropdownMenu";
-import { DataToolbar } from "./DataToolbar";
 import { FiMoreVertical } from "./icons/feather";
-import {
-  Pagination,
-  type PaginationActionContext,
-  type PaginationProps,
-  type PaginationSize,
-} from "./Pagination";
 import { Progress, type ProgressSize } from "./Progress";
 import { Scrollbar } from "./Scrollbar";
 
@@ -92,22 +85,13 @@ export interface AdaptiveCardAction<TData extends object = object> {
   onAction?: (row: TData, rowIndex: number) => void;
 }
 
-export type AdaptiveCardActionSource =
-  | "item-action"
-  | "search"
-  | "refresh"
-  | "view-switch"
-  | "pagination"
-  | "page-size";
+export type AdaptiveCardActionSource = "item-action";
 
 export interface AdaptiveCardActionContext<TData extends object = object> {
   source: AdaptiveCardActionSource;
   actionId?: string;
   row?: TData;
   rowIndex?: number;
-  page?: number;
-  pageSize?: number;
-  search?: string;
   event?: unknown;
 }
 
@@ -139,41 +123,10 @@ export interface AdaptiveCardProps<TData extends object = object> extends Omit<
   actionLayout?: AdaptiveCardActionLayout;
   actionMenuLabel?: ReactNode;
 
-  searchable?: boolean;
-  searchPlaceholder?: string;
-  searchAriaLabel?: string;
-
-  showToolbar?: boolean;
-  showViewSwitch?: boolean;
-  switchToTableViewLabel?: string;
-  onSwitchToTableView?: () => void;
-  showRefresh?: boolean;
-  onRefresh?: () => void | Promise<void>;
-  refreshLabel?: string;
-  refreshingLabel?: string;
-
   virtualized?: boolean;
   virtualizedMaxHeight?: number | string;
   virtualizedEstimateSize?: number;
   virtualizedOverscan?: number;
-
-  serverSide?: boolean;
-  totalRows?: number;
-  pageIndex?: number;
-  onPageChange?: (page: number) => void;
-  onPageSizeChange?: (pageSize: number) => void;
-  showPagination?: boolean;
-  paginationVariant?: PaginationProps["variant"];
-  paginationDefaultPageSize?: number;
-  paginationPageSizeOptions?: number[];
-  paginationMaxVisiblePages?: number;
-  paginationShowPageSizeSelector?: boolean;
-  paginationShowSummary?: boolean;
-  paginationShowShowingPage?: boolean;
-  paginationResetPageOnPageSizeChange?: boolean;
-  paginationLabels?: PaginationProps["labels"];
-  paginationSummaryFormatter?: PaginationProps["summaryFormatter"];
-  paginationShowingPageFormatter?: PaginationProps["showingPageFormatter"];
 
   viewportMaxHeight?: number | string;
   emptyText?: ReactNode;
@@ -200,7 +153,6 @@ type AdaptiveCardSizeTokens = {
   valueLineHeight: number;
   actionGap: string;
   actionButtonSize: "xs" | "sm" | "md" | "lg";
-  paginationSize: PaginationSize;
   progressSize: ProgressSize;
   iconSize: number;
   mediaHeight: string;
@@ -232,7 +184,6 @@ interface ResolvedAdaptiveCardFieldSchema<
 
 const baseClasses = "flex w-full min-w-0 flex-col";
 const defaultEmptyText = "No adaptive cards available.";
-const defaultPageSize = 12;
 
 const sizeTokens: Record<AdaptiveCardSize, AdaptiveCardSizeTokens> = {
   xs: {
@@ -246,7 +197,6 @@ const sizeTokens: Record<AdaptiveCardSize, AdaptiveCardSizeTokens> = {
     valueLineHeight: 1.35,
     actionGap: "0.3rem",
     actionButtonSize: "xs",
-    paginationSize: "xs",
     progressSize: "xs",
     iconSize: 12,
     mediaHeight: "8.5rem",
@@ -262,7 +212,6 @@ const sizeTokens: Record<AdaptiveCardSize, AdaptiveCardSizeTokens> = {
     valueLineHeight: 1.4,
     actionGap: "0.36rem",
     actionButtonSize: "sm",
-    paginationSize: "sm",
     progressSize: "sm",
     iconSize: 13,
     mediaHeight: "9.75rem",
@@ -278,7 +227,6 @@ const sizeTokens: Record<AdaptiveCardSize, AdaptiveCardSizeTokens> = {
     valueLineHeight: 1.42,
     actionGap: "0.42rem",
     actionButtonSize: "md",
-    paginationSize: "md",
     progressSize: "md",
     iconSize: 14,
     mediaHeight: "11rem",
@@ -294,7 +242,6 @@ const sizeTokens: Record<AdaptiveCardSize, AdaptiveCardSizeTokens> = {
     valueLineHeight: 1.46,
     actionGap: "0.48rem",
     actionButtonSize: "lg",
-    paginationSize: "lg",
     progressSize: "lg",
     iconSize: 15,
     mediaHeight: "12.5rem",
@@ -778,38 +725,10 @@ export function AdaptiveCard<TData extends object = object>({
   actionPlacement = "bottom",
   actionLayout = "own-row",
   actionMenuLabel = "Actions",
-  searchable = false,
-  searchPlaceholder = "Search adaptive cards...",
-  searchAriaLabel = "Search adaptive cards",
-  showToolbar = true,
-  showViewSwitch = false,
-  switchToTableViewLabel = "Table",
-  onSwitchToTableView,
-  showRefresh = false,
-  onRefresh,
-  refreshLabel = "Refresh",
-  refreshingLabel = "Refreshing",
   virtualized = false,
   virtualizedMaxHeight = "36rem",
   virtualizedEstimateSize,
   virtualizedOverscan = 6,
-  serverSide = false,
-  totalRows,
-  pageIndex,
-  onPageChange,
-  onPageSizeChange,
-  showPagination = true,
-  paginationVariant = "advance",
-  paginationDefaultPageSize = defaultPageSize,
-  paginationPageSizeOptions,
-  paginationMaxVisiblePages = 5,
-  paginationShowPageSizeSelector = true,
-  paginationShowSummary = true,
-  paginationShowShowingPage = true,
-  paginationResetPageOnPageSizeChange = true,
-  paginationLabels,
-  paginationSummaryFormatter,
-  paginationShowingPageFormatter,
   viewportMaxHeight,
   emptyText = defaultEmptyText,
   onAction,
@@ -828,12 +747,6 @@ export function AdaptiveCard<TData extends object = object>({
 
   const [viewportWidth, setViewportWidth] = useState(() =>
     normalizeViewportWidth(),
-  );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [uncontrolledPage, setUncontrolledPage] = useState(1);
-  const [pageSize, setPageSize] = useState(
-    normalizePositiveInteger(paginationDefaultPageSize, defaultPageSize),
   );
 
   const listParentRef = useRef<HTMLDivElement | null>(null);
@@ -855,12 +768,6 @@ export function AdaptiveCard<TData extends object = object>({
     };
   }, []);
 
-  useEffect(() => {
-    setPageSize(
-      normalizePositiveInteger(paginationDefaultPageSize, defaultPageSize),
-    );
-  }, [paginationDefaultPageSize]);
-
   const resolvedSchema = useMemo(
     () => resolveSchema(schema, data, showFieldLabels),
     [data, schema, showFieldLabels],
@@ -876,51 +783,7 @@ export function AdaptiveCard<TData extends object = object>({
     resolvedColumns,
     resolvedBreakpoints,
   );
-
-  const normalizedSearch = searchQuery.trim().toLowerCase();
-
-  const filteredRows = useMemo(() => {
-    if (serverSide || !searchable || normalizedSearch === "") {
-      return data;
-    }
-
-    return data.filter((row) => {
-      const rowText = JSON.stringify(row).toLowerCase();
-      return rowText.includes(normalizedSearch);
-    });
-  }, [data, normalizedSearch, searchable, serverSide]);
-
-  const totalRowsResolved = serverSide
-    ? normalizePositiveInteger(totalRows, data.length)
-    : filteredRows.length;
-
-  const totalPages = Math.max(1, Math.ceil(totalRowsResolved / pageSize));
-
-  const isPageControlled = serverSide && typeof pageIndex === "number";
-  const currentPage = clampNumber(
-    isPageControlled ? (pageIndex ?? 1) : uncontrolledPage,
-    1,
-    totalPages,
-  );
-
-  useEffect(() => {
-    if (isPageControlled) {
-      return;
-    }
-
-    setUncontrolledPage((previousPage) =>
-      clampNumber(previousPage, 1, totalPages),
-    );
-  }, [isPageControlled, totalPages]);
-
-  const pageRows = useMemo(() => {
-    if (serverSide) {
-      return data;
-    }
-
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredRows.slice(startIndex, startIndex + pageSize);
-  }, [currentPage, data, filteredRows, pageSize, serverSide]);
+  const visibleRows = data;
 
   const resolvedVirtualEstimate =
     typeof virtualizedEstimateSize === "number" &&
@@ -937,7 +800,7 @@ export function AdaptiveCard<TData extends object = object>({
   const canVirtualize = virtualized && resolvedOutsideColumns === 1;
 
   const rowVirtualizer = useVirtualizer({
-    count: canVirtualize ? pageRows.length : 0,
+    count: canVirtualize ? visibleRows.length : 0,
     getScrollElement: () => listParentRef.current,
     estimateSize: () => resolvedVirtualEstimate,
     overscan: resolvedVirtualOverscan,
@@ -945,79 +808,8 @@ export function AdaptiveCard<TData extends object = object>({
 
   const inlineActionLimit = resolveInlineActionCount(actionInlineMaxVisible);
 
-  const canShowViewSwitch = showViewSwitch && onSwitchToTableView != null;
-  const shouldShowToolbar =
-    showToolbar && (searchable || showRefresh || canShowViewSwitch);
-
   function emitAction(context: AdaptiveCardActionContext<TData>): void {
     onAction?.(context);
-  }
-
-  async function handleRefresh(): Promise<void> {
-    if (onRefresh == null) {
-      return;
-    }
-
-    setIsRefreshing(true);
-
-    try {
-      await Promise.resolve(onRefresh());
-    } finally {
-      setIsRefreshing(false);
-    }
-  }
-
-  function handleSearchChange(value: string): void {
-    setSearchQuery(value);
-
-    if (!serverSide) {
-      setUncontrolledPage(1);
-    }
-
-    emitAction({
-      source: "search",
-      search: value,
-      page: 1,
-      pageSize,
-    });
-  }
-
-  function handlePageChange(nextPage: number): void {
-    const normalizedPage = clampNumber(nextPage, 1, totalPages);
-
-    if (!isPageControlled) {
-      setUncontrolledPage(normalizedPage);
-    }
-
-    onPageChange?.(normalizedPage);
-
-    emitAction({
-      source: "pagination",
-      page: normalizedPage,
-      pageSize,
-      search: normalizedSearch === "" ? undefined : normalizedSearch,
-    });
-  }
-
-  function handlePageSizeChange(nextPageSize: number): void {
-    const normalizedPageSize = normalizePositiveInteger(nextPageSize, pageSize);
-    setPageSize(normalizedPageSize);
-    onPageSizeChange?.(normalizedPageSize);
-
-    if (paginationResetPageOnPageSizeChange) {
-      if (!isPageControlled) {
-        setUncontrolledPage(1);
-      }
-
-      onPageChange?.(1);
-    }
-
-    emitAction({
-      source: "page-size",
-      page: paginationResetPageOnPageSizeChange ? 1 : currentPage,
-      pageSize: normalizedPageSize,
-      search: normalizedSearch === "" ? undefined : normalizedSearch,
-    });
   }
 
   function resolveRowActions(
@@ -1043,9 +835,6 @@ export function AdaptiveCard<TData extends object = object>({
       actionId: action.id,
       row,
       rowIndex,
-      page: currentPage,
-      pageSize,
-      search: normalizedSearch === "" ? undefined : normalizedSearch,
       event,
     });
 
@@ -1716,46 +1505,7 @@ export function AdaptiveCard<TData extends object = object>({
       aria-label="Adaptive card grid"
       {...props}
     >
-      {shouldShowToolbar ? (
-        <DataToolbar
-          size={sizeToken.actionButtonSize}
-          showSearch={searchable}
-          searchValue={searchQuery}
-          searchPlaceholder={searchPlaceholder}
-          searchAriaLabel={searchAriaLabel}
-          onSearchChange={handleSearchChange}
-          showSwitch={canShowViewSwitch}
-          switchMode="table"
-          switchLabel={switchToTableViewLabel}
-          onSwitch={() => {
-            emitAction({
-              source: "view-switch",
-              actionId: "table-view",
-              page: currentPage,
-              pageSize,
-              search: normalizedSearch === "" ? undefined : normalizedSearch,
-            });
-
-            onSwitchToTableView?.();
-          }}
-          showRefresh={showRefresh}
-          refreshing={isRefreshing}
-          refreshLabel={refreshLabel}
-          refreshingLabel={refreshingLabel}
-          onRefresh={() => {
-            emitAction({
-              source: "refresh",
-              page: currentPage,
-              pageSize,
-              search: normalizedSearch === "" ? undefined : normalizedSearch,
-            });
-
-            return handleRefresh();
-          }}
-        />
-      ) : null}
-
-      {pageRows.length === 0 ? (
+      {visibleRows.length === 0 ? (
         <div
           style={{
             width: "100%",
@@ -1783,10 +1533,8 @@ export function AdaptiveCard<TData extends object = object>({
             }}
           >
             {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-              const row = pageRows[virtualRow.index];
-              const cardRowIndex = serverSide
-                ? virtualRow.index
-                : (currentPage - 1) * pageSize + virtualRow.index;
+              const row = visibleRows[virtualRow.index];
+              const cardRowIndex = virtualRow.index;
 
               return (
                 <div
@@ -1814,46 +1562,10 @@ export function AdaptiveCard<TData extends object = object>({
           aria-label="Adaptive cards list"
         >
           <div style={cardsGridStyle}>
-            {pageRows.map((row, index) => {
-              const cardRowIndex = serverSide
-                ? index
-                : (currentPage - 1) * pageSize + index;
-
-              return renderCard(row, cardRowIndex);
-            })}
+            {visibleRows.map((row, index) => renderCard(row, index))}
           </div>
         </Scrollbar>
       )}
-
-      {showPagination ? (
-        <Pagination
-          variant={paginationVariant}
-          size={sizeToken.paginationSize}
-          page={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
-          pageSizeOptions={paginationPageSizeOptions}
-          maxVisiblePages={paginationMaxVisiblePages}
-          showPageSizeSelector={paginationShowPageSizeSelector}
-          showSummary={paginationShowSummary}
-          showShowingPage={paginationShowShowingPage}
-          labels={paginationLabels}
-          summaryFormatter={paginationSummaryFormatter}
-          showingPageFormatter={paginationShowingPageFormatter}
-          onPageChange={handlePageChange}
-          onPageSizeChange={handlePageSizeChange}
-          onAction={(context: PaginationActionContext) => {
-            emitAction({
-              source:
-                context.source === "page-size" ? "page-size" : "pagination",
-              page: context.page,
-              pageSize: context.pageSize,
-              search: normalizedSearch === "" ? undefined : normalizedSearch,
-              event: context.event,
-            });
-          }}
-        />
-      ) : null}
     </div>
   );
 }

@@ -11,10 +11,11 @@ import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 import {
   AdvanceFilter,
   type AdvanceFilterApplyReason,
+  type AdvanceFilterButtonProps,
   type AdvanceFilterColumn,
   type AdvanceFilterResult,
 } from "./AdvanceFilter";
-import { Button } from "./Button";
+import { Button, type ButtonProps } from "./Button";
 import { Input } from "./Input";
 import {
   FiGrid,
@@ -35,6 +36,11 @@ export type DataToolbarActionSource =
   | "switch"
   | "refresh"
   | "fullscreen";
+
+export type DataToolbarButtonProps = Omit<
+  ButtonProps,
+  "children" | "onAction" | "size" | "type"
+>;
 
 export interface DataToolbarActionContext {
   source: DataToolbarActionSource;
@@ -82,6 +88,7 @@ export interface DataToolbarProps extends Omit<
   advanceFilterActiveCount?: number;
   advanceFilterTitle?: ReactNode;
   advanceFilterDescription?: ReactNode;
+  advanceFilterTriggerButtonProps?: AdvanceFilterButtonProps;
   addFilterLabel?: string;
   addSortLabel?: string;
   clearFiltersLabel?: string;
@@ -94,18 +101,21 @@ export interface DataToolbarProps extends Omit<
   switchMode?: DataToolbarSwitchMode;
   switchIcon?: ReactNode;
   switchLabel?: string;
+  switchButtonProps?: DataToolbarButtonProps;
   onSwitch?: (mode: DataToolbarSwitchMode) => void;
 
   showRefresh?: boolean;
   refreshing?: boolean;
   refreshLabel?: string;
   refreshingLabel?: string;
+  refreshButtonProps?: DataToolbarButtonProps;
   onRefresh?: () => void | Promise<void>;
 
   showFullscreen?: boolean;
   fullscreen?: boolean;
   fullscreenLabel?: string;
   exitFullscreenLabel?: string;
+  fullscreenButtonProps?: DataToolbarButtonProps;
   onFullscreenChange?: (nextValue: boolean) => void;
 
   onAction?: (context: DataToolbarActionContext) => void;
@@ -192,6 +202,7 @@ export function DataToolbar({
   advanceFilterActiveCount,
   advanceFilterTitle,
   advanceFilterDescription,
+  advanceFilterTriggerButtonProps,
   addFilterLabel,
   addSortLabel,
   clearFiltersLabel,
@@ -203,16 +214,19 @@ export function DataToolbar({
   switchMode = "adaptive-card",
   switchIcon,
   switchLabel,
+  switchButtonProps,
   onSwitch,
   showRefresh = false,
   refreshing,
   refreshLabel = "Refresh",
   refreshingLabel = "Refreshing",
+  refreshButtonProps,
   onRefresh,
   showFullscreen = false,
   fullscreen = false,
   fullscreenLabel = "Fullscreen",
   exitFullscreenLabel = "Exit",
+  fullscreenButtonProps,
   onFullscreenChange,
   onAction,
   className = "",
@@ -244,6 +258,11 @@ export function DataToolbar({
   const resolvedAdvanceFilterColumns = advanceFilterColumns ?? [];
   const canShowAdvanceFilter =
     showAdvanceFilter && resolvedAdvanceFilterColumns.length > 0;
+  const advanceFilterTriggerButtonOverrides =
+    advanceFilterTriggerButtonProps ?? {};
+  const switchButtonOverrides = switchButtonProps ?? {};
+  const refreshButtonOverrides = refreshButtonProps ?? {};
+  const fullscreenButtonOverrides = fullscreenButtonProps ?? {};
 
   const rootStyle: CSSProperties = {
     width: "100%",
@@ -378,6 +397,7 @@ export function DataToolbar({
             triggerOpenLabel={advanceFilterOpenLabel}
             triggerCloseLabel={advanceFilterCloseLabel}
             triggerAriaLabel={advanceFilterAriaLabel}
+            triggerButtonProps={advanceFilterTriggerButtonOverrides}
             activeFilterCount={advanceFilterActiveCount}
             title={advanceFilterTitle}
             description={advanceFilterDescription}
@@ -401,13 +421,19 @@ export function DataToolbar({
 
         {showSwitch ? (
           <Button
+            {...switchButtonOverrides}
             size={sizeToken.controlSize}
-            variant="outline"
-            iconOnly
-            tooltip={resolvedSwitchLabel}
-            tooltipSide="top"
-            tooltipSize="xs"
-            aria-label={resolvedSwitchLabel}
+            variant={switchButtonOverrides.variant ?? "outline"}
+            iconOnly={switchButtonOverrides.iconOnly ?? true}
+            tooltip={switchButtonOverrides.tooltip ?? resolvedSwitchLabel}
+            tooltipSide={switchButtonOverrides.tooltipSide ?? "top"}
+            tooltipSize={switchButtonOverrides.tooltipSize ?? "xs"}
+            aria-label={
+              typeof switchButtonOverrides["aria-label"] === "string" &&
+              switchButtonOverrides["aria-label"].trim() !== ""
+                ? switchButtonOverrides["aria-label"]
+                : resolvedSwitchLabel
+            }
             onAction={(event) => {
               onSwitch?.(switchMode);
               onAction?.({
@@ -423,14 +449,25 @@ export function DataToolbar({
 
         {showRefresh ? (
           <Button
+            {...refreshButtonOverrides}
             size={sizeToken.controlSize}
-            variant="outline"
-            iconOnly
-            tooltip={isRefreshing ? refreshingLabel : refreshLabel}
-            tooltipSide="top"
-            tooltipSize="xs"
-            aria-label={isRefreshing ? refreshingLabel : refreshLabel}
-            disabled={isRefreshing}
+            variant={refreshButtonOverrides.variant ?? "outline"}
+            iconOnly={refreshButtonOverrides.iconOnly ?? true}
+            tooltip={
+              refreshButtonOverrides.tooltip ??
+              (isRefreshing ? refreshingLabel : refreshLabel)
+            }
+            tooltipSide={refreshButtonOverrides.tooltipSide ?? "top"}
+            tooltipSize={refreshButtonOverrides.tooltipSize ?? "xs"}
+            aria-label={
+              typeof refreshButtonOverrides["aria-label"] === "string" &&
+              refreshButtonOverrides["aria-label"].trim() !== ""
+                ? refreshButtonOverrides["aria-label"]
+                : isRefreshing
+                  ? refreshingLabel
+                  : refreshLabel
+            }
+            disabled={isRefreshing || refreshButtonOverrides.disabled === true}
             onAction={(event) => {
               void handleRefresh(event);
             }}
@@ -441,13 +478,24 @@ export function DataToolbar({
 
         {showFullscreen ? (
           <Button
+            {...fullscreenButtonOverrides}
             size={sizeToken.controlSize}
-            variant={fullscreen ? "primary" : "outline"}
-            iconOnly
-            tooltip={resolvedFullscreenLabel}
-            tooltipSide="top"
-            tooltipSize="xs"
-            aria-label={resolvedFullscreenLabel}
+            variant={
+              fullscreenButtonOverrides.variant ??
+              (fullscreen ? "primary" : "outline")
+            }
+            iconOnly={fullscreenButtonOverrides.iconOnly ?? true}
+            tooltip={
+              fullscreenButtonOverrides.tooltip ?? resolvedFullscreenLabel
+            }
+            tooltipSide={fullscreenButtonOverrides.tooltipSide ?? "top"}
+            tooltipSize={fullscreenButtonOverrides.tooltipSize ?? "xs"}
+            aria-label={
+              typeof fullscreenButtonOverrides["aria-label"] === "string" &&
+              fullscreenButtonOverrides["aria-label"].trim() !== ""
+                ? fullscreenButtonOverrides["aria-label"]
+                : resolvedFullscreenLabel
+            }
             onAction={(event) => {
               const nextValue = !fullscreen;
               onFullscreenChange?.(nextValue);
