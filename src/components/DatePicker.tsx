@@ -1224,6 +1224,7 @@ export function DatePicker({
 
   const fieldBaseStyle: CSSProperties = {
     width: "100%",
+    boxSizing: "border-box",
     height: tokens.height,
     borderWidth: "1px",
     borderStyle: "solid",
@@ -1303,12 +1304,16 @@ export function DatePicker({
     width:
       mode === "time"
         ? isCompactLayout
-          ? "min(16rem, calc(100vw - 1rem))"
-          : "min(17.5rem, calc(100vw - 1rem))"
+          ? "min(100%, 15.5rem, calc(100vw - 0.5rem))"
+          : "min(100%, 16.75rem, calc(100vw - 0.75rem))"
         : isCompactLayout
-          ? "min(16rem, calc(100vw - 1rem))"
-          : "min(18.75rem, calc(100vw - 1rem))",
-    maxWidth: "calc(100vw - 1rem)",
+          ? "min(100%, 15.5rem, calc(100vw - 0.5rem))"
+          : "min(100%, 17.25rem, calc(100vw - 0.75rem))",
+    maxWidth: isCompactLayout
+      ? "calc(100vw - 0.5rem)"
+      : "calc(100vw - 0.75rem)",
+    boxSizing: "border-box",
+    overflowX: "hidden",
     borderWidth: "1px",
     borderStyle: "solid",
     borderColor: invalid
@@ -1331,9 +1336,9 @@ export function DatePicker({
   };
 
   const panelNavigationButtonStyle: CSSProperties = {
-    width: isCompactLayout ? "1.5rem" : "1.65rem",
-    height: isCompactLayout ? "1.5rem" : "1.65rem",
-    minHeight: isCompactLayout ? "1.5rem" : "1.65rem",
+    width: isCompactLayout ? "1.36rem" : "1.65rem",
+    height: isCompactLayout ? "1.36rem" : "1.65rem",
+    minHeight: isCompactLayout ? "1.36rem" : "1.65rem",
     paddingInline: 0,
     paddingBlock: 0,
     borderRadius: "999px",
@@ -1342,7 +1347,7 @@ export function DatePicker({
   const monthYearControlWrapStyle: CSSProperties = {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: isCompactLayout ? "0.25rem" : "0.35rem",
+    gap: isCompactLayout ? "0.2rem" : "0.35rem",
     flex: 1,
     minWidth: 0,
   };
@@ -1378,7 +1383,7 @@ export function DatePicker({
   const rangeFieldRowStyle: CSSProperties = {
     display: "grid",
     gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gap: isCompactLayout ? "0.35rem" : "0.5rem",
+    gap: isCompactLayout ? "0.25rem" : "0.45rem",
   };
 
   const rangeFieldButtonStyle: CSSProperties = {
@@ -1409,6 +1414,8 @@ export function DatePicker({
     color: "var(--ktn-text-primary)",
     minHeight: "1rem",
     fontVariantNumeric: "tabular-nums",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   };
 
   const calendarBoxStyle: CSSProperties = {
