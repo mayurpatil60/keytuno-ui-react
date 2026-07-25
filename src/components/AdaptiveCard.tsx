@@ -113,6 +113,8 @@ export interface AdaptiveCardProps<TData extends object = object> extends Omit<
   insideColumns?: AdaptiveCardInnerColumns;
   columns?: number | AdaptiveCardColumns;
   columnBreakpoints?: AdaptiveCardColumnBreakpoints;
+  cardGap?: number | string;
+  listGap?: number | string;
 
   actions?:
     | AdaptiveCardAction<TData>[]
@@ -315,6 +317,25 @@ function normalizePositiveInteger(
 
   const normalized = Math.floor(value);
   return normalized <= 0 ? fallback : normalized;
+}
+
+function normalizeSpacingValue(
+  value: number | string | undefined,
+  fallback: string,
+): string {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return `${Math.max(0, value)}px`;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value.trim();
+
+    if (normalized !== "") {
+      return normalized;
+    }
+  }
+
+  return fallback;
 }
 
 function normalizeViewportWidth(): number {
@@ -747,6 +768,8 @@ export function AdaptiveCard<TData extends object = object>({
   insideColumns = 2,
   columns,
   columnBreakpoints,
+  cardGap,
+  listGap,
   actions = [],
   cardClickable = false,
   actionMode = "auto",
@@ -768,6 +791,8 @@ export function AdaptiveCard<TData extends object = object>({
 }: AdaptiveCardProps<TData>): JSX.Element {
   const variantToken = variantTokens[variant];
   const sizeToken = sizeTokens[size];
+  const resolvedCardGap = normalizeSpacingValue(cardGap, sizeToken.cardGap);
+  const resolvedListGap = normalizeSpacingValue(listGap, sizeToken.listGap);
 
   const resolvedColumns = useMemo(() => resolveColumns(columns), [columns]);
   const resolvedBreakpoints = useMemo(
@@ -819,7 +844,7 @@ export function AdaptiveCard<TData extends object = object>({
   const resolvedVirtualEstimate =
     typeof virtualizedEstimateSize === "number" &&
     Number.isFinite(virtualizedEstimateSize)
-      ? Math.max(120, Math.floor(virtualizedEstimateSize))
+      ? Math.max(48, Math.floor(virtualizedEstimateSize))
       : defaultVirtualEstimate[size];
 
   const resolvedVirtualOverscan =
@@ -1281,7 +1306,7 @@ export function AdaptiveCard<TData extends object = object>({
       padding: sizeToken.cardPadding,
       display: "flex",
       flexDirection: "column",
-      gap: sizeToken.cardGap,
+      gap: resolvedCardGap,
       background: showCardInteractiveTone
         ? "color-mix(in srgb, var(--ktn-bg-muted, #edf2f7) 90%, var(--ktn-border-muted, #e2e8f0))"
         : variantToken.surfaceBackground,
@@ -1296,7 +1321,7 @@ export function AdaptiveCard<TData extends object = object>({
       minWidth: 0,
       display: "grid",
       gridTemplateColumns: `repeat(${resolvedInnerColumns}, minmax(0, 1fr))`,
-      gap: sizeToken.cardGap,
+      gap: resolvedCardGap,
       alignItems: "start",
       boxSizing: "border-box",
     };
@@ -1306,7 +1331,7 @@ export function AdaptiveCard<TData extends object = object>({
       minWidth: 0,
       display: "flex",
       alignItems: "center",
-      gap: sizeToken.cardGap,
+      gap: resolvedCardGap,
       boxSizing: "border-box",
     };
 
@@ -1530,7 +1555,7 @@ export function AdaptiveCard<TData extends object = object>({
     minWidth: 0,
     display: "grid",
     gridTemplateColumns: `repeat(${resolvedOutsideColumns}, minmax(0, 1fr))`,
-    gap: sizeToken.listGap,
+    gap: resolvedListGap,
     boxSizing: "border-box",
   };
 
@@ -1563,7 +1588,7 @@ export function AdaptiveCard<TData extends object = object>({
     minWidth: 0,
     display: "flex",
     flexDirection: "column",
-    gap: sizeToken.listGap,
+    gap: resolvedListGap,
     color: variantToken.valueColor,
     boxSizing: "border-box",
     ...style,
@@ -1611,13 +1636,15 @@ export function AdaptiveCard<TData extends object = object>({
               return (
                 <div
                   key={virtualRow.key}
+                  ref={rowVirtualizer.measureElement}
+                  data-index={virtualRow.index}
                   style={{
                     position: "absolute",
                     top: 0,
                     left: 0,
                     width: "100%",
                     transform: `translateY(${virtualRow.start}px)`,
-                    paddingBottom: sizeToken.listGap,
+                    paddingBottom: resolvedListGap,
                     boxSizing: "border-box",
                   }}
                 >

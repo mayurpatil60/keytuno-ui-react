@@ -1735,6 +1735,8 @@ import type {
   // Outside-card layout (cards grid)
   columns?={number | AdaptiveCardColumns}
   columnBreakpoints?={AdaptiveCardColumnBreakpoints}
+  cardGap?={number | string}
+  listGap?={number | string}
 
   // Actions
   actions?={AdaptiveCardAction<User>[] | ((row: User, rowIndex: number) => AdaptiveCardAction<User>[])}
@@ -1750,7 +1752,7 @@ import type {
   // Virtualization
   virtualized?={boolean}            // optimized for one-card-per-row mode
   virtualizedMaxHeight?={number | string}
-  virtualizedEstimateSize?={number}
+  virtualizedEstimateSize?={number} // initial row-height estimate only (not spacing)
   virtualizedOverscan?={number}
 
   // Viewport/state
@@ -1793,6 +1795,8 @@ type AdaptiveCardActionLayout = 'own-row' | 'same-row';
 // - This is the native enterprise card surface for app-owned data (no external Adaptive Cards SDK required).
 // - `insideColumns` controls field layout inside each card (1, 2, or 3 columns).
 // - `columns` + `columnBreakpoints` control the outer responsive grid of cards.
+// - `listGap` controls spacing between cards in both multi-column grids and one-column virtualized mode.
+// - `cardGap` controls internal spacing between field rows inside each card.
 // - `cardClickable` enables row-level card click actions and emits `source='item-click'`.
 // - Row-level card clicks ignore nested interactive targets (`a`, `button`, menu triggers, and other interactive controls),
 //   so field links and action buttons continue working independently.
