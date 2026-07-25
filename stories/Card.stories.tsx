@@ -4,13 +4,14 @@ import type { Meta, StoryObj } from "@storybook/react";
 import {
   Button,
   Card,
+  CardGroup,
   type CardActionContext,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@keytuno/ui-react";
+} from "../src/index";
 
 const meta: Meta<typeof Card> = {
   title: "Data/Card",
@@ -115,9 +116,9 @@ export const CardCollapse: Story = {
     <div style={stackStyle}>
       <h3 style={{ margin: 0 }}>Collapsible</h3>
       <Card collapse style={cardWidthStyle}>
-        <CardHeader>
-          <CardTitle>Market Notifications</CardTitle>
-          <CardDescription>
+        <CardHeader collapseTrigger>
+          <CardTitle collapseTrigger>Market Notifications</CardTitle>
+          <CardDescription collapseTrigger>
             Chevron appears because collapse is true.
           </CardDescription>
         </CardHeader>
@@ -133,6 +134,71 @@ export const CardCollapse: Story = {
           </Button>
         </CardFooter>
       </Card>
+    </div>
+  ),
+};
+
+export const CardSectionDividers: Story = {
+  name: "Card Section Dividers",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Optional Horizontal Lines</h3>
+
+      <Card style={cardWidthStyle}>
+        <CardHeader>
+          <CardTitle>Contract Details</CardTitle>
+          <CardDescription>
+            Horizontal separators are optional for content and footer.
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent divider>
+          Content divider is enabled after header.
+        </CardContent>
+
+        <CardFooter divider>
+          <Button size="sm" variant="outline">
+            Cancel
+          </Button>
+          <Button size="sm" variant="primary">
+            Save
+          </Button>
+        </CardFooter>
+      </Card>
+    </div>
+  ),
+};
+
+export const CardGroupJoined: Story = {
+  name: "Card Group (Joined)",
+  render: () => (
+    <div style={stackStyle}>
+      <h3 style={{ margin: 0 }}>Joined Cards (No Gap)</h3>
+
+      <div style={cardWidthStyle}>
+        <CardGroup joined>
+          <Card>
+            <CardHeader>
+              <CardTitle>Step 1</CardTitle>
+              <CardDescription>Profile information</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Step 2</CardTitle>
+              <CardDescription>Preference selection</CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Step 3</CardTitle>
+              <CardDescription>Review and submit</CardDescription>
+            </CardHeader>
+          </Card>
+        </CardGroup>
+      </div>
     </div>
   ),
 };
@@ -193,8 +259,11 @@ export const CardPlayground: Story = {
     collapse: true,
     defaultCollapsed: false,
     withAction: false,
+    headerCollapseTrigger: false,
     titleCollapseTrigger: false,
     descriptionCollapseTrigger: false,
+    contentDivider: false,
+    footerDivider: false,
   },
   argTypes: {
     size: {
@@ -211,6 +280,11 @@ export const CardPlayground: Story = {
     defaultCollapsed: {
       control: "boolean",
     },
+    headerCollapseTrigger: {
+      control: "boolean",
+      description:
+        "Enable collapse toggle from CardHeader click/keyboard interactions.",
+    },
     titleCollapseTrigger: {
       control: "boolean",
       description:
@@ -220,6 +294,14 @@ export const CardPlayground: Story = {
       control: "boolean",
       description:
         "Enable collapse toggle when CardDescription is clicked or activated with keyboard.",
+    },
+    contentDivider: {
+      control: "boolean",
+      description: "Show a horizontal divider before CardContent.",
+    },
+    footerDivider: {
+      control: "boolean",
+      description: "Show a horizontal divider before CardFooter.",
     },
     withAction: {
       control: "boolean",
@@ -253,7 +335,7 @@ export const CardPlayground: Story = {
         onClick={withAction ? args.onClick : undefined}
         style={cardWidthStyle}
       >
-        <CardHeader>
+        <CardHeader collapseTrigger={args.headerCollapseTrigger}>
           <CardTitle collapseTrigger={args.titleCollapseTrigger}>
             Card Playground
           </CardTitle>
@@ -262,12 +344,12 @@ export const CardPlayground: Story = {
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
+        <CardContent divider={args.contentDivider}>
           This content and footer will hide when the card is collapsed via the
           chevron, title, or description trigger.
         </CardContent>
 
-        <CardFooter>
+        <CardFooter divider={args.footerDivider}>
           <Button size="sm" variant="primary">
             Save
           </Button>

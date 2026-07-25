@@ -56,7 +56,28 @@ const preview: Preview = {
   parameters: {
     options: {
       storySort: {
-        order: ["Component", "Icons", "Theme"],
+        order: [
+          "Data",
+          [
+            "Card",
+            "CardGroup",
+            "AdaptiveCard",
+            "AdvanceFilter",
+            "DataToolbar",
+            "FileList",
+            "List",
+            "StepwiseForm",
+            "Table",
+            "*",
+          ],
+          "Forms",
+          "Feedback",
+          "Navigation",
+          "Layout",
+          "Overlay",
+          "Themes",
+          "*",
+        ],
       },
     },
     controls: {

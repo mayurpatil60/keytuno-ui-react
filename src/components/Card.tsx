@@ -33,7 +33,9 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   onAction?: (context: CardActionContext) => void;
 }
 
-export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
+  collapseTrigger?: boolean;
+}
 
 export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
   collapseTrigger?: boolean;
@@ -45,9 +47,13 @@ export interface CardDescriptionProps extends HTMLAttributes<HTMLParagraphElemen
 
 export interface CardActionProps extends HTMLAttributes<HTMLDivElement> {}
 
-export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
+  divider?: boolean;
+}
 
-export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {}
+export interface CardFooterProps extends HTMLAttributes<HTMLDivElement> {
+  divider?: boolean;
+}
 
 type CardSizeTokens = {
   titleFontSize: string;
@@ -274,8 +280,13 @@ export function Card({
 
 export function CardHeader({
   children,
+  collapseTrigger = false,
   className = "",
   style,
+  onClick,
+  onKeyDown,
+  role,
+  tabIndex,
   ...props
 }: CardHeaderProps): JSX.Element {
   const {
@@ -289,6 +300,7 @@ export function CardHeader({
   } = useCardContextValue();
   const spacingToken = spacingTokens[spacing];
   const sizeToken = sizeTokens[size];
+  const isCollapseTrigger = collapse === true && collapseTrigger === true;
 
   const contentChildren: ReactNode[] = [];
   const actionChildren: ReactNode[] = [];
@@ -303,6 +315,42 @@ export function CardHeader({
   });
 
   const composedClassName = className.trim() === "" ? undefined : className;
+  const resolvedRole = role ?? (isCollapseTrigger ? "button" : undefined);
+  const resolvedTabIndex = tabIndex ?? (isCollapseTrigger ? 0 : undefined);
+
+  function handleHeaderClick(event: ReactMouseEvent<HTMLDivElement>): void {
+    onClick?.(event);
+
+    if (!isCollapseTrigger || event.defaultPrevented) {
+      return;
+    }
+
+    const targetElement = event.target as HTMLElement | null;
+
+    if (targetElement?.closest("[data-card-action='true']") != null) {
+      return;
+    }
+
+    event.stopPropagation();
+    const nextCollapsed = !collapsed;
+    toggleCollapse();
+    emitAction("collapse-toggle", event, nextCollapsed);
+  }
+
+  function handleHeaderKeyDown(
+    event: ReactKeyboardEvent<HTMLDivElement>,
+  ): void {
+    onKeyDown?.(event);
+
+    if (event.defaultPrevented || !isCollapseTrigger) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.currentTarget.click();
+    }
+  }
 
   const headerStyle: CSSProperties = {
     display: "flex",
@@ -321,6 +369,7 @@ export function CardHeader({
     flexDirection: "column",
     gap: "0.25rem",
     fontSize: sizeToken.contentFontSize,
+    ...(isCollapseTrigger ? { cursor: "pointer" } : {}),
   };
 
   const controlsStyle: CSSProperties = {
@@ -345,7 +394,17 @@ export function CardHeader({
   };
 
   return (
-    <div className={composedClassName} style={headerStyle} {...props}>
+    <div
+      className={composedClassName}
+      style={headerStyle}
+      role={resolvedRole}
+      tabIndex={resolvedTabIndex}
+      aria-expanded={isCollapseTrigger ? !collapsed : undefined}
+      aria-controls={isCollapseTrigger ? contentRegionId : undefined}
+      onClick={handleHeaderClick}
+      onKeyDown={handleHeaderKeyDown}
+      {...props}
+    >
       <div style={contentStyle}>{contentChildren}</div>
 
       {actionChildren.length > 0 || collapse ? (
@@ -585,7 +644,12 @@ export function CardAction({
   };
 
   return (
-    <div className={composedClassName} style={actionStyle} {...props}>
+    <div
+      data-card-action="true"
+      className={composedClassName}
+      style={actionStyle}
+      {...props}
+    >
       {children}
     </div>
   );
@@ -593,6 +657,7 @@ export function CardAction({
 
 export function CardContent({
   children,
+  divider = false,
   className = "",
   style,
   id,
@@ -611,6 +676,7 @@ export function CardContent({
     display: collapse && collapsed ? "none" : "block",
     paddingBlock: spacingToken.sectionPaddingBlock,
     paddingInline: spacingToken.sectionPaddingInline,
+    borderTop: divider ? "1px solid var(--ktn-border-muted)" : undefined,
     fontSize: sizeToken.contentFontSize,
     lineHeight: 1.45,
     color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
@@ -633,6 +699,7 @@ export function CardContent({
 
 export function CardFooter({
   children,
+  divider = false,
   className = "",
   style,
   ...props
@@ -648,6 +715,7 @@ export function CardFooter({
     gap: spacingToken.actionGap,
     paddingBlock: spacingToken.sectionPaddingBlock,
     paddingInline: spacingToken.sectionPaddingInline,
+    borderTop: divider ? "1px solid var(--ktn-border-muted)" : undefined,
     fontSize: sizeToken.footerFontSize,
     color: "var(--ktn-text-primary)",
     ...style,

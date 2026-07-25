@@ -858,6 +858,102 @@ Stepper behavior notes:
 - Action controls are right-aligned and include only previous, next, and submit.
 - Submit button uses success styling by default, and completed step tick indicators use success styling.
 
+### StepwiseForm
+
+```ts
+import { StepwiseForm } from '@keytuno/ui-react';
+
+type StepwiseFormCardProps = Omit<
+  CardProps,
+  'children' | 'collapse' | 'defaultCollapsed' | 'onCollapseChange' | 'onAction'
+>;
+
+type StepwiseFormControlButtonProps = Omit<
+  ButtonProps,
+  'children' | 'onAction' | 'type'
+>;
+
+interface StepwiseFormControlConfig {
+  show?: boolean;
+  label?: ReactNode;
+  icon?: ReactNode;
+  showIcon?: boolean;
+  iconOnly?: boolean;
+  iconPosition?: 'left' | 'right';
+  ariaLabel?: string;
+  buttonProps?: StepwiseFormControlButtonProps; // full Button props forwarding
+}
+
+interface StepwiseFormControls {
+  previous?: StepwiseFormControlConfig;
+  next?: StepwiseFormControlConfig;
+  submit?: StepwiseFormControlConfig;
+}
+
+interface StepwiseFormStep {
+  id: string;
+  title: ReactNode;
+  summary?: ReactNode;
+  description?: ReactNode;
+  content?: ReactNode;
+  footer?: ReactNode;
+  disabled?: boolean;
+  completed?: boolean;
+  collapsible?: boolean;
+  defaultOpen?: boolean;
+  open?: boolean;
+  headerCollapseTrigger?: boolean;
+  showScrollbar?: boolean;
+  contentMaxHeight?: CSSProperties['maxHeight'];
+  showContentDivider?: boolean;
+  showFooterDivider?: boolean;
+  cardProps?: StepwiseFormCardProps; // full Card props forwarding per step
+  controls?: StepwiseFormControls;   // per-step control overrides
+}
+
+<StepwiseForm
+  steps={StepwiseFormStep[]}
+  size?={'xs'|'sm'|'md'|'lg'}
+  spacing?={'xs'|'sm'|'md'|'lg'}
+  activeStepId?={string}
+  defaultActiveStepId?={string}
+  onActiveStepChange?={(stepId: string) => void}
+  openStepIds?={string[]}
+  defaultOpenStepIds?={string[]}
+  onOpenStepIdsChange?={(ids: string[]) => void}
+  collapsible?={boolean}
+  allowMultipleOpen?={boolean}
+  disabled?={boolean}
+  joined?={boolean}                  // default true, joins cards without spacing
+  showSummary?={boolean}
+  showFooterStepCounter?={boolean}
+  headerCollapseTrigger?={boolean}   // default true
+  contentScrollable?={boolean}
+  contentMaxHeight?={CSSProperties['maxHeight']}
+  showContentDivider?={boolean}      // optional line after header
+  showFooterDivider?={boolean}       // optional line before footer
+  showPrevious?={boolean}
+  showNext?={boolean}
+  showSubmit?={boolean}
+  submitOnLastStep?={boolean}
+  hideNextWhenLastStep?={boolean}
+  controls?={{ previous, next, submit }}
+  cardProps?={StepwiseFormCardProps} // shared Card props for all step cards
+  onSubmit?={(activeStepId: string | null) => void}
+  onAction?={(ctx: StepwiseFormActionContext) => void}
+/>
+```
+
+StepwiseForm behavior notes:
+
+- Header title follows a step summary pattern: `Step X of Y: {step title}`.
+- Each step is rendered as a card in a collapsible group; `joined={true}` joins cards without space between them.
+- Header and summary/description area can toggle open/close when the step is collapsible (`headerCollapseTrigger`, step-level override).
+- Horizontal separators are optional with `showContentDivider` and `showFooterDivider`, with per-step overrides available.
+- Footer actions are aligned as previous (left), step counter (center), and next/submit (right).
+- Card and Button APIs are reused through `cardProps` and `controls.*.buttonProps` so styling and behavior stay consistent with existing components.
+- Middle content supports optional scrollbar with `contentScrollable` and `contentMaxHeight`, plus per-step overrides (`showScrollbar`, `contentMaxHeight`).
+
 ### Navbar
 
 ```ts
@@ -1039,7 +1135,7 @@ interface SidebarActionContext {
 ### Card
 
 ```ts
-import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from '@keytuno/ui-react';
+import { Card, CardGroup, CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter } from '@keytuno/ui-react';
 
 <Card
   size?={'xs'|'sm'|'md'|'lg'}
@@ -1048,18 +1144,27 @@ import { Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent, 
   defaultCollapsed?={boolean}
   onCollapseChange?={(collapsed: boolean) => void}
 >
-  <CardHeader>
+  <CardHeader collapseTrigger?={boolean}>
     <CardTitle collapseTrigger?={boolean}>Title</CardTitle>
     <CardDescription collapseTrigger?={boolean}>Subtitle</CardDescription>
     <CardAction>…buttons…</CardAction>
   </CardHeader>
-  <CardContent>…</CardContent>
-  <CardFooter>…</CardFooter>
+  <CardContent divider?={boolean}>…</CardContent>
+  <CardFooter divider?={boolean}>…</CardFooter>
 </Card>
 
+<CardGroup joined?={boolean} gap?={CSSProperties['gap']}>
+  <Card>…</Card>
+  <Card>…</Card>
+  <Card>…</Card>
+</CardGroup>
+
 // Notes:
+// - CardHeader collapseTrigger is optional and only applies when Card has collapse={true}.
 // - CardTitle/CardDescription collapseTrigger is optional and only applies when Card has collapse={true}.
-// - When collapseTrigger is enabled, title/description can collapse and reopen card content via click or keyboard (Enter/Space).
+// - CardContent/CardFooter divider is optional and adds horizontal separators.
+// - CardGroup joined mode removes spacing between stacked cards and merges borders.
+// - When collapseTrigger is enabled, header/title/description can collapse and reopen card content via click or keyboard (Enter/Space).
 ```
 
 ### Field
