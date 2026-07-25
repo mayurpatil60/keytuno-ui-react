@@ -870,7 +870,7 @@ type StepwiseFormCardProps = Omit<
 
 type StepwiseFormControlButtonProps = Omit<
   ButtonProps,
-  'children' | 'onAction' | 'type'
+  'children' | 'type'
 >;
 
 interface StepwiseFormControlConfig {
@@ -908,6 +908,9 @@ interface StepwiseFormStep {
   showContentDivider?: boolean;
   showFooterDivider?: boolean;
   cardProps?: StepwiseFormCardProps; // full Card props forwarding per step
+  prevBtnProps?: StepwiseFormControlButtonProps;
+  nextBtnProps?: StepwiseFormControlButtonProps;
+  submitBtnProps?: StepwiseFormControlButtonProps;
   controls?: StepwiseFormControls;   // per-step control overrides
 }
 
@@ -937,6 +940,9 @@ interface StepwiseFormStep {
   showSubmit?={boolean}
   submitOnLastStep?={boolean}
   hideNextWhenLastStep?={boolean}
+  prevBtnProps?={StepwiseFormControlButtonProps}
+  nextBtnProps?={StepwiseFormControlButtonProps}
+  submitBtnProps?={StepwiseFormControlButtonProps}
   controls?={{ previous, next, submit }}
   cardProps?={StepwiseFormCardProps} // shared Card props for all step cards
   onSubmit?={(activeStepId: string | null) => void}
@@ -947,11 +953,16 @@ interface StepwiseFormStep {
 StepwiseForm behavior notes:
 
 - Header title follows a step summary pattern: `Step X of Y: {step title}`.
-- Each step is rendered as a card in a collapsible group; `joined={true}` joins cards without space between them.
+- Each step is rendered as a card in a collapsible group; `joined={true}` joins cards edge-to-edge with no visual gap between cards.
 - Header and summary/description area can toggle open/close when the step is collapsible (`headerCollapseTrigger`, step-level override).
 - Horizontal separators are optional with `showContentDivider` and `showFooterDivider`, with per-step overrides available.
 - Footer actions are aligned as previous (left), step counter (center), and next/submit (right).
-- Card and Button APIs are reused through `cardProps` and `controls.*.buttonProps` so styling and behavior stay consistent with existing components.
+- Button APIs are reusable from three layers:
+  - shared direct aliases (`prevBtnProps`, `nextBtnProps`, `submitBtnProps`)
+  - shared structured overrides (`controls.*.buttonProps`)
+  - per-step overrides (`step.prevBtnProps`, `step.nextBtnProps`, `step.submitBtnProps`, and `step.controls.*.buttonProps`)
+- Precedence is most specific last: shared alias -> shared controls -> step alias -> step controls.
+- `submitOnLastStep={false}` shows submit on every open step; `true` limits submit to the last enabled step.
 - Middle content supports optional scrollbar with `contentScrollable` and `contentMaxHeight`, plus per-step overrides (`showScrollbar`, `contentMaxHeight`).
 
 ### Navbar

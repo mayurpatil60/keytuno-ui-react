@@ -5,6 +5,7 @@ import {
   type CSSProperties,
   type HTMLAttributes,
   type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 
@@ -46,7 +47,7 @@ export type StepwiseFormCardProps = Omit<
 
 export type StepwiseFormControlButtonProps = Omit<
   ButtonProps,
-  "children" | "onAction" | "type"
+  "children" | "type"
 >;
 
 export interface StepwiseFormControlConfig {
@@ -84,6 +85,9 @@ export interface StepwiseFormStep {
   showContentDivider?: boolean;
   showFooterDivider?: boolean;
   cardProps?: StepwiseFormCardProps;
+  prevBtnProps?: StepwiseFormControlButtonProps;
+  nextBtnProps?: StepwiseFormControlButtonProps;
+  submitBtnProps?: StepwiseFormControlButtonProps;
   controls?: StepwiseFormControls;
 }
 
@@ -126,6 +130,9 @@ export interface StepwiseFormProps extends Omit<
   showSubmit?: boolean;
   submitOnLastStep?: boolean;
   hideNextWhenLastStep?: boolean;
+  prevBtnProps?: StepwiseFormControlButtonProps;
+  nextBtnProps?: StepwiseFormControlButtonProps;
+  submitBtnProps?: StepwiseFormControlButtonProps;
   controls?: StepwiseFormControls;
   cardProps?: StepwiseFormCardProps;
   onSubmit?: (activeStepId: string | null) => void;
@@ -376,6 +383,23 @@ function mergeControlConfig(
   };
 }
 
+function withButtonPropsAlias(
+  control: StepwiseFormControlConfig | undefined,
+  buttonProps: StepwiseFormControlButtonProps | undefined,
+): StepwiseFormControlConfig | undefined {
+  if (control == null && buttonProps == null) {
+    return undefined;
+  }
+
+  return {
+    ...control,
+    buttonProps: {
+      ...(buttonProps ?? {}),
+      ...(control?.buttonProps ?? {}),
+    },
+  };
+}
+
 function resolveControl(
   control: StepwiseFormControlConfig | undefined,
   defaults: {
@@ -403,7 +427,9 @@ function resolveControl(
     iconOnly: control?.iconOnly ?? buttonProps.iconOnly ?? false,
     iconPosition: control?.iconPosition ?? "left",
     ariaLabel:
-      control?.ariaLabel ?? (labelText === "" ? defaults.ariaLabel : labelText),
+      control?.ariaLabel ??
+      buttonProps["aria-label"] ??
+      (labelText === "" ? defaults.ariaLabel : labelText),
     buttonProps: {
       ...buttonProps,
       variant: buttonProps.variant ?? defaults.variant,
@@ -479,6 +505,9 @@ export function StepwiseForm({
   showSubmit = true,
   submitOnLastStep = true,
   hideNextWhenLastStep = true,
+  prevBtnProps,
+  nextBtnProps,
+  submitBtnProps,
   controls,
   cardProps,
   onSubmit,
@@ -750,7 +779,7 @@ export function StepwiseForm({
       aria-label={ariaLabel ?? "Stepwise form"}
       {...props}
     >
-      <CardGroup joined={joined} gap={tokens.rootGap}>
+      <CardGroup joined={joined} gap={joined ? 0 : tokens.rootGap}>
         {steps.map((step, index) => {
           const {
             size: stepCardSize,
@@ -782,17 +811,43 @@ export function StepwiseForm({
           const panelId = `${generatedId}-step-panel-${index}`;
           const triggerId = `${generatedId}-step-trigger-${index}`;
 
-          const mergedPreviousControl = mergeControlConfig(
+          const sharedPreviousControl = withButtonPropsAlias(
             controls?.previous,
+            prevBtnProps,
+          );
+          const sharedNextControl = withButtonPropsAlias(
+            controls?.next,
+            nextBtnProps,
+          );
+          const sharedSubmitControl = withButtonPropsAlias(
+            controls?.submit,
+            submitBtnProps,
+          );
+
+          const stepPreviousControl = withButtonPropsAlias(
             step.controls?.previous,
+            step.prevBtnProps,
+          );
+          const stepNextControl = withButtonPropsAlias(
+            step.controls?.next,
+            step.nextBtnProps,
+          );
+          const stepSubmitControl = withButtonPropsAlias(
+            step.controls?.submit,
+            step.submitBtnProps,
+          );
+
+          const mergedPreviousControl = mergeControlConfig(
+            sharedPreviousControl,
+            stepPreviousControl,
           );
           const mergedNextControl = mergeControlConfig(
-            controls?.next,
-            step.controls?.next,
+            sharedNextControl,
+            stepNextControl,
           );
           const mergedSubmitControl = mergeControlConfig(
-            controls?.submit,
-            step.controls?.submit,
+            sharedSubmitControl,
+            stepSubmitControl,
           );
 
           const previousControl = resolveControl(mergedPreviousControl, {
@@ -830,7 +885,7 @@ export function StepwiseForm({
             showNextControl && !(hideNextWhenLastStep && isLastEnabledStep);
 
           const showSubmitButton =
-            showSubmitControl && submitOnLastStep && isLastEnabledStep;
+            showSubmitControl && (submitOnLastStep ? isLastEnabledStep : true);
 
           const shouldScroll =
             (step.showScrollbar ?? contentScrollable) === true;
@@ -854,7 +909,11 @@ export function StepwiseForm({
             borderColor: stepActive
               ? activeCardBorderColor
               : "var(--ktn-border-muted)",
-            boxShadow: stepActive ? `0 0 0 1px ${activeCardRingColor}` : "none",
+            boxShadow: stepActive
+              ? joined
+                ? `inset 0 0 0 1px ${activeCardRingColor}`
+                : `0 0 0 1px ${activeCardRingColor}`
+              : "none",
             ...sharedCardStyle,
             ...stepCardStyle,
             // In joined CardGroup mode, cards overlap by 1px to merge borders.
@@ -962,6 +1021,22 @@ export function StepwiseForm({
           const nextButtonProps = nextControl.buttonProps;
           const submitButtonProps = submitControl.buttonProps;
 
+          function handleControlButtonAction(
+            controlButtonAction:
+              | ((event: ReactMouseEvent<HTMLButtonElement>) => void)
+              | undefined,
+            event: ReactMouseEvent<HTMLButtonElement>,
+            callback: () => void,
+          ): void {
+            controlButtonAction?.(event);
+
+            if (event.defaultPrevented) {
+              return;
+            }
+
+            callback();
+          }
+
           return (
             <Card
               key={step.id}
@@ -1003,7 +1078,7 @@ export function StepwiseForm({
                   <CardAction>
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="ghost"
                       size={buttonSize}
                       iconOnly
                       aria-label={stepOpen ? "Collapse step" : "Expand step"}
@@ -1059,17 +1134,23 @@ export function StepwiseForm({
                           previousStepId == null
                         }
                         onAction={(event) => {
-                          if (previousStepId == null) {
-                            return;
-                          }
+                          handleControlButtonAction(
+                            previousButtonProps.onAction,
+                            event,
+                            () => {
+                              if (previousStepId == null) {
+                                return;
+                              }
 
-                          const previousStep = steps.find(
-                            (item) => item.id === previousStepId,
+                              const previousStep = steps.find(
+                                (item) => item.id === previousStepId,
+                              );
+
+                              if (previousStep != null) {
+                                setActiveStep(previousStep, "previous", event);
+                              }
+                            },
                           );
-
-                          if (previousStep != null) {
-                            setActiveStep(previousStep, "previous", event);
-                          }
                         }}
                       >
                         {renderControlContent(previousControl)}
@@ -1099,17 +1180,23 @@ export function StepwiseForm({
                           nextStepId == null
                         }
                         onAction={(event) => {
-                          if (nextStepId == null) {
-                            return;
-                          }
+                          handleControlButtonAction(
+                            nextButtonProps.onAction,
+                            event,
+                            () => {
+                              if (nextStepId == null) {
+                                return;
+                              }
 
-                          const nextStep = steps.find(
-                            (item) => item.id === nextStepId,
+                              const nextStep = steps.find(
+                                (item) => item.id === nextStepId,
+                              );
+
+                              if (nextStep != null) {
+                                setActiveStep(nextStep, "next", event);
+                              }
+                            },
                           );
-
-                          if (nextStep != null) {
-                            setActiveStep(nextStep, "next", event);
-                          }
                         }}
                       >
                         {renderControlContent(nextControl)}
@@ -1129,13 +1216,19 @@ export function StepwiseForm({
                           submitButtonProps.disabled === true || stepDisabled
                         }
                         onAction={(event) => {
-                          onSubmit?.(step.id);
-
-                          emitAction("submit", {
-                            activeStepId: step.id,
-                            stepId: step.id,
+                          handleControlButtonAction(
+                            submitButtonProps.onAction,
                             event,
-                          });
+                            () => {
+                              onSubmit?.(step.id);
+
+                              emitAction("submit", {
+                                activeStepId: step.id,
+                                stepId: step.id,
+                                event,
+                              });
+                            },
+                          );
                         }}
                       >
                         {renderControlContent(submitControl)}

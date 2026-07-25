@@ -91,6 +91,46 @@ const scrollableSteps: StepwiseFormStep[] = [
   },
 ];
 
+const controlOverrideSteps: StepwiseFormStep[] = [
+  {
+    id: "account",
+    title: "Account Setup",
+    summary: "Start with account and identity fields.",
+    description: "Step-level next button can override shared button props.",
+    defaultOpen: true,
+    nextBtnProps: {
+      variant: "secondary",
+      compact: true,
+      tooltip: "Continue to billing",
+    },
+    content: (
+      <p style={bodyTextStyle}>
+        Step-level `nextBtnProps` is applied here while cards remain joined.
+      </p>
+    ),
+  },
+  {
+    id: "billing",
+    title: "Billing",
+    summary:
+      "Shared prev/next/submit props are forwarded as full Button props.",
+    content: (
+      <p style={bodyTextStyle}>
+        Shared button props can control variant, compact mode, tooltip, and aria
+        attributes.
+      </p>
+    ),
+  },
+  {
+    id: "confirm",
+    title: "Confirmation",
+    summary: "Submit final setup.",
+    content: (
+      <p style={bodyTextStyle}>Submit action is available on the last step.</p>
+    ),
+  },
+];
+
 export const StepwiseFormStory: Story = {
   name: "Stepwise Form",
   render: () => (
@@ -124,6 +164,40 @@ export const StepwiseFormScrollable: Story = {
   ),
 };
 
+export const StepwiseFormButtonProps: Story = {
+  name: "Button Props Overrides",
+  render: () => (
+    <div style={frameStyle}>
+      <StepwiseForm
+        steps={controlOverrideSteps}
+        joined
+        prevBtnProps={{
+          variant: "ghost",
+          compact: true,
+          tooltip: "Go back",
+        }}
+        nextBtnProps={{
+          variant: "outline",
+          tooltip: "Move forward",
+          "aria-label": "Go to next step",
+        }}
+        submitBtnProps={{
+          variant: "primary",
+          tooltip: "Submit setup",
+        }}
+        controls={{
+          submit: {
+            label: "Finish",
+            iconPosition: "right",
+          },
+        }}
+        onAction={action("action")}
+        onSubmit={action("submit")}
+      />
+    </div>
+  ),
+};
+
 export const StepwiseFormPlayground: Story = {
   name: "Playground",
   args: {
@@ -144,6 +218,17 @@ export const StepwiseFormPlayground: Story = {
     showSubmit: true,
     hideNextWhenLastStep: true,
     submitOnLastStep: true,
+    prevBtnProps: {
+      variant: "outline",
+    },
+    nextBtnProps: {
+      variant: "outline",
+    },
+    submitBtnProps: {
+      variant: "primary",
+    },
+    controls: undefined,
+    cardProps: undefined,
     disabled: false,
   },
   argTypes: {
@@ -170,10 +255,13 @@ export const StepwiseFormPlayground: Story = {
     showSubmit: { control: "boolean" },
     hideNextWhenLastStep: { control: "boolean" },
     submitOnLastStep: { control: "boolean" },
+    prevBtnProps: { control: "object" },
+    nextBtnProps: { control: "object" },
+    submitBtnProps: { control: "object" },
     disabled: { control: "boolean" },
     steps: { table: { disable: true } },
-    controls: { table: { disable: true } },
-    cardProps: { table: { disable: true } },
+    controls: { control: "object" },
+    cardProps: { control: "object" },
     defaultActiveStepId: { table: { disable: true } },
     activeStepId: { table: { disable: true } },
     openStepIds: { table: { disable: true } },
@@ -206,6 +294,11 @@ export const StepwiseFormPlayground: Story = {
         showSubmit={args.showSubmit}
         hideNextWhenLastStep={args.hideNextWhenLastStep}
         submitOnLastStep={args.submitOnLastStep}
+        prevBtnProps={args.prevBtnProps}
+        nextBtnProps={args.nextBtnProps}
+        submitBtnProps={args.submitBtnProps}
+        controls={args.controls}
+        cardProps={args.cardProps}
         disabled={args.disabled}
         onAction={args.onAction}
         onActiveStepChange={args.onActiveStepChange}

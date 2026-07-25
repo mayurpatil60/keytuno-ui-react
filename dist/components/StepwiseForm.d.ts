@@ -7,7 +7,7 @@ type StepwiseFormSize = CardSize;
 type StepwiseFormSpacing = CardSpacing;
 type StepwiseFormActionSource = "step-select" | "step-toggle" | "previous" | "next" | "submit";
 type StepwiseFormCardProps = Omit<CardProps, "children" | "collapse" | "defaultCollapsed" | "onCollapseChange" | "onAction">;
-type StepwiseFormControlButtonProps = Omit<ButtonProps, "children" | "onAction" | "type">;
+type StepwiseFormControlButtonProps = Omit<ButtonProps, "children" | "type">;
 interface StepwiseFormControlConfig {
     show?: boolean;
     label?: ReactNode;
@@ -41,6 +41,9 @@ interface StepwiseFormStep {
     showContentDivider?: boolean;
     showFooterDivider?: boolean;
     cardProps?: StepwiseFormCardProps;
+    prevBtnProps?: StepwiseFormControlButtonProps;
+    nextBtnProps?: StepwiseFormControlButtonProps;
+    submitBtnProps?: StepwiseFormControlButtonProps;
     controls?: StepwiseFormControls;
 }
 interface StepwiseFormActionContext {
@@ -78,11 +81,14 @@ interface StepwiseFormProps extends Omit<HTMLAttributes<HTMLDivElement>, "childr
     showSubmit?: boolean;
     submitOnLastStep?: boolean;
     hideNextWhenLastStep?: boolean;
+    prevBtnProps?: StepwiseFormControlButtonProps;
+    nextBtnProps?: StepwiseFormControlButtonProps;
+    submitBtnProps?: StepwiseFormControlButtonProps;
     controls?: StepwiseFormControls;
     cardProps?: StepwiseFormCardProps;
     onSubmit?: (activeStepId: string | null) => void;
     onAction?: (context: StepwiseFormActionContext) => void;
 }
-declare function StepwiseForm({ steps, size, spacing, activeStepId, defaultActiveStepId, onActiveStepChange, openStepIds, defaultOpenStepIds, onOpenStepIdsChange, collapsible, allowMultipleOpen, disabled, joined, showSummary, showFooterStepCounter, headerCollapseTrigger, contentScrollable, contentMaxHeight, showContentDivider, showFooterDivider, showPrevious, showNext, showSubmit, submitOnLastStep, hideNextWhenLastStep, controls, cardProps, onSubmit, onAction, className, style, role, ["aria-label"]: ariaLabel, ...props }: StepwiseFormProps): JSX.Element;
+declare function StepwiseForm({ steps, size, spacing, activeStepId, defaultActiveStepId, onActiveStepChange, openStepIds, defaultOpenStepIds, onOpenStepIdsChange, collapsible, allowMultipleOpen, disabled, joined, showSummary, showFooterStepCounter, headerCollapseTrigger, contentScrollable, contentMaxHeight, showContentDivider, showFooterDivider, showPrevious, showNext, showSubmit, submitOnLastStep, hideNextWhenLastStep, prevBtnProps, nextBtnProps, submitBtnProps, controls, cardProps, onSubmit, onAction, className, style, role, ["aria-label"]: ariaLabel, ...props }: StepwiseFormProps): JSX.Element;
 
 export { StepwiseForm, type StepwiseFormActionContext, type StepwiseFormActionSource, type StepwiseFormCardProps, type StepwiseFormControlButtonProps, type StepwiseFormControlConfig, type StepwiseFormControls, type StepwiseFormProps, type StepwiseFormSize, type StepwiseFormSpacing, type StepwiseFormStep };
