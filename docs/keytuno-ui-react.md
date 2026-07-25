@@ -1258,6 +1258,7 @@ Dialog scroll behavior notes:
 - When `scrollable` is enabled, `DialogContent` keeps header and footer visible and applies the inbuilt `Scrollbar` only to the middle content section.
 - `maxContentHeight` defaults to `min(86vh, 40rem)` and is also clamped by viewport height (`calc(100vh - 2.5rem)`) so the full dialog remains visible.
 - Header-to-body, body-to-footer, and scrollbar-to-content spacing are intentionally separated for clearer visual grouping.
+- Dialog layer and overlay interactions stop pointer/click bubbling to parent containers, preventing click-through side effects (for example, row/card `item-click` handlers firing when a dialog closes).
 
 Dialog playbook pattern (middle-only scrollbar + sticky footer):
 

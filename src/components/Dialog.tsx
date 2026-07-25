@@ -326,6 +326,18 @@ export function Dialog({
     });
   }
 
+  function stopLayerEventPropagation(event: unknown): void {
+    if (!event || typeof event !== "object") {
+      return;
+    }
+
+    const eventLike = event as {
+      stopPropagation?: () => void;
+    };
+
+    eventLike.stopPropagation?.();
+  }
+
   useEffect(() => {
     if (!(isOpen && closeOnEscape && !disabled)) {
       return;
@@ -551,11 +563,24 @@ export function Dialog({
         {renderTrigger()}
 
         {isOpen ? (
-          <div style={layerStyle}>
+          <div
+            style={layerStyle}
+            onPointerDown={(event) => {
+              stopLayerEventPropagation(event);
+            }}
+            onClick={(event) => {
+              stopLayerEventPropagation(event);
+            }}
+          >
             <div
               aria-hidden
               style={backdropStyle}
+              onPointerDown={(event) => {
+                stopLayerEventPropagation(event);
+              }}
               onClick={(event) => {
+                stopLayerEventPropagation(event);
+
                 if (closeOnOverlayClick) {
                   setDialogOpen(false, "overlay", event);
                 }
