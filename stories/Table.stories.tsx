@@ -13,6 +13,7 @@ import {
 interface TradeRow {
   id: string;
   symbol: string;
+  detailsUrl: string;
   sector: string;
   status: "Open" | "Paused" | "Closed";
   owner: string;
@@ -34,6 +35,7 @@ const tradeRows: TradeRow[] = Array.from({ length: 180 }, (_, index) => {
   return {
     id: `TRD-${String(seed).padStart(4, "0")}`,
     symbol: `STK${String(100 + seed)}`,
+    detailsUrl: `https://keytuno.app/trades/${seed}`,
     sector: sectors[index % sectors.length] ?? "Banking",
     status: statuses[index % statuses.length] ?? "Open",
     owner: owners[index % owners.length] ?? "Mayur",
@@ -48,6 +50,23 @@ const tableColumns: TableColumnDef<TradeRow>[] = [
   {
     accessorKey: "symbol",
     header: "Symbol",
+    cell: ({ getValue, row }) => {
+      const symbol = String(getValue() ?? "");
+
+      return (
+        <a
+          href={row.original.detailsUrl}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            color: "var(--ktn-action-primary-bg, #2563eb)",
+            textDecoration: "none",
+          }}
+        >
+          {symbol}
+        </a>
+      );
+    },
   },
   {
     accessorKey: "sector",
@@ -195,6 +214,39 @@ export const SelectableStickyHeader: Story = {
   ),
 };
 
+export const ActionableRowClickablePlaybook: Story = {
+  name: "Actionable Row Clickable Playbook",
+  argTypes: {
+    onAction: { action: "table-action" },
+  },
+  render: (args) => (
+    <div style={shellStyle}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: "0.78rem",
+          color: "var(--ktn-text-secondary, #64748b)",
+        }}
+      >
+        Click a row to emit row-click. Link and action buttons remain
+        independently interactive. Hover tone is transient only.
+      </p>
+
+      <Table
+        data={tradeRows.slice(0, 20)}
+        columns={tableColumns}
+        rowActions={tableRowActions}
+        rowClickable
+        variant="basic"
+        size="sm"
+        sortable
+        hoverable
+        onAction={args.onAction}
+      />
+    </div>
+  ),
+};
+
 const playgroundArgTypes = {
   variant: {
     control: "select",
@@ -211,6 +263,7 @@ const playgroundArgTypes = {
   stickyHeader: { control: "boolean" },
   sortable: { control: "boolean" },
   filterable: { control: "boolean" },
+  rowClickable: { control: "boolean" },
   selectable: { control: "boolean" },
   multiSelect: { control: "boolean" },
   columnVisibility: { control: "boolean" },
@@ -234,6 +287,7 @@ export const TablePlayground: Story = {
     stickyHeader: false,
     sortable: true,
     filterable: true,
+    rowClickable: true,
     selectable: false,
     multiSelect: true,
     columnVisibility: false,
@@ -256,6 +310,7 @@ export const TablePlayground: Story = {
         stickyHeader={args.stickyHeader ?? false}
         sortable={args.sortable ?? true}
         filterable={args.filterable ?? true}
+        rowClickable={args.rowClickable ?? false}
         selectable={args.selectable ?? false}
         multiSelect={args.multiSelect ?? true}
         columnVisibility={args.columnVisibility ?? false}

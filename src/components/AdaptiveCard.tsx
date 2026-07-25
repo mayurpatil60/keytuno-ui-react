@@ -5,6 +5,7 @@ import {
   useState,
   type CSSProperties,
   type HTMLAttributes,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 
@@ -85,7 +86,7 @@ export interface AdaptiveCardAction<TData extends object = object> {
   onAction?: (row: TData, rowIndex: number) => void;
 }
 
-export type AdaptiveCardActionSource = "item-action";
+export type AdaptiveCardActionSource = "item-action" | "item-click";
 
 export interface AdaptiveCardActionContext<TData extends object = object> {
   source: AdaptiveCardActionSource;
@@ -116,6 +117,7 @@ export interface AdaptiveCardProps<TData extends object = object> extends Omit<
   actions?:
     | AdaptiveCardAction<TData>[]
     | ((row: TData, rowIndex: number) => AdaptiveCardAction<TData>[]);
+  cardClickable?: boolean | ((row: TData, rowIndex: number) => boolean);
   actionMode?: AdaptiveCardActionMode;
   actionInlineMaxVisible?: number;
   actionAlignment?: AdaptiveCardActionAlignment;
@@ -184,6 +186,8 @@ interface ResolvedAdaptiveCardFieldSchema<
 
 const baseClasses = "flex w-full min-w-0 flex-col";
 const defaultEmptyText = "No adaptive cards available.";
+const interactiveCardChildSelector =
+  "a[href],button,input,select,textarea,summary,[role='button'],[role='link'],[role='menuitem'],[role='menuitemcheckbox'],[role='menuitemradio'],[role='option'],[contenteditable='true'],[data-card-action='true'],[data-ktn-adaptive-card-interactive='true']";
 
 const sizeTokens: Record<AdaptiveCardSize, AdaptiveCardSizeTokens> = {
   xs: {
@@ -706,6 +710,31 @@ function toCardSpacing(size: AdaptiveCardSize): "xs" | "sm" | "md" | "lg" {
   return size;
 }
 
+function resolveCardClickable<TData extends object>(
+  cardClickable: boolean | ((row: TData, rowIndex: number) => boolean),
+  row: TData,
+  rowIndex: number,
+): boolean {
+  if (typeof cardClickable === "function") {
+    return cardClickable(row, rowIndex);
+  }
+
+  return cardClickable;
+}
+
+function shouldIgnoreCardClickFromTarget(
+  target: EventTarget | null,
+  currentTarget: HTMLElement,
+): boolean {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const interactiveAncestor = target.closest(interactiveCardChildSelector);
+
+  return interactiveAncestor != null && interactiveAncestor !== currentTarget;
+}
+
 export function AdaptiveCard<TData extends object = object>({
   data = [],
   schema,
@@ -719,6 +748,7 @@ export function AdaptiveCard<TData extends object = object>({
   columns,
   columnBreakpoints,
   actions = [],
+  cardClickable = false,
   actionMode = "auto",
   actionInlineMaxVisible,
   actionAlignment = "right",
@@ -748,6 +778,7 @@ export function AdaptiveCard<TData extends object = object>({
   const [viewportWidth, setViewportWidth] = useState(() =>
     normalizeViewportWidth(),
   );
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
 
   const listParentRef = useRef<HTMLDivElement | null>(null);
 
@@ -1160,7 +1191,7 @@ export function AdaptiveCard<TData extends object = object>({
 
     if (resolvedActionMode === "menu") {
       return (
-        <div style={rowActionStyle}>
+        <div style={rowActionStyle} data-card-action="true">
           <DropdownMenu size={sizeToken.actionButtonSize}>
             <DropdownMenuTrigger
               openLabel="Open actions"
@@ -1211,7 +1242,7 @@ export function AdaptiveCard<TData extends object = object>({
     const inlineActions = rowActions.slice(0, inlineActionLimit);
 
     return (
-      <div style={rowActionStyle}>
+      <div style={rowActionStyle} data-card-action="true">
         {inlineActions.map((action) => {
           const disabled = resolveActionDisabled(action, row, rowIndex);
           const iconOnly = action.icon != null;
@@ -1240,6 +1271,9 @@ export function AdaptiveCard<TData extends object = object>({
 
   function renderCard(row: TData, rowIndex: number): JSX.Element {
     const rowId = resolveRowKey(row, rowIndex, rowKey);
+    const isCardClickable = resolveCardClickable(cardClickable, row, rowIndex);
+    const isCardHovered = hoveredCardId === rowId;
+    const showCardInteractiveTone = isCardClickable && isCardHovered;
 
     const cardStyle: CSSProperties = {
       width: "100%",
@@ -1248,9 +1282,12 @@ export function AdaptiveCard<TData extends object = object>({
       display: "flex",
       flexDirection: "column",
       gap: sizeToken.cardGap,
-      background: variantToken.surfaceBackground,
+      background: showCardInteractiveTone
+        ? "color-mix(in srgb, var(--ktn-bg-muted, #edf2f7) 90%, var(--ktn-border-muted, #e2e8f0))"
+        : variantToken.surfaceBackground,
       border: variantToken.surfaceBorder,
       boxShadow: variantToken.surfaceShadow,
+      transition: "background-color 140ms ease",
       boxSizing: "border-box",
     };
 
@@ -1282,6 +1319,23 @@ export function AdaptiveCard<TData extends object = object>({
     const cardActions = renderCardActions(row, rowIndex, actionLayout);
     const usesSameRowLayout =
       actionLayout === "same-row" && cardActions != null;
+
+    function handleCardClick(event: ReactMouseEvent<HTMLDivElement>): void {
+      if (event.defaultPrevented || !isCardClickable) {
+        return;
+      }
+
+      if (shouldIgnoreCardClickFromTarget(event.target, event.currentTarget)) {
+        return;
+      }
+
+      emitAction({
+        source: "item-click",
+        row,
+        rowIndex,
+        event,
+      });
+    }
 
     const resolvedFieldEntries: Array<{
       field: ResolvedAdaptiveCardFieldSchema<TData>;
@@ -1402,8 +1456,26 @@ export function AdaptiveCard<TData extends object = object>({
         size={sizeToken.cardSize}
         spacing={toCardSpacing(sizeToken.cardSize)}
         style={cardStyle}
-        role="article"
+        role={isCardClickable ? undefined : "article"}
         aria-label={cardAriaLabel}
+        onClick={isCardClickable ? handleCardClick : undefined}
+        onMouseEnter={
+          isCardClickable
+            ? () => {
+                setHoveredCardId(rowId);
+              }
+            : undefined
+        }
+        onMouseLeave={
+          isCardClickable
+            ? () => {
+                setHoveredCardId((currentCardId) =>
+                  currentCardId === rowId ? null : currentCardId,
+                );
+              }
+            : undefined
+        }
+        data-ktn-adaptive-card-clickable={isCardClickable ? "true" : undefined}
       >
         {usesSameRowLayout ? (
           fieldRows.length === 0 ? (

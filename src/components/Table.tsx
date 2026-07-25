@@ -4,6 +4,7 @@ import {
   useState,
   type CSSProperties,
   type HTMLAttributes,
+  type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
 
@@ -42,7 +43,8 @@ export type TableActionSource =
   | "filter"
   | "selection"
   | "column-visibility"
-  | "row-action";
+  | "row-action"
+  | "row-click";
 
 export interface TableActionContext<TData extends object = object> {
   source: TableActionSource;
@@ -107,6 +109,7 @@ export interface TableProps<TData extends object = object> extends Omit<
   onSelectionChange?: (selectedRows: TData[]) => void;
   onAction?: (context: TableActionContext<TData>) => void;
 
+  rowClickable?: boolean | ((row: TData, rowIndex: number) => boolean);
   rowActions?: RowAction<TData>[];
 
   columnVisibility?: boolean;
@@ -150,6 +153,8 @@ const baseClasses = "flex w-full min-w-0 flex-col";
 const SPECIAL_SELECT_COLUMN_ID = "__select";
 const SPECIAL_ACTIONS_COLUMN_ID = "__actions";
 const DEFAULT_EMPTY_TEXT = "No records found.";
+const interactiveRowChildSelector =
+  "a[href],button,input,select,textarea,summary,[role='button'],[role='link'],[role='menuitem'],[role='menuitemcheckbox'],[role='menuitemradio'],[role='option'],[contenteditable='true'],[data-ktn-table-row-interactive='true']";
 
 const sizeTokens: Record<TableSize, TableSizeTokens> = {
   xs: {
@@ -553,6 +558,31 @@ function resolveRowActionTooltip<TData extends object>(
   return readableActionId === "" ? undefined : readableActionId;
 }
 
+function resolveRowClickable<TData extends object>(
+  rowClickable: boolean | ((row: TData, rowIndex: number) => boolean),
+  row: TData,
+  rowIndex: number,
+): boolean {
+  if (typeof rowClickable === "function") {
+    return rowClickable(row, rowIndex);
+  }
+
+  return rowClickable;
+}
+
+function shouldIgnoreRowClickFromTarget(
+  target: EventTarget | null,
+  currentTarget: HTMLElement,
+): boolean {
+  if (!(target instanceof Element)) {
+    return false;
+  }
+
+  const interactiveAncestor = target.closest(interactiveRowChildSelector);
+
+  return interactiveAncestor != null && interactiveAncestor !== currentTarget;
+}
+
 export function Table<TData extends object = object>({
   data = [],
   columns,
@@ -571,6 +601,7 @@ export function Table<TData extends object = object>({
   selectedCountFormatter = (count: number) => `${count} selected`,
   onSelectionChange,
   onAction,
+  rowClickable = false,
   rowActions,
   columnVisibility = false,
   defaultHiddenColumns,
@@ -1290,30 +1321,66 @@ export function Table<TData extends object = object>({
                 </tr>
               ) : (
                 table.getRowModel().rows.map((row) => {
+                  const isRowClickable = resolveRowClickable(
+                    rowClickable,
+                    row.original,
+                    row.index,
+                  );
                   const isHovered = hoveredRowId === row.id;
                   const isRowSelected = row.getIsSelected();
+                  const showRowHoverTone =
+                    isHovered && (hoverable || isRowClickable);
+
+                  function handleRowClick(
+                    event: ReactMouseEvent<HTMLTableRowElement>,
+                  ): void {
+                    if (event.defaultPrevented || !isRowClickable) {
+                      return;
+                    }
+
+                    if (
+                      shouldIgnoreRowClickFromTarget(
+                        event.target,
+                        event.currentTarget,
+                      )
+                    ) {
+                      return;
+                    }
+
+                    onAction?.({
+                      source: "row-click",
+                      row: row.original,
+                      rowIndex: row.index,
+                      event,
+                    });
+                  }
 
                   return (
                     <tr
                       key={row.id}
                       aria-selected={selectable ? isRowSelected : undefined}
+                      data-ktn-table-row-clickable={
+                        isRowClickable ? "true" : undefined
+                      }
                       style={{
                         backgroundColor: isRowSelected
                           ? "color-mix(in srgb, var(--ktn-action-primary-bg, #2563eb) 16%, transparent)"
-                          : isHovered && hoverable
+                          : showRowHoverTone
                             ? colorToken.hoverRowColor
                             : shouldStriped && row.index % 2 === 1
                               ? colorToken.stripedRowColor
                               : "transparent",
+                        cursor: isRowClickable ? "pointer" : undefined,
                         transition: "background-color 100ms ease",
                       }}
+                      onClick={isRowClickable ? handleRowClick : undefined}
                       onMouseEnter={() => {
-                        if (hoverable) {
+                        if (hoverable || isRowClickable) {
                           setHoveredRowId(row.id);
                         }
                       }}
                       onMouseLeave={() => {
-                        if (hoverable) {
+                        if (hoverable || isRowClickable) {
                           setHoveredRowId((current) =>
                             current === row.id ? null : current,
                           );

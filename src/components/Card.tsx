@@ -219,6 +219,10 @@ export function Card({
       return;
     }
 
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       event.currentTarget.click();

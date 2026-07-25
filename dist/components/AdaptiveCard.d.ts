@@ -45,7 +45,7 @@ interface AdaptiveCardAction<TData extends object = object> {
     disabled?: boolean | ((row: TData, rowIndex: number) => boolean);
     onAction?: (row: TData, rowIndex: number) => void;
 }
-type AdaptiveCardActionSource = "item-action";
+type AdaptiveCardActionSource = "item-action" | "item-click";
 interface AdaptiveCardActionContext<TData extends object = object> {
     source: AdaptiveCardActionSource;
     actionId?: string;
@@ -66,6 +66,7 @@ interface AdaptiveCardProps<TData extends object = object> extends Omit<HTMLAttr
     columns?: number | AdaptiveCardColumns;
     columnBreakpoints?: AdaptiveCardColumnBreakpoints;
     actions?: AdaptiveCardAction<TData>[] | ((row: TData, rowIndex: number) => AdaptiveCardAction<TData>[]);
+    cardClickable?: boolean | ((row: TData, rowIndex: number) => boolean);
     actionMode?: AdaptiveCardActionMode;
     actionInlineMaxVisible?: number;
     actionAlignment?: AdaptiveCardActionAlignment;
@@ -80,6 +81,6 @@ interface AdaptiveCardProps<TData extends object = object> extends Omit<HTMLAttr
     emptyText?: ReactNode;
     onAction?: (context: AdaptiveCardActionContext<TData>) => void;
 }
-declare function AdaptiveCard<TData extends object = object>({ data, schema, rowKey, variant, size, locale, currency, showFieldLabels, insideColumns, columns, columnBreakpoints, actions, actionMode, actionInlineMaxVisible, actionAlignment, actionPlacement, actionLayout, actionMenuLabel, virtualized, virtualizedMaxHeight, virtualizedEstimateSize, virtualizedOverscan, viewportMaxHeight, emptyText, onAction, className, style, ...props }: AdaptiveCardProps<TData>): JSX.Element;
+declare function AdaptiveCard<TData extends object = object>({ data, schema, rowKey, variant, size, locale, currency, showFieldLabels, insideColumns, columns, columnBreakpoints, actions, cardClickable, actionMode, actionInlineMaxVisible, actionAlignment, actionPlacement, actionLayout, actionMenuLabel, virtualized, virtualizedMaxHeight, virtualizedEstimateSize, virtualizedOverscan, viewportMaxHeight, emptyText, onAction, className, style, ...props }: AdaptiveCardProps<TData>): JSX.Element;
 
 export { AdaptiveCard, type AdaptiveCardAction, type AdaptiveCardActionAlignment, type AdaptiveCardActionContext, type AdaptiveCardActionLayout, type AdaptiveCardActionMode, type AdaptiveCardActionPlacement, type AdaptiveCardActionSource, type AdaptiveCardColumnBreakpoints, type AdaptiveCardColumns, type AdaptiveCardFieldSchema, type AdaptiveCardFieldType, type AdaptiveCardInnerColumns, type AdaptiveCardProps, type AdaptiveCardSize, type AdaptiveCardVariant };

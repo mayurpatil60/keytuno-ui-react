@@ -15,6 +15,7 @@ interface PortfolioRow {
   symbol: string;
   desk: string;
   owner: string;
+  profileUrl: string;
   status: "Open" | "Review" | "Closed";
   price: number;
   change: number;
@@ -49,6 +50,7 @@ const portfolioRows: PortfolioRow[] = Array.from(
       symbol: `STK${String(100 + seed)}`,
       desk: desks[index % desks.length] ?? "Derivatives",
       owner: owners[index % owners.length] ?? "Mayur",
+      profileUrl: `https://keytuno.app/portfolio/${seed}`,
       status: statuses[index % statuses.length] ?? "Open",
       price: 130 + ((seed * 23) % 1620),
       change: ((seed % 2 === 0 ? 1 : -1) * ((seed * 11) % 130)) / 10,
@@ -70,13 +72,19 @@ const adaptiveSchema: AdaptiveCardFieldSchema<PortfolioRow>[] = [
   { key: "desk", label: "Desk", priority: 2 },
   { key: "owner", label: "Owner", priority: 3 },
   {
+    key: "profileUrl",
+    label: "Profile",
+    type: "link",
+    priority: 4,
+  },
+  {
     key: "price",
     label: "Price",
     type: "currency",
     currency: "INR",
     align: "right",
     maximumFractionDigits: 2,
-    priority: 4,
+    priority: 5,
   },
   {
     key: "change",
@@ -84,7 +92,7 @@ const adaptiveSchema: AdaptiveCardFieldSchema<PortfolioRow>[] = [
     type: "percent",
     align: "right",
     maximumFractionDigits: 2,
-    priority: 5,
+    priority: 6,
   },
   {
     key: "exposure",
@@ -93,14 +101,14 @@ const adaptiveSchema: AdaptiveCardFieldSchema<PortfolioRow>[] = [
     currency: "INR",
     align: "right",
     maximumFractionDigits: 0,
-    priority: 6,
+    priority: 7,
   },
   {
     key: "updatedAt",
     label: "Updated",
     type: "date",
     dateOptions: { year: "numeric", month: "short", day: "numeric" },
-    priority: 7,
+    priority: 8,
   },
 ];
 
@@ -209,6 +217,45 @@ export const VirtualizedOneColumn: Story = {
         virtualizedEstimateSize={240}
         virtualizedOverscan={8}
         actionLayout="own-row"
+      />
+    </div>
+  ),
+};
+
+export const ActionableClickablePlaybook: Story = {
+  name: "Actionable Clickable Playbook",
+  argTypes: {
+    onAction: { action: "adaptive-action" },
+  },
+  render: (args) => (
+    <div style={shellStyle}>
+      <p
+        style={{
+          margin: 0,
+          fontSize: "0.78rem",
+          color: "var(--ktn-text-secondary, #64748b)",
+        }}
+      >
+        Click the card body to emit item-click. Hover tone is pointer-only and
+        does not persist after click. Link and action buttons stay independently
+        clickable.
+      </p>
+
+      <AdaptiveCard<PortfolioRow>
+        data={portfolioRows.slice(0, 8)}
+        rowKey="id"
+        schema={adaptiveSchema}
+        actions={adaptiveActions}
+        variant="default"
+        size="sm"
+        columns={{ mobile: 1, tablet: 1, web: 1 }}
+        insideColumns={2}
+        actionLayout="same-row"
+        actionPlacement="top"
+        actionAlignment="right"
+        actionMode="inline"
+        cardClickable
+        onAction={args.onAction}
       />
     </div>
   ),
@@ -326,6 +373,7 @@ const playgroundArgTypes = {
     control: "inline-radio",
     options: [1, 2, 3],
   },
+  cardClickable: { control: "boolean" },
   columns: { control: "object" },
   onAction: { action: "adaptive-action" },
   data: { table: { disable: true } },
@@ -344,7 +392,12 @@ export const AdaptiveCardPlayground: Story = {
     variant: "default",
     size: "sm",
     insideColumns: 2,
-    columns: { mobile: 1, tablet: 1, web: 1 },
+    cardClickable: true,
+    columns: {
+      "mobile": 1,
+      "tablet": 2,
+      "web": 3
+    },
   },
   argTypes: playgroundArgTypes,
   render: (args) => (
@@ -362,6 +415,7 @@ export const AdaptiveCardPlayground: Story = {
         variant={args.variant ?? "default"}
         size={args.size ?? "sm"}
         insideColumns={args.insideColumns ?? 2}
+        cardClickable={args.cardClickable ?? false}
         columns={args.columns ?? { mobile: 1, tablet: 1, web: 1 }}
         onAction={args.onAction}
       />

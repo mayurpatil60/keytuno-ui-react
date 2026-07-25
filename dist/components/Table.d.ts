@@ -5,7 +5,7 @@ import './Tooltip.js';
 
 type TableVariant = "basic" | "outline" | "ghost" | "filled" | "minimal" | "striped";
 type TableSize = "xs" | "sm" | "md" | "lg";
-type TableActionSource = "sort" | "filter" | "selection" | "column-visibility" | "row-action";
+type TableActionSource = "sort" | "filter" | "selection" | "column-visibility" | "row-action" | "row-click";
 interface TableActionContext<TData extends object = object> {
     source: TableActionSource;
     sort?: SortingState;
@@ -54,6 +54,7 @@ interface TableProps<TData extends object = object> extends Omit<HTMLAttributes<
     selectedCountFormatter?: (count: number) => ReactNode;
     onSelectionChange?: (selectedRows: TData[]) => void;
     onAction?: (context: TableActionContext<TData>) => void;
+    rowClickable?: boolean | ((row: TData, rowIndex: number) => boolean);
     rowActions?: RowAction<TData>[];
     columnVisibility?: boolean;
     defaultHiddenColumns?: string[];
@@ -68,6 +69,6 @@ interface TableProps<TData extends object = object> extends Omit<HTMLAttributes<
     stickyHeader?: boolean;
     emptyText?: ReactNode;
 }
-declare function Table<TData extends object = object>({ data, columns, rowKey, variant, size, compact, sortable, filterable, columnFilters, selectable, multiSelect, selectAllRowsAriaLabel, selectRowAriaLabelFormatter, selectedCountFormatter, onSelectionChange, onAction, rowActions, columnVisibility, defaultHiddenColumns, loading, loadingRows, loadingText, skeleton, striped, hoverable, bordered, rounded, stickyHeader, emptyText, className, style, ...props }: TableProps<TData>): JSX.Element;
+declare function Table<TData extends object = object>({ data, columns, rowKey, variant, size, compact, sortable, filterable, columnFilters, selectable, multiSelect, selectAllRowsAriaLabel, selectRowAriaLabelFormatter, selectedCountFormatter, onSelectionChange, onAction, rowClickable, rowActions, columnVisibility, defaultHiddenColumns, loading, loadingRows, loadingText, skeleton, striped, hoverable, bordered, rounded, stickyHeader, emptyText, className, style, ...props }: TableProps<TData>): JSX.Element;
 
 export { type RowAction, Table, type TableActionContext, type TableActionSource, type TableColumnDef, type TableProps, type TableSize, type TableVariant };

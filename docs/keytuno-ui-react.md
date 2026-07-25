@@ -1666,6 +1666,9 @@ const rowActions: RowAction<User>[] = [
   columnVisibility?={boolean}
   defaultHiddenColumns?={string[]}
 
+  // Row click
+  rowClickable?={boolean | ((row: User, rowIndex: number) => boolean)}
+
   // Row actions
   rowActions={rowActions}
 
@@ -1685,6 +1688,14 @@ const rowActions: RowAction<User>[] = [
 // - Table is a standalone data surface renderer.
 // - Table viewport uses the inbuilt Scrollbar component (axis='both').
 // - Sort headers and row actions use inbuilt Button controls and feather icons.
+// - `rowClickable` emits `onAction({ source: 'row-click', row, rowIndex, event })`.
+// - Row-click handling ignores nested interactive descendants (`a`, `button`, `input`, select/menu controls, and custom `[data-ktn-table-row-interactive='true']`).
+// - Actionable row hover tone is transient only (no persisted visited styling).
+// - Storybook references:
+//   - Basic
+//   - Selectable Sticky Header
+//   - Actionable Row Clickable Playbook
+//   - Table Playground
 ```
 
 ### AdaptiveCard
@@ -1727,6 +1738,7 @@ import type {
 
   // Actions
   actions?={AdaptiveCardAction<User>[] | ((row: User, rowIndex: number) => AdaptiveCardAction<User>[])}
+  cardClickable?={boolean | ((row: User, rowIndex: number) => boolean)}
   actionMode?={'auto'|'inline'|'menu'}
   actionInlineMaxVisible?={number}
   actionAlignment?={'left'|'right'}
@@ -1773,7 +1785,7 @@ type AdaptiveCardFieldType =
   | 'progress'
   | 'media';
 
-type AdaptiveCardActionSource = 'item-action';
+type AdaptiveCardActionSource = 'item-action' | 'item-click';
 
 type AdaptiveCardActionLayout = 'own-row' | 'same-row';
 
@@ -1781,6 +1793,10 @@ type AdaptiveCardActionLayout = 'own-row' | 'same-row';
 // - This is the native enterprise card surface for app-owned data (no external Adaptive Cards SDK required).
 // - `insideColumns` controls field layout inside each card (1, 2, or 3 columns).
 // - `columns` + `columnBreakpoints` control the outer responsive grid of cards.
+// - `cardClickable` enables row-level card click actions and emits `source='item-click'`.
+// - Row-level card clicks ignore nested interactive targets (`a`, `button`, menu triggers, and other interactive controls),
+//   so field links and action buttons continue working independently.
+// - Actionable cards apply enterprise hover/focus treatment (muted surface + stronger border/shadow) when `cardClickable` is enabled.
 // - `actionLayout='same-row'` attaches actions to one row only:
 //   - `actionPlacement='top'` -> actions share only the first rendered field row.
 //   - `actionPlacement='bottom'` -> actions share only the last rendered field row.
@@ -1790,8 +1806,10 @@ type AdaptiveCardActionLayout = 'own-row' | 'same-row';
 // - Storybook references:
 //   - Basic
 //   - Virtualized One Column
+//   - Actionable Clickable Playbook
 //   - Action Position Matrix
 //   - AdaptiveCard Playground
+//   - DataToolbar -> View Mode Switch (table/adaptive-card)
 ```
 
 ### List

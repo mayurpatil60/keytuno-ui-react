@@ -339,6 +339,7 @@ export const ToolbarComposition: Story = {
             columns={tableColumns}
             sortable={false}
             filterable={false}
+            rowClickable
           />
         ) : (
           <AdaptiveCard<DemoRow>
@@ -346,6 +347,7 @@ export const ToolbarComposition: Story = {
             rowKey="id"
             schema={adaptiveSchema}
             actions={adaptiveActions}
+            cardClickable
             variant="default"
             size="sm"
             columns={{ mobile: 1, tablet: 1, web: 1 }}
