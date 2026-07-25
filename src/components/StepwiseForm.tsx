@@ -807,7 +807,7 @@ export function StepwiseForm({
             label: "Next",
             icon: <FiChevronRight size={tokens.iconSize} />,
             ariaLabel: "Go to next step",
-            variant: "primary",
+            variant: "outline",
             size: buttonSize,
           });
 
@@ -1003,7 +1003,7 @@ export function StepwiseForm({
                   <CardAction>
                     <Button
                       type="button"
-                      variant="ghost"
+                      variant="outline"
                       size={buttonSize}
                       iconOnly
                       aria-label={stepOpen ? "Collapse step" : "Expand step"}
