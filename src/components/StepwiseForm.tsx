@@ -136,6 +136,7 @@ type StepwiseFormTokens = {
   rootGap: string;
   sectionGap: string;
   footerGap: string;
+  footerTopGap: string;
   summarySize: string;
   descriptionSize: string;
   counterSize: string;
@@ -159,6 +160,7 @@ const tokensBySize: Record<StepwiseFormSize, StepwiseFormTokens> = {
     rootGap: "0.6rem",
     sectionGap: "0.45rem",
     footerGap: "0.4rem",
+    footerTopGap: "0.22rem",
     summarySize: "0.74rem",
     descriptionSize: "0.72rem",
     counterSize: "0.72rem",
@@ -168,6 +170,7 @@ const tokensBySize: Record<StepwiseFormSize, StepwiseFormTokens> = {
     rootGap: "0.7rem",
     sectionGap: "0.5rem",
     footerGap: "0.45rem",
+    footerTopGap: "0.24rem",
     summarySize: "0.78rem",
     descriptionSize: "0.76rem",
     counterSize: "0.76rem",
@@ -177,6 +180,7 @@ const tokensBySize: Record<StepwiseFormSize, StepwiseFormTokens> = {
     rootGap: "0.8rem",
     sectionGap: "0.58rem",
     footerGap: "0.52rem",
+    footerTopGap: "0.28rem",
     summarySize: "0.82rem",
     descriptionSize: "0.82rem",
     counterSize: "0.8rem",
@@ -186,6 +190,7 @@ const tokensBySize: Record<StepwiseFormSize, StepwiseFormTokens> = {
     rootGap: "0.9rem",
     sectionGap: "0.65rem",
     footerGap: "0.58rem",
+    footerTopGap: "0.34rem",
     summarySize: "0.9rem",
     descriptionSize: "0.88rem",
     counterSize: "0.86rem",
@@ -840,13 +845,16 @@ export function StepwiseForm({
             .filter((value) => value != null && value.trim() !== "")
             .join(" ");
 
+          const activeCardBorderColor =
+            "var(--ktn-stepwise-active-border, color-mix(in srgb, var(--ktn-action-primary-bg) 34%, var(--ktn-border-muted)))";
+          const activeCardRingColor =
+            "var(--ktn-stepwise-active-ring, color-mix(in srgb, var(--ktn-action-primary-bg) 18%, var(--ktn-border-muted)))";
+
           const cardStyle: CSSProperties = {
             borderColor: stepActive
-              ? "var(--ktn-action-primary-bg)"
+              ? activeCardBorderColor
               : "var(--ktn-border-muted)",
-            boxShadow: stepActive
-              ? "0 0 0 1px var(--ktn-action-primary-bg)"
-              : "none",
+            boxShadow: stepActive ? `0 0 0 1px ${activeCardRingColor}` : "none",
             ...sharedCardStyle,
             ...stepCardStyle,
             // In joined CardGroup mode, cards overlap by 1px to merge borders.
@@ -901,6 +909,7 @@ export function StepwiseForm({
           const footerStyle: CSSProperties = {
             display: stepOpen ? "flex" : "none",
             flexDirection: "column",
+            marginTop: tokens.footerTopGap,
             gap: tokens.footerGap,
           };
 
