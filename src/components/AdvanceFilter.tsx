@@ -9,9 +9,9 @@ import {
 import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 
 import { Button, type ButtonProps } from "./Button";
-import { Field, FieldContent, FieldDescription, FieldLabel } from "./Field";
+import { Field, FieldContent, FieldLabel } from "./Field";
 import { Input } from "./Input";
-import { FiFilter, FiX } from "./icons/feather";
+import { FiFilter, FiPlus, FiX } from "./icons/feather";
 import {
   Select,
   type SelectOption,
@@ -21,7 +21,6 @@ import {
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -114,7 +113,6 @@ export interface AdvanceFilterProps {
 
   side?: SheetSide;
   title?: ReactNode;
-  description?: ReactNode;
   filtersSectionLabel?: ReactNode;
   sortSectionLabel?: ReactNode;
 
@@ -487,20 +485,17 @@ export function AdvanceFilter({
   triggerButtonProps,
   side = "right",
   title = "Advance Filter",
-  description = "Filter columns with multiple rules and operators",
   filtersSectionLabel = "Filter rules",
   sortSectionLabel = "Sort rules",
   addFilterLabel = "Add filter",
   addSortLabel = "Add sort",
-  clearFiltersLabel = "Clear filters",
-  resetSortingLabel = "Reset sorting",
-  applyFiltersLabel = "Apply filters",
+  clearFiltersLabel = "Clear",
+  applyFiltersLabel = "Apply",
   addFilterButtonProps,
   addSortButtonProps,
   resetFilterButtonProps,
   resetSortButtonProps,
   clearFiltersButtonProps,
-  resetSortingButtonProps,
   applyFiltersButtonProps,
   globalFilterLabel = "Global search",
   globalFilterPlaceholder = "Search all columns",
@@ -577,13 +572,7 @@ export function AdvanceFilter({
       allowedFilterColumnIds,
     );
 
-    setFilterRules(
-      nextFilterRules.length > 0
-        ? nextFilterRules
-        : firstFilterableColumnId === ""
-          ? []
-          : [createFilterRule(firstFilterableColumnId)],
-    );
+    setFilterRules(nextFilterRules.length > 0 ? nextFilterRules : []);
 
     setSortRules(extractSortRules(sorting, allowedSortColumnIds));
     setDraftGlobalSearch(globalSearch);
@@ -723,17 +712,15 @@ export function AdvanceFilter({
   }
 
   function handleClearFilters(): void {
-    const fallbackRules =
-      firstFilterableColumnId === ""
-        ? []
-        : [createFilterRule(firstFilterableColumnId)];
+    const fallbackRules: AdvanceRule[] = [];
 
     setFilterRules(fallbackRules);
+    setSortRules([]);
     setDraftGlobalSearch("");
 
     const nextResult: AdvanceFilterResult = {
       columnFilters: [],
-      sorting: buildSortingFromRules(sortRules),
+      sorting: [],
       globalSearch: "",
     };
 
@@ -746,34 +733,8 @@ export function AdvanceFilter({
       sorting: nextResult.sorting,
       globalSearch: nextResult.globalSearch,
       filterRuleCount: fallbackRules.length,
-      sortRuleCount: sortRules.length,
-      activeFilterCount: 0,
-    });
-  }
-
-  function handleResetSorting(): void {
-    setSortRules([]);
-
-    const nextResult: AdvanceFilterResult = {
-      columnFilters: buildFiltersFromRules(filterRules),
-      sorting: [],
-      globalSearch: canUseGlobalFilter ? draftGlobalSearch : "",
-    };
-
-    onApply(nextResult, "reset-sorting");
-    onAction?.({
-      source: "reset-sorting",
-      reason: "reset-sorting",
-      open: isOpen,
-      columnFilters: nextResult.columnFilters,
-      sorting: nextResult.sorting,
-      globalSearch: nextResult.globalSearch,
-      filterRuleCount: filterRules.length,
       sortRuleCount: 0,
-      activeFilterCount: countActiveAdvancedFilters(
-        nextResult.columnFilters,
-        nextResult.globalSearch,
-      ),
+      activeFilterCount: 0,
     });
   }
 
@@ -799,7 +760,6 @@ export function AdvanceFilter({
   const resetFilterButtonOverrides = resetFilterButtonProps ?? {};
   const resetSortButtonOverrides = resetSortButtonProps ?? {};
   const clearFiltersButtonOverrides = clearFiltersButtonProps ?? {};
-  const resetSortingButtonOverrides = resetSortingButtonProps ?? {};
   const applyFiltersButtonOverrides = applyFiltersButtonProps ?? {};
 
   const resolvedTriggerButtonAriaLabel =
@@ -835,6 +795,20 @@ export function AdvanceFilter({
     display: "flex",
     flexDirection: "column",
     gap: "0.56rem",
+  };
+
+  const filterSectionStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.7rem",
+    marginBlockStart: canUseGlobalFilter ? "0.3rem" : 0,
+  };
+
+  const sortSectionStyle: CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.7rem",
+    marginBlockStart: "0.55rem",
   };
 
   const filterRuleRowStyle: CSSProperties = {
@@ -987,7 +961,6 @@ export function AdvanceFilter({
       >
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
         </SheetHeader>
 
         <div style={bodyStyle}>
@@ -1004,139 +977,142 @@ export function AdvanceFilter({
                     setDraftGlobalSearch(event.currentTarget.value);
                   }}
                 />
-
-                <FieldDescription>
-                  Applies across all visible columns.
-                </FieldDescription>
               </FieldContent>
             </Field>
           ) : null}
 
-          <div style={sectionHeaderStyle}>
-            <p style={sectionLabelStyle}>{filtersSectionLabel}</p>
+          <div style={filterSectionStyle}>
+            <div style={sectionHeaderStyle}>
+              <p style={sectionLabelStyle}>{filtersSectionLabel}</p>
 
-            <Button
-              {...addFilterButtonOverrides}
-              size={controlSize}
-              variant={addFilterButtonOverrides.variant ?? "outline"}
-              onAction={() => {
-                if (firstFilterableColumnId === "") {
-                  return;
-                }
+              <Button
+                {...addFilterButtonOverrides}
+                size={controlSize}
+                variant={addFilterButtonOverrides.variant ?? "outline"}
+                onAction={() => {
+                  if (firstFilterableColumnId === "") {
+                    return;
+                  }
 
-                setFilterRules((current) => [
-                  ...current,
-                  createFilterRule(firstFilterableColumnId),
-                ]);
-                emitAction("add-filter");
-              }}
-            >
-              + {addFilterLabel}
-            </Button>
-          </div>
+                  setFilterRules((current) => [
+                    ...current,
+                    createFilterRule(firstFilterableColumnId),
+                  ]);
+                  emitAction("add-filter");
+                }}
+              >
+                <FiPlus size={14} /> {addFilterLabel}
+              </Button>
+            </div>
 
-          <div style={rulesWrapStyle}>
-            {filterRules.map((rule, index) => (
-              <div key={rule.id} style={filterRuleRowStyle}>
-                <Select
-                  size={controlSize}
-                  variant={selectVariant}
-                  options={filterColumnSelectOptions}
-                  value={rule.columnId}
-                  placeholder="Column"
-                  searchPlaceholder="Search columns"
-                  emptyText="No columns found."
-                  aria-label={`Filter column ${index + 1}`}
-                  style={filterColumnControlStyle}
-                  onValueChange={(value) => {
-                    const nextColumnId = toSingleSelectValue(value);
-
-                    if (nextColumnId == null) {
-                      return;
-                    }
-
-                    updateFilterRule(rule.id, {
-                      columnId: nextColumnId,
-                    });
-                  }}
-                />
-
-                <Select
-                  size={controlSize}
-                  variant={selectVariant}
-                  options={filterOperatorSelectOptions}
-                  value={rule.operator}
-                  placeholder="Operator"
-                  searchPlaceholder="Search operators"
-                  emptyText="No operators found."
-                  aria-label={`Filter operator ${index + 1}`}
-                  style={filterOperatorControlStyle}
-                  onValueChange={(value) => {
-                    const nextOperator = toSingleSelectValue(value);
-
-                    if (nextOperator == null) {
-                      return;
-                    }
-
-                    updateFilterRule(rule.id, {
-                      operator: nextOperator as AdvanceFilterOperator,
-                    });
-                  }}
-                />
-
-                <Input
-                  size={controlSize}
-                  value={rule.value}
-                  placeholder={ruleValuePlaceholder}
-                  aria-label={`Filter value ${index + 1}`}
-                  style={filterValueControlStyle}
-                  onChange={(event) => {
-                    updateFilterRule(rule.id, {
-                      value: event.currentTarget.value,
-                    });
-                  }}
-                />
-
-                <div style={clearRuleButtonWrapStyle}>
-                  <Button
-                    {...resetFilterButtonOverrides}
+            <div style={rulesWrapStyle}>
+              {filterRules.map((rule, index) => (
+                <div key={rule.id} style={filterRuleRowStyle}>
+                  <Select
                     size={controlSize}
-                    variant={resetFilterButtonOverrides.variant ?? "ghost"}
-                    iconOnly={resetFilterButtonOverrides.iconOnly ?? true}
-                    iconOnlyTone={
-                      resetFilterButtonOverrides.iconOnlyTone ?? true
-                    }
-                    tooltip={
-                      resetFilterButtonOverrides.tooltip ?? "Reset this filter"
-                    }
-                    tooltipSide={
-                      resetFilterButtonOverrides.tooltipSide ?? "top"
-                    }
-                    tooltipSize={resetFilterButtonOverrides.tooltipSize ?? "xs"}
-                    aria-label={
-                      typeof resetFilterButtonOverrides["aria-label"] ===
-                        "string" &&
-                      resetFilterButtonOverrides["aria-label"].trim() !== ""
-                        ? resetFilterButtonOverrides["aria-label"]
-                        : `Reset filter ${index + 1}`
-                    }
-                    onAction={() => {
-                      resetFilterRule(rule.id);
-                    }}
-                  >
-                    <FiX size={14} />
-                  </Button>
-                </div>
-              </div>
-            ))}
+                    variant={selectVariant}
+                    options={filterColumnSelectOptions}
+                    value={rule.columnId}
+                    placeholder="Column"
+                    searchPlaceholder="Search columns"
+                    emptyText="No columns found."
+                    aria-label={`Filter column ${index + 1}`}
+                    style={filterColumnControlStyle}
+                    onValueChange={(value) => {
+                      const nextColumnId = toSingleSelectValue(value);
 
-            {filterRules.length === 0 ? (
-              <p style={hintTextStyle}>Add a filter row to start filtering.</p>
-            ) : null}
+                      if (nextColumnId == null) {
+                        return;
+                      }
+
+                      updateFilterRule(rule.id, {
+                        columnId: nextColumnId,
+                      });
+                    }}
+                  />
+
+                  <Select
+                    size={controlSize}
+                    variant={selectVariant}
+                    options={filterOperatorSelectOptions}
+                    value={rule.operator}
+                    placeholder="Operator"
+                    searchPlaceholder="Search operators"
+                    emptyText="No operators found."
+                    aria-label={`Filter operator ${index + 1}`}
+                    style={filterOperatorControlStyle}
+                    onValueChange={(value) => {
+                      const nextOperator = toSingleSelectValue(value);
+
+                      if (nextOperator == null) {
+                        return;
+                      }
+
+                      updateFilterRule(rule.id, {
+                        operator: nextOperator as AdvanceFilterOperator,
+                      });
+                    }}
+                  />
+
+                  <Input
+                    size={controlSize}
+                    value={rule.value}
+                    placeholder={ruleValuePlaceholder}
+                    aria-label={`Filter value ${index + 1}`}
+                    style={filterValueControlStyle}
+                    onChange={(event) => {
+                      updateFilterRule(rule.id, {
+                        value: event.currentTarget.value,
+                      });
+                    }}
+                  />
+
+                  <div style={clearRuleButtonWrapStyle}>
+                    <Button
+                      {...resetFilterButtonOverrides}
+                      size={controlSize}
+                      variant={resetFilterButtonOverrides.variant ?? "ghost"}
+                      iconOnly={resetFilterButtonOverrides.iconOnly ?? true}
+                      iconOnlyTone={
+                        resetFilterButtonOverrides.iconOnlyTone ?? true
+                      }
+                      tooltip={
+                        resetFilterButtonOverrides.tooltip ??
+                        "Reset this filter"
+                      }
+                      tooltipSide={
+                        resetFilterButtonOverrides.tooltipSide ?? "top"
+                      }
+                      tooltipSize={
+                        resetFilterButtonOverrides.tooltipSize ?? "xs"
+                      }
+                      aria-label={
+                        typeof resetFilterButtonOverrides["aria-label"] ===
+                          "string" &&
+                        resetFilterButtonOverrides["aria-label"].trim() !== ""
+                          ? resetFilterButtonOverrides["aria-label"]
+                          : `Reset filter ${index + 1}`
+                      }
+                      onAction={() => {
+                        resetFilterRule(rule.id);
+                      }}
+                    >
+                      <FiX size={14} />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+
+              {filterRules.length === 0 ? (
+                <p style={hintTextStyle}>
+                  Add a filter row to start filtering.
+                </p>
+              ) : null}
+            </div>
           </div>
 
           {enableSorting && sortableColumns.length > 0 ? (
-            <>
+            <div style={sortSectionStyle}>
               <div style={sectionHeaderStyle}>
                 <p style={sectionLabelStyle}>{sortSectionLabel}</p>
 
@@ -1156,7 +1132,7 @@ export function AdvanceFilter({
                     emitAction("add-sort");
                   }}
                 >
-                  + {addSortLabel}
+                  <FiPlus size={14} /> {addSortLabel}
                 </Button>
               </div>
 
@@ -1248,12 +1224,10 @@ export function AdvanceFilter({
                 ))}
 
                 {sortRules.length === 0 ? (
-                  <p style={hintTextStyle}>
-                    Add sort rows to apply multi-column sorting.
-                  </p>
+                  <p style={hintTextStyle}>Add a sort row to start sorting.</p>
                 ) : null}
               </div>
-            </>
+            </div>
           ) : null}
         </div>
 
@@ -1267,17 +1241,6 @@ export function AdvanceFilter({
             >
               {clearFiltersLabel}
             </Button>
-
-            {enableSorting && sortableColumns.length > 0 ? (
-              <Button
-                {...resetSortingButtonOverrides}
-                size={controlSize}
-                variant={resetSortingButtonOverrides.variant ?? "outline"}
-                onAction={handleResetSorting}
-              >
-                {resetSortingLabel}
-              </Button>
-            ) : null}
           </div>
 
           <Button

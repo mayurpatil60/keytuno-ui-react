@@ -102,7 +102,6 @@ export const Basic: Story = {
       controlSize="sm"
       side="right"
       title="Advance Filter"
-      description="Filter columns with multiple rules and operators"
       triggerOpenLabel="Advance Filter"
       triggerCloseLabel="Close Advance Filter"
       triggerButtonProps={{ iconOnlyTone: true }}
@@ -150,7 +149,6 @@ export const ActionsAndAccessibility: Story = {
         triggerCloseLabel="Close trade advance filters"
         triggerAriaLabel="Open trade advance filters"
         title="Advance Filter"
-        description="Filter columns with multiple rules and operators"
         onApply={args.onApply}
         onAction={handleAction}
       />
@@ -199,9 +197,6 @@ const playgroundArgTypes = {
     control: "boolean",
   },
   title: {
-    control: "text",
-  },
-  description: {
     control: "text",
   },
   filtersSectionLabel: {
@@ -301,7 +296,6 @@ export const AdvanceFilterPlayground: Story = {
     canUseGlobalFilter: true,
     enableSorting: true,
     title: "Advance Filter",
-    description: "Filter columns with multiple rules and operators",
     filtersSectionLabel: "Filter rules",
     sortSectionLabel: "Sort rules",
     addFilterLabel: "Add filter",

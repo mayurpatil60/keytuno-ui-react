@@ -1499,7 +1499,6 @@ interface AdvanceFilterColumn {
   // sheet
   side?={'left'|'right'|'top'|'bottom'}
   title?={ReactNode}                // default 'Advance Filter'
-  description?={ReactNode}          // default 'Filter columns with multiple rules and operators'
 
   // section labels
   filtersSectionLabel?={ReactNode}
@@ -1583,7 +1582,6 @@ import type { ColumnFiltersState, SortingState } from '@tanstack/react-table';
   advanceFilterOpenLabel?={string}   // one-word recommended: 'Filter'
   advanceFilterCloseLabel?={string}  // one-word recommended: 'Close'
   advanceFilterTitle?={ReactNode}
-  advanceFilterDescription?={ReactNode}
   advanceFilterTriggerButtonProps?={AdvanceFilterButtonProps}
 
   // Icon actions

@@ -390,7 +390,6 @@ const playgroundArgTypes = {
   advanceFilterOpenLabel: { control: "text" },
   advanceFilterCloseLabel: { control: "text" },
   advanceFilterTitle: { control: "text" },
-  advanceFilterDescription: { control: "text" },
   advanceFilterTriggerButtonProps: { control: "object" },
   showSwitch: { control: "boolean" },
   switchMode: {
@@ -433,7 +432,6 @@ export const DataToolbarPlayground: Story = {
     advanceFilterOpenLabel: "Filter",
     advanceFilterCloseLabel: "Close",
     advanceFilterTitle: "Advance Filter",
-    advanceFilterDescription: "Configure filters and sorting",
     advanceFilterTriggerButtonProps: {
       variant: "secondary",
     },

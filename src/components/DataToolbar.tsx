@@ -87,7 +87,6 @@ export interface DataToolbarProps extends Omit<
   advanceFilterAriaLabel?: string;
   advanceFilterActiveCount?: number;
   advanceFilterTitle?: ReactNode;
-  advanceFilterDescription?: ReactNode;
   advanceFilterTriggerButtonProps?: AdvanceFilterButtonProps;
   addFilterLabel?: string;
   addSortLabel?: string;
@@ -201,7 +200,6 @@ export function DataToolbar({
   advanceFilterAriaLabel,
   advanceFilterActiveCount,
   advanceFilterTitle,
-  advanceFilterDescription,
   advanceFilterTriggerButtonProps,
   addFilterLabel,
   addSortLabel,
@@ -400,7 +398,6 @@ export function DataToolbar({
             triggerButtonProps={advanceFilterTriggerButtonOverrides}
             activeFilterCount={advanceFilterActiveCount}
             title={advanceFilterTitle}
-            description={advanceFilterDescription}
             addFilterLabel={addFilterLabel}
             addSortLabel={addSortLabel}
             clearFiltersLabel={clearFiltersLabel}

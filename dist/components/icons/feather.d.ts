@@ -4,6 +4,7 @@ type FeatherIconProps = SVGProps<SVGSVGElement> & {
     size?: number | string;
 };
 declare function FiX(props: FeatherIconProps): JSX.Element;
+declare function FiPlus(props: FeatherIconProps): JSX.Element;
 declare function FiCalendar(props: FeatherIconProps): JSX.Element;
 declare function FiChevronDown(props: FeatherIconProps): JSX.Element;
 declare function FiChevronUp(props: FeatherIconProps): JSX.Element;
@@ -36,4 +37,4 @@ declare function FiMinimize2(props: FeatherIconProps): JSX.Element;
 declare function FiRefreshCw(props: FeatherIconProps): JSX.Element;
 declare function FiSearch(props: FeatherIconProps): JSX.Element;
 
-export { type FeatherIconProps, FiCalendar, FiCheck, FiChevronDown, FiChevronLeft, FiChevronRight, FiChevronUp, FiChevronsLeft, FiChevronsRight, FiClock, FiColumns, FiDownload, FiEdit3, FiExternalLink, FiEye, FiFile, FiFileText, FiFilm, FiFilter, FiGrid, FiImage, FiLink2, FiList, FiMaximize2, FiMenu, FiMinimize2, FiMoreVertical, FiMusic, FiRefreshCw, FiSearch, FiTrash2, FiUploadCloud, FiX };
+export { type FeatherIconProps, FiCalendar, FiCheck, FiChevronDown, FiChevronLeft, FiChevronRight, FiChevronUp, FiChevronsLeft, FiChevronsRight, FiClock, FiColumns, FiDownload, FiEdit3, FiExternalLink, FiEye, FiFile, FiFileText, FiFilm, FiFilter, FiGrid, FiImage, FiLink2, FiList, FiMaximize2, FiMenu, FiMinimize2, FiMoreVertical, FiMusic, FiPlus, FiRefreshCw, FiSearch, FiTrash2, FiUploadCloud, FiX };

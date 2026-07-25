@@ -56,7 +56,6 @@ interface AdvanceFilterProps {
     triggerButtonProps?: AdvanceFilterButtonProps;
     side?: SheetSide;
     title?: ReactNode;
-    description?: ReactNode;
     filtersSectionLabel?: ReactNode;
     sortSectionLabel?: ReactNode;
     addFilterLabel?: string;
@@ -77,6 +76,6 @@ interface AdvanceFilterProps {
     onApply: (result: AdvanceFilterResult, reason: AdvanceFilterApplyReason) => void;
     onAction?: (context: AdvanceFilterActionContext) => void;
 }
-declare function AdvanceFilter({ open, defaultOpen, onOpenChange, columns, columnFilters, sorting, globalSearch, canUseGlobalFilter, enableSorting, controlSize, selectVariant, showTrigger, triggerDisabled, triggerTooltipSide, triggerTooltipSize, triggerOpenLabel, triggerCloseLabel, triggerIcon, triggerAriaLabel, activeFilterCount, triggerButtonProps, side, title, description, filtersSectionLabel, sortSectionLabel, addFilterLabel, addSortLabel, clearFiltersLabel, resetSortingLabel, applyFiltersLabel, addFilterButtonProps, addSortButtonProps, resetFilterButtonProps, resetSortButtonProps, clearFiltersButtonProps, resetSortingButtonProps, applyFiltersButtonProps, globalFilterLabel, globalFilterPlaceholder, ruleValuePlaceholder, onApply, onAction, }: AdvanceFilterProps): JSX.Element;
+declare function AdvanceFilter({ open, defaultOpen, onOpenChange, columns, columnFilters, sorting, globalSearch, canUseGlobalFilter, enableSorting, controlSize, selectVariant, showTrigger, triggerDisabled, triggerTooltipSide, triggerTooltipSize, triggerOpenLabel, triggerCloseLabel, triggerIcon, triggerAriaLabel, activeFilterCount, triggerButtonProps, side, title, filtersSectionLabel, sortSectionLabel, addFilterLabel, addSortLabel, clearFiltersLabel, applyFiltersLabel, addFilterButtonProps, addSortButtonProps, resetFilterButtonProps, resetSortButtonProps, clearFiltersButtonProps, applyFiltersButtonProps, globalFilterLabel, globalFilterPlaceholder, ruleValuePlaceholder, onApply, onAction, }: AdvanceFilterProps): JSX.Element;
 
 export { AdvanceFilter, type AdvanceFilterActionContext, type AdvanceFilterActionSource, type AdvanceFilterApplyReason, type AdvanceFilterButtonProps, type AdvanceFilterColumn, type AdvanceFilterOperator, type AdvanceFilterProps, type AdvanceFilterResult, type AdvanceSortDirection };
