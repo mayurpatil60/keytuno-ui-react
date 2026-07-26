@@ -166,6 +166,7 @@ Current callback groups:
 
 - Event-style `onAction(event)`: `Button`, `Badge`, `Avatar`, item-level `NavbarItem`, item-level `SidebarItem`, and item-level breadcrumb actions.
 - Context-style `onAction(context)`: all stateful form/data/overlay/navigation containers (`Select`, `DatePicker`, `ColorPicker`, `TimezonePicker`, `Radio`, `Switch`, `Checkbox`, `Slider`, `Table`, `Pagination`, `Dialog`, `Sheet`, `DropdownMenu`, `Tabs`, `Stepper`, `List`, `Field`, etc.).
+- Hybrid callback: `BadgeSelect` uses event-style `onAction(event)` for the badge trigger and context-style `onSelectAction(context)` for dropdown state/value interactions (`open`, `close`, `select`).
 
 When adding new components, keep this standard:
 
@@ -306,6 +307,40 @@ import { Badge } from '@keytuno/ui-react';
 >
   Label
 </Badge>
+```
+
+### BadgeSelect
+
+```ts
+import { BadgeSelect } from '@keytuno/ui-react';
+
+interface BadgeSelectOption { value: string; label: string; description?: string; keywords?: string[]; disabled?: boolean; }
+interface BadgeSelectGroup  { label: string; options: BadgeSelectOption[]; }
+
+<BadgeSelect
+  // all Badge trigger props are supported
+  variant?={'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+  size?={'xs'|'sm'|'md'|'lg'}
+  onAction?={(e: MouseEvent) => void}
+
+  // Select-like behavior (standalone compact dropdown, does not render Select)
+  // no search input or clear-action controls
+  options?={BadgeSelectOption[]}
+  groups?={BadgeSelectGroup[]}
+  value?={string | string[] | null}
+  defaultValue?={string | string[] | null}
+  multiple?={boolean}
+  showSelectedValue?={boolean}
+  placeholder?={string}
+  emptyText?={string}
+  dropdownVariant?={'inline'|'overlay'}
+  side?={'auto'|'left'|'top'|'bottom'|'right'} // default 'bottom'
+  sideOffset?={number}                          // default 0px
+  onValueChange?={(value) => void}
+  onSelectAction?={(context: BadgeSelectActionContext) => void}
+>
+  Label
+</BadgeSelect>
 ```
 
 ### Spinner

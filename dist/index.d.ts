@@ -5,6 +5,7 @@ export { Toggle, ToggleActionContext, ToggleActionSource, ToggleProps } from './
 export { ButtonGroup, ButtonGroupActionContext, ButtonGroupOrientation, ButtonGroupProps, ButtonGroupSize, ButtonGroupVariant } from './components/ButtonGroup.js';
 export { Spinner, SpinnerActionContext, SpinnerActionSource, SpinnerProps, SpinnerSize } from './components/Spinner.js';
 export { Badge, BadgeProps, BadgeSize, BadgeVariant } from './components/Badge.js';
+export { BadgeSelect, BadgeSelectActionContext, BadgeSelectActionSource, BadgeSelectDropdownVariant, BadgeSelectGroup, BadgeSelectOption, BadgeSelectProps, BadgeSelectSide, BadgeSelectValue } from './components/BadgeSelect.js';
 export { Toast, ToastActionContext, ToastActionSource, ToastProps, ToastSize, ToastVariant, toastSizes, toastVariants } from './components/Toast.js';
 export { Accordion, AccordionItem, AccordionOrientation, AccordionProps, AccordionSize } from './components/Accordion.js';
 export { Tabs, TabsActionContext, TabsActionSource, TabsItem, TabsOrientation, TabsProps, TabsSide, TabsSize, TabsVariant } from './components/Tabs.js';

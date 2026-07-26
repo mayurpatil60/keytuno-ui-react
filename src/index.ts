@@ -23,6 +23,17 @@ export type {
 } from "./components/Spinner";
 export { Badge } from "./components/Badge";
 export type { BadgeProps, BadgeSize, BadgeVariant } from "./components/Badge";
+export { BadgeSelect } from "./components/BadgeSelect";
+export type {
+  BadgeSelectActionContext,
+  BadgeSelectActionSource,
+  BadgeSelectDropdownVariant,
+  BadgeSelectGroup,
+  BadgeSelectOption,
+  BadgeSelectProps,
+  BadgeSelectSide,
+  BadgeSelectValue,
+} from "./components/BadgeSelect";
 export { Toast, toastSizes, toastVariants } from "./components/Toast";
 export type {
   ToastActionContext,
