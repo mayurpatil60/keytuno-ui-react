@@ -25,6 +25,7 @@ interface DialogContentProps extends HTMLAttributes<HTMLDivElement> {
     showCloseButton?: boolean;
     scrollable?: boolean;
     maxContentHeight?: string;
+    maxWidth?: string;
     closeButtonLabel?: string;
 }
 interface DialogHeaderProps extends HTMLAttributes<HTMLDivElement> {
@@ -37,7 +38,7 @@ interface DialogFooterProps extends HTMLAttributes<HTMLDivElement> {
     sticky?: boolean;
 }
 declare function Dialog({ children, open, defaultOpen, onOpenChange, onAction, trigger, variant, size, disabled, closeOnOverlayClick, closeOnEscape, className, style, ...props }: DialogProps): JSX.Element;
-declare function DialogContent({ children, showCloseButton, scrollable, maxContentHeight, closeButtonLabel, className, style, ...props }: DialogContentProps): JSX.Element;
+declare function DialogContent({ children, showCloseButton, scrollable, maxContentHeight, maxWidth, closeButtonLabel, className, style, ...props }: DialogContentProps): JSX.Element;
 declare function DialogHeader({ children, className, style, ...props }: DialogHeaderProps): JSX.Element;
 declare function DialogTitle({ children, className, style, ...props }: DialogTitleProps): JSX.Element;
 declare function DialogDescription({ children, className, style, ...props }: DialogDescriptionProps): JSX.Element;

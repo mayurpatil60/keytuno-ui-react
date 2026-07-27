@@ -62,6 +62,7 @@ export interface DialogContentProps extends HTMLAttributes<HTMLDivElement> {
   showCloseButton?: boolean;
   scrollable?: boolean;
   maxContentHeight?: string;
+  maxWidth?: string;
   closeButtonLabel?: string;
 }
 
@@ -600,6 +601,7 @@ export function DialogContent({
   showCloseButton = true,
   scrollable = false,
   maxContentHeight = "min(86vh, 40rem)",
+  maxWidth,
   closeButtonLabel = "Close dialog",
   className = "",
   style,
@@ -778,6 +780,7 @@ export function DialogContent({
   }
 
   const resolvedMaxContentHeight = `min(${maxContentHeight}, calc(100vh - 2.5rem))`;
+  const resolvedMaxContentWidth = maxWidth?.trim() || sizeToken.maxWidth;
   const sectionSpacing = shouldUseMiddleScrollbar
     ? `calc(${sizeToken.sectionGap} + 0.18rem)`
     : sizeToken.sectionGap;
@@ -785,7 +788,7 @@ export function DialogContent({
   const contentStyle: CSSProperties = {
     position: "relative",
     pointerEvents: "auto",
-    width: `min(100%, ${sizeToken.maxWidth})`,
+    width: `min(100%, ${resolvedMaxContentWidth})`,
     maxHeight: resolvedMaxContentHeight,
     overflow: "visible",
     borderWidth: "1px",
