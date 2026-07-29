@@ -169,7 +169,7 @@ const myTheme: ThemeContract = {
       buttonSuccessBackground: '#16a34a',
       buttonSuccessForeground: '#ffffff',
       buttonWarningBackground: '#f59e0b',
-      buttonWarningForeground: '#111827',
+      buttonWarningForeground: '#ffffff',
       buttonAccentBackground: '#db2777',
       buttonAccentForeground: '#ffffff',
       buttonDestructiveBackground: '#ef4444',
