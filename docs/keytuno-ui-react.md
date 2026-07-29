@@ -99,20 +99,40 @@ const activeTheme = resolveTheme('light');
 | `--ktn-bg-default` | Page background |
 | `--ktn-bg-surface` | Card / panel background |
 | `--ktn-bg-muted` | Subtle background (hover, striped rows) |
+| `--ktn-bg-hover` | Interactive hover surface tone |
+| `--ktn-bg-selected` | Interactive selected/active surface tone |
 | `--ktn-text-primary` | Primary text |
 | `--ktn-text-secondary` | Secondary / muted text |
 | `--ktn-border-muted` | Default border |
 | `--ktn-border-strong` | Focused / emphasized border |
 | `--ktn-action-primary-bg` | Primary button / accent color |
 | `--ktn-action-primary-fg` | Text on primary button |
+| `--ktn-action-primary-soft-bg` | Primary soft surface (light variant backgrounds) |
 | `--ktn-action-success-bg` | Success action color (green) |
 | `--ktn-action-success-fg` | Text on success actions |
+| `--ktn-action-success-soft-bg` | Success soft surface (light variant backgrounds) |
 | `--ktn-action-warning-bg` | Warning action color (yellow) |
 | `--ktn-action-warning-fg` | Text on warning actions |
-| `--ktn-action-accent-bg` | Accent action color (violet) |
+| `--ktn-action-warning-soft-bg` | Warning soft surface (light variant backgrounds) |
+| `--ktn-action-accent-bg` | Accent action color (rose) |
 | `--ktn-action-accent-fg` | Text on accent actions |
+| `--ktn-action-accent-soft-bg` | Accent soft surface (light variant backgrounds) |
 | `--ktn-action-danger-bg` | Destructive / danger color |
 | `--ktn-action-danger-fg` | Text on danger button |
+| `--ktn-action-danger-soft-bg` | Danger soft surface (light variant backgrounds) |
+| `--ktn-button-default-bg` | Secondary/default button background |
+| `--ktn-button-default-fg` | Secondary/default button text color |
+| `--ktn-button-default-border` | Secondary/default button border color |
+| `--ktn-button-primary-bg` | Primary button background |
+| `--ktn-button-primary-fg` | Primary button text color |
+| `--ktn-button-success-bg` | Success button background |
+| `--ktn-button-success-fg` | Success button text color |
+| `--ktn-button-warning-bg` | Warning button background |
+| `--ktn-button-warning-fg` | Warning button text color |
+| `--ktn-button-accent-bg` | Accent button background |
+| `--ktn-button-accent-fg` | Accent button text color |
+| `--ktn-button-destructive-bg` | Destructive button background |
+| `--ktn-button-destructive-fg` | Destructive button text color |
 | `--ktn-radius-sm/md/lg/pill` | Border radii |
 | `--ktn-shadow-sm/md` | Box shadows |
 
@@ -128,10 +148,32 @@ const myTheme: ThemeContract = {
   primitives: basePrimitiveTokens,
   semantic: {
     colors: createSemanticColors(basePrimitiveTokens.colors, {
-      actionPrimaryBackground: '#0e639c',
+      backgroundHover: '#e2ecff',
+      backgroundSelected: '#dbeafe',
+      borderStrong: '#94a3b8',
+      actionPrimaryBackground: '#1d4ed8',
+      actionPrimarySoftBackground: '#dbeafe',
       actionSuccessBackground: '#15803d',
-      actionWarningBackground: '#ca8a04',
-      actionAccentBackground: '#7c3aed',
+      actionSuccessSoftBackground: '#dcfce7',
+      actionWarningBackground: '#b45309',
+      actionWarningSoftBackground: '#fef3c7',
+      actionAccentBackground: '#be185d',
+      actionAccentSoftBackground: '#fce7f3',
+      actionDangerBackground: '#b91c1c',
+      actionDangerSoftBackground: '#fee2e2',
+      buttonDefaultBackground: '#edf2f7',
+      buttonDefaultForeground: '#1f2937',
+      buttonDefaultBorder: '#d2dce8',
+      buttonPrimaryBackground: '#2563eb',
+      buttonPrimaryForeground: '#ffffff',
+      buttonSuccessBackground: '#16a34a',
+      buttonSuccessForeground: '#ffffff',
+      buttonWarningBackground: '#f59e0b',
+      buttonWarningForeground: '#111827',
+      buttonAccentBackground: '#db2777',
+      buttonAccentForeground: '#ffffff',
+      buttonDestructiveBackground: '#ef4444',
+      buttonDestructiveForeground: '#ffffff',
     }),
   },
 };
@@ -285,7 +327,8 @@ import { Button } from '@keytuno/ui-react';
 />
 ```
 
-- `secondary` Button variant uses the same surface background token as Select (`--ktn-bg-surface`), so light and dark themes stay visually aligned.
+- Button variants use dedicated semantic button tokens (`--ktn-button-*-bg/fg`, plus `--ktn-button-default-border`) so light/dark palettes can be tuned independently from badge/alert soft surfaces.
+- Button hover behavior uses enterprise-style contrast: each variant darkens its background on hover and also adjusts border/text colors.
 
 ### Toggle
 
@@ -335,6 +378,9 @@ import { Badge } from '@keytuno/ui-react';
 </Badge>
 ```
 
+- Badge variants are borderless and rely on semantic background/text tokens for tone.
+- Soft variant surfaces are powered by `--ktn-action-*-soft-bg` tokens (for example primary `#dbeafe`, success `#dcfce7`, warning `#fef3c7`, danger `#fee2e2`).
+
 ### BadgeSelect
 
 ```ts
@@ -368,6 +414,9 @@ interface BadgeSelectGroup  { label: string; options: BadgeSelectOption[]; }
   Label
 </BadgeSelect>
 ```
+
+- BadgeSelect trigger and panel are borderless; option hover/selected visuals are driven by `--ktn-bg-hover` and `--ktn-bg-selected`.
+- BadgeSelect hover/selected treatment also blends variant soft tokens for brighter light-theme option feedback.
 
 ### Spinner
 

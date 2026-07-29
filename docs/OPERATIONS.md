@@ -49,6 +49,7 @@ pnpm audit --prod --audit-level high
    - `docs/COMPATIBILITY.md` (if version ranges or framework support changed)
    - `docs/releases/*.md` (when release notes need additive token/variant change history)
    - `keytuno-ui-library.md` phase or release execution record
+   - When semantic tokens change, ensure docs and adapter mappings include all related CSS vars (for example: `--ktn-bg-hover`, `--ktn-bg-selected`, `--ktn-border-strong`, `--ktn-action-danger-bg`, `--ktn-action-danger-fg`, `--ktn-action-primary-soft-bg`, `--ktn-action-success-soft-bg`, `--ktn-action-warning-soft-bg`, `--ktn-action-accent-soft-bg`, `--ktn-action-danger-soft-bg`, `--ktn-button-default-bg`, `--ktn-button-default-fg`, `--ktn-button-default-border`, `--ktn-button-primary-bg`, `--ktn-button-primary-fg`, `--ktn-button-success-bg`, `--ktn-button-success-fg`, `--ktn-button-warning-bg`, `--ktn-button-warning-fg`, `--ktn-button-accent-bg`, `--ktn-button-accent-fg`, `--ktn-button-destructive-bg`, `--ktn-button-destructive-fg`)
 
 5. Git-tag payload sanity checks pass:
    - `dist/` is tracked in git and not ignored.

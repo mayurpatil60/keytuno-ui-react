@@ -34,16 +34,37 @@ Peer dependencies:
 1. react ^18
 2. react-dom ^18
 
-## Built-in Themes and Action Tones
+## Built-in Themes and Semantic Tones
 
-1. Built-in themes: `light`, `dark`.
-2. Semantic action token pairs exported by `themeToCssVariables`:
+1. Built-in themes: `light`, `dark` with refreshed neutral surfaces and action hues.
+2. Semantic surface tokens exported by `themeToCssVariables`:
+	- `--ktn-bg-default`, `--ktn-bg-surface`, `--ktn-bg-muted`
+	- `--ktn-bg-hover`, `--ktn-bg-selected`
+3. Semantic border tokens:
+	- `--ktn-border-muted`, `--ktn-border-strong`
+4. Semantic action token pairs:
 	- `--ktn-action-primary-bg` / `--ktn-action-primary-fg`
 	- `--ktn-action-success-bg` / `--ktn-action-success-fg` (green)
-	- `--ktn-action-warning-bg` / `--ktn-action-warning-fg` (yellow)
-	- `--ktn-action-accent-bg` / `--ktn-action-accent-fg` (violet)
-3. Button-like variant coverage includes `success`, `warning`, and `accent` for: Badge, BadgeSelect, Button, ButtonGroup, Alert, Dialog, and InputGroup.
-4. Toast variants include: `default`, `success`, `warning`, `accent`, and `danger`.
+	- `--ktn-action-warning-bg` / `--ktn-action-warning-fg` (amber)
+	- `--ktn-action-accent-bg` / `--ktn-action-accent-fg` (rose)
+	- `--ktn-action-danger-bg` / `--ktn-action-danger-fg` (red)
+5. Semantic soft variant surface tokens:
+	- `--ktn-action-primary-soft-bg` (light default: `#dbeafe`)
+	- `--ktn-action-success-soft-bg` (light default: `#dcfce7`)
+	- `--ktn-action-warning-soft-bg` (light default: `#fef3c7`)
+	- `--ktn-action-accent-soft-bg` (light default: `#fce7f3`)
+	- `--ktn-action-danger-soft-bg` (light default: `#fee2e2`)
+6. Dedicated button tone tokens:
+	- `--ktn-button-default-bg` / `--ktn-button-default-fg` / `--ktn-button-default-border` (light defaults: `#edf2f7` / `#1f2937` / `#d2dce8`)
+	- `--ktn-button-primary-bg` / `--ktn-button-primary-fg` (light default primary: `#2563eb`)
+	- `--ktn-button-success-bg` / `--ktn-button-success-fg`
+	- `--ktn-button-warning-bg` / `--ktn-button-warning-fg`
+	- `--ktn-button-accent-bg` / `--ktn-button-accent-fg`
+	- `--ktn-button-destructive-bg` / `--ktn-button-destructive-fg` (light default destructive: `#ef4444`)
+7. Button hover behavior uses enterprise-style emphasis: hover darkens the button background and also adjusts border/text colors for clearer affordance.
+8. Badge, BadgeSelect, Toast, and Alert variant surfaces are token-driven and use soft backgrounds in light theme.
+9. Button-like variant coverage includes `success`, `warning`, `accent`, and `destructive` for: Badge, BadgeSelect, Button, ButtonGroup, Alert, Dialog, and InputGroup.
+10. Toast variants include: `default`, `success`, `warning`, `accent`, and `danger`.
 
 Table now focuses on data interaction (filter/sort/search/pagination and table-card switching) without built-in export dependencies.
 

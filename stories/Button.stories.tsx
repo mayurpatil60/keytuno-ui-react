@@ -131,7 +131,7 @@ export const ButtonIcon: Story = {
           variant="secondary"
           compact
           iconOnly
-          iconColor="var(--ktn-action-warning-bg, #f59e0b)"
+          iconColor="var(--ktn-button-warning-bg, #f59e0b)"
           aria-label="Custom"
         >
           <FiSettings aria-hidden size={13} />

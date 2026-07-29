@@ -210,13 +210,13 @@ const sizeTokens: Record<AlertSize, AlertSizeTokens> = {
 
 const variantTokens: Record<AlertVariant, AlertVariantTokens> = {
   primary: {
-    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    backgroundColor: "var(--ktn-action-primary-soft-bg, #dbeafe)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 35%, var(--ktn-border-muted))",
-    titleColor: "var(--ktn-text-primary)",
+      "color-mix(in srgb, var(--ktn-action-primary-bg) 24%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-primary-bg)",
     descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     actionColor: "var(--ktn-action-primary-bg)",
-    shadowColor: "rgba(37, 99, 235, 0.18)",
+    shadowColor: "rgba(29, 78, 216, 0.16)",
   },
   secondary: {
     backgroundColor: "var(--ktn-bg-surface, #ffffff)",
@@ -227,40 +227,40 @@ const variantTokens: Record<AlertVariant, AlertVariantTokens> = {
     shadowColor: "rgba(15, 23, 42, 0.14)",
   },
   success: {
-    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    backgroundColor: "var(--ktn-action-success-soft-bg, #dcfce7)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 42%, var(--ktn-border-muted))",
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 24%, var(--ktn-border-muted))",
     titleColor: "var(--ktn-action-success-bg, #15803d)",
     descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     actionColor: "var(--ktn-action-success-bg, #15803d)",
-    shadowColor: "rgba(21, 128, 61, 0.2)",
+    shadowColor: "rgba(21, 128, 61, 0.16)",
   },
   warning: {
-    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    backgroundColor: "var(--ktn-action-warning-soft-bg, #fef3c7)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 42%, var(--ktn-border-muted))",
-    titleColor: "var(--ktn-action-warning-bg, #ca8a04)",
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #b45309) 24%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-warning-bg, #b45309)",
     descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    actionColor: "var(--ktn-action-warning-bg, #ca8a04)",
-    shadowColor: "rgba(202, 138, 4, 0.2)",
+    actionColor: "var(--ktn-action-warning-bg, #b45309)",
+    shadowColor: "rgba(180, 83, 9, 0.16)",
   },
   accent: {
-    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    backgroundColor: "var(--ktn-action-accent-soft-bg, #fce7f3)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 42%, var(--ktn-border-muted))",
-    titleColor: "var(--ktn-action-accent-bg, #7c3aed)",
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #be185d) 24%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-accent-bg, #be185d)",
     descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    actionColor: "var(--ktn-action-accent-bg, #7c3aed)",
-    shadowColor: "rgba(124, 58, 237, 0.22)",
+    actionColor: "var(--ktn-action-accent-bg, #be185d)",
+    shadowColor: "rgba(190, 24, 93, 0.16)",
   },
   destructive: {
-    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    backgroundColor: "var(--ktn-action-danger-soft-bg, #fee2e2)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 45%, var(--ktn-border-muted))",
-    titleColor: "var(--ktn-action-danger-bg, #dc2626)",
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #b91c1c) 24%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-danger-bg, #b91c1c)",
     descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    actionColor: "var(--ktn-action-danger-bg, #dc2626)",
-    shadowColor: "rgba(220, 38, 38, 0.2)",
+    actionColor: "var(--ktn-action-danger-bg, #b91c1c)",
+    shadowColor: "rgba(185, 28, 28, 0.16)",
   },
   outline: {
     backgroundColor: "var(--ktn-bg-surface, #ffffff)",

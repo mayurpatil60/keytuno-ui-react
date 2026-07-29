@@ -50,6 +50,19 @@ pnpm build-storybook
 	- Use `Separator` as the only spelling in code, exports, docs, and stories.
 4. Navbar variant update: `soft` was removed from `Navbar`; use `light` or `brand-light` for soft enterprise styling, and use `default` or `outline` for legacy compatibility styles.
 5. Button-like tone variants now include `success`, `warning`, and `accent` across Badge, BadgeSelect, Button, ButtonGroup, Alert, Dialog, and InputGroup; Toast variants include `accent` in addition to `default/success/warning/danger`.
+6. Semantic color token surface now includes `backgroundHover`, `backgroundSelected`, `borderStrong`, `actionDangerBackground`, and `actionDangerForeground` (mapped to `--ktn-bg-hover`, `--ktn-bg-selected`, `--ktn-border-strong`, `--ktn-action-danger-bg`, and `--ktn-action-danger-fg`).
+7. Added soft variant background semantic tokens for cross-component light surfaces:
+	- `actionPrimarySoftBackground` (`--ktn-action-primary-soft-bg`, light: `#dbeafe`)
+	- `actionSuccessSoftBackground` (`--ktn-action-success-soft-bg`, light: `#dcfce7`)
+	- `actionWarningSoftBackground` (`--ktn-action-warning-soft-bg`, light: `#fef3c7`)
+	- `actionAccentSoftBackground` (`--ktn-action-accent-soft-bg`, light: `#fce7f3`)
+	- `actionDangerSoftBackground` (`--ktn-action-danger-soft-bg`, light: `#fee2e2`)
+8. Badge and BadgeSelect visuals are borderless; BadgeSelect option hover/selected emphasis is token-driven and adapts across light/dark themes.
+9. Button color tuning now uses dedicated semantic button tokens:
+	- `buttonDefaultBackground/Foreground/Border` (`--ktn-button-default-bg`, `--ktn-button-default-fg`, `--ktn-button-default-border`)
+	- `buttonPrimaryBackground/Foreground` (`--ktn-button-primary-bg`, `--ktn-button-primary-fg`)
+	- `buttonSuccessBackground/Foreground`, `buttonWarningBackground/Foreground`, `buttonAccentBackground/Foreground`, `buttonDestructiveBackground/Foreground`
+10. Button hover behavior now applies enterprise-style emphasis: per-variant hover states darken background tones and also adjust border/text colors for both light and dark themes.
 
 ## Testing Compatibility Notes
 

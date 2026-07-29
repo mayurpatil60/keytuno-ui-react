@@ -111,7 +111,7 @@ const sizeTokens: Record<BadgeSize, BadgeSelectSizeTokens> = {
     optionGap: "0.2rem",
     groupLabelSize: "0.5625rem",
     checkSize: "0.6rem",
-    optionRadius: "0px",
+    optionRadius: "var(--ktn-radius-sm, 0.375rem)",
     minPanelWidth: "6.75rem",
     maxPanelWidth: "9rem",
   },
@@ -123,7 +123,7 @@ const sizeTokens: Record<BadgeSize, BadgeSelectSizeTokens> = {
     optionGap: "0.22rem",
     groupLabelSize: "0.625rem",
     checkSize: "0.66rem",
-    optionRadius: "0px",
+    optionRadius: "var(--ktn-radius-sm, 0.375rem)",
     minPanelWidth: "7rem",
     maxPanelWidth: "9.5rem",
   },
@@ -135,7 +135,7 @@ const sizeTokens: Record<BadgeSize, BadgeSelectSizeTokens> = {
     optionGap: "0.24rem",
     groupLabelSize: "0.6875rem",
     checkSize: "0.7rem",
-    optionRadius: "0px",
+    optionRadius: "var(--ktn-radius-sm, 0.375rem)",
     minPanelWidth: "7.5rem",
     maxPanelWidth: "10.5rem",
   },
@@ -147,7 +147,7 @@ const sizeTokens: Record<BadgeSize, BadgeSelectSizeTokens> = {
     optionGap: "0.26rem",
     groupLabelSize: "0.75rem",
     checkSize: "0.74rem",
-    optionRadius: "0px",
+    optionRadius: "var(--ktn-radius-sm, 0.375rem)",
     minPanelWidth: "8rem",
     maxPanelWidth: "11.5rem",
   },
@@ -339,22 +339,42 @@ function normalizeGroups(
 
 function resolveAccentColor(variant: BadgeProps["variant"]): string {
   if (variant === "destructive") {
-    return "var(--ktn-action-danger-bg, #dc2626)";
+    return "var(--ktn-action-danger-bg)";
   }
 
   if (variant === "success") {
-    return "var(--ktn-action-success-bg, #15803d)";
+    return "var(--ktn-action-success-bg)";
   }
 
   if (variant === "warning") {
-    return "var(--ktn-action-warning-bg, #ca8a04)";
+    return "var(--ktn-action-warning-bg)";
   }
 
   if (variant === "accent") {
-    return "var(--ktn-action-accent-bg, #7c3aed)";
+    return "var(--ktn-action-accent-bg)";
   }
 
   return "var(--ktn-action-primary-bg)";
+}
+
+function resolveAccentSoftColor(variant: BadgeProps["variant"]): string {
+  if (variant === "destructive") {
+    return "var(--ktn-action-danger-soft-bg, #fee2e2)";
+  }
+
+  if (variant === "success") {
+    return "var(--ktn-action-success-soft-bg, #dcfce7)";
+  }
+
+  if (variant === "warning") {
+    return "var(--ktn-action-warning-soft-bg, #fef3c7)";
+  }
+
+  if (variant === "accent") {
+    return "var(--ktn-action-accent-soft-bg, #fce7f3)";
+  }
+
+  return "var(--ktn-action-primary-soft-bg, #dbeafe)";
 }
 
 export function BadgeSelect({
@@ -393,6 +413,9 @@ export function BadgeSelect({
   ...badgeProps
 }: BadgeSelectProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false);
+  const [hoveredOptionValue, setHoveredOptionValue] = useState<string | null>(
+    null,
+  );
   const [resolvedFloatingSide, setResolvedFloatingSide] =
     useState<FixedBadgeSelectSide>("bottom");
   const [floatingPosition, setFloatingPosition] = useState({ x: 0, y: 0 });
@@ -422,6 +445,12 @@ export function BadgeSelect({
 
   useEffect(() => {
     if (!isOpen) {
+      setHoveredOptionValue((current) => (current == null ? current : null));
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
       return;
     }
 
@@ -447,6 +476,7 @@ export function BadgeSelect({
     ? resolvedFloatingSide
     : "bottom";
   const resolvedAccentColor = resolveAccentColor(variant);
+  const resolvedAccentSoftColor = resolveAccentSoftColor(variant);
   const resolvedOptions = options ?? EMPTY_OPTIONS;
   const resolvedGroups = groups ?? EMPTY_GROUPS;
 
@@ -760,15 +790,11 @@ export function BadgeSelect({
     width: "max-content",
     minWidth: "max-content",
     maxWidth: `min(${tokens.maxPanelWidth}, calc(100vw - 16px))`,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: invalid
-      ? "var(--ktn-action-danger-bg, #dc2626)"
-      : `color-mix(in srgb, var(--ktn-border-muted) 76%, ${resolvedAccentColor} 24%)`,
     borderRadius: "var(--ktn-radius-lg, 0.75rem)",
     backgroundColor: "var(--ktn-bg-surface, #ffffff)",
-    boxShadow:
-      "0 4px 14px color-mix(in srgb, var(--ktn-text-primary, #0f172a) 14%, transparent)",
+    boxShadow: invalid
+      ? "0 0 0 2px color-mix(in srgb, var(--ktn-action-danger-bg) 42%, transparent), var(--ktn-shadow-md, 0 6px 16px rgb(15 23 42 / 0.12))"
+      : "var(--ktn-shadow-md, 0 6px 16px rgb(15 23 42 / 0.12))",
     padding: tokens.panelPadding,
     display: "flex",
     flexDirection: "column",
@@ -810,13 +836,16 @@ export function BadgeSelect({
     height: tokens.optionHeight,
     paddingInline: tokens.optionPaddingInline,
     borderRadius: tokens.optionRadius,
-    borderWidth: "0px",
-    borderStyle: "solid",
-    borderColor: "transparent",
+    borderWidth: 0,
     lineHeight: 1,
     fontWeight: 400,
     gap: "0.22rem",
+    transition: "background-color 120ms ease, color 120ms ease",
   };
+
+  const optionHoverBackground = `color-mix(in srgb, var(--ktn-bg-hover, var(--ktn-bg-muted)) 78%, ${resolvedAccentSoftColor} 22%)`;
+  const optionSelectedBackground = `color-mix(in srgb, ${resolvedAccentSoftColor} 86%, ${resolvedAccentColor} 14%)`;
+  const optionAccentTextColor = `color-mix(in srgb, ${resolvedAccentColor} 90%, var(--ktn-text-primary, #0f172a))`;
 
   const optionTextWrapStyle: CSSProperties = {
     display: "inline-flex",
@@ -843,7 +872,7 @@ export function BadgeSelect({
     width: tokens.checkSize,
     height: tokens.checkSize,
     lineHeight: 0,
-    color: `color-mix(in srgb, ${resolvedAccentColor} 88%, black)`,
+    color: `color-mix(in srgb, ${resolvedAccentColor} 90%, var(--ktn-text-primary, #0f172a))`,
     flexShrink: 0,
     marginInlineStart: 0,
   };
@@ -946,10 +975,6 @@ export function BadgeSelect({
                     }
                     style={{
                       ...groupStyle,
-                      borderTop:
-                        groupIndex > 0 && group.label != null
-                          ? "1px solid var(--ktn-border-muted)"
-                          : undefined,
                       paddingBlockStart: groupIndex > 0 ? "0.2rem" : 0,
                     }}
                   >
@@ -964,6 +989,7 @@ export function BadgeSelect({
 
                     {group.options.map((option, optionIndex) => {
                       const selected = selectedSet.has(option.value);
+                      const hovered = hoveredOptionValue === option.value;
 
                       return (
                         <Button
@@ -980,13 +1006,18 @@ export function BadgeSelect({
                           role="option"
                           style={{
                             ...optionStyle,
-                            backgroundColor: "transparent",
-                            borderColor: "transparent",
+                            backgroundColor: selected
+                              ? optionSelectedBackground
+                              : hovered
+                                ? optionHoverBackground
+                                : "transparent",
                             color: option.disabled
                               ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
                               : selected
-                                ? `color-mix(in srgb, ${resolvedAccentColor} 88%, black)`
-                                : "var(--ktn-text-primary)",
+                                ? optionAccentTextColor
+                                : hovered
+                                  ? optionAccentTextColor
+                                  : "var(--ktn-text-primary)",
                             cursor:
                               disabled || option.disabled
                                 ? "not-allowed"
@@ -995,6 +1026,26 @@ export function BadgeSelect({
                           }}
                           onMouseDown={(event) => {
                             event.preventDefault();
+                          }}
+                          onMouseEnter={() => {
+                            if (!disabled && !option.disabled) {
+                              setHoveredOptionValue(option.value);
+                            }
+                          }}
+                          onMouseLeave={() => {
+                            setHoveredOptionValue((current) =>
+                              current === option.value ? null : current,
+                            );
+                          }}
+                          onFocus={() => {
+                            if (!disabled && !option.disabled) {
+                              setHoveredOptionValue(option.value);
+                            }
+                          }}
+                          onBlur={() => {
+                            setHoveredOptionValue((current) =>
+                              current === option.value ? null : current,
+                            );
                           }}
                           onClick={(event) => {
                             handleOptionSelect(option, event);

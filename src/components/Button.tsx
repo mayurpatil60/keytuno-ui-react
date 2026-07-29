@@ -46,15 +46,15 @@ export type ButtonSharedProps = Pick<
 >;
 
 const iconToneColors: Record<ButtonVariantValue, string> = {
-  primary: "var(--ktn-action-primary-bg)",
+  primary: "var(--ktn-button-primary-bg, var(--ktn-action-primary-bg))",
   outline: "var(--ktn-text-primary)",
-  secondary: "var(--ktn-action-primary-bg)",
+  secondary: "var(--ktn-button-default-fg, var(--ktn-text-primary))",
   ghost: "var(--ktn-text-primary)",
-  destructive: "var(--ktn-action-danger-bg, #dc2626)",
-  success: "var(--ktn-action-success-bg, #15803d)",
-  warning: "var(--ktn-action-warning-bg, #ca8a04)",
-  accent: "var(--ktn-action-accent-bg, #7c3aed)",
-  link: "var(--ktn-action-primary-bg)",
+  destructive: "var(--ktn-button-destructive-bg, #ef4444)",
+  success: "var(--ktn-button-success-bg, #16a34a)",
+  warning: "var(--ktn-button-warning-bg, #f59e0b)",
+  accent: "var(--ktn-button-accent-bg, #db2777)",
+  link: "var(--ktn-button-primary-bg, var(--ktn-action-primary-bg))",
 };
 
 const baseClasses =
@@ -78,9 +78,9 @@ const baseButtonStyle: CSSProperties = {
 
 const variantStyles: Record<ButtonVariantValue, CSSProperties> = {
   primary: {
-    backgroundColor: "var(--ktn-action-primary-bg)",
-    color: "var(--ktn-action-primary-fg)",
-    borderColor: "var(--ktn-action-primary-bg)",
+    backgroundColor: "var(--ktn-button-primary-bg, #2563eb)",
+    color: "var(--ktn-button-primary-fg, #ffffff)",
+    borderColor: "var(--ktn-button-primary-bg, #2563eb)",
   },
   outline: {
     backgroundColor: "transparent",
@@ -88,9 +88,9 @@ const variantStyles: Record<ButtonVariantValue, CSSProperties> = {
     borderColor: "var(--ktn-border-muted)",
   },
   secondary: {
-    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
-    color: "var(--ktn-text-primary)",
-    borderColor: "var(--ktn-border-muted)",
+    backgroundColor: "var(--ktn-button-default-bg, #edf2f7)",
+    color: "var(--ktn-button-default-fg, #1f2937)",
+    borderColor: "var(--ktn-button-default-border, #d2dce8)",
   },
   ghost: {
     backgroundColor: "transparent",
@@ -98,28 +98,28 @@ const variantStyles: Record<ButtonVariantValue, CSSProperties> = {
     borderColor: "transparent",
   },
   destructive: {
-    backgroundColor: "var(--ktn-action-danger-bg, #dc2626)",
-    color: "var(--ktn-action-danger-fg, #ffffff)",
-    borderColor: "var(--ktn-action-danger-bg, #dc2626)",
+    backgroundColor: "var(--ktn-button-destructive-bg, #ef4444)",
+    color: "var(--ktn-button-destructive-fg, #ffffff)",
+    borderColor: "var(--ktn-button-destructive-bg, #ef4444)",
   },
   success: {
-    backgroundColor: "var(--ktn-action-success-bg, #15803d)",
-    color: "var(--ktn-action-success-fg, #ffffff)",
-    borderColor: "var(--ktn-action-success-bg, #15803d)",
+    backgroundColor: "var(--ktn-button-success-bg, #16a34a)",
+    color: "var(--ktn-button-success-fg, #ffffff)",
+    borderColor: "var(--ktn-button-success-bg, #16a34a)",
   },
   warning: {
-    backgroundColor: "var(--ktn-action-warning-bg, #ca8a04)",
-    color: "var(--ktn-action-warning-fg, #111827)",
-    borderColor: "var(--ktn-action-warning-bg, #ca8a04)",
+    backgroundColor: "var(--ktn-button-warning-bg, #f59e0b)",
+    color: "var(--ktn-button-warning-fg, #111827)",
+    borderColor: "var(--ktn-button-warning-bg, #f59e0b)",
   },
   accent: {
-    backgroundColor: "var(--ktn-action-accent-bg, #7c3aed)",
-    color: "var(--ktn-action-accent-fg, #ffffff)",
-    borderColor: "var(--ktn-action-accent-bg, #7c3aed)",
+    backgroundColor: "var(--ktn-button-accent-bg, #db2777)",
+    color: "var(--ktn-button-accent-fg, #ffffff)",
+    borderColor: "var(--ktn-button-accent-bg, #db2777)",
   },
   link: {
     backgroundColor: "transparent",
-    color: "var(--ktn-action-primary-bg)",
+    color: "var(--ktn-button-primary-bg, var(--ktn-action-primary-bg))",
     borderColor: "transparent",
     borderWidth: 0,
     textDecoration: "underline",
@@ -130,48 +130,66 @@ const variantStyles: Record<ButtonVariantValue, CSSProperties> = {
 const hoverStyles: Record<ButtonVariantValue, CSSProperties> = {
   primary: {
     backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
-    borderColor: "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-primary-bg, #2563eb) 84%, #0f172a 16%)",
+    color:
+      "color-mix(in srgb, var(--ktn-button-primary-fg, #ffffff) 90%, var(--ktn-button-primary-bg, #2563eb) 10%)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-button-primary-bg, #2563eb) 78%, #0f172a 22%)",
   },
   outline: {
-    backgroundColor: "var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))",
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #e2e8f0) 86%, #334155 14%)",
+    color: "var(--ktn-action-primary-bg)",
     borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
   },
   secondary: {
     backgroundColor:
-      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, var(--ktn-text-primary, #0f172a))",
-    borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
+      "color-mix(in srgb, var(--ktn-button-default-bg, #edf2f7) 82%, #64748b 18%)",
+    color:
+      "color-mix(in srgb, var(--ktn-button-default-fg, #1f2937) 72%, var(--ktn-button-primary-bg, #2563eb) 28%)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-button-primary-bg, #2563eb) 32%, var(--ktn-button-default-border, #d2dce8) 68%)",
   },
   ghost: {
-    backgroundColor: "var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))",
-    borderColor: "transparent",
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-muted, #e2e8f0) 88%, #334155 12%)",
+    color: "var(--ktn-action-primary-bg)",
+    borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
   },
   destructive: {
     backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-destructive-bg, #ef4444) 84%, #7f1d1d 16%)",
+    color: "var(--ktn-button-destructive-fg, #ffffff)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-destructive-bg, #ef4444) 76%, #7f1d1d 24%)",
   },
   success: {
     backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-success-bg, #16a34a) 84%, #14532d 16%)",
+    color:
+      "color-mix(in srgb, var(--ktn-button-success-fg, #ffffff) 88%, var(--ktn-button-success-bg, #16a34a) 12%)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-success-bg, #16a34a) 76%, #14532d 24%)",
   },
   warning: {
     backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-warning-bg, #f59e0b) 86%, #92400e 14%)",
+    color:
+      "color-mix(in srgb, var(--ktn-button-warning-fg, #111827) 92%, #000000 8%)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-warning-bg, #f59e0b) 76%, #92400e 24%)",
   },
   accent: {
     backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-accent-bg, #db2777) 84%, #831843 16%)",
+    color:
+      "color-mix(in srgb, var(--ktn-button-accent-fg, #ffffff) 88%, var(--ktn-button-accent-bg, #db2777) 12%)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
+      "color-mix(in srgb, var(--ktn-button-accent-bg, #db2777) 74%, #831843 26%)",
   },
   link: {
-    color: "color-mix(in srgb, var(--ktn-action-primary-bg) 85%, black)",
+    color:
+      "color-mix(in srgb, var(--ktn-button-primary-bg, var(--ktn-action-primary-bg)) 82%, #0f172a 18%)",
   },
 };
 

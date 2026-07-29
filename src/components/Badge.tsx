@@ -25,84 +25,59 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const baseClasses =
-  "inline-flex items-center justify-center border font-medium leading-none whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
+  "inline-flex items-center justify-center font-medium leading-none whitespace-nowrap select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2";
 
 const baseStyle: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   justifyContent: "center",
   gap: "0.25rem",
-  borderWidth: "1px",
-  borderStyle: "solid",
   fontWeight: 600,
   lineHeight: 1.1,
   verticalAlign: "middle",
   textAlign: "center",
   whiteSpace: "nowrap",
   userSelect: "none",
-  transition:
-    "background-color 120ms ease, color 120ms ease, border-color 120ms ease",
+  transition: "background-color 120ms ease, color 120ms ease",
 };
 
 const variantStyles: Record<BadgeVariant, CSSProperties> = {
   primary: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-primary-bg) 16%, white)",
-    color: "color-mix(in srgb, var(--ktn-action-primary-bg) 88%, black)",
-    borderColor: "color-mix(in srgb, var(--ktn-action-primary-bg) 30%, white)",
+    backgroundColor: "var(--ktn-action-primary-soft-bg, #dbeafe)",
+    color: "var(--ktn-action-primary-bg)",
   },
   secondary: {
-    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.12))",
+    backgroundColor: "var(--ktn-bg-muted)",
     color: "var(--ktn-text-primary)",
-    borderColor: "var(--ktn-border-muted)",
   },
   success: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 14%, white)",
-    color:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 88%, black)",
-    borderColor:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 28%, white)",
+    backgroundColor: "var(--ktn-action-success-soft-bg, #dcfce7)",
+    color: "var(--ktn-action-success-bg)",
   },
   warning: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 16%, white)",
-    color:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
-    borderColor:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 30%, white)",
+    backgroundColor: "var(--ktn-action-warning-soft-bg, #fef3c7)",
+    color: "color-mix(in srgb, var(--ktn-action-warning-bg) 88%, #111827)",
   },
   accent: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 14%, white)",
-    color:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 88%, black)",
-    borderColor:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 28%, white)",
+    backgroundColor: "var(--ktn-action-accent-soft-bg, #fce7f3)",
+    color: "var(--ktn-action-accent-bg)",
   },
   destructive: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 14%, white)",
-    color:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 88%, black)",
-    borderColor:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 28%, white)",
+    backgroundColor: "var(--ktn-action-danger-soft-bg, #fee2e2)",
+    color: "var(--ktn-action-danger-bg)",
   },
   outline: {
-    backgroundColor: "transparent",
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-hover, var(--ktn-bg-muted)) 88%, transparent)",
     color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    borderColor: "var(--ktn-border-muted)",
   },
   ghost: {
-    backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
+    backgroundColor: "color-mix(in srgb, var(--ktn-bg-muted) 82%, transparent)",
     color: "var(--ktn-text-secondary, var(--ktn-text-primary))",
-    borderColor: "transparent",
   },
   link: {
     backgroundColor: "transparent",
     color: "var(--ktn-action-primary-bg)",
-    borderColor: "transparent",
-    borderWidth: 0,
     textDecoration: "underline",
     textUnderlineOffset: "0.12em",
   },

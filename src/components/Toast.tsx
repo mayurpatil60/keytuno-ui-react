@@ -102,36 +102,29 @@ const surfaceStyleByVariant: Record<ToastVariant, CSSProperties> = {
     borderColor: "var(--ktn-border-muted)",
   },
   success: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #16a34a) 18%, white)",
-    color:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #16a34a) 90%, black)",
+    backgroundColor: "var(--ktn-action-success-soft-bg, #dcfce7)",
+    color: "var(--ktn-action-success-bg, #15803d)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-success-bg, #16a34a) 34%, white)",
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 28%, var(--ktn-border-muted))",
   },
   warning: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #d97706) 18%, white)",
+    backgroundColor: "var(--ktn-action-warning-soft-bg, #fef3c7)",
     color:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #d97706) 90%, black)",
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #b45309) 90%, #111827)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-warning-bg, #d97706) 34%, white)",
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #b45309) 28%, var(--ktn-border-muted))",
   },
   accent: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 18%, white)",
-    color:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
+    backgroundColor: "var(--ktn-action-accent-soft-bg, #fce7f3)",
+    color: "var(--ktn-action-accent-bg, #be185d)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 34%, white)",
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #be185d) 26%, var(--ktn-border-muted))",
   },
   danger: {
-    backgroundColor:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 16%, white)",
-    color:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)",
+    backgroundColor: "var(--ktn-action-danger-soft-bg, #fee2e2)",
+    color: "var(--ktn-action-danger-bg, #b91c1c)",
     borderColor:
-      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 32%, white)",
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #b91c1c) 28%, var(--ktn-border-muted))",
   },
 };
 
