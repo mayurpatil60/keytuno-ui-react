@@ -183,6 +183,9 @@ export const BadgeSelectPlayground: Story = {
       options: [
         "primary",
         "secondary",
+        "success",
+        "warning",
+        "accent",
         "destructive",
         "outline",
         "ghost",

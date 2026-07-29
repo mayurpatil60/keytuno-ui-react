@@ -11,7 +11,7 @@ import {
   type ToastActionContext,
   type ToastSize,
   type ToastVariant,
-} from "@keytuno/ui-react";
+} from "../src/index";
 
 type ToastPlaygroundArgs = {
   variant: ToastVariant;
@@ -31,6 +31,7 @@ const variantOptions: ToastVariant[] = [
   "default",
   "success",
   "warning",
+  "accent",
   "danger",
 ];
 const sizeOptions: ToastSize[] = ["xs", "sm", "md"];
@@ -39,6 +40,7 @@ const messageByVariant: Record<ToastVariant, string> = {
   default: "Changes saved",
   success: "Profile updated",
   warning: "Storage almost full",
+  accent: "Theme switched",
   danger: "Upload failed",
 };
 

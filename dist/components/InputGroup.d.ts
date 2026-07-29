@@ -3,7 +3,7 @@ import { ButtonProps } from './Button.js';
 import { InputProps } from './Input.js';
 import './Tooltip.js';
 
-type InputGroupVariant = "primary" | "secondary" | "destructive" | "outline" | "ghost" | "link";
+type InputGroupVariant = "primary" | "secondary" | "success" | "warning" | "accent" | "destructive" | "outline" | "ghost" | "link";
 type InputGroupSize = "xs" | "sm" | "md" | "lg";
 type InputGroupAlign = "inline-start" | "inline-end" | "block-start" | "block-end";
 type InputGroupActionSource = "focus-within" | "blur-within" | "control-change" | "button-action";

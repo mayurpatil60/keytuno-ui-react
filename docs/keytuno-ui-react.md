@@ -79,6 +79,19 @@ function App() {
 }
 ```
 
+### Built-in themes
+
+- `light`: default light surface and text palette with semantic action tones.
+- `dark`: dark surface palette with matched semantic action tones.
+
+```ts
+import { themeNames, themes, resolveTheme } from '@keytuno/ui-react';
+
+const availableThemes = themeNames; // ['dark', 'light']
+const darkVars = themeToCssVariables(themes.dark);
+const activeTheme = resolveTheme('light');
+```
+
 ### CSS variable reference
 
 | Variable | Purpose |
@@ -92,6 +105,12 @@ function App() {
 | `--ktn-border-strong` | Focused / emphasized border |
 | `--ktn-action-primary-bg` | Primary button / accent color |
 | `--ktn-action-primary-fg` | Text on primary button |
+| `--ktn-action-success-bg` | Success action color (green) |
+| `--ktn-action-success-fg` | Text on success actions |
+| `--ktn-action-warning-bg` | Warning action color (yellow) |
+| `--ktn-action-warning-fg` | Text on warning actions |
+| `--ktn-action-accent-bg` | Accent action color (violet) |
+| `--ktn-action-accent-fg` | Text on accent actions |
 | `--ktn-action-danger-bg` | Destructive / danger color |
 | `--ktn-action-danger-fg` | Text on danger button |
 | `--ktn-radius-sm/md/lg/pill` | Border radii |
@@ -107,7 +126,14 @@ const myTheme: ThemeContract = {
   name: 'light',
   mode: 'default',
   primitives: basePrimitiveTokens,
-  semantic: { colors: createSemanticColors({ actionPrimaryBackground: '#7c3aed', … }) },
+  semantic: {
+    colors: createSemanticColors(basePrimitiveTokens.colors, {
+      actionPrimaryBackground: '#0e639c',
+      actionSuccessBackground: '#15803d',
+      actionWarningBackground: '#ca8a04',
+      actionAccentBackground: '#7c3aed',
+    }),
+  },
 };
 ```
 
@@ -239,7 +265,7 @@ This section is a practical quick reference. For exact source-of-truth props and
 ```ts
 import { Button } from '@keytuno/ui-react';
 
-// variant: 'primary' | 'outline' | 'ghost' | 'secondary' | 'destructive' | 'link'
+// variant: 'primary' | 'outline' | 'ghost' | 'secondary' | 'success' | 'warning' | 'accent' | 'destructive' | 'link'
 // size: 'xs' | 'sm' | 'md' | 'lg'
 <Button
   variant="primary"
@@ -285,7 +311,7 @@ import { ButtonGroup } from '@keytuno/ui-react';
 <ButtonGroup
   orientation?={'horizontal'|'vertical'}   // default 'horizontal'
   size?={'xs'|'sm'|'md'|'lg'}
-  variant?={'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+  variant?={'primary'|'outline'|'ghost'|'secondary'|'success'|'warning'|'accent'|'destructive'|'link'}
   compact?={boolean}
   disabled?={boolean}
   onAction?={(ctx: ButtonGroupActionContext) => void}
@@ -301,7 +327,7 @@ import { ButtonGroup } from '@keytuno/ui-react';
 import { Badge } from '@keytuno/ui-react';
 
 <Badge
-  variant?={'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+  variant?={'primary'|'outline'|'ghost'|'secondary'|'success'|'warning'|'accent'|'destructive'|'link'}
   size?={'xs'|'sm'|'md'|'lg'}
   onAction?={(e: MouseEvent) => void}
 >
@@ -319,7 +345,7 @@ interface BadgeSelectGroup  { label: string; options: BadgeSelectOption[]; }
 
 <BadgeSelect
   // all Badge trigger props are supported
-  variant?={'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+  variant?={'primary'|'outline'|'ghost'|'secondary'|'success'|'warning'|'accent'|'destructive'|'link'}
   size?={'xs'|'sm'|'md'|'lg'}
   onAction?={(e: MouseEvent) => void}
 
@@ -661,7 +687,6 @@ import { ColorPicker } from '@keytuno/ui-react';
 <ColorPicker
   size?={'xs'|'sm'|'md'|'lg'}
   variant?={'compact'|'detailed'}
-  variant?={'compact'|'detailed'}    // backwards-compatible alias; prefer variant
   value?={string | null}             // controlled HEX value (for example '#2563eb')
   defaultValue?={string | null}      // uncontrolled initial HEX value
   swatches?={string[]}               // optional curated palette
@@ -1248,7 +1273,7 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupTextarea, Input
 
 // Combines addons + inputs + buttons into a visual unit
 <InputGroup
-  variant?={'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+  variant?={'primary'|'outline'|'ghost'|'secondary'|'success'|'warning'|'accent'|'destructive'|'link'}
   size?={'xs'|'sm'|'md'|'lg'}
   align?={'inline-start'|'inline-end'|'block-start'|'block-end'}
   disabled?={boolean}
@@ -1262,19 +1287,35 @@ import { InputGroup, InputGroupAddon, InputGroupInput, InputGroupTextarea, Input
 ### Dialog
 
 ```ts
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@keytuno/ui-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  type DialogActionContext,
+} from '@keytuno/ui-react';
 
 <Dialog
   open?={boolean}
   defaultOpen?={boolean}
   onOpenChange?={(open: boolean) => void}
+  onAction?={(context: DialogActionContext) => void} // { source, open, event? }
   trigger?={ReactNode}              // element that opens the dialog
-  variant?={'primary'|'outline'|'ghost'|'secondary'|'destructive'|'link'}
+  variant?={'primary'|'secondary'|'success'|'warning'|'accent'|'destructive'|'outline'|'ghost'|'link'}
   size?={'xs'|'sm'|'md'|'lg'}
+  disabled?={boolean}
   closeOnOverlayClick?={boolean}
   closeOnEscape?={boolean}
 >
-  <DialogContent showCloseButton?={boolean} scrollable?={boolean} maxContentHeight?={string} closeButtonLabel?={string}>
+  <DialogContent
+    showCloseButton?={boolean}
+    scrollable?={boolean}
+    maxContentHeight?={string}
+    maxWidth?={string}
+    closeButtonLabel?={string}
+  >
     <DialogHeader>
       <DialogTitle>Title</DialogTitle>
       <DialogDescription>Description</DialogDescription>
@@ -1288,12 +1329,39 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 </Dialog>
 ```
 
+Dialog action sources:
+
+```ts
+type DialogActionSource =
+  | 'trigger'
+  | 'overlay'
+  | 'escape'
+  | 'close-button'
+  | 'open-change';
+
+type DialogActionContext = {
+  source: DialogActionSource;
+  open: boolean;
+  event?: unknown;
+};
+```
+
 Dialog scroll behavior notes:
 
-- When `scrollable` is enabled, `DialogContent` keeps header and footer visible and applies the inbuilt `Scrollbar` only to the middle content section.
+- `DialogContent` keeps header and footer outside the middle scroll viewport, so long body content scrolls independently.
+- When `scrollable` is enabled, the middle section always uses the inbuilt `Scrollbar`.
+- Even when `scrollable` is `false`, overflow is measured and the middle scrollbar auto-enables when needed.
 - `maxContentHeight` defaults to `min(86vh, 40rem)` and is also clamped by viewport height (`calc(100vh - 2.5rem)`) so the full dialog remains visible.
+- `maxWidth` can override size token widths when custom dialog widths are needed.
 - Header-to-body, body-to-footer, and scrollbar-to-content spacing are intentionally separated for clearer visual grouping.
 - Dialog layer and overlay interactions stop pointer/click bubbling to parent containers, preventing click-through side effects (for example, row/card `item-click` handlers firing when a dialog closes).
+- Focus is managed automatically: open moves focus into the dialog, `Tab` is trapped within it, and close restores focus to the previous element.
+
+Dialog accessibility notes:
+
+- `DialogContent` applies `role="dialog"` and `aria-modal="true"`.
+- `DialogTitle` and `DialogDescription` automatically wire `aria-labelledby` / `aria-describedby` when present.
+- `closeButtonLabel` customizes the close button's accessible label.
 
 Dialog playbook pattern (middle-only scrollbar + sticky footer):
 
@@ -1328,6 +1396,8 @@ const [stickyFooter, setStickyFooter] = useState(true);
   <DialogFooter sticky={stickyFooter}>...</DialogFooter>
 </DialogContent>
 ```
+
+`DialogFooter` `sticky` is useful for long-scroll layouts where you want a consistent footer surface treatment while content moves behind it.
 
 ### Sheet
 
@@ -1405,7 +1475,7 @@ import { Alert, AlertTitle, AlertDescription, AlertAction } from '@keytuno/ui-re
   open?={boolean}
   defaultOpen?={boolean}
   onOpenChange?={(open: boolean) => void}
-  variant?={'primary'|'secondary'|'destructive'|'outline'|'link'|'compact'}
+  variant?={'primary'|'secondary'|'success'|'warning'|'accent'|'destructive'|'outline'|'link'|'compact'}
   side?={'top-left'|'top-center'|'top-right'|'bottom-left'|'bottom-center'|'bottom-right'}
   size?={'xs'|'sm'|'md'|'lg'}
   duration?={number}               // ms until auto-dismiss (0 = no auto-dismiss)
@@ -1437,7 +1507,7 @@ import { Toast } from '@keytuno/ui-react';
   defaultOpen?={boolean}
   onOpenChange?={(open: boolean) => void}
   onAction?={(ctx: ToastActionContext) => void}
-  variant?={'default'|'success'|'warning'|'danger'}
+  variant?={'default'|'success'|'warning'|'accent'|'danger'}
   size?={'xs'|'sm'|'md'}
   duration?={number}
   bottomOffset?={number}

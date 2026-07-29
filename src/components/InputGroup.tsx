@@ -16,6 +16,9 @@ import { Input, type InputProps, type InputSize } from "./Input";
 export type InputGroupVariant =
   | "primary"
   | "secondary"
+  | "success"
+  | "warning"
+  | "accent"
   | "destructive"
   | "outline"
   | "ghost"
@@ -171,6 +174,24 @@ const groupVariantStyles: Record<InputGroupVariant, CSSProperties> = {
     backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.08))",
     color: "var(--ktn-text-primary)",
   },
+  success: {
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 42%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
+  },
+  warning: {
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 42%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
+  },
+  accent: {
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 42%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
+  },
   destructive: {
     borderColor:
       "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 42%, var(--ktn-border-muted))",
@@ -202,6 +223,15 @@ const focusStyles: Record<InputGroupVariant, CSSProperties> = {
   },
   secondary: {
     boxShadow: "0 0 0 2px rgba(100, 116, 139, 0.2)",
+  },
+  success: {
+    boxShadow: "0 0 0 2px rgba(21, 128, 61, 0.24)",
+  },
+  warning: {
+    boxShadow: "0 0 0 2px rgba(202, 138, 4, 0.24)",
+  },
+  accent: {
+    boxShadow: "0 0 0 2px rgba(124, 58, 237, 0.24)",
   },
   destructive: {
     boxShadow: "0 0 0 2px rgba(220, 38, 38, 0.24)",

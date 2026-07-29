@@ -94,6 +94,9 @@ type AlertCustomColorPlaygroundArgs = PlaygroundArgs & {
 const variantOptions: AlertVariant[] = [
   "primary",
   "secondary",
+  "success",
+  "warning",
+  "accent",
   "destructive",
   "outline",
   "link",

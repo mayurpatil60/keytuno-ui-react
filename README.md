@@ -34,6 +34,17 @@ Peer dependencies:
 1. react ^18
 2. react-dom ^18
 
+## Built-in Themes and Action Tones
+
+1. Built-in themes: `light`, `dark`.
+2. Semantic action token pairs exported by `themeToCssVariables`:
+	- `--ktn-action-primary-bg` / `--ktn-action-primary-fg`
+	- `--ktn-action-success-bg` / `--ktn-action-success-fg` (green)
+	- `--ktn-action-warning-bg` / `--ktn-action-warning-fg` (yellow)
+	- `--ktn-action-accent-bg` / `--ktn-action-accent-fg` (violet)
+3. Button-like variant coverage includes `success`, `warning`, and `accent` for: Badge, BadgeSelect, Button, ButtonGroup, Alert, Dialog, and InputGroup.
+4. Toast variants include: `default`, `success`, `warning`, `accent`, and `danger`.
+
 Table now focuses on data interaction (filter/sort/search/pagination and table-card switching) without built-in export dependencies.
 
 ## Local Development

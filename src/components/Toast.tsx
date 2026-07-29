@@ -14,6 +14,7 @@ export const toastVariants = [
   "default",
   "success",
   "warning",
+  "accent",
   "danger",
 ] as const;
 export type ToastVariant = (typeof toastVariants)[number];
@@ -84,6 +85,7 @@ const badgeVariantByToastVariant: Record<ToastVariant, BadgeVariant> = {
   default: "secondary",
   success: "primary",
   warning: "outline",
+  accent: "accent",
   danger: "destructive",
 };
 
@@ -114,6 +116,14 @@ const surfaceStyleByVariant: Record<ToastVariant, CSSProperties> = {
       "color-mix(in srgb, var(--ktn-action-warning-bg, #d97706) 90%, black)",
     borderColor:
       "color-mix(in srgb, var(--ktn-action-warning-bg, #d97706) 34%, white)",
+  },
+  accent: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 18%, white)",
+    color:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 34%, white)",
   },
   danger: {
     backgroundColor:

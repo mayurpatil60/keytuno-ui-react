@@ -49,6 +49,7 @@ pnpm build-storybook
 	- Canonical file/component naming is `Separator` (`src/components/Separator.tsx`, `Separator`).
 	- Use `Separator` as the only spelling in code, exports, docs, and stories.
 4. Navbar variant update: `soft` was removed from `Navbar`; use `light` or `brand-light` for soft enterprise styling, and use `default` or `outline` for legacy compatibility styles.
+5. Button-like tone variants now include `success`, `warning`, and `accent` across Badge, BadgeSelect, Button, ButtonGroup, Alert, Dialog, and InputGroup; Toast variants include `accent` in addition to `default/success/warning/danger`.
 
 ## Testing Compatibility Notes
 

@@ -1,6 +1,6 @@
 import { HTMLAttributes, ReactNode } from 'react';
 
-type DialogVariant = "primary" | "secondary" | "destructive" | "outline" | "ghost" | "link";
+type DialogVariant = "primary" | "secondary" | "success" | "warning" | "accent" | "destructive" | "outline" | "ghost" | "link";
 type DialogSize = "xs" | "sm" | "md" | "lg";
 type DialogActionSource = "trigger" | "overlay" | "escape" | "close-button" | "open-change";
 interface DialogActionContext {

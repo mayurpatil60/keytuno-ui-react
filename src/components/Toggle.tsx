@@ -7,11 +7,11 @@ import {
   type MouseEvent,
   type ReactElement,
   type ReactNode,
-} from 'react';
+} from "react";
 
-import { Button, type ButtonProps } from './Button';
+import { Button, type ButtonProps } from "./Button";
 
-export type ToggleActionSource = 'click' | 'pressed-change' | 'focus' | 'blur';
+export type ToggleActionSource = "click" | "pressed-change" | "focus" | "blur";
 
 export interface ToggleActionContext {
   source: ToggleActionSource;
@@ -22,7 +22,10 @@ export interface ToggleActionContext {
   event?: unknown;
 }
 
-export interface ToggleProps extends Omit<ButtonProps, 'aria-pressed' | 'onAction'> {
+export interface ToggleProps extends Omit<
+  ButtonProps,
+  "aria-pressed" | "onAction"
+> {
   pressed?: boolean;
   defaultPressed?: boolean;
   onPressedChange?: (pressed: boolean) => void;
@@ -30,56 +33,79 @@ export interface ToggleProps extends Omit<ButtonProps, 'aria-pressed' | 'onActio
   onAction?: (context: ToggleActionContext) => void;
 }
 
-type ToggleVariant = NonNullable<ButtonProps['variant']>;
+type ToggleVariant = NonNullable<ButtonProps["variant"]>;
 
 const pressedStyles: Record<ToggleVariant, CSSProperties> = {
   primary: {
-    backgroundColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)',
-    borderColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)',
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
+    borderColor: "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
   },
   outline: {
-    backgroundColor: 'var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))',
-    borderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
+    backgroundColor: "var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))",
+    borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
   },
   secondary: {
-    backgroundColor: 'color-mix(in srgb, var(--ktn-bg-surface) 88%, var(--ktn-text-primary))',
-    borderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-surface) 88%, var(--ktn-text-primary))",
+    borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
+  },
+  success: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 90%, black)",
+  },
+  warning: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
+  },
+  accent: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
   },
   ghost: {
-    backgroundColor: 'var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))',
-    borderColor: 'transparent',
+    backgroundColor: "var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))",
+    borderColor: "transparent",
   },
   destructive: {
-    backgroundColor: 'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)',
-    borderColor: 'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)',
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)",
   },
   link: {
-    color: 'color-mix(in srgb, var(--ktn-action-primary-bg) 85%, black)',
+    color: "color-mix(in srgb, var(--ktn-action-primary-bg) 85%, black)",
   },
 };
 
-function resolveVariant(variant?: ButtonProps['variant']): ToggleVariant {
+function resolveVariant(variant?: ButtonProps["variant"]): ToggleVariant {
   if (variant != null) {
     return variant;
   }
 
-  return 'primary';
+  return "primary";
 }
 
 function isIconLikeElement(element: ReactElement): boolean {
-  if (typeof element.type === 'string') {
-    return element.type === 'svg';
+  if (typeof element.type === "string") {
+    return element.type === "svg";
   }
 
   const componentType = element.type as { displayName?: string; name?: string };
-  const componentName = `${componentType.displayName ?? componentType.name ?? ''}`.toLowerCase();
+  const componentName =
+    `${componentType.displayName ?? componentType.name ?? ""}`.toLowerCase();
 
   return (
-    componentName.includes('icon') ||
-    componentName.startsWith('fi') ||
-    componentName.startsWith('fa') ||
-    componentName.startsWith('md') ||
-    componentName.startsWith('ri')
+    componentName.includes("icon") ||
+    componentName.startsWith("fi") ||
+    componentName.startsWith("fa") ||
+    componentName.startsWith("md") ||
+    componentName.startsWith("ri")
   );
 }
 
@@ -100,7 +126,9 @@ function applyPressedIconFill(node: ReactNode): ReactNode {
 
   const currentChildren = element.props.children;
   const nextChildren =
-    currentChildren !== undefined ? applyPressedIconFill(currentChildren) : currentChildren;
+    currentChildren !== undefined
+      ? applyPressedIconFill(currentChildren)
+      : currentChildren;
 
   const nextProps: {
     children?: ReactNode;
@@ -115,9 +143,9 @@ function applyPressedIconFill(node: ReactNode): ReactNode {
   if (isIconLikeElement(element)) {
     nextProps.style = {
       ...element.props.style,
-      fill: 'currentColor',
+      fill: "currentColor",
     };
-    nextProps.fill = 'currentColor';
+    nextProps.fill = "currentColor";
   }
 
   if (Object.keys(nextProps).length === 0) {
@@ -142,7 +170,9 @@ export function Toggle({
   style,
   ...props
 }: ToggleProps): JSX.Element {
-  const [uncontrolledPressed, setUncontrolledPressed] = useState(defaultPressed === true);
+  const [uncontrolledPressed, setUncontrolledPressed] = useState(
+    defaultPressed === true,
+  );
   const isControlled = pressed !== undefined;
   const isPressed = isControlled ? pressed === true : uncontrolledPressed;
   const resolvedVariant = resolveVariant(variant);
@@ -173,7 +203,7 @@ export function Toggle({
     }
 
     onPressedChange?.(nextPressed);
-    emitAction('pressed-change', {
+    emitAction("pressed-change", {
       pressed: nextPressed,
       previousPressed,
       event,
@@ -184,7 +214,7 @@ export function Toggle({
     onClick?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('click', {
+      emitAction("click", {
         event,
       });
     }
@@ -200,7 +230,7 @@ export function Toggle({
     onFocus?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('focus', {
+      emitAction("focus", {
         event,
       });
     }
@@ -210,7 +240,7 @@ export function Toggle({
     onBlur?.(event);
 
     if (!event.defaultPrevented) {
-      emitAction('blur', {
+      emitAction("blur", {
         event,
       });
     }
@@ -231,7 +261,7 @@ export function Toggle({
       disabled={disabled}
       style={toggleStyle}
       aria-pressed={isPressed}
-      data-state={isPressed ? 'on' : 'off'}
+      data-state={isPressed ? "on" : "off"}
       onClick={handleClick}
       onFocus={handleFocus}
       onBlur={handleBlur}

@@ -45,7 +45,9 @@ pnpm audit --prod --audit-level high
 
 4. Required docs updated for user-facing changes:
    - `README.md`
+   - `docs/keytuno-ui-react.md` (theme list, token references, and component variant unions)
    - `docs/COMPATIBILITY.md` (if version ranges or framework support changed)
+   - `docs/releases/*.md` (when release notes need additive token/variant change history)
    - `keytuno-ui-library.md` phase or release execution record
 
 5. Git-tag payload sanity checks pass:

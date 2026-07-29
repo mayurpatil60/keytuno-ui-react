@@ -37,6 +37,9 @@ export const BadgeVariants: Story = {
       <div style={rowStyle}>
         <Badge variant="primary">Primary</Badge>
         <Badge variant="secondary">Secondary</Badge>
+        <Badge variant="success">Success</Badge>
+        <Badge variant="warning">Warning</Badge>
+        <Badge variant="accent">Accent</Badge>
         <Badge variant="destructive">Destructive</Badge>
         <Badge variant="outline">Outline</Badge>
         <Badge variant="ghost">Ghost</Badge>
@@ -108,6 +111,9 @@ export const BadgePlayground: Story = {
       options: [
         "primary",
         "secondary",
+        "success",
+        "warning",
+        "accent",
         "destructive",
         "outline",
         "ghost",

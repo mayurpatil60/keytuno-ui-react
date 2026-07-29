@@ -1,6 +1,6 @@
 import { HTMLAttributes, ReactNode, CSSProperties } from 'react';
 
-declare const toastVariants: readonly ["default", "success", "warning", "danger"];
+declare const toastVariants: readonly ["default", "success", "warning", "accent", "danger"];
 type ToastVariant = (typeof toastVariants)[number];
 declare const toastSizes: readonly ["xs", "sm", "md"];
 type ToastSize = (typeof toastSizes)[number];

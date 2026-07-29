@@ -292,6 +292,9 @@ export const DialogPlayground: Story = {
       options: [
         "primary",
         "secondary",
+        "success",
+        "warning",
+        "accent",
         "destructive",
         "outline",
         "ghost",
@@ -423,6 +426,9 @@ export const DialogScrollablePlayground: Story = {
       options: [
         "primary",
         "secondary",
+        "success",
+        "warning",
+        "accent",
         "destructive",
         "outline",
         "ghost",
@@ -512,6 +518,9 @@ export const DialogFooterPlayground: Story = {
       options: [
         "primary",
         "secondary",
+        "success",
+        "warning",
+        "accent",
         "destructive",
         "outline",
         "ghost",

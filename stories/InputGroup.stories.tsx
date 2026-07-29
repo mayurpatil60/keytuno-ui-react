@@ -229,6 +229,9 @@ export const InputGroupPlayground: Story = {
       options: [
         "primary",
         "secondary",
+        "success",
+        "warning",
+        "accent",
         "destructive",
         "outline",
         "ghost",

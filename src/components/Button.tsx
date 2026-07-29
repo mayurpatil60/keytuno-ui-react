@@ -1,9 +1,28 @@
-import { useState, type ButtonHTMLAttributes, type CSSProperties, type MouseEvent } from 'react';
+import {
+  useState,
+  type ButtonHTMLAttributes,
+  type CSSProperties,
+  type MouseEvent,
+} from "react";
 
-import { Tooltip, type TooltipProps, type TooltipSide, type TooltipSize } from './Tooltip';
+import {
+  Tooltip,
+  type TooltipProps,
+  type TooltipSide,
+  type TooltipSize,
+} from "./Tooltip";
 
-type ButtonVariantValue = 'primary' | 'outline' | 'ghost' | 'destructive' | 'secondary' | 'link';
-type ButtonSizeValue = 'xs' | 'sm' | 'md' | 'lg';
+type ButtonVariantValue =
+  | "primary"
+  | "outline"
+  | "ghost"
+  | "destructive"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "accent"
+  | "link";
+type ButtonSizeValue = "xs" | "sm" | "md" | "lg";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariantValue;
@@ -11,9 +30,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   compact?: boolean;
   iconOnly?: boolean;
   iconOnlyTone?: boolean;
-  iconColor?: CSSProperties['color'];
+  iconColor?: CSSProperties["color"];
   onAction?: (event: MouseEvent<HTMLButtonElement>) => void;
-  tooltip?: TooltipProps['label'];
+  tooltip?: TooltipProps["label"];
   tooltipSide?: TooltipSide;
   tooltipSize?: TooltipSize;
   tooltipDisabled?: boolean;
@@ -21,173 +40,217 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   tooltipCloseDelay?: number;
 }
 
-export type ButtonSharedProps = Pick<ButtonProps, 'variant' | 'size' | 'compact' | 'disabled'>;
+export type ButtonSharedProps = Pick<
+  ButtonProps,
+  "variant" | "size" | "compact" | "disabled"
+>;
 
 const iconToneColors: Record<ButtonVariantValue, string> = {
-  primary: 'var(--ktn-action-primary-bg)',
-  outline: 'var(--ktn-text-primary)',
-  secondary: 'var(--ktn-action-primary-bg)',
-  ghost: 'var(--ktn-text-primary)',
-  destructive: 'var(--ktn-action-danger-bg, #dc2626)',
-  link: 'var(--ktn-action-primary-bg)',
+  primary: "var(--ktn-action-primary-bg)",
+  outline: "var(--ktn-text-primary)",
+  secondary: "var(--ktn-action-primary-bg)",
+  ghost: "var(--ktn-text-primary)",
+  destructive: "var(--ktn-action-danger-bg, #dc2626)",
+  success: "var(--ktn-action-success-bg, #15803d)",
+  warning: "var(--ktn-action-warning-bg, #ca8a04)",
+  accent: "var(--ktn-action-accent-bg, #7c3aed)",
+  link: "var(--ktn-action-primary-bg)",
 };
 
 const baseClasses =
-  'inline-flex items-center justify-center gap-2 border font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60';
+  "inline-flex items-center justify-center gap-2 border font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60";
 
 const baseButtonStyle: CSSProperties = {
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '0.5rem',
-  borderWidth: '1px',
-  borderStyle: 'solid',
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "0.5rem",
+  borderWidth: "1px",
+  borderStyle: "solid",
   fontWeight: 500,
   lineHeight: 1,
-  verticalAlign: 'middle',
-  whiteSpace: 'nowrap',
-  userSelect: 'none',
-  transition: 'background-color 120ms ease, color 120ms ease, border-color 120ms ease',
+  verticalAlign: "middle",
+  whiteSpace: "nowrap",
+  userSelect: "none",
+  transition:
+    "background-color 120ms ease, color 120ms ease, border-color 120ms ease",
 };
 
 const variantStyles: Record<ButtonVariantValue, CSSProperties> = {
   primary: {
-    backgroundColor: 'var(--ktn-action-primary-bg)',
-    color: 'var(--ktn-action-primary-fg)',
-    borderColor: 'var(--ktn-action-primary-bg)',
+    backgroundColor: "var(--ktn-action-primary-bg)",
+    color: "var(--ktn-action-primary-fg)",
+    borderColor: "var(--ktn-action-primary-bg)",
   },
   outline: {
-    backgroundColor: 'transparent',
-    color: 'var(--ktn-text-primary)',
-    borderColor: 'var(--ktn-border-muted)',
+    backgroundColor: "transparent",
+    color: "var(--ktn-text-primary)",
+    borderColor: "var(--ktn-border-muted)",
   },
   secondary: {
-    backgroundColor: 'var(--ktn-bg-surface, #ffffff)',
-    color: 'var(--ktn-text-primary)',
-    borderColor: 'var(--ktn-border-muted)',
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    color: "var(--ktn-text-primary)",
+    borderColor: "var(--ktn-border-muted)",
   },
   ghost: {
-    backgroundColor: 'transparent',
-    color: 'var(--ktn-text-primary)',
-    borderColor: 'transparent',
+    backgroundColor: "transparent",
+    color: "var(--ktn-text-primary)",
+    borderColor: "transparent",
   },
   destructive: {
-    backgroundColor: 'var(--ktn-action-danger-bg, #dc2626)',
-    color: 'var(--ktn-action-danger-fg, #ffffff)',
-    borderColor: 'var(--ktn-action-danger-bg, #dc2626)',
+    backgroundColor: "var(--ktn-action-danger-bg, #dc2626)",
+    color: "var(--ktn-action-danger-fg, #ffffff)",
+    borderColor: "var(--ktn-action-danger-bg, #dc2626)",
+  },
+  success: {
+    backgroundColor: "var(--ktn-action-success-bg, #15803d)",
+    color: "var(--ktn-action-success-fg, #ffffff)",
+    borderColor: "var(--ktn-action-success-bg, #15803d)",
+  },
+  warning: {
+    backgroundColor: "var(--ktn-action-warning-bg, #ca8a04)",
+    color: "var(--ktn-action-warning-fg, #111827)",
+    borderColor: "var(--ktn-action-warning-bg, #ca8a04)",
+  },
+  accent: {
+    backgroundColor: "var(--ktn-action-accent-bg, #7c3aed)",
+    color: "var(--ktn-action-accent-fg, #ffffff)",
+    borderColor: "var(--ktn-action-accent-bg, #7c3aed)",
   },
   link: {
-    backgroundColor: 'transparent',
-    color: 'var(--ktn-action-primary-bg)',
-    borderColor: 'transparent',
+    backgroundColor: "transparent",
+    color: "var(--ktn-action-primary-bg)",
+    borderColor: "transparent",
     borderWidth: 0,
-    textDecoration: 'underline',
-    textUnderlineOffset: '0.14em',
+    textDecoration: "underline",
+    textUnderlineOffset: "0.14em",
   },
 };
 
 const hoverStyles: Record<ButtonVariantValue, CSSProperties> = {
   primary: {
-    backgroundColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)',
-    borderColor: 'color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)',
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
+    borderColor: "color-mix(in srgb, var(--ktn-action-primary-bg) 90%, black)",
   },
   outline: {
-    backgroundColor: 'var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))',
-    borderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
+    backgroundColor: "var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))",
+    borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
   },
   secondary: {
-    backgroundColor: 'color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, var(--ktn-text-primary, #0f172a))',
-    borderColor: 'var(--ktn-border-strong, var(--ktn-border-muted))',
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-bg-surface, #ffffff) 88%, var(--ktn-text-primary, #0f172a))",
+    borderColor: "var(--ktn-border-strong, var(--ktn-border-muted))",
   },
   ghost: {
-    backgroundColor: 'var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))',
-    borderColor: 'transparent',
+    backgroundColor: "var(--ktn-bg-muted, rgba(127, 127, 127, 0.1))",
+    borderColor: "transparent",
   },
   destructive: {
-    backgroundColor: 'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)',
-    borderColor: 'color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)',
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 90%, black)",
+  },
+  success: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 90%, black)",
+  },
+  warning: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
+  },
+  accent: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 90%, black)",
   },
   link: {
-    color: 'color-mix(in srgb, var(--ktn-action-primary-bg) 85%, black)',
+    color: "color-mix(in srgb, var(--ktn-action-primary-bg) 85%, black)",
   },
 };
 
 const sizeStyles: Record<ButtonSizeValue, CSSProperties> = {
   md: {
-    height: '2.5rem',
-    paddingInline: '0.95rem',
-    fontSize: '0.875rem',
-    borderRadius: 'var(--ktn-radius-md)',
+    height: "2.5rem",
+    paddingInline: "0.95rem",
+    fontSize: "0.875rem",
+    borderRadius: "var(--ktn-radius-md)",
   },
   xs: {
-    height: '1.75rem',
-    paddingInline: '0.5rem',
-    fontSize: '0.75rem',
-    borderRadius: 'var(--ktn-radius-sm)',
+    height: "1.75rem",
+    paddingInline: "0.5rem",
+    fontSize: "0.75rem",
+    borderRadius: "var(--ktn-radius-sm)",
   },
   sm: {
-    height: '2.125rem',
-    paddingInline: '0.75rem',
-    fontSize: '0.8125rem',
-    borderRadius: 'var(--ktn-radius-md)',
+    height: "2.125rem",
+    paddingInline: "0.75rem",
+    fontSize: "0.8125rem",
+    borderRadius: "var(--ktn-radius-md)",
   },
   lg: {
-    height: '2.75rem',
-    paddingInline: '1.125rem',
-    fontSize: '0.95rem',
-    borderRadius: 'var(--ktn-radius-md)',
+    height: "2.75rem",
+    paddingInline: "1.125rem",
+    fontSize: "0.95rem",
+    borderRadius: "var(--ktn-radius-md)",
   },
 };
 
 const compactSizeStyles: Record<ButtonSizeValue, CSSProperties> = {
   xs: {
-    height: '1.36rem',
-    paddingInline: '0.24rem',
-    fontSize: '0.7rem',
-    borderRadius: 'var(--ktn-radius-sm)',
-    gap: '0.2rem',
+    height: "1.36rem",
+    paddingInline: "0.24rem",
+    fontSize: "0.7rem",
+    borderRadius: "var(--ktn-radius-sm)",
+    gap: "0.2rem",
   },
   sm: {
-    height: '1.56rem',
-    paddingInline: '0.28rem',
-    fontSize: '0.75rem',
-    borderRadius: 'var(--ktn-radius-sm)',
-    gap: '0.22rem',
+    height: "1.56rem",
+    paddingInline: "0.28rem",
+    fontSize: "0.75rem",
+    borderRadius: "var(--ktn-radius-sm)",
+    gap: "0.22rem",
   },
   md: {
-    height: '1.78rem',
-    paddingInline: '0.32rem',
-    fontSize: '0.8rem',
-    borderRadius: 'var(--ktn-radius-sm)',
-    gap: '0.24rem',
+    height: "1.78rem",
+    paddingInline: "0.32rem",
+    fontSize: "0.8rem",
+    borderRadius: "var(--ktn-radius-sm)",
+    gap: "0.24rem",
   },
   lg: {
-    height: '1.96rem',
-    paddingInline: '0.36rem',
-    fontSize: '0.86rem',
-    borderRadius: 'var(--ktn-radius-sm)',
-    gap: '0.26rem',
+    height: "1.96rem",
+    paddingInline: "0.36rem",
+    fontSize: "0.86rem",
+    borderRadius: "var(--ktn-radius-sm)",
+    gap: "0.26rem",
   },
 };
 
 const iconOnlySizeStyles: Record<ButtonSizeValue, CSSProperties> = {
   xs: {
-    width: '1.75rem',
+    width: "1.75rem",
     paddingInline: 0,
     gap: 0,
   },
   sm: {
-    width: '2.125rem',
+    width: "2.125rem",
     paddingInline: 0,
     gap: 0,
   },
   md: {
-    width: '2.5rem',
+    width: "2.5rem",
     paddingInline: 0,
     gap: 0,
   },
   lg: {
-    width: '2.75rem',
+    width: "2.75rem",
     paddingInline: 0,
     gap: 0,
   },
@@ -195,16 +258,16 @@ const iconOnlySizeStyles: Record<ButtonSizeValue, CSSProperties> = {
 
 const compactIconOnlySizeStyles: Record<ButtonSizeValue, CSSProperties> = {
   xs: {
-    width: '1.36rem',
+    width: "1.36rem",
   },
   sm: {
-    width: '1.56rem',
+    width: "1.56rem",
   },
   md: {
-    width: '1.78rem',
+    width: "1.78rem",
   },
   lg: {
-    width: '1.96rem',
+    width: "1.96rem",
   },
 };
 
@@ -213,32 +276,32 @@ function resolveVariant(variant?: ButtonVariantValue): ButtonVariantValue {
     return variant;
   }
 
-  return 'primary';
+  return "primary";
 }
 
 export function Button({
   children,
   variant,
-  size = 'md',
+  size = "md",
   compact = false,
   iconOnly = false,
   iconOnlyTone = false,
   iconColor,
   onAction,
   tooltip,
-  tooltipSide = 'auto',
-  tooltipSize = 'sm',
+  tooltipSide = "auto",
+  tooltipSize = "sm",
   tooltipDisabled = false,
   tooltipOpenDelay,
   tooltipCloseDelay,
-  className = '',
+  className = "",
   style,
-  type = 'button',
+  type = "button",
   disabled,
   onClick,
   onMouseEnter,
   onMouseLeave,
-  'aria-label': ariaLabel,
+  "aria-label": ariaLabel,
   ...props
 }: ButtonProps): JSX.Element {
   const [isHovered, setIsHovered] = useState(false);
@@ -277,34 +340,35 @@ export function Button({
     ...(iconOnly && compact ? compactIconOnlySizeStyles[size] : {}),
     ...(isIconColorMode
       ? {
-          backgroundColor: 'transparent',
-          borderColor: 'transparent',
+          backgroundColor: "transparent",
+          borderColor: "transparent",
           borderWidth: 0,
           color: resolvedIconColor,
-          textDecoration: 'none',
+          textDecoration: "none",
         }
       : {}),
     ...(isHovered
       ? {
-          position: 'relative',
+          position: "relative",
           zIndex: 1,
         }
       : {}),
     ...(isDisabled
       ? {
-          cursor: 'not-allowed',
+          cursor: "not-allowed",
           opacity: 0.6,
         }
       : {
-          cursor: 'pointer',
+          cursor: "pointer",
         }),
     ...style,
   };
 
-  const hasTooltip = tooltip != null && !(typeof tooltip === 'string' && tooltip.trim() === '');
-  const tooltipLabel = typeof tooltip === 'string' ? tooltip.trim() : '';
+  const hasTooltip =
+    tooltip != null && !(typeof tooltip === "string" && tooltip.trim() === "");
+  const tooltipLabel = typeof tooltip === "string" ? tooltip.trim() : "";
   const resolvedAriaLabel =
-    ariaLabel ?? (iconOnly && tooltipLabel !== '' ? tooltipLabel : undefined);
+    ariaLabel ?? (iconOnly && tooltipLabel !== "" ? tooltipLabel : undefined);
 
   const buttonElement = (
     <button

@@ -337,6 +337,26 @@ function normalizeGroups(
   return normalized;
 }
 
+function resolveAccentColor(variant: BadgeProps["variant"]): string {
+  if (variant === "destructive") {
+    return "var(--ktn-action-danger-bg, #dc2626)";
+  }
+
+  if (variant === "success") {
+    return "var(--ktn-action-success-bg, #15803d)";
+  }
+
+  if (variant === "warning") {
+    return "var(--ktn-action-warning-bg, #ca8a04)";
+  }
+
+  if (variant === "accent") {
+    return "var(--ktn-action-accent-bg, #7c3aed)";
+  }
+
+  return "var(--ktn-action-primary-bg)";
+}
+
 export function BadgeSelect({
   dropdownVariant = "inline",
   side = "bottom",
@@ -426,6 +446,7 @@ export function BadgeSelect({
   const resolvedSide: FixedBadgeSelectSide = shouldFloatPanel
     ? resolvedFloatingSide
     : "bottom";
+  const resolvedAccentColor = resolveAccentColor(variant);
   const resolvedOptions = options ?? EMPTY_OPTIONS;
   const resolvedGroups = groups ?? EMPTY_GROUPS;
 
@@ -743,7 +764,7 @@ export function BadgeSelect({
     borderStyle: "solid",
     borderColor: invalid
       ? "var(--ktn-action-danger-bg, #dc2626)"
-      : "color-mix(in srgb, var(--ktn-border-muted) 76%, var(--ktn-action-primary-bg) 24%)",
+      : `color-mix(in srgb, var(--ktn-border-muted) 76%, ${resolvedAccentColor} 24%)`,
     borderRadius: "var(--ktn-radius-lg, 0.75rem)",
     backgroundColor: "var(--ktn-bg-surface, #ffffff)",
     boxShadow:
@@ -822,7 +843,7 @@ export function BadgeSelect({
     width: tokens.checkSize,
     height: tokens.checkSize,
     lineHeight: 0,
-    color: "color-mix(in srgb, var(--ktn-action-primary-bg) 88%, black)",
+    color: `color-mix(in srgb, ${resolvedAccentColor} 88%, black)`,
     flexShrink: 0,
     marginInlineStart: 0,
   };
@@ -964,7 +985,7 @@ export function BadgeSelect({
                             color: option.disabled
                               ? "var(--ktn-text-secondary, var(--ktn-text-primary))"
                               : selected
-                                ? "color-mix(in srgb, var(--ktn-action-primary-bg) 88%, black)"
+                                ? `color-mix(in srgb, ${resolvedAccentColor} 88%, black)`
                                 : "var(--ktn-text-primary)",
                             cursor:
                               disabled || option.disabled

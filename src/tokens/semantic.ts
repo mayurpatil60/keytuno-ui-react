@@ -1,4 +1,7 @@
-import type { PrimitiveColorTokens, SemanticColorTokens } from '../contracts/theme-contract';
+import type {
+  PrimitiveColorTokens,
+  SemanticColorTokens,
+} from "../contracts/theme-contract";
 
 export function createSemanticColors(
   palette: PrimitiveColorTokens,
@@ -13,6 +16,12 @@ export function createSemanticColors(
     borderMuted: palette.slate300,
     actionPrimaryBackground: palette.teal700,
     actionPrimaryForeground: palette.white,
+    actionSuccessBackground: "#15803d",
+    actionSuccessForeground: palette.white,
+    actionWarningBackground: "#ca8a04",
+    actionWarningForeground: palette.slate900,
+    actionAccentBackground: "#7c3aed",
+    actionAccentForeground: palette.white,
     ...overrides,
   };
 }

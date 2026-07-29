@@ -1,6 +1,6 @@
-export type ThemeName = 'dark' | 'light';
+export type ThemeName = "dark" | "light";
 
-export type ThemeMode = 'default';
+export type ThemeMode = "default";
 
 export interface PrimitiveColorTokens {
   white: string;
@@ -54,6 +54,12 @@ export interface SemanticColorTokens {
   borderMuted: string;
   actionPrimaryBackground: string;
   actionPrimaryForeground: string;
+  actionSuccessBackground: string;
+  actionSuccessForeground: string;
+  actionWarningBackground: string;
+  actionWarningForeground: string;
+  actionAccentBackground: string;
+  actionAccentForeground: string;
 }
 
 export interface SemanticTokens {

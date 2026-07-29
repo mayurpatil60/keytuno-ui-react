@@ -1,5 +1,5 @@
-type ThemeName = 'dark' | 'light';
-type ThemeMode = 'default';
+type ThemeName = "dark" | "light";
+type ThemeMode = "default";
 interface PrimitiveColorTokens {
     white: string;
     black: string;
@@ -47,6 +47,12 @@ interface SemanticColorTokens {
     borderMuted: string;
     actionPrimaryBackground: string;
     actionPrimaryForeground: string;
+    actionSuccessBackground: string;
+    actionSuccessForeground: string;
+    actionWarningBackground: string;
+    actionWarningForeground: string;
+    actionAccentBackground: string;
+    actionAccentForeground: string;
 }
 interface SemanticTokens {
     colors: SemanticColorTokens;

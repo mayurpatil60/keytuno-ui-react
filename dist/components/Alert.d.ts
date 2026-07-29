@@ -2,7 +2,7 @@ import { HTMLAttributes, ReactNode, CSSProperties } from 'react';
 import { ButtonProps } from './Button.js';
 import './Tooltip.js';
 
-type AlertVariant = "primary" | "secondary" | "destructive" | "outline" | "link" | "compact";
+type AlertVariant = "primary" | "secondary" | "success" | "warning" | "accent" | "destructive" | "outline" | "link" | "compact";
 type AlertSide = "top-left" | "bottom-left" | "bottom-right" | "top-right" | "bottom-center" | "top-center";
 type AlertSize = "xs" | "sm" | "md" | "lg";
 type AlertActionSource = "open" | "open-change" | "close-button" | "auto-close" | "escape" | "action-click" | "focus" | "blur";

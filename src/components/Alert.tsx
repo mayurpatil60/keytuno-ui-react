@@ -25,6 +25,9 @@ import { Button, type ButtonProps } from "./Button";
 export type AlertVariant =
   | "primary"
   | "secondary"
+  | "success"
+  | "warning"
+  | "accent"
   | "destructive"
   | "outline"
   | "link"
@@ -222,6 +225,33 @@ const variantTokens: Record<AlertVariant, AlertVariantTokens> = {
     descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
     actionColor: "var(--ktn-text-primary)",
     shadowColor: "rgba(15, 23, 42, 0.14)",
+  },
+  success: {
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 42%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-success-bg, #15803d)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-action-success-bg, #15803d)",
+    shadowColor: "rgba(21, 128, 61, 0.2)",
+  },
+  warning: {
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 42%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-warning-bg, #ca8a04)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-action-warning-bg, #ca8a04)",
+    shadowColor: "rgba(202, 138, 4, 0.2)",
+  },
+  accent: {
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 42%, var(--ktn-border-muted))",
+    titleColor: "var(--ktn-action-accent-bg, #7c3aed)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+    actionColor: "var(--ktn-action-accent-bg, #7c3aed)",
+    shadowColor: "rgba(124, 58, 237, 0.22)",
   },
   destructive: {
     backgroundColor: "var(--ktn-bg-surface, #ffffff)",
@@ -488,6 +518,18 @@ function getPlacementStyle(
 function resolveActionButtonVariant(
   variant: AlertVariant,
 ): NonNullable<ButtonProps["variant"]> {
+  if (variant === "success") {
+    return "success";
+  }
+
+  if (variant === "warning") {
+    return "warning";
+  }
+
+  if (variant === "accent") {
+    return "accent";
+  }
+
   if (variant === "destructive") {
     return "destructive";
   }

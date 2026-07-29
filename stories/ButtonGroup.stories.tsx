@@ -1,14 +1,18 @@
-import type { Meta, StoryObj } from '@storybook/react';
-import { FiEdit3, FiEye, FiSettings } from 'react-icons/fi';
+import type { Meta, StoryObj } from "@storybook/react";
+import { FiEdit3, FiEye, FiSettings } from "react-icons/fi";
 
-import { Button, ButtonGroup, type ButtonGroupActionContext } from '@keytuno/ui-react';
+import {
+  Button,
+  ButtonGroup,
+  type ButtonGroupActionContext,
+} from "../src/index";
 
 const meta: Meta<typeof ButtonGroup> = {
-  title: 'Actions/Button Group',
+  title: "Actions/Button Group",
   component: ButtonGroup,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   parameters: {
-    layout: 'centered',
+    layout: "centered",
   },
 };
 
@@ -16,9 +20,18 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 type CompactPlaygroundArgs = {
-  orientation: 'horizontal' | 'vertical';
-  size: 'xs' | 'sm' | 'md' | 'lg';
-  variant: 'primary' | 'outline' | 'secondary' | 'ghost' | 'destructive' | 'link';
+  orientation: "horizontal" | "vertical";
+  size: "xs" | "sm" | "md" | "lg";
+  variant:
+    | "primary"
+    | "outline"
+    | "secondary"
+    | "success"
+    | "warning"
+    | "accent"
+    | "ghost"
+    | "destructive"
+    | "link";
   disabled: boolean;
   withLabels: boolean;
   withTooltips: boolean;
@@ -26,9 +39,9 @@ type CompactPlaygroundArgs = {
 };
 
 export const ButtonGroupStory: Story = {
-  name: 'Button Group',
+  name: "Button Group",
   render: () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
       <ButtonGroup orientation="horizontal" size="md" variant="outline">
         <Button>Overview</Button>
         <Button>Orders</Button>
@@ -47,7 +60,7 @@ export const ButtonGroupStory: Story = {
         <Button>Disabled 3</Button>
       </ButtonGroup>
 
-      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+      <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
         <ButtonGroup
           orientation="horizontal"
           size="sm"
@@ -66,7 +79,12 @@ export const ButtonGroupStory: Story = {
           </Button>
         </ButtonGroup>
 
-        <ButtonGroup orientation="horizontal" size="sm" variant="outline" compact>
+        <ButtonGroup
+          orientation="horizontal"
+          size="sm"
+          variant="outline"
+          compact
+        >
           <Button>
             <FiEye size={13} />
             <span>View</span>
@@ -86,37 +104,47 @@ export const ButtonGroupStory: Story = {
 };
 
 export const ButtonGroupPlayground: Story = {
-  name: 'Button Group Playground',
+  name: "Button Group Playground",
   args: {
-    orientation: 'horizontal',
-    size: 'md',
-    variant: 'outline',
+    orientation: "horizontal",
+    size: "md",
+    variant: "outline",
     compact: false,
     disabled: false,
   },
   argTypes: {
     orientation: {
-      control: 'inline-radio',
-      options: ['horizontal', 'vertical'],
+      control: "inline-radio",
+      options: ["horizontal", "vertical"],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
     variant: {
-      control: 'select',
-      options: ['primary', 'outline', 'secondary', 'ghost', 'destructive', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "outline",
+        "secondary",
+        "success",
+        "warning",
+        "accent",
+        "ghost",
+        "destructive",
+        "link",
+      ],
     },
-    compact: { control: 'boolean' },
-    disabled: { control: 'boolean' },
-    onAction: { action: 'group-action' },
+    compact: { control: "boolean" },
+    disabled: { control: "boolean" },
+    onAction: { action: "group-action" },
     children: { table: { disable: true } },
     style: { table: { disable: true } },
     className: { table: { disable: true } },
   },
   render: (args) => {
-    const orientation = args.orientation ?? 'horizontal';
-    const size = args.size ?? 'md';
+    const orientation = args.orientation ?? "horizontal";
+    const size = args.size ?? "md";
     const variant = args.variant;
     const compact = args.compact ?? false;
     const disabled = args.disabled ?? false;
@@ -140,43 +168,54 @@ export const ButtonGroupPlayground: Story = {
 };
 
 export const CompactTriplePlayground: StoryObj<CompactPlaygroundArgs> = {
-  name: 'Compact Triple Playground',
+  name: "Compact Triple Playground",
   args: {
-    orientation: 'horizontal',
-    size: 'sm',
-    variant: 'secondary',
+    orientation: "horizontal",
+    size: "sm",
+    variant: "secondary",
     disabled: false,
     withLabels: false,
     withTooltips: true,
   },
   argTypes: {
     orientation: {
-      control: 'inline-radio',
-      options: ['horizontal', 'vertical'],
+      control: "inline-radio",
+      options: ["horizontal", "vertical"],
     },
     size: {
-      control: 'select',
-      options: ['xs', 'sm', 'md', 'lg'],
+      control: "select",
+      options: ["xs", "sm", "md", "lg"],
     },
     variant: {
-      control: 'select',
-      options: ['primary', 'outline', 'secondary', 'ghost', 'destructive', 'link'],
+      control: "select",
+      options: [
+        "primary",
+        "outline",
+        "secondary",
+        "success",
+        "warning",
+        "accent",
+        "ghost",
+        "destructive",
+        "link",
+      ],
     },
-    disabled: { control: 'boolean' },
-    withLabels: { control: 'boolean' },
-    withTooltips: { control: 'boolean' },
-    onAction: { action: 'group-action' },
+    disabled: { control: "boolean" },
+    withLabels: { control: "boolean" },
+    withTooltips: { control: "boolean" },
+    onAction: { action: "group-action" },
   },
   render: (args) => {
-    const orientation = args.orientation ?? 'horizontal';
-    const size = args.size ?? 'sm';
-    const variant = args.variant ?? 'secondary';
+    const orientation = args.orientation ?? "horizontal";
+    const size = args.size ?? "sm";
+    const variant = args.variant ?? "secondary";
     const disabled = args.disabled ?? false;
     const withLabels = args.withLabels ?? false;
     const withTooltips = args.withTooltips ?? true;
     const onAction = args.onAction;
 
-    const iconSize = size === 'xs' ? 11 : size === 'sm' ? 12 : size === 'md' ? 13 : 14;
+    const iconSize =
+      size === "xs" ? 11 : size === "sm" ? 12 : size === "md" ? 13 : 14;
 
     return (
       <ButtonGroup
@@ -188,17 +227,20 @@ export const CompactTriplePlayground: StoryObj<CompactPlaygroundArgs> = {
         onAction={onAction}
         aria-label="Compact actions"
       >
-        <Button aria-label="View" tooltip={withTooltips ? 'View' : undefined}>
+        <Button aria-label="View" tooltip={withTooltips ? "View" : undefined}>
           <FiEye size={iconSize} />
           {withLabels ? <span>View</span> : null}
         </Button>
 
-        <Button aria-label="Edit" tooltip={withTooltips ? 'Edit' : undefined}>
+        <Button aria-label="Edit" tooltip={withTooltips ? "Edit" : undefined}>
           <FiEdit3 size={iconSize} />
           {withLabels ? <span>Edit</span> : null}
         </Button>
 
-        <Button aria-label="Settings" tooltip={withTooltips ? 'Settings' : undefined}>
+        <Button
+          aria-label="Settings"
+          tooltip={withTooltips ? "Settings" : undefined}
+        >
           <FiSettings size={iconSize} />
           {withLabels ? <span>Settings</span> : null}
         </Button>

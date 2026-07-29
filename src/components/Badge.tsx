@@ -9,6 +9,9 @@ import type {
 export type BadgeVariant =
   | "primary"
   | "secondary"
+  | "success"
+  | "warning"
+  | "accent"
   | "destructive"
   | "outline"
   | "ghost"
@@ -52,6 +55,30 @@ const variantStyles: Record<BadgeVariant, CSSProperties> = {
     backgroundColor: "var(--ktn-bg-muted, rgba(100, 116, 139, 0.12))",
     color: "var(--ktn-text-primary)",
     borderColor: "var(--ktn-border-muted)",
+  },
+  success: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 14%, white)",
+    color:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 88%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 28%, white)",
+  },
+  warning: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 16%, white)",
+    color:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 90%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 30%, white)",
+  },
+  accent: {
+    backgroundColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 14%, white)",
+    color:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 88%, black)",
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 28%, white)",
   },
   destructive: {
     backgroundColor:

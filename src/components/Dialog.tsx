@@ -22,6 +22,9 @@ import { Scrollbar } from "./Scrollbar";
 export type DialogVariant =
   | "primary"
   | "secondary"
+  | "success"
+  | "warning"
+  | "accent"
   | "destructive"
   | "outline"
   | "ghost"
@@ -167,6 +170,27 @@ const variantTokens: Record<DialogVariant, DialogVariantTokens> = {
     titleColor: "var(--ktn-text-primary)",
     descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
   },
+  success: {
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-success-bg, #15803d) 45%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-action-success-bg, #15803d)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+  },
+  warning: {
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-warning-bg, #ca8a04) 45%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-action-warning-bg, #ca8a04)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+  },
+  accent: {
+    borderColor:
+      "color-mix(in srgb, var(--ktn-action-accent-bg, #7c3aed) 45%, var(--ktn-border-muted))",
+    backgroundColor: "var(--ktn-bg-surface, #ffffff)",
+    titleColor: "var(--ktn-action-accent-bg, #7c3aed)",
+    descriptionColor: "var(--ktn-text-secondary, var(--ktn-text-primary))",
+  },
   destructive: {
     borderColor:
       "color-mix(in srgb, var(--ktn-action-danger-bg, #dc2626) 45%, var(--ktn-border-muted))",
@@ -251,9 +275,30 @@ function containsComponentType(
 
 function resolveTriggerVariant(
   variant: DialogVariant,
-): "primary" | "secondary" | "destructive" | "outline" | "ghost" | "link" {
+):
+  | "primary"
+  | "secondary"
+  | "success"
+  | "warning"
+  | "accent"
+  | "destructive"
+  | "outline"
+  | "ghost"
+  | "link" {
   if (variant === "secondary") {
     return "secondary";
+  }
+
+  if (variant === "success") {
+    return "success";
+  }
+
+  if (variant === "warning") {
+    return "warning";
+  }
+
+  if (variant === "accent") {
+    return "accent";
   }
 
   if (variant === "destructive") {
