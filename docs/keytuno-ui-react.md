@@ -1693,8 +1693,9 @@ interface AdvanceFilterColumn {
 AdvanceFilter behavior notes:
 
 - Trigger is an icon-only filter button that opens a responsive Sheet (mobile, tablet, desktop).
-- Sheet layout includes global search, multiple filter rules, multiple sort rules, per-rule clear icon actions, and sticky footer actions.
-- Footer actions: `Clear filters`, `Reset filters` (sorting reset label configurable), and `Apply filters`.
+- Sheet layout includes global search, multiple filter rules, multiple sort rules, per-rule remove icon actions, and sticky footer actions.
+- Footer actions: `Clear filters` and `Apply filters`.
+- Per-rule remove icons delete the selected rule row, including the last remaining filter or sort row.
 - Internally uses inbuilt primitives (`Button`, `Sheet`, `Field`, `Input`, `Select`) and token-based styling.
 - Table and AdaptiveCard surfaces use the same filter token model, so behavior stays consistent across view modes.
 

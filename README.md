@@ -128,7 +128,7 @@ Release verification status for v1.0.0:
 
 1. `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
 2. `pnpm typecheck`: pass.
-3. `pnpm test`: pass (current suite: spinner-focused baseline tests).
+3. `pnpm test`: pass (current suite includes Spinner and AdvanceFilter interaction coverage).
 4. `pnpm build`: pass.
 5. `pnpm build-storybook`: pass.
 6. `pnpm size`: pass all configured size budgets.
@@ -139,6 +139,12 @@ Recommended next hardening before larger rollout:
 1. Reduce lint warnings (mainly hook dependency and unused symbol warnings).
 2. Increase test coverage for stateful and composite components (Select, DatePicker, Dialog, DropdownMenu, Table, FileUpload).
 3. Add Playwright smoke scenarios for reusable components rendered multiple times on one page.
+
+## Post-Release Maintenance Update (2026-07-31)
+
+1. Fixed AdvanceFilter rule removal behavior so newly added filter rows can be removed immediately, including when only one filter row exists.
+2. Aligned per-row remove control labels for accessibility clarity (`Remove filter N` and `Remove sort N`).
+3. Added regression tests for add/remove filter and sort row flows in `AdvanceFilter`.
 
 ## Testing Guidance for Reusable Components
 

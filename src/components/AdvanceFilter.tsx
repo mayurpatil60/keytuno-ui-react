@@ -668,21 +668,7 @@ export function AdvanceFilter({
   }
 
   function resetFilterRule(ruleId: string): void {
-    setFilterRules((current) => {
-      if (current.length <= 1) {
-        return current.map((rule) =>
-          rule.id === ruleId
-            ? {
-                ...rule,
-                operator: defaultFilterOperator,
-                value: "",
-              }
-            : rule,
-        );
-      }
-
-      return current.filter((rule) => rule.id !== ruleId);
-    });
+    setFilterRules((current) => current.filter((rule) => rule.id !== ruleId));
 
     emitAction("reset-filter-rule");
   }
@@ -1077,8 +1063,7 @@ export function AdvanceFilter({
                         resetFilterButtonOverrides.iconOnlyTone ?? true
                       }
                       tooltip={
-                        resetFilterButtonOverrides.tooltip ??
-                        "Reset this filter"
+                        resetFilterButtonOverrides.tooltip ?? "Remove filter"
                       }
                       tooltipSide={
                         resetFilterButtonOverrides.tooltipSide ?? "top"
@@ -1091,7 +1076,7 @@ export function AdvanceFilter({
                           "string" &&
                         resetFilterButtonOverrides["aria-label"].trim() !== ""
                           ? resetFilterButtonOverrides["aria-label"]
-                          : `Reset filter ${index + 1}`
+                          : `Remove filter ${index + 1}`
                       }
                       onAction={() => {
                         resetFilterRule(rule.id);
@@ -1198,7 +1183,7 @@ export function AdvanceFilter({
                           resetSortButtonOverrides.iconOnlyTone ?? true
                         }
                         tooltip={
-                          resetSortButtonOverrides.tooltip ?? "Reset this sort"
+                          resetSortButtonOverrides.tooltip ?? "Remove sort"
                         }
                         tooltipSide={
                           resetSortButtonOverrides.tooltipSide ?? "top"
@@ -1211,7 +1196,7 @@ export function AdvanceFilter({
                             "string" &&
                           resetSortButtonOverrides["aria-label"].trim() !== ""
                             ? resetSortButtonOverrides["aria-label"]
-                            : `Reset sort ${index + 1}`
+                            : `Remove sort ${index + 1}`
                         }
                         onAction={() => {
                           resetSortRule(rule.id);
