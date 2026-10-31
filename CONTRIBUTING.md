@@ -15,7 +15,7 @@ This repository provides the standalone `@keytuno/ui-react` package used by Keyt
 
 ## Release Contributor Record
 
-1. v1.0.0 contributor: Mayur Patil.
+1. v2.0.0 contributor: Mayur Patil.
 2. Contact: mayurpatil60@gmail.com.
 3. Profile: https://github.com/mayurpatil60.
 

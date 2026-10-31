@@ -23,10 +23,10 @@ This repository has completed Phase 1 (standalone skeleton), Phase 2 (source mig
 ## Install (private GitHub tag)
 
 ```bash
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.0
+pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v2.0.0
 
 # or use SSH if your local git auth is SSH-based
-pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v1.0.0
+pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v2.0.0
 ```
 
 Peer dependencies:
@@ -103,12 +103,12 @@ pnpm storybook
 ## Release Notes Process (lightweight)
 
 1. Keep a short summary in commit messages for each phase.
-2. Tag stable milestones (for example: v1.0.0, v1.0.1).
+2. Tag stable milestones (for example: v2.0.0, v2.0.1).
 3. Update this README when install instructions or package scope changes.
 
 Release baseline (Phase 5):
 
-1. First stable release tag prepared: v1.0.0.
+1. Latest release tag: v2.0.0 (see `docs/releases/v2.0.0.md`).
 2. Standard release validation gate:
 
 ```bash
@@ -122,17 +122,15 @@ pnpm size
 pnpm audit --prod --audit-level high
 ```
 
-## Quality Snapshot (2026-07-01)
+## Quality Snapshot (2026-10-31)
 
-Release verification status for v1.0.0:
+Release verification status for v2.0.0:
 
 1. `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
 2. `pnpm typecheck`: pass.
-3. `pnpm test`: pass (current suite includes Spinner, AdvanceFilter interaction, and file utility coverage; 8 tests).
+3. `pnpm test`: pass (8 tests: Spinner, AdvanceFilter interaction, and file utility coverage).
 4. `pnpm build`: pass.
-5. `pnpm build-storybook`: pass.
-6. `pnpm size`: pass all configured size budgets.
-7. `pnpm audit --prod --audit-level high`: no known vulnerabilities.
+5. `pnpm size`: pass all configured size budgets.
 
 Recommended next hardening before larger rollout:
 
@@ -140,15 +138,15 @@ Recommended next hardening before larger rollout:
 2. Increase test coverage for stateful and composite components (Select, DatePicker, Dialog, DropdownMenu, Table, FileUpload).
 3. Add Playwright smoke scenarios for reusable components rendered multiple times on one page.
 
-## Unreleased Changes on `main` (after the v1.0.0 tag)
+## Changes in v2.0.0 (since v1.0.0)
 
-The `v1.0.0` tag points to the 2026-07-01 release commit. Everything below landed on `main` afterwards and is NOT part of `#v1.0.0`; cut a new tag to ship it.
+Full notes: `docs/releases/v2.0.0.md`. The `v1.0.0` tag points to the 2026-07-01 release commit and does not include the items below.
 
 1. Fixed AdvanceFilter rule removal behavior so newly added filter rows can be removed immediately, including when only one filter row exists.
 2. Aligned per-row remove control labels for accessibility clarity (`Remove filter N` and `Remove sort N`).
 3. Added regression tests for add/remove filter and sort row flows in `AdvanceFilter`.
 4. Refreshed semantic color tokens, soft variant surfaces, borderless Badge/BadgeSelect, and button tone/hover behavior (see the token list above).
-5. BREAKING: removed the `@keytuno/ui-react/addons/table-exporters` subpath export and the optional `jspdf`, `jspdf-autotable`, and `xlsx` peer dependencies that shipped in `v1.0.0`. Release the next tag as a major version, or restore the export, per the SemVer policy in `docs/OPERATIONS.md`.
+5. BREAKING: removed the `@keytuno/ui-react/addons/table-exporters` subpath export and the optional `jspdf`, `jspdf-autotable`, and `xlsx` peer dependencies that shipped in `v1.0.0`. This is why the release is a major version (`v2.0.0`).
 6. `AdaptiveCard` link/media fields, `FilePreview`, and `FileUpload` now reject unsafe URL schemes (`javascript:` and similar), and `FileUpload` enforces `accept` on drag-and-drop.
 
 ## Testing Guidance for Reusable Components
@@ -273,7 +271,7 @@ git config --global url."https://x-access-token:${KEYTUNO_UI_READ_TOKEN}@github.
 npm install --legacy-peer-deps
 ```
 
-## Release Contributor (v1.0.0)
+## Release Contributor (v2.0.0)
 
 1. Name: Mayur Patil
 2. Email: mayurpatil60@gmail.com

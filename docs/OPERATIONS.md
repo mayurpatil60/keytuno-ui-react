@@ -4,11 +4,11 @@
 
 This document defines the release policy, version bump rules, and rollback steps for `@keytuno/ui-react`.
 
-Current stable release: `v1.0.0`.
+Current stable release: `v2.0.0`.
 
 ## Release Ownership
 
-1. Release contributor for v1.0.0: Mayur Patil.
+1. Release contributor for v2.0.0: Mayur Patil.
 2. Contact email: mayurpatil60@gmail.com.
 3. GitHub profile: https://github.com/mayurpatil60.
 
@@ -67,7 +67,7 @@ git ls-tree -r --name-only vX.Y.Z dist/index.js dist/index.d.ts
 ```bash
 pnpm version <patch|minor|major> --no-git-tag-version
 # or explicit version
-pnpm version 1.0.0 --no-git-tag-version
+pnpm version 2.0.0 --no-git-tag-version
 pnpm build
 git add package.json pnpm-lock.yaml docs/ README.md dist/
 git commit -m "release(ui-react): prepare vX.Y.Z"
