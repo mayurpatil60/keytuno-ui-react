@@ -56,7 +56,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 ```
 
-This avoids common red diagnostics such as unresolved `@keytuno/ui-react` imports in story files and implicit-any callback parameters.
+This avoids common red diagnostics such as unresolved `@keytuno/ui-react` imports in story files and implicit-any callback parameters. Storybook still resolves `@keytuno/ui-react` at runtime through the alias in `.storybook/main.ts`, so older stories using the package name keep working.
 
 ---
 
@@ -134,6 +134,7 @@ const activeTheme = resolveTheme('light');
 | `--ktn-button-destructive-bg` | Destructive button background |
 | `--ktn-button-destructive-fg` | Destructive button text color |
 | `--ktn-radius-sm/md/lg/pill` | Border radii |
+| `--ktn-space-xs/sm/md/lg/xl` | Spacing scale |
 | `--ktn-shadow-sm/md` | Box shadows |
 
 ### Custom theme / subtheme
@@ -201,7 +202,7 @@ Release baseline: `@keytuno/ui-react` v1.0.0.
 
 - `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
 - `pnpm typecheck`: pass.
-- `pnpm test`: pass (2 tests in `Spinner.test.tsx`).
+- `pnpm test`: pass (8 tests: Spinner, AdvanceFilter, file utilities).
 - `pnpm build`: pass.
 - `pnpm build-storybook`: pass.
 - `pnpm size`: pass all configured bundle budgets.
@@ -210,7 +211,7 @@ Release baseline: `@keytuno/ui-react` v1.0.0.
 Follow-up quality debt before broader adoption:
 
 - Reduce lint warnings (primarily hook dependency warnings and unused symbols).
-- Increase unit/integration coverage beyond the current spinner-only test file.
+- Increase unit/integration coverage for stateful and composite components (Select, DatePicker, Dialog, DropdownMenu, Table, FileUpload).
 
 ---
 
@@ -483,8 +484,8 @@ import { Tooltip } from '@keytuno/ui-react';
   side?={'left'|'top'|'bottom'|'right'|'auto'}
   size?={'xs'|'sm'|'md'|'lg'}
   disabled?={boolean}
-  openDelay?={number}               // ms, default 400
-  closeDelay?={number}
+  openDelay?={number}               // ms, default 120
+  closeDelay?={number}              // ms, default 70
   onAction?={(ctx: TooltipActionContext) => void}
 >
   <Button>Hover me</Button>
@@ -783,11 +784,15 @@ import { Pagination } from '@keytuno/ui-react';
   pageSizeSelectVariant?={'inline'|'overlay'} // default 'inline' for page-size selector
   page?={number}                    // 1-based current page
   defaultPage?={number}
-  totalPages={number}
+  totalPages?={number}              // default 1
   pageSize?={number}
+  defaultPageSize?={number}
   pageSizeOptions?={number[]}       // default [12, 24, 48]
   onPageChange?={(page: number) => void}
   onPageSizeChange?={(size: number) => void}
+  onAction?={(context: PaginationActionContext) => void}
+  disabled?={boolean}
+  resetPageOnPageSizeChange?={boolean} // default true
   maxVisiblePages?={number}
   showPageSizeSelector?={boolean}
   showSummary?={boolean}
@@ -857,6 +862,7 @@ interface TabsItem {
   side?={'left'|'top'|'bottom'|'right'}
   disabled?={boolean}
   emptyText?={ReactNode}
+  onAction?={(ctx: TabsActionContext) => void}
 />
 ```
 
@@ -1533,6 +1539,7 @@ import { Alert, AlertTitle, AlertDescription, AlertAction } from '@keytuno/ui-re
   closeButtonLabel?={string}
   customColors?={{ backgroundColor, borderColor, titleColor, descriptionColor, actionColor }}
   viewportInset?={number | { top, right, bottom, left }}
+  onAction?={(ctx: AlertActionContext) => void}
 >
   <AlertTitle>Saved!</AlertTitle>
   <AlertDescription>Your changes have been saved.</AlertDescription>
@@ -1963,6 +1970,7 @@ type AdaptiveCardActionLayout = 'own-row' | 'same-row';
 //   - Other field rows keep full-width card layout (no full-height side action column).
 // - One-card-per-row enterprise mode: set `columns={1}` and optionally enable `virtualized`.
 // - Uses inbuilt primitives (Card, Button, Badge, Progress, DropdownMenu, Scrollbar).
+// - `link`/`media` fields only render clickable anchors for relative URLs and http, https, blob, data, mailto, and tel schemes; other schemes (for example `javascript:`) render as plain text.
 // - Storybook references:
 //   - Basic
 //   - Virtualized One Column
@@ -2036,6 +2044,8 @@ import { FilePreview } from '@keytuno/ui-react';
   typeDescriptionFormatter?={(typeLabel: string) => ReactNode}
   imageInteractionHint?={ReactNode}
   defaultInteractionHint?={ReactNode}
+  showLinkIcons?={boolean}
+  linkButtonStyle?={CSSProperties}
   disabled?={boolean}
   closeOnOverlayClick?={boolean}
   closeOnEscape?={boolean}
@@ -2074,6 +2084,11 @@ interface FileListItem {
   showMimeType?={boolean}
   showBytes?={boolean}
   onRemove?={(file: FileListItem, index: number) => void}
+  compactChipProps?={Omit<BadgeProps, 'children'>}
+  virtualized?={boolean}
+  virtualizedMaxHeight?={CSSProperties['maxHeight']}
+  virtualizedEstimateSize?={number}
+  virtualizedOverscan?={number}
 />
 ```
 
@@ -2128,7 +2143,7 @@ interface FileUploadProfileConfig {
   invalid?={boolean}
   errorMessage?={ReactNode}
   multiple?={boolean}
-  accept?={string}                  // MIME type or extension filter, e.g. 'image/*,.pdf'
+  accept?={string}                  // MIME type or extension filter, e.g. 'image/*,.pdf'; also enforced for drag-and-drop
   disabled?={boolean}
   placeholder?={ReactNode}
   dropzoneHint?={ReactNode}

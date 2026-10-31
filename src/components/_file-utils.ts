@@ -90,6 +90,69 @@ export function getMimeTypeFromDataUrl(src: string): string | undefined {
   return header.slice(0, semicolonIndex).toLowerCase();
 }
 
+const safeUrlSchemes = new Set([
+  "http",
+  "https",
+  "blob",
+  "data",
+  "mailto",
+  "tel",
+]);
+
+/**
+ * Returns `true` for relative URLs and absolute URLs using an allow-listed
+ * scheme. Rejects `javascript:`, `vbscript:` and other executable schemes.
+ */
+export function isSafeUrl(url: string): boolean {
+  // Browsers ignore whitespace/control characters inside the scheme.
+  const compact = Array.from(url)
+    .filter((char) => {
+      const code = char.charCodeAt(0);
+      return code > 32 && code !== 127;
+    })
+    .join("");
+  const schemeMatch = /^([a-z][a-z0-9+.-]*):/i.exec(compact);
+
+  if (schemeMatch == null) {
+    return true;
+  }
+
+  return safeUrlSchemes.has((schemeMatch[1] as string).toLowerCase());
+}
+
+/**
+ * Checks a file against an HTML `accept` list (extensions, exact MIME types
+ * and `type/*` wildcards). An empty list accepts every file.
+ */
+export function matchesAccept(
+  file: { name: string; type: string },
+  accept: string,
+): boolean {
+  const tokens = accept
+    .split(",")
+    .map((token) => token.trim().toLowerCase())
+    .filter((token) => token !== "");
+
+  if (tokens.length === 0) {
+    return true;
+  }
+
+  const fileName = file.name.toLowerCase();
+  const fileType = file.type.toLowerCase();
+
+  return tokens.some((token) => {
+    if (token.startsWith(".")) {
+      return fileName.endsWith(token);
+    }
+
+    if (token.endsWith("/*")) {
+      return fileType.startsWith(token.slice(0, -1));
+    }
+
+    return fileType === token;
+  });
+}
+
 /**
  * Resolves a human-readable filename from a URL or raw path.
  * Falls back to `"Untitled file"` when no path segment is found.

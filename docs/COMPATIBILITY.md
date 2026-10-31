@@ -40,7 +40,7 @@ pnpm build-storybook
 2. Keep component behavior stable while adjusting internals for React API changes.
 3. If runtime behavior changes for consumers, release as a major version.
 
-## API Consistency Notes (v1.0.0)
+## API Consistency Notes (v1.0.0, items 5-10 are unreleased on `main`)
 
 1. Most stateful components expose direct change callbacks and `onAction(context)`.
 2. Event-style `onAction(event)` remains intentional for `Button`, `Badge`, `Avatar`, and item-level actions in `Breadcrumb`, `Navbar`, and `Sidebar`.
@@ -74,7 +74,7 @@ pnpm build-storybook
 	- label text
 	- scoped `data-testid`
 	- avoid positional/index-only selectors
-5. In this library repository's Storybook files, import from local source exports (`../src/index`) rather than `@keytuno/ui-react` to avoid local module-resolution red diagnostics.
+5. In this library repository's Storybook files, prefer local source exports (`../src/index`) over `@keytuno/ui-react`. Storybook resolves both (alias in `.storybook/main.ts`), but the package name shows unresolved-module diagnostics in the editor because `tsconfig.json` has no path mapping; some existing stories and `.storybook/preview.ts` still use the package name.
 6. Keep story typings as `Meta<typeof Component>` and `StoryObj<typeof meta>` to preserve typed `render(args)` signatures and avoid implicit-any issues.
 
 ## Vite and Storybook Upgrade Guidance

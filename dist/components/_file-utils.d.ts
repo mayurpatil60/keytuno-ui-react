@@ -17,9 +17,22 @@ declare function getLowerFileExtension(fileNameOrUrl: string): string;
  */
 declare function getMimeTypeFromDataUrl(src: string): string | undefined;
 /**
+ * Returns `true` for relative URLs and absolute URLs using an allow-listed
+ * scheme. Rejects `javascript:`, `vbscript:` and other executable schemes.
+ */
+declare function isSafeUrl(url: string): boolean;
+/**
+ * Checks a file against an HTML `accept` list (extensions, exact MIME types
+ * and `type/*` wildcards). An empty list accepts every file.
+ */
+declare function matchesAccept(file: {
+    name: string;
+    type: string;
+}, accept: string): boolean;
+/**
  * Resolves a human-readable filename from a URL or raw path.
  * Falls back to `"Untitled file"` when no path segment is found.
  */
 declare function resolveFileName(source: string): string;
 
-export { audioExtensions, getLowerFileExtension, getMimeTypeFromDataUrl, imageExtensions, resolveFileName, spreadsheetExtensions, videoExtensions };
+export { audioExtensions, getLowerFileExtension, getMimeTypeFromDataUrl, imageExtensions, isSafeUrl, matchesAccept, resolveFileName, spreadsheetExtensions, videoExtensions };

@@ -146,6 +146,9 @@ export function Accordion({
   const itemIds = useMemo(() => new Set(items.map((item) => item.id)), [items]);
   const accordionId = useId();
   const triggerRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const onOpenItemsChangeRef = useRef(onOpenItemsChange);
+
+  onOpenItemsChangeRef.current = onOpenItemsChange;
 
   const [openItemIds, setOpenItemIds] = useState<string[]>(() =>
     normalizeDefaultOpenItems(defaultOpenItems, itemIds, multiple),
@@ -166,8 +169,8 @@ export function Accordion({
   }, [itemIds, multiple]);
 
   useEffect(() => {
-    onOpenItemsChange?.(openItemIds);
-  }, [onOpenItemsChange, openItemIds]);
+    onOpenItemsChangeRef.current?.(openItemIds);
+  }, [openItemIds]);
 
   function toggleItem(itemId: string, itemDisabled: boolean): void {
     if (disabled || itemDisabled) {

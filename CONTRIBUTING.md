@@ -65,7 +65,7 @@ For reusable component changes (especially components rendered multiple times pe
 2. Avoid exporting internal-only helpers from `src/index.ts`.
 3. Prefer token-driven styles over hardcoded colors to keep themes consistent.
 4. Document any new prop, token, or behavior change in repository docs.
-5. When adding or tuning color states (including variant soft backgrounds like `actionPrimarySoftBackground` or button tones like `buttonPrimaryBackground`), extend `SemanticColorTokens`, map them in `themeToCssVariables`, and update token docs in `README.md` and `docs/keytuno-ui-react.md` in the same PR.
+5. When adding or tuning color states (including variant soft backgrounds like `actionPrimarySoftBackground` or button tones like `buttonPrimaryBackground`), extend `SemanticColorTokens`, add defaults in `createSemanticColors` (and values in `light`/`dark` themes), map them in `themeToCssVariables`, and update token docs in `README.md` and `docs/keytuno-ui-react.md` in the same PR.
 
 ## Commit and Release Hygiene
 

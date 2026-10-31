@@ -14,7 +14,7 @@ Current stable release: `v1.0.0`.
 
 ## Versioning Policy
 
-The package uses Semantic Versioning.
+The package uses Semantic Versioning. Release tags use the `vX.Y.Z` form (legacy tags `0.1.0` and `0.1.1` without the `v` prefix exist and should not be used by consumers).
 
 1. Patch (`x.y.Z`): bug fixes, docs updates, build/config updates, and non-breaking style adjustments.
 2. Minor (`x.Y.z`): new components, additive props, additive theme tokens, and non-breaking behavior additions.
@@ -48,7 +48,6 @@ pnpm audit --prod --audit-level high
    - `docs/keytuno-ui-react.md` (theme list, token references, and component variant unions)
    - `docs/COMPATIBILITY.md` (if version ranges or framework support changed)
    - `docs/releases/*.md` (when release notes need additive token/variant change history)
-   - `keytuno-ui-library.md` phase or release execution record
    - When semantic tokens change, ensure docs and adapter mappings include all related CSS vars (for example: `--ktn-bg-hover`, `--ktn-bg-selected`, `--ktn-border-strong`, `--ktn-action-danger-bg`, `--ktn-action-danger-fg`, `--ktn-action-primary-soft-bg`, `--ktn-action-success-soft-bg`, `--ktn-action-warning-soft-bg`, `--ktn-action-accent-soft-bg`, `--ktn-action-danger-soft-bg`, `--ktn-button-default-bg`, `--ktn-button-default-fg`, `--ktn-button-default-border`, `--ktn-button-primary-bg`, `--ktn-button-primary-fg`, `--ktn-button-success-bg`, `--ktn-button-success-fg`, `--ktn-button-warning-bg`, `--ktn-button-warning-fg`, `--ktn-button-accent-bg`, `--ktn-button-accent-fg`, `--ktn-button-destructive-bg`, `--ktn-button-destructive-fg`)
 
 5. Git-tag payload sanity checks pass:
@@ -63,12 +62,16 @@ git ls-tree -r --name-only vX.Y.Z dist/index.js dist/index.d.ts
 ## Release Procedure
 
 1. Confirm current package version in `package.json`.
-2. Apply version bump:
+2. Apply version bump without letting the package manager tag early, then rebuild and commit `dist/` (consumers install the git tag, so `dist/` must match the tagged source):
 
 ```bash
-pnpm version <patch|minor|major>
+pnpm version <patch|minor|major> --no-git-tag-version
 # or explicit version
 pnpm version 1.0.0 --no-git-tag-version
+pnpm build
+git add package.json pnpm-lock.yaml docs/ README.md dist/
+git commit -m "release(ui-react): prepare vX.Y.Z"
+git tag -a vX.Y.Z -m "release: @keytuno/ui-react vX.Y.Z"
 ```
 
 3. Push commit and tag:

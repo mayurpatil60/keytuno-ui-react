@@ -128,7 +128,7 @@ Release verification status for v1.0.0:
 
 1. `pnpm lint`: pass with warnings only (0 errors, 24 warnings).
 2. `pnpm typecheck`: pass.
-3. `pnpm test`: pass (current suite includes Spinner and AdvanceFilter interaction coverage).
+3. `pnpm test`: pass (current suite includes Spinner, AdvanceFilter interaction, and file utility coverage; 8 tests).
 4. `pnpm build`: pass.
 5. `pnpm build-storybook`: pass.
 6. `pnpm size`: pass all configured size budgets.
@@ -140,11 +140,16 @@ Recommended next hardening before larger rollout:
 2. Increase test coverage for stateful and composite components (Select, DatePicker, Dialog, DropdownMenu, Table, FileUpload).
 3. Add Playwright smoke scenarios for reusable components rendered multiple times on one page.
 
-## Post-Release Maintenance Update (2026-07-31)
+## Unreleased Changes on `main` (after the v1.0.0 tag)
+
+The `v1.0.0` tag points to the 2026-07-01 release commit. Everything below landed on `main` afterwards and is NOT part of `#v1.0.0`; cut a new tag to ship it.
 
 1. Fixed AdvanceFilter rule removal behavior so newly added filter rows can be removed immediately, including when only one filter row exists.
 2. Aligned per-row remove control labels for accessibility clarity (`Remove filter N` and `Remove sort N`).
 3. Added regression tests for add/remove filter and sort row flows in `AdvanceFilter`.
+4. Refreshed semantic color tokens, soft variant surfaces, borderless Badge/BadgeSelect, and button tone/hover behavior (see the token list above).
+5. BREAKING: removed the `@keytuno/ui-react/addons/table-exporters` subpath export and the optional `jspdf`, `jspdf-autotable`, and `xlsx` peer dependencies that shipped in `v1.0.0`. Release the next tag as a major version, or restore the export, per the SemVer policy in `docs/OPERATIONS.md`.
+6. `AdaptiveCard` link/media fields, `FilePreview`, and `FileUpload` now reject unsafe URL schemes (`javascript:` and similar), and `FileUpload` enforces `accept` on drag-and-drop.
 
 ## Testing Guidance for Reusable Components
 
@@ -193,10 +198,10 @@ pnpm version minor --no-git-tag-version
 pnpm version major --no-git-tag-version
 ```
 
-4. Commit release changes:
+4. Commit release changes (`dist/` is tracked and consumed through the git tag, so it must be rebuilt in step 2 and committed):
 
 ```bash
-git add package.json pnpm-lock.yaml README.md docs/
+git add package.json pnpm-lock.yaml README.md docs/ dist/
 git commit -m "release(ui-react): prepare v1.0.1"
 ```
 

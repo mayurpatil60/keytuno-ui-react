@@ -27,6 +27,7 @@ import {
   getLowerFileExtension,
   getMimeTypeFromDataUrl,
   imageExtensions,
+  isSafeUrl,
   resolveFileName,
   spreadsheetExtensions,
   videoExtensions,
@@ -591,7 +592,7 @@ export function FilePreview({
   }
 
   function openInNewTab(): void {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && isSafeUrl(src)) {
       window.open(src, "_blank", "noopener,noreferrer");
     }
   }
@@ -633,7 +634,7 @@ export function FilePreview({
       );
     }
 
-    if (resolvedType === "pdf") {
+    if (resolvedType === "pdf" && isSafeUrl(src)) {
       return (
         <iframe
           title={`Preview ${fileName}`}

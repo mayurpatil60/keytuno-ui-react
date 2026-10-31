@@ -42,7 +42,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/<owner>/keytuno-ui-react.git"
+    "url": "git+https://github.com/mayurpatil60/keytuno-ui-react.git"
   },
   "license": "UNLICENSED",
   "files": [

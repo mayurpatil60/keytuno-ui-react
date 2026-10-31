@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "./DropdownMenu";
 import { FiMoreVertical } from "./icons/feather";
+import { isSafeUrl } from "./_file-utils";
 import { Progress, type ProgressSize } from "./Progress";
 import { Scrollbar } from "./Scrollbar";
 
@@ -1017,6 +1018,10 @@ export function AdaptiveCard<TData extends object = object>({
       );
     }
 
+    if (!isSafeUrl(mediaValue.src)) {
+      return mediaValue.src;
+    }
+
     return (
       <a
         href={mediaValue.src}
@@ -1075,6 +1080,10 @@ export function AdaptiveCard<TData extends object = object>({
 
       if (href.trim() === "") {
         return "-";
+      }
+
+      if (!isSafeUrl(href)) {
+        return href;
       }
 
       return (

@@ -13,6 +13,8 @@ import {
 
 import { FiUploadCloud, FiX } from "./icons/feather";
 
+import { matchesAccept } from "./_file-utils";
+
 import { Button, type ButtonProps } from "./Button";
 import {
   Dialog,
@@ -726,7 +728,10 @@ export function FileUpload({
       return;
     }
 
-    const selectedFiles = Array.from(fileList);
+    // Drag-and-drop bypasses the native input `accept` filter, so enforce it here.
+    const selectedFiles = Array.from(fileList).filter((file) =>
+      matchesAccept(file, resolvedAccept ?? ""),
+    );
 
     if (selectedFiles.length === 0) {
       return;
