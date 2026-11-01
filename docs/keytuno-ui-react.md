@@ -94,48 +94,48 @@ const activeTheme = resolveTheme('light');
 
 ### CSS variable reference
 
-| Variable | Purpose |
-|---|---|
-| `--ktn-bg-default` | Page background |
-| `--ktn-bg-surface` | Card / panel background |
-| `--ktn-bg-muted` | Subtle background (hover, striped rows) |
-| `--ktn-bg-hover` | Interactive hover surface tone |
-| `--ktn-bg-selected` | Interactive selected/active surface tone |
-| `--ktn-text-primary` | Primary text |
-| `--ktn-text-secondary` | Secondary / muted text |
-| `--ktn-border-muted` | Default border |
-| `--ktn-border-strong` | Focused / emphasized border |
-| `--ktn-action-primary-bg` | Primary button / accent color |
-| `--ktn-action-primary-fg` | Text on primary button |
+| Variable                       | Purpose                                          |
+| ------------------------------ | ------------------------------------------------ |
+| `--ktn-bg-default`             | Page background                                  |
+| `--ktn-bg-surface`             | Card / panel background                          |
+| `--ktn-bg-muted`               | Subtle background (hover, striped rows)          |
+| `--ktn-bg-hover`               | Interactive hover surface tone                   |
+| `--ktn-bg-selected`            | Interactive selected/active surface tone         |
+| `--ktn-text-primary`           | Primary text                                     |
+| `--ktn-text-secondary`         | Secondary / muted text                           |
+| `--ktn-border-muted`           | Default border                                   |
+| `--ktn-border-strong`          | Focused / emphasized border                      |
+| `--ktn-action-primary-bg`      | Primary button / accent color                    |
+| `--ktn-action-primary-fg`      | Text on primary button                           |
 | `--ktn-action-primary-soft-bg` | Primary soft surface (light variant backgrounds) |
-| `--ktn-action-success-bg` | Success action color (green) |
-| `--ktn-action-success-fg` | Text on success actions |
+| `--ktn-action-success-bg`      | Success action color (green)                     |
+| `--ktn-action-success-fg`      | Text on success actions                          |
 | `--ktn-action-success-soft-bg` | Success soft surface (light variant backgrounds) |
-| `--ktn-action-warning-bg` | Warning action color (yellow) |
-| `--ktn-action-warning-fg` | Text on warning actions |
+| `--ktn-action-warning-bg`      | Warning action color (yellow)                    |
+| `--ktn-action-warning-fg`      | Text on warning actions                          |
 | `--ktn-action-warning-soft-bg` | Warning soft surface (light variant backgrounds) |
-| `--ktn-action-accent-bg` | Accent action color (rose) |
-| `--ktn-action-accent-fg` | Text on accent actions |
-| `--ktn-action-accent-soft-bg` | Accent soft surface (light variant backgrounds) |
-| `--ktn-action-danger-bg` | Destructive / danger color |
-| `--ktn-action-danger-fg` | Text on danger button |
-| `--ktn-action-danger-soft-bg` | Danger soft surface (light variant backgrounds) |
-| `--ktn-button-default-bg` | Secondary/default button background |
-| `--ktn-button-default-fg` | Secondary/default button text color |
-| `--ktn-button-default-border` | Secondary/default button border color |
-| `--ktn-button-primary-bg` | Primary button background |
-| `--ktn-button-primary-fg` | Primary button text color |
-| `--ktn-button-success-bg` | Success button background |
-| `--ktn-button-success-fg` | Success button text color |
-| `--ktn-button-warning-bg` | Warning button background |
-| `--ktn-button-warning-fg` | Warning button text color |
-| `--ktn-button-accent-bg` | Accent button background |
-| `--ktn-button-accent-fg` | Accent button text color |
-| `--ktn-button-destructive-bg` | Destructive button background |
-| `--ktn-button-destructive-fg` | Destructive button text color |
-| `--ktn-radius-sm/md/lg/pill` | Border radii |
-| `--ktn-space-xs/sm/md/lg/xl` | Spacing scale |
-| `--ktn-shadow-sm/md` | Box shadows |
+| `--ktn-action-accent-bg`       | Accent action color (rose)                       |
+| `--ktn-action-accent-fg`       | Text on accent actions                           |
+| `--ktn-action-accent-soft-bg`  | Accent soft surface (light variant backgrounds)  |
+| `--ktn-action-danger-bg`       | Destructive / danger color                       |
+| `--ktn-action-danger-fg`       | Text on danger button                            |
+| `--ktn-action-danger-soft-bg`  | Danger soft surface (light variant backgrounds)  |
+| `--ktn-button-default-bg`      | Secondary/default button background              |
+| `--ktn-button-default-fg`      | Secondary/default button text color              |
+| `--ktn-button-default-border`  | Secondary/default button border color            |
+| `--ktn-button-primary-bg`      | Primary button background                        |
+| `--ktn-button-primary-fg`      | Primary button text color                        |
+| `--ktn-button-success-bg`      | Success button background                        |
+| `--ktn-button-success-fg`      | Success button text color                        |
+| `--ktn-button-warning-bg`      | Warning button background                        |
+| `--ktn-button-warning-fg`      | Warning button text color                        |
+| `--ktn-button-accent-bg`       | Accent button background                         |
+| `--ktn-button-accent-fg`       | Accent button text color                         |
+| `--ktn-button-destructive-bg`  | Destructive button background                    |
+| `--ktn-button-destructive-fg`  | Destructive button text color                    |
+| `--ktn-radius-sm/md/lg/pill`   | Border radii                                     |
+| `--ktn-space-xs/sm/md/lg/xl`   | Spacing scale                                    |
+| `--ktn-shadow-sm/md`           | Box shadows                                      |
 
 ### Custom theme / subtheme
 
