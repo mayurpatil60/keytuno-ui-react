@@ -23,10 +23,7 @@ This repository has completed Phase 1 (standalone skeleton), Phase 2 (source mig
 ## Install (private GitHub tag)
 
 ```bash
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v2.0.0
-
-# or use SSH if your local git auth is SSH-based
-pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v2.0.0
+pnpm add github:mayurpatil60/keytuno-ui-react#v2.0.0
 ```
 
 Peer dependencies:
@@ -229,17 +226,13 @@ Example target tag: `v1.0.1`
 1. Install from GitHub tag in consumer project:
 
 ```bash
-# HTTPS (recommended for CI and token-based auth)
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.1
-
-# or SSH (developer machine with SSH key auth)
-pnpm add git+ssh://git@github.com/mayurpatil60/keytuno-ui-react.git#v1.0.1
+pnpm add github:mayurpatil60/keytuno-ui-react#v1.0.1
 ```
 
 2. npm-based consumer apps can use:
 
 ```bash
-npm install "git+https://github.com/mayurpatil60/keytuno-ui-react.git#v1.0.1"
+npm install "github:mayurpatil60/keytuno-ui-react#v1.0.1"
 ```
 
 3. If the dependency already exists, update tag in `package.json` and reinstall:

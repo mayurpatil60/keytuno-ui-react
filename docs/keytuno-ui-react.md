@@ -8,7 +8,7 @@
 
 ```bash
 # private GitHub tag install (current recommended release path)
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#v2.0.0
+pnpm add github:mayurpatil60/keytuno-ui-react#v2.0.0
 
 # optional registry install (only if your environment publishes @keytuno/ui-react)
 pnpm add @keytuno/ui-react

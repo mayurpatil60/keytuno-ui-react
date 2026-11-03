@@ -90,7 +90,7 @@ git ls-tree -r --name-only vX.Y.Z dist/index.js dist/index.d.ts
 5. Verify tag install in a consumer app:
 
 ```bash
-pnpm add git+https://github.com/mayurpatil60/keytuno-ui-react.git#vX.Y.Z
+pnpm add github:mayurpatil60/keytuno-ui-react#vX.Y.Z
 ```
 
 6. Verify reusable-component behavior in consumer app test flows:
